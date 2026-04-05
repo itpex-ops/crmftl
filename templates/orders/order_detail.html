@@ -1,0 +1,123 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5>Order Details - {{ order.order_no }}</h5>
+            <span class="badge bg-success">{{ order.order_status|capfirst }}</span>
+        </div>
+
+        <div class="card-body">
+            <!-- CUSTOMER DETAILS -->
+            <h6 class="text-success mb-3">👤 Customer Details</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label>Name</label>
+                    <input class="form-control" value="{{ order.customer_name }}" disabled>
+                </div>
+                <div class="col-md-4">
+                    <label>Contact</label>
+                    <input class="form-control" value="{{ order.customer_contact }}" disabled>
+                </div>
+                <div class="col-md-4">
+                    <label>Vehicle Type</label>
+                    <input class="form-control" value="{{ order.vehicle_type }}" disabled>
+                </div>
+            </div>
+
+            <!-- ROUTES -->
+            <hr>
+            <h6>📍 Route</h6>
+            {% if order.routes %}
+                {% for r in order.routes %}
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-3">
+                            <label>Origin</label>
+                            <input class="form-control" value="{{ r.origin }}" disabled>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Destination</label>
+                            <input class="form-control" value="{{ r.destination }}" disabled>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No routes defined.</p>
+            {% endif %}
+
+            <!-- PRICING -->
+            <hr>
+            <h6 class="text-warning">💰 Pricing</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label>Final Rate</label>
+                    <input class="form-control" value="{{ order.final_rate }}" disabled>
+                </div>
+               
+                <div class="col-md-3">
+                    <label>GST %</label>
+                    <input class="form-control" value="{{ order.gst_percent }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label>Total Amount</label>
+                    <input class="form-control bg-light" value="{{ order.total_rate }}" disabled>
+                </div>
+            </div>
+
+            <!-- PAYMENT -->
+            <hr>
+            <h6>💳 Payment</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label>Payment Terms</label>
+                    <input class="form-control" value="{{ order.payment_terms }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label>Advance</label>
+                    <input class="form-control" value="{{ order.advance }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label>Balance</label>
+                    <input class="form-control" value="{{ order.balance }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label>Payment Status</label>
+                    <input class="form-control" value="{{ order.payment_status|capfirst }}" disabled>
+                </div>
+            </div>
+
+            <!-- VEHICLES -->
+            <hr>
+            <h6>🚚 Assigned Vehicles</h6>
+            {% if order.vehicles.all %}
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Vehicle No</th>
+                            <th>Driver</th>
+                            <th>Freight</th>
+                            <th>Advance</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in order.vehicles.all %}
+                            <tr>
+                                <td>{{ v.vehicle_number }}</td>
+                                <td>{{ v.driver_number }}</td>
+                                <td>{{ v.total_freight }}</td>
+                                <td>{{ v.advance }}</td>
+                                <td>{{ v.balance }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No vehicles assigned yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

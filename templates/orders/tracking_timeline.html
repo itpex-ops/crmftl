@@ -1,0 +1,132 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h4>📍 Tracking Timeline - {{ order.order_no }}</h4>
+
+    <div class="timeline mt-4">
+        {% for step in timeline %}
+        <div class="timeline-step {% if step.done %}completed{% else %}pending{% endif %}">
+            <div class="circle"></div>
+            <div class="line"></div>
+            <div class="content">
+                <label>
+                    <input type="checkbox" class="tracking-step" data-step="{{ step.key }}" {% if step.done %}checked{%
+                        endif %}>
+                    <strong>{{ step.name }}</strong>
+                </label>
+                {% if step.timestamp %}
+                <br><small>{{ step.timestamp|date:"d M Y H:i" }}</small>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-3">
+        <strong>Remarks:</strong>
+        <textarea id="remarks" class="form-control mt-2">{{ remarks }}</textarea>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        margin: 20px 0;
+        padding-left: 40px;
+    }
+
+    .timeline-step {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    .timeline-step .circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 1;
+    }
+
+    .timeline-step .line {
+        position: absolute;
+        left: 9px;
+        top: 20px;
+        width: 2px;
+        height: calc(100% - 20px);
+        background-color: #ccc;
+        z-index: 0;
+    }
+
+    .timeline-step.completed .circle {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .timeline-step.completed .line {
+        background-color: #28a745;
+    }
+
+    .timeline-step:last-child .line {
+        display: none;
+    }
+
+    .timeline-step .content {
+        margin-left: 40px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const orderId = '{{ order.id }}';
+        const csrfToken = '{{ csrf_token }}';
+
+        // Step checkboxes
+        document.querySelectorAll(".tracking-step").forEach(cb => {
+            cb.addEventListener("change", function () {
+                const step = this.dataset.step;
+                const checked = this.checked;
+
+                fetch("{% url 'tracking_ajax_update' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `order_id=${orderId}&step=${step}&checked=${checked}`
+                })
+                    .then(resp => resp.json())
+                    .then(data => {
+                        if (!data.success) { alert(data.error); cb.checked = !checked; }
+                        else if (data.timestamp) {
+                            const small = cb.closest(".content").querySelector("small");
+                            if (small) { small.textContent = `(${data.timestamp})`; }
+                        }
+                    });
+            });
+        });
+
+        // Remarks auto-save
+        const remarksBox = document.getElementById("remarks");
+        let timeout = null;
+        remarksBox.addEventListener("input", function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                fetch("{% url 'tracking_ajax_update' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `order_id=${orderId}&step=remarks&checked=true&remarks=${encodeURIComponent(this.value)}`
+                });
+            }, 800);
+        });
+    });
+</script>
+{% endblock %}

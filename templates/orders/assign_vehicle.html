@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <!-- HEADER -->
+        <div class="card-header bg-warning">
+            <h5>🚚 Assign Vehicle - {{ order.order_no }}</h5>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <!-- 🚚 BASIC -->
+                    <div class="col-md-4">
+                        <label>Vehicle Number</label>
+                        <input name="vehicle_number" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Driver Number</label>
+                        <input name="driver_number" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Owner Number</label>
+                        <input name="owner_number" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Source</label>
+                        <input name="source" class="form-control">
+                    </div>
+
+                    <!-- 💰 FREIGHT -->
+                    <div class="col-md-4">
+                        <label>Freight Amount</label>
+                        <input type="number" step="0.01" name="freight_amount" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Advance</label>
+                        <input type="number" step="0.01" name="advance" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Brokerage</label>
+                        <input type="number" step="0.01" name="brokerage" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Loading</label>
+                        <input type="number" step="0.01" name="loading" class="form-control">
+                    </div>
+
+                    <!-- 💳 PAYMENT -->
+                    <hr>
+                    <h6 class="text-primary">💳 UPI Payment Details</h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label>UPI App</label>
+                            <select name="upi_app" class="form-control">
+                                <option value="phonepe">📱 PhonePe</option>
+                                <option value="gpay">💰 Google Pay</option>
+                                <option value="paytm">🏦 Paytm</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>UPI ID / Number</label>
+                            <input name="upi_number" class="form-control" placeholder="example@upi">
+                        </div>
+
+                    </div>
+            
+ <h6 class="text-primary">💳 Account Details</h6>
+                    <div class="col-md-4">
+                        <label>Account Name</label>
+                        <input name="account_name" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Account Number</label>
+                        <input name="account_number" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>IFSC</label>
+                        <input name="ifsc" class="form-control">
+                    </div>
+                     <div class="col-md-4">
+                        <label>Saving / Current </label>
+                        <input name="ac_type" class="form-control">
+                    </div>
+
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="mt-4">
+
+                    <button class="btn btn-success">
+                        💾 Save Vehicle
+                    </button>
+
+                    <a href="{% url 'order_detail' order.id %}" class="btn btn-secondary">
+                        ⬅ Back
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

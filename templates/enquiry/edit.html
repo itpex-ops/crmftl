@@ -1,0 +1,307 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .window-card {
+        border-radius: 12px;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .window-header {
+        background: #1e293b;
+        color: white;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .window-actions button {
+        border: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        margin-left: 6px;
+        cursor: pointer;
+    }
+
+    .btn-close-circle {
+        background: #ef4444;
+    }
+
+    .btn-min {
+        background: #facc15;
+    }
+
+    .btn-max {
+        background: #22c55e;
+    }
+
+    .window-body {
+        padding: 20px;
+        background: white;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .fullscreen {
+        position: fixed;
+        top: 0;
+        left: 240px;
+        width: calc(100% - 240px);
+        height: 100%;
+        z-index: 999;
+        overflow-y: auto;
+    }
+</style>
+
+<div class="container mt-4">
+    <div id="windowBox" class="window-card">
+
+        <!-- HEADER -->
+        <div class="window-header">
+            <div>
+                {% if e.status == "pending_pitch1" %}
+                <span class="badge bg-warning">Pending for Pitch 1</span>
+                {% elif e.status == "pending_pitch2" %}
+                <span class="badge bg-info">Pending for Pitch 2</span>
+                {% elif e.status == "pending_pitch3" %}
+                <span class="badge bg-primary">Pending for Pitch 3</span>
+                {% elif e.status == "confirmed" %}
+                <span class="badge bg-success">Confirmed</span>
+                {% else %}
+                <span class="badge bg-light">Rejected</span>
+                {% endif %}
+            </div>
+
+            <h5>✏ Enquiry - {{ e.enquiry_no }}</h5>
+
+            <div>
+                {% if e.status == "confirmed" %}
+                <span class="badge bg-success">LOCKED</span>
+                {% else %}
+                <span class="badge bg-warning">PITCH IN PROGRESS</span>
+                {% endif %}
+            </div>
+
+            <div class="window-actions">
+                <button class="btn-min" onclick="minimizeWindow()"></button>
+                <button class="btn-max" onclick="maximizeWindow()"></button>
+                <button class="btn-close-circle" onclick="closeWindow()"></button>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="window-body">
+            <form method="POST">
+                {% csrf_token %}
+                <!-- CUSTOMER DETAILS -->
+                <h6 class="text-success mb-3">👤 Customer Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-4"><label>Customer Name</label><input value="{{ e.customer_name }}"
+                            class="form-control" disabled></div>
+                    <div class="col-md-4"><label>Mobile</label><input value="{{ e.customer_contact }}"
+                            class="form-control" disabled></div>
+                    <div class="col-md-4"><label>Email</label><input value="{{ e.email }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Lead Source</label><input value="{{ e.lead_source }}"
+                            class="form-control" disabled></div>
+                    <div class="col-md-3" id="reference_box"><label>Reference Name</label><input
+                            value="{{ e.reference_name }}" class="form-control" disabled></div>
+                    <div class="col-md-3"><label>Pickups</label><input value="{{ e.pickups }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Deliveries</label><input value="{{ e.deliveries }}"
+                            class="form-control" disabled></div>
+                </div>
+
+                <!-- ROUTE -->
+                <hr>
+                <h6>📍 Route</h6>
+                <div class="row g-3">
+                    {% for r in e.routes %}
+                    <div class="col-md-3"><label>Origin</label><input value="{{ r.origin }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Destination</label><input value="{{ r.destination }}"
+                            class="form-control" disabled></div>
+                    {% empty %}-{% endfor %}
+                    <div class="col-md-3"><label>KMs</label><input value="{{ e.kms }}" class="form-control" disabled>
+                    </div>
+                    <div class="col-md-3"><label>Vehicle Type</label><input value="{{ e.vehicle_type }}"
+                            class="form-control" disabled></div>
+                    <div class="col-md-3"><label>Vehicle Description</label><input value="{{ e.vehicle_description }}"
+                            class="form-control" disabled></div>
+                </div>
+
+                <!-- LOAD -->
+                <hr>
+                <h6 class="text-warning">📦 Load Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-3"><label>Pieces</label><input value="{{ e.pieces }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Tonnage</label><input value="{{ e.tonnage }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Breadth</label><input value="{{ e.breadth }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Height</label><input value="{{ e.height }}" class="form-control"
+                            disabled></div>
+                    <div class="col-md-3"><label>Width</label><input value="{{ e.width }}" class="form-control"
+                            disabled></div>
+                </div>
+
+                <!-- PITCH INPUTS -->
+                <hr>
+                <h6 class="text-warning">₹ Pitch / Rate Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-3"><label>Pitch 1</label><input name="pitch1" value="{{ e.pitch1 }}"
+                            placeholder="pitch1" class="form-control"></div>
+                    <div class="col-md-3"><label>Pitch 2</label><input name="pitch2" value="{{ e.pitch2 }}"
+                            placeholder="pitch2" class="form-control"></div>
+                    <div class="col-md-3"><label>Pitch 3</label><input name="pitch3" value="{{ e.pitch3 }}"
+                            placeholder="pitch3" class="form-control"></div>
+                </div>
+
+                <!-- REMARKS -->
+                <hr>
+                <div class="row g-3">
+                    <div class="col-md-9">
+                        <label>Remarks</label>
+                        <textarea name="remarks" class="form-control">{{ e.remarks }}</textarea>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-sm btn-success">✅ Save</button>
+                </div>
+                <!-- PRICING -->
+                {% if e.status == "confirmed" %}
+                <div id="pricing_section">
+                    <hr>
+                    <h6 class="text-success">💰 Pricing</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label>Choose Payment Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">Status</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="rate_mismatch">Mismatch</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Final Price</label><input name="finalized_rate" id="finalized_rate"
+                                class="form-control"></div>
+                        <div class="col-md-2"><label>GST</label><input name="gst_percent" value="{{ e.gstbill }}"
+                                id="gst_select" class="form-control" disabled></div>
+                        <div class="col-md-2"><label>Loading Charges </label><input name="loading_charges"
+                                value="{{e.loading_unloading}}" id="loading_charges" class="form-control"
+                                placeholder="Loading"></div>
+                        <div class="col-md-2"><label>Total Amount </label><input name="total_rate" id="total_rate"
+                                class="form-control bg-light" readonly placeholder="Total"></div>
+                    </div>
+                </div>
+
+                <hr>
+                <h6>💳 Payment</h6>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label></label>
+                        <select name="payment_terms" id="payment_terms" class="form-select">
+                            <option value="">Select</option>
+                            <option value="advance_balance">Advance</option>
+                            <option value="topay">Topay</option>
+                            <option value="full">Full</option>
+                            <option value="credit">Credit</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3"><label>Advance</label><input id="advance" name="advance"
+                            value="{{ e.advance }}" class="form-control"></div>
+                    <div class="col-md-3"><label>Balance</label><input id="balance" name="balance"
+                            value="{{ e.balance }}" class="form-control"></div>
+                    <div class="col-md-3"><label>Topay</label><input id="topay" name="topay" value="{{ e.topay }}"
+                            class="form-control"></div>
+                </div>
+                {% endif %}
+
+                <hr>
+
+                <!-- Convert to Order -->
+                <hr>
+                <div class="mt-3">
+                    {% if e.status == "confirmed" %}
+                    {% if e.is_converted_to_order and e.order %}
+                    <div class="alert alert-success">
+                        ✅ Order Created: <a href="{% url 'order_detail' e.order.id %}">{{ e.order.order_no }}</a>
+                    </div>
+                    {% else %}
+                    <form method="POST" action="{% url 'convert_to_order' e.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Create order?')">
+                            🚀 Convert to Order
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        toggleReference();
+        showPricing();
+        document.querySelectorAll("input, textarea").forEach(el => { if (el.value === "None") el.value = ""; });
+
+        document.getElementById("finalized_rate")?.addEventListener("input", calcTotal);
+        document.getElementById("loading_charges")?.addEventListener("input", calcTotal);
+        document.getElementById("gst_select")?.addEventListener("input", calcTotal);
+
+        document.getElementById("payment_terms")?.addEventListener("change", calcPayment);
+        document.getElementById("advance")?.addEventListener("input", calcPayment);
+    });
+
+    function showPricing() {
+        let status = "{{ e.status }}";
+        if (status === "confirmed") {
+            document.getElementById("pricing_section").style.display = "block";
+        }
+    }
+
+    function toggleReference() {
+        let val = "{{ e.lead_source }}";
+        let box = document.getElementById("reference_box");
+        if (box) box.style.display = (val === "reference") ? "block" : "";
+    }
+
+    function calcTotal() {
+        let base = parseFloat(document.getElementById("finalized_rate")?.value) || 0;
+        let gst = parseFloat(document.getElementById("gst_select")?.value) || 0;
+        let load = parseFloat(document.getElementById("loading_charges")?.value) || 0;
+        let total = base + (base * gst / 100) + load;
+        document.getElementById("total_rate").value = total.toFixed(2);
+    }
+
+    function calcPayment() {
+        let total = parseFloat(document.getElementById("total_rate")?.value) || 0;
+        let adv = parseFloat(document.getElementById("advance")?.value) || 0;
+        let type = document.getElementById("payment_terms")?.value;
+
+        if (type === "advance_balance") {
+            document.getElementById("balance").value = (total - adv).toFixed(2);
+        } else if (type === "full") {
+            document.getElementById("advance").value = total;
+            document.getElementById("balance").value = 0;
+        } else if (type === "topay") {
+            document.getElementById("topay").value = total;
+        }
+    }
+
+    function minimizeWindow() { document.querySelector(".window-body").classList.toggle("hidden"); }
+    function maximizeWindow() { document.getElementById("windowBox").classList.toggle("fullscreen"); }
+    function closeWindow() { document.getElementById("windowBox").style.display = ""; }
+</script>
+
+{% endblock %}

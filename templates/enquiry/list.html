@@ -1,0 +1,312 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<!-- ICONS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    /* PREMIUM CARD */
+    .card {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        border: none;
+    }
+
+    /* TABLE */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0 6px;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #f1f5f9;
+        font-size: 12px;
+        text-transform: uppercase;
+        border: none;
+    }
+
+    .table tbody tr {
+        background: #fff;
+        transition: 0.2s;
+    }
+
+    .table tbody tr:hover {
+        transform: scale(1.002);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .table td {
+        border: none;
+        padding: 10px;
+        vertical-align: middle;
+    }
+
+    /* STATUS */
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+    }
+
+    .pitch1 {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .pitch2 {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .pitch3 {
+        background: #e2d9f3;
+        color: #4b0082;
+    }
+
+    .confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .waiting-rate {
+        background: #ffe5d0;
+        color: #e8590c;
+    }
+
+    .rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* ACTION BUTTONS */
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: 0.2s;
+    }
+
+    .action-edit {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .action-delete {
+        background: #ffe2e2;
+        color: #dc2626;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* SEARCH */
+    .search-box {
+        border-radius: 10px;
+        width: 250px;
+    }
+
+    /* PAGINATION */
+    .pagination button {
+        margin: 2px;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0">🚚 Enquiry Management</h4>
+            <small class="text-muted">Smart logistics CRM</small>
+        </div>
+
+        <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 Search...">
+    </div>
+
+    <!-- TABLE -->
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table class="table align-middle" id="enquiryTable">
+                <thead>
+                    <tr>
+                        <th>Enquiry</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Route</th>
+                        <th>Vehicle</th>
+                        <th>Qty</th>
+                        <th>Weight</th>
+                        <th>Expected ₹</th>
+                        <th>Approved ₹</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    {% for e in enquiries %}
+                    <tr>
+                        <td><strong>{{ e.enquiry_no }}</strong></td>
+                        <td>{{ e.date|date:"d M Y" }}</td>
+
+                        <td>
+                            <div class="fw-semibold">{{ e.customer_name }}</div>
+                            <small class="text-muted">{{ e.email }}</small>
+                        </td>
+
+                        <td>{{ e.customer_contact }}</td>
+
+                        <td style="white-space: normal;">
+                            {% for r in e.routes %}
+                            {{ r.origin }} → {{ r.destination }}<br>
+                            {% empty %}-{% endfor %}
+                        </td>
+
+                        <td>{{ e.vehicle_type }}</td>
+                        <td>{{ e.pieces }}</td>
+                        <td>{{ e.weight }}</td>
+
+                        <td>{{ e.expected_rate|default:"-" }}</td>
+
+                        <td>
+                            {% if e.approved_rate %}
+                            <strong class="text-success">₹ {{ e.approved_rate }}</strong>
+                            {% elif e.pitch3 %}
+                            <span class="text-primary">₹ {{ e.pitch3 }}</span>
+                            {% elif e.pitch2 %}
+                            <span class="text-info">₹ {{ e.pitch2 }}</span>
+                            {% elif e.pitch1 %}
+                            <span class="text-warning">₹ {{ e.pitch1 }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if e.status == "Waiting For Rate Approval" %}
+                            <span class="badge-status waiting-rate">Waiting For Rate Approval</span>
+                            {% elif e.status == "pending_pitch1" %}
+                            <span class="badge-status pitch1">Pending For Pitch1</span>
+                            {% elif e.status == "pending_pitch2" %}
+                            <span class="badge-status pitch2">Pending For Pitch2</span>
+                            {% elif e.status == "pending_pitch3" %}
+                            <span class="badge-status pitch3">Pending For Pitch3</span>
+                            {% elif e.status == "confirmed" %}
+                            <span class="badge-status confirmed">Confirmed</span>
+                            {% else %}
+                            <span class="badge-status rejected">Rejected</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+
+                                <!-- EDIT -->
+                                <a href="{% url 'edit_enquiry' e.id %}" class="action-btn action-edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <!-- ✅ CONFIRM BUTTON -->
+                                {% if e.status != "confirmed"  %}
+                                <a href="{% url 'confirm_enquiry' e.id %}" class="action-btn"
+                                    style="background:#d4edda;color:#155724;"
+                                    onclick="return confirm('Confirm this enquiry?')" title="Confirm">
+                                    ✔
+                                </a>
+                                {% endif %}
+
+                                <!-- DELETE -->
+                                {% if request.user.role == 'admin' or e.created_by == request.user %}
+                                <form action="{% url 'delete_enquiry' e.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="action-btn action-delete" onclick="return confirm('Delete?')"
+                                        title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="d-flex justify-content-between mt-3">
+            <small class="text-muted">
+                Showing <span id="startRow"></span> - <span id="endRow"></span>
+            </small>
+
+            <div id="paginationControls"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    const rowsPerPage = 10;
+    let currentPage = 1;
+
+    const rows = Array.from(document.querySelectorAll("#tableBody tr"));
+
+    function displayTable(page) {
+        currentPage = page;
+        let start = (page - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        rows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end) ? "" : "none";
+        });
+
+        document.getElementById("startRow").innerText = start + 1;
+        document.getElementById("endRow").innerText = Math.min(end, rows.length);
+
+        setupPagination();
+    }
+
+    function setupPagination() {
+        let pageCount = Math.ceil(rows.length / rowsPerPage);
+        let container = document.getElementById("paginationControls");
+        container.innerHTML = "";
+
+        for (let i = 1; i <= pageCount; i++) {
+            let btn = document.createElement("button");
+            btn.innerText = i;
+            btn.className = "btn btn-sm " + (i === currentPage ? "btn-primary" : "btn-outline-primary");
+
+            btn.onclick = () => displayTable(i);
+            container.appendChild(btn);
+        }
+    }
+
+    // SEARCH
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let val = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+        });
+    });
+
+    displayTable(1);
+</script>
+
+{% endblock %}

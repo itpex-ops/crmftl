@@ -1,0 +1,216 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<style>
+    /* Base */
+    .stat-card,
+    .order-card {
+        border-radius: 12px;
+        padding: 15px;
+        background: #fff;
+        border: none;
+        position: relative;
+    }
+
+    /* LEFT BORDER COLORS */
+    .border-left-primary {
+        border-left: 5px solid #4e73df;
+    }
+
+    .border-left-success {
+        border-left: 5px solid #1cc88a;
+    }
+
+    .border-left-danger {
+        border-left: 5px solid #e74a3b;
+    }
+
+    .border-left-info {
+        border-left: 5px solid #36b9cc;
+    }
+
+    /* Hover effect */
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: 0.2s;
+    }
+
+    /* Optional soft background tint */
+    .border-left-success {
+        background: linear-gradient(to right, #eafaf1, #ffffff);
+    }
+
+    .border-left-danger {
+        background: linear-gradient(to right, #fdecea, #ffffff);
+    }
+
+    .border-left-primary {
+        background: linear-gradient(to right, #eef2ff, #ffffff);
+    }
+
+    .border-left-info {
+        background: linear-gradient(to right, #e8f9fc, #ffffff);
+    }
+</style>
+<div class="container mt-4">
+
+    <!-- 🔷 HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">📦 Orders Dashboard</h4>
+    </div>
+    <!-- 🔷 STATS CARDS -->
+    <div class="row mb-4 text-center">
+
+        <div class="col-md-3">
+            <div class="card stat-card border-left-primary shadow-sm">
+                <h6>Total Orders</h6>
+                <h4>{{ orders|length }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-left-success shadow-sm">
+                <h6>Assigned</h6>
+                <h4>{{ assigned_count }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-left-danger shadow-sm">
+                <h6>Pending</h6>
+                <h4>{{ pending_count }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-left-info shadow-sm">
+                <h6>Total Revenue</h6>
+                <h4>₹ {{ total_revenue|default:"0" }}</h4>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<!-- 🔷 ORDERS GRID -->
+<div class="row" id="ordersContainer">
+
+    {% for order in orders %}
+    <div class="col-md-6 col-lg-4 mb-4 order-item" data-name="{{ order.customer_name }}"
+        data-order="{{ order.order_no }}"
+        data-status="{% if order.vehicles.count %}assigned{% else %}not_assigned{% endif %}">
+
+        <div class="card order-card h-100 border-0 shadow-sm">
+
+            <!-- HEADER -->
+            <div class="card-header bg-white border-0 d-flex justify-content-between">
+                <div>
+                    <strong>{{ order.order_no }}</strong><br>
+                    <small class="text-muted">{{ order.date }}</small>
+                </div>
+
+                {% if order.vehicles.count %}
+                <span class="badge bg-success">Assigned</span>
+                {% else %}
+                <span class="badge bg-danger">Pending</span>
+                {% endif %}
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+
+                <p class="mb-2">
+                    👤 <strong>{{ order.customer_name }}</strong><br>
+                    <small class="text-muted">{{ order.customer_contact }}</small>
+                </p>
+
+                <p class="mb-2">
+                    📍 <span class="fw-semibold text-primary">
+                        {{ order.origin }} → {{ order.destination }}
+                    </span><br>
+                    <small class="text-muted">{{ order.vehicle_type }}</small>
+                </p>
+
+                <hr>
+
+                {% if order.vehicles.count %}
+                {% with v=order.vehicles.first %}
+                <p class="mb-1">🚚 {{ v.vehicle_number }}</p>
+                <small class="text-muted">📞 {{ v.driver_number }}</small>
+                {% endwith %}
+                {% else %}
+                <p class="text-muted">🚫 Vehicle not assigned</p>
+                {% endif %}
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+
+                <strong class="text-success">₹ {{ order.total_rate|default:"0" }}</strong>
+
+                <div>
+                    <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+</div>
+
+<!-- 🔷 STYLES -->
+<style>
+    .stat-card {
+        border-radius: 12px;
+        padding: 15px;
+        background: #fff;
+    }
+
+    .order-card {
+        border-radius: 14px;
+        transition: 0.2s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-body {
+        font-size: 14px;
+    }
+</style>
+
+<!-- 🔷 FILTER SCRIPT -->
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let value = this.value.toLowerCase();
+        document.querySelectorAll(".order-item").forEach(function (el) {
+            let name = el.dataset.name.toLowerCase();
+            let order = el.dataset.order.toLowerCase();
+
+            el.style.display = (name.includes(value) || order.includes(value)) ? "" : "none";
+        });
+    });
+
+    document.getElementById("filterStatus").addEventListener("change", function () {
+        let value = this.value;
+
+        document.querySelectorAll(".order-item").forEach(function (el) {
+            let status = el.dataset.status;
+
+            el.style.display = (!value || status === value) ? "" : "none";
+        });
+    });
+</script>
+
+{% endblock %}

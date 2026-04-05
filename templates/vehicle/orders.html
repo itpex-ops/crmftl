@@ -1,0 +1,158 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">📦 Orders Management</h4>
+    </div>
+
+    <div class="card-header text-white d-flex justify-content-between align-items-center">
+
+        <div class="card-header bg-light text-white">
+            <h6 class="mb-0">All Orders</h6>
+        </div>
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <thead class="table-light text-center">
+                    <th>#</th>
+                    <th>Order No</th>
+                    <th>Customer</th>
+                    <th>Route</th>
+                    <th>Vehicle</th>
+                    <th>Freight</th>
+                    <th>Tracking</th>
+                    <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for order in orders %}
+                    <tr>
+
+                        <td class="text-center">{{ forloop.counter }}</td>
+
+                        <td>
+
+                            <strong>{{ order.order_no }}</strong><br>
+                            <small class="text-muted">{{ order.date }}</small>
+                        </td>
+
+                        <td>
+                            {{ order.customer_name }}<br>
+                            <small>{{ order.customer_contact }}</small>
+                        </td>
+
+                        <td>
+                            <span class="text-primary">
+                                {{ order.origin }} → {{ order.destination }}
+                            </span><br>
+                            <small>{{ order.vehicle_type }}</small>
+                        </td>
+
+                        <!-- 🚚 VEHICLE -->
+                        <td>
+                            {% if order.vehicles.count %}
+                            {% with v=order.vehicles.first %}
+                            <span class="badge bg-success">Assigned</span><br>
+                            🚚 {{ v.vehicle_number }}<br>
+                            <small>📞 {{ v.driver_number }}</small>
+                            {% endwith %}
+                            {% else %}
+                            <span class="badge bg-danger">Not Assigned</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- 💰 FREIGHT -->
+                        <td>
+                            ₹ {{ order.total_rate|default:"0" }}
+                        </td>
+
+                        <!-- 📍 TRACKING -->
+                        <td>
+                            {% if order.tracking %}
+
+                            {% if order.tracking.delivered %}
+                            <span class="badge bg-success">Delivered</span>
+
+                            {% elif order.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">In Transit</span>
+
+                            {% elif order.tracking.vehicle_placed %}
+                            <span class="badge bg-info text-dark">Vehicle Placed</span>
+
+                            {% elif order.tracking.vehicle_document %}
+                            <span class="badge bg-info text-dark">Document Collected </span>
+
+                            {% elif order.tracking.invoice_eway %}
+                            <span class="badge bg-info text-dark">Invoice/Eway</span>
+
+                            {% elif order.tracking.advance_to_fleet %}
+                            <span class="badge bg-info text-dark">Advance To Fleet</span>
+
+                            {% elif order.tracking.arrived %}
+                            <span class="badge bg-info text-dark">Arrived</span>
+
+                            {% elif order.tracking.pod_received %}
+                            <span class="badge bg-info text-dark">POD Received</span>
+
+
+                            {% elif order.tracking.transporter_paid %}
+                            <span class="badge bg-info text-dark">Transporter Paid</span>
+
+                            {% elif order.tracking.customer_paid %}
+                            <span class="badge bg-info text-dark">Customer Paid</span>
+
+                            {% elif order.tracking.settled %}
+                            <span class="badge bg-info text-dark">Settled</span>
+
+                            {% else %}
+                            <span class="badge bg-secondary">Pending</span>
+
+                            {% endif %}
+
+                            {% else %}
+                            <span class="badge bg-secondary">Not Started</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="text-center">
+
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a href="{% url 'assign_vehicle' order.id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-truck"></i>
+                            </a>
+                            <a href="{% url 'tracking_page' order.id %}" class="btn btn-sm btn-info">
+                                📍
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No Orders Found
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

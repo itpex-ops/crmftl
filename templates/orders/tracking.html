@@ -1,0 +1,90 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h4 class="fw-bold mb-3">📍 Tracking Update - {{ order.order_no }}</h4>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card p-3 shadow-sm">
+
+            <div class="row">
+
+                <!-- STEP CHECKBOXES -->
+                <div class="col-md-6">
+                    <label><input type="checkbox" name="vehicle_placed"
+                        {% if tracking.vehicle_placed %}checked{% endif %}>
+                        🚚 Vehicle Placed
+                    </label><br>
+
+                    <label><input type="checkbox" name="vehicle_document"
+                        {% if tracking.vehicle_document %}checked{% endif %}>
+                        📄 Vehicle Document
+                    </label><br>
+
+                    <label><input type="checkbox" name="invoice_eway"
+                        {% if tracking.invoice_eway %}checked{% endif %}>
+                        🧾 Invoice / E-way
+                    </label><br>
+
+                    <label><input type="checkbox" name="advance_to_fleet"
+                        {% if tracking.advance_to_fleet %}checked{% endif %}>
+                        💰 Advance to Fleet
+                    </label><br>
+
+                    <label><input type="checkbox" name="fleet_departed"
+                        {% if tracking.fleet_departed %}checked{% endif %}>
+                        🚛 Fleet Departed
+                    </label><br>
+                </div>
+
+                <div class="col-md-6">
+                    <label><input type="checkbox" name="advance_received"
+                        {% if tracking.advance_received %}checked{% endif %}>
+                        💵 Advance Received
+                    </label><br>
+
+                    <label><input type="checkbox" name="arrived"
+                        {% if tracking.arrived %}checked{% endif %}>
+                        📍 Arrived
+                    </label><br>
+
+                    <label><input type="checkbox" name="delivered"
+                        {% if tracking.delivered %}checked{% endif %}>
+                        ✅ Delivered
+                    </label><br>
+
+                    <label><input type="checkbox" name="pod_received"
+                        {% if tracking.pod_received %}checked{% endif %}>
+                        📦 POD Received
+                    </label><br>
+
+                    <label><input type="checkbox" name="settled"
+                        {% if tracking.settled %}checked{% endif %}>
+                        🧮 Settled
+                    </label><br>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <!-- REMARKS -->
+            <textarea name="remarks" class="form-control"
+                      placeholder="Remarks...">{{ tracking.remarks }}</textarea>
+
+            <br>
+
+            <button type="submit" class="btn btn-success">
+                💾 Save Tracking
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

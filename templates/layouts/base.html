@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Parcelex</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f5f7fb;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 240px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.hide {
+            margin-left: -240px;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .submenu a {
+            font-size: 14px;
+            padding-left: 30px;
+        }
+
+        /* CONTENT */
+        .content {
+            margin-left: 240px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .content.full {
+            margin-left: 0;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -240px;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar p-3" id="sidebar">
+
+        <img src="{% static 'assets/images/com_logo.JPG' %}" class="img-fluid rounded mx-auto d-block mb-3" width="120">
+
+        <h5 class="text-center">FTL</h5>
+        <hr>
+
+        <!-- Dashboard -->
+        <a href="{% url 'user_dashboard' %}"
+            class="{% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+
+        <!-- ROLE BASED MENU -->
+        {% if request.user.role == "admin" or request.user.role == "sales" %}
+
+        <!-- ENQUIRY -->
+        <a data-bs-toggle="collapse" href="#enquiryMenu">
+            <i class="bi bi-telephone"></i> Enquiries
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+
+        <div class="collapse submenu {% if 'enquiry' in request.resolver_match.url_name %}show{% endif %}"
+            id="enquiryMenu">
+
+            <a href="{% url 'create_enquiry' %}"
+                class="{% if request.resolver_match.url_name == 'create_enquiry' %}active{% endif %}">
+                ➕ Create
+            </a>
+
+            <a href="{% url 'enquiry_list' %}"
+                class="{% if request.resolver_match.url_name == 'enquiry_list' %}active{% endif %}">
+                📋 List
+            </a>
+
+        </div>
+        {% endif %}
+
+        <a data-bs-toggle="collapse" href="#orderMenu" role="button">
+            <i class="bi bi-box-seam"></i> Orders
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse submenu {% if '/orders/' in request.path %}show{% endif %}" id="orderMenu">
+            <a href="{% url 'create_enquiry' %}" class="{% if '/orders/' in request.path %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Manual
+            </a>
+            <a href="{% url 'order_list' %}" class="{% if '/orders/' == request.path %}active{% endif %}">
+                <i class="bi bi-list"></i> List
+            </a>
+        </div>
+
+        {% if request.user.role == "admin" or request.user.role == "sales" %}
+        <!-- VEHICLE -->
+
+        <a data-bs-toggle="collapse" href="#vehicleMenu" role="button">
+            <i class="bi bi-box-seam"></i> Vechicles
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse submenu {% if '/orders/' in request.path %}show{% endif %}" id="vehicleMenu">
+            <a href="{% url 'order_list' %}" class="{% if '/orders/' in request.path %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Assign
+            </a>
+            <a href="#" class="{% if '/vehicles/' == request.path %}active{% endif %}">
+                <i class="bi bi-list"></i> Tracking
+            </a>
+        </div>
+        {% endif %}
+<hr>
+        {% if request.user.role == "admin"  or request.user.role == "sales" %}
+        <!-- REPORT -->
+         <a data-bs-toggle="collapse" href="#AccountsMenu" role="button">
+            <i class="bi bi-box-seam"></i> Accounts
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse submenu {% if '/accounts/' in request.path %}show{% endif %}" id="AccountsMenu">
+            <a href="#" class="{% if '/accounts/' in request.path %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Settlement
+            </a>
+            <a href="#" class="{% if '/accounts/' == request.path %}active{% endif %}">
+                <i class="bi bi-list"></i> Balance
+            </a>
+        </div>
+        {% endif %}
+<hr>
+
+         {% if request.user.role == "admin"  or request.user.role == "sales" %}
+        <!-- REPORT -->
+        <a href="#">
+            <i class="bi bi-bar-chart"></i> Reports
+        </a>
+        {% endif %}
+        <hr>
+
+        <a href="{% url 'logout' %}">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+
+        <!-- NAVBAR -->
+        <nav class="navbar mb-4 p-3 rounded shadow-sm d-flex justify-content-between">
+
+            <!-- ☰ Toggle -->
+            <button class="btn btn-outline-primary" id="toggleBtn">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div>
+                Welcome, <strong>{{ request.user.username }}</strong>
+            </div>
+
+            <div>
+                <span class="badge bg-primary">
+                    {{ request.user.role }}
+                </span>
+            </div>
+
+        </nav>
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+    <!-- JS -->
+    <script>
+        const toggleBtn = document.getElementById("toggleBtn");
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
+
+        toggleBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("show");
+            sidebar.classList.toggle("hide");
+            content.classList.toggle("full");
+        });
+    </script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
