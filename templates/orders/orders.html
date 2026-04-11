@@ -1,0 +1,215 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <!-- 🔷 HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">📦 Orders Management</h5>
+    </div>
+
+    <!-- 🔷 STATS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card premium-card stat-card primary">
+                <small>Total Orders</small>
+                <h4>{{ orders|length }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card success">
+                <small>Assigned</small>
+                <h4>{{ assigned_count }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card danger">
+                <small>Pending</small>
+                <h4>{{ pending_count }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card info">
+                <small>Revenue</small>
+                <h4>₹ {{ total_revenue|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔷 FILTER -->
+    <div class="card premium-card p-3 mb-4 glass">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control search-box"
+                    placeholder="🔍 Search orders...">
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔷 TABLE -->
+    <div class="card table-card shadow-sm">
+        <div class="table-container">
+            <table class="table table-hover align-middle mb-0" id="orderTable">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th class="sortable">Order No</th>
+                        <th>Customer</th>
+                        <th>Route</th>
+                        <th>Vehicle</th>
+                        <th class="sortable">Freight ₹</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for order in orders %}
+                    <tr class="order-row fade-in">
+                        <td>{{ forloop.counter }}</td>
+                        <td data-value="{{ order.order_no }}">   <i class="bi bi-eye"></i>
+                            <a href="{% url 'view_order' order.id %}" class="btn btn-sm ">
+                             
+                             <strong>{{ order.order_no }}</strong></a><br>
+                            <small class="text-muted">{{ order.date }}</small>
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{{ order.customer_avatar|default:'/static/assets/images/avatar/4.png' }}"
+                                    class="avatar-sm rounded-circle">
+                                <div>
+                                    {{ order.customer_name }}<br>
+                                    <small class="text-muted">{{ order.customer_contact }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            {% for r in order.routes %}
+                                <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
+                            {% empty %}-{% endfor %}
+                        </td>
+
+                        <td>
+                            {% if order.vehicles.count %}
+                                <span class="badge bg-success">Assigned</span><br>
+                                🚚 {{ order.vehicles.first.vehicle_number }}
+                            {% else %}
+                                <span class="badge bg-danger">Not Assigned</span>
+                            {% endif %}
+                        </td>
+
+                        <td data-value="{{ order.total_rate }}">
+                            ₹ {{ order.total_rate|default:"0" }}
+                        </td>
+
+                        <td>
+                            {% if order.tracking and order.tracking.delivered %}
+                                <span class="badge bg-success">Delivered</span>
+                            {% elif order.tracking and order.tracking.fleet_departed %}
+                                <span class="badge bg-warning text-dark">In Transit</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No Orders Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+}
+
+.route-pill {
+    background: #eef4ff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+.table-card {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.table-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+}
+
+.order-row:hover {
+    background: #f8fafc;
+}
+
+.premium-card {
+    border-radius: 14px;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #eee;
+    transition: 0.25s;
+}
+
+.premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.primary { border-left: 4px solid #4e73df; }
+.success { border-left: 4px solid #1cc88a; }
+.danger  { border-left: 4px solid #e74a3b; }
+.info    { border-left: 4px solid #36b9cc; }
+
+.search-box {
+    border-radius: 10px;
+    padding: 10px;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("searchInput");
+    const rows = document.querySelectorAll(".order-row");
+
+    searchInput.addEventListener("keyup", function () {
+        const value = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+
+            if (text.includes(value)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+});
+</script>
+
+{% endblock %}

@@ -15,6 +15,7 @@
     <style>
         body {
             background-color: #f5f7fb;
+            font-family: 'Inter', sans-serif;
         }
 
         /* SIDEBAR */
@@ -26,35 +27,51 @@
             width: 240px;
             transition: all 0.3s;
             z-index: 1000;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
         }
 
         .sidebar.hide {
             margin-left: -240px;
         }
 
+        .sidebar img {
+            border: 2px solid #0ea5e9;
+            padding: 3px;
+        }
+
+        .sidebar h5 {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
         .sidebar a {
             color: #cbd5e1;
             display: block;
-            padding: 12px;
+            padding: 12px 15px;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            margin-bottom: 3px;
+            transition: all 0.2s;
         }
 
         .sidebar a:hover,
         .sidebar a.active {
             background: #0ea5e9;
             color: white;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
         .submenu a {
             font-size: 14px;
-            padding-left: 30px;
+            padding-left: 35px;
+            color: #e2e8f0;
         }
 
         /* CONTENT */
         .content {
             margin-left: 240px;
-            padding: 20px;
+            padding: 25px 30px;
             transition: all 0.3s;
         }
 
@@ -62,9 +79,16 @@
             margin-left: 0;
         }
 
+        /* NAVBAR */
         .navbar {
             background: white;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        .navbar .btn {
+            border-radius: 8px;
         }
 
         /* MOBILE */
@@ -81,6 +105,20 @@
                 margin-left: 0;
             }
         }
+
+        /* SCROLLBAR */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
     </style>
 </head>
 
@@ -91,98 +129,100 @@
 
         <img src="{% static 'assets/images/com_logo.JPG' %}" class="img-fluid rounded mx-auto d-block mb-3" width="120">
 
-        <h5 class="text-center">FTL</h5>
-        <hr>
+        <h5 class="text-center mb-3">FTL</h5>
+        <hr class="border-gray-600">
 
         <!-- Dashboard -->
         <a href="{% url 'user_dashboard' %}"
             class="{% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
-            <i class="bi bi-speedometer2"></i> Dashboard
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </a>
 
         <!-- ROLE BASED MENU -->
-        {% if request.user.role == "admin" or request.user.role == "sales" %}
+        {% if request.user.role in "admin sales" %}
 
         <!-- ENQUIRY -->
         <a data-bs-toggle="collapse" href="#enquiryMenu">
-            <i class="bi bi-telephone"></i> Enquiries
+            <i class="bi bi-telephone me-2"></i> Enquiries
             <i class="bi bi-chevron-down float-end"></i>
         </a>
-
         <div class="collapse submenu {% if 'enquiry' in request.resolver_match.url_name %}show{% endif %}"
             id="enquiryMenu">
-
             <a href="{% url 'create_enquiry' %}"
-                class="{% if request.resolver_match.url_name == 'create_enquiry' %}active{% endif %}">
-                ➕ Create
-            </a>
-
+                class="{% if request.resolver_match.url_name == 'create_enquiry' %}active{% endif %}">➕ Create</a>
             <a href="{% url 'enquiry_list' %}"
-                class="{% if request.resolver_match.url_name == 'enquiry_list' %}active{% endif %}">
-                📋 List
-            </a>
-
+                class="{% if request.resolver_match.url_name == 'enquiry_list' %}active{% endif %}">📋 List</a>
         </div>
-        {% endif %}
 
-        <a data-bs-toggle="collapse" href="#orderMenu" role="button">
-            <i class="bi bi-box-seam"></i> Orders
+        <!-- ORDERS -->
+        <a data-bs-toggle="collapse" href="#orderMenu">
+            <i class="bi bi-box-seam me-2"></i> Orders
             <i class="bi bi-chevron-down float-end"></i>
         </a>
-        <div class="collapse submenu {% if '/orders/' in request.path %}show{% endif %}" id="orderMenu">
-            <a href="{% url 'create_enquiry' %}" class="{% if '/orders/' in request.path %}active{% endif %}">
-                <i class="bi bi-plus-circle"></i> Manual
+        <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
+            <a href="{% url 'create_enquiry' %}" class="{% if 'orders' in request.path %}active{% endif %}">
+                <i class="bi bi-plus-circle me-1"></i> Manual
             </a>
-            <a href="{% url 'order_list' %}" class="{% if '/orders/' == request.path %}active{% endif %}">
-                <i class="bi bi-list"></i> List
+            <a href="{% url 'order_list' %}"
+                class="{% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+                <i class="bi bi-list me-1"></i> List
             </a>
         </div>
 
+        <!-- VEHICLES -->
+        <a data-bs-toggle="collapse" href="#vehicleMenu">
+            <i class="bi bi-truck me-2"></i> Vehicles
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse submenu {% if 'vehicles' in request.path or 'tracking' in request.path %}show{% endif %}"
+            id="vehicleMenu">
+            <a href="{% url 'all_assigned_vehicles' %}" class="{% if 'vehicles' in request.path %}active{% endif %}">
+                <i class="bi bi-plus-circle me-1"></i> Assigned
+            </a>
+            <a href="#" class="{% if 'tracking' in request.path %}active{% endif %}">
+                <i class="bi bi-list me-1"></i> Tracking
+            </a>
+        </div>
+
+        <!-- 💰 ACCOUNTS -->
         {% if request.user.role == "admin" or request.user.role == "sales" %}
-        <!-- VEHICLE -->
 
-        <a data-bs-toggle="collapse" href="#vehicleMenu" role="button">
-            <i class="bi bi-box-seam"></i> Vechicles
-            <i class="bi bi-chevron-down float-end"></i>
+        <a data-bs-toggle="collapse" href="#accountsMenu" role="button" class="d-flex justify-content-between align-items-center
+   {% if 'accounts' in request.path %}active{% endif %}">
+
+            <span><i class="bi bi-wallet2 me-2"></i> Accounts</span>
+            <i class="bi bi-chevron-down"></i>
         </a>
-        <div class="collapse submenu {% if '/orders/' in request.path %}show{% endif %}" id="vehicleMenu">
-            <a href="{% url 'order_list' %}" class="{% if '/orders/' in request.path %}active{% endif %}">
-                <i class="bi bi-plus-circle"></i> Assign
+
+        <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
+
+            <!-- 📊 Dashboard (LIST PAGE) -->
+            <a href="#"
+                class="{% if request.resolver_match.url_name == 'accounts_list' %}active{% endif %}">
+                <i class="bi bi-bar-chart-line me-1"></i> Dashboard
             </a>
-            <a href="#" class="{% if '/vehicles/' == request.path %}active{% endif %}">
-                <i class="bi bi-list"></i> Tracking
+
+            <!-- 📒 Ledger -->
+            <a href="#" class="">
+                <i class="bi bi-journal-text me-1"></i> Ledger
             </a>
+
+            <!-- 💸 Transactions -->
+            <a href="#" class="">
+                <i class="bi bi-cash-coin me-1"></i> Transactions
+            </a>
+
         </div>
-        {% endif %}
-<hr>
-        {% if request.user.role == "admin"  or request.user.role == "sales" %}
-        <!-- REPORT -->
-         <a data-bs-toggle="collapse" href="#AccountsMenu" role="button">
-            <i class="bi bi-box-seam"></i> Accounts
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
-        <div class="collapse submenu {% if '/accounts/' in request.path %}show{% endif %}" id="AccountsMenu">
-            <a href="#" class="{% if '/accounts/' in request.path %}active{% endif %}">
-                <i class="bi bi-plus-circle"></i> Settlement
-            </a>
-            <a href="#" class="{% if '/accounts/' == request.path %}active{% endif %}">
-                <i class="bi bi-list"></i> Balance
-            </a>
-        </div>
-        {% endif %}
-<hr>
 
-         {% if request.user.role == "admin"  or request.user.role == "sales" %}
-        <!-- REPORT -->
-        <a href="#">
-            <i class="bi bi-bar-chart"></i> Reports
-        </a>
         {% endif %}
-        <hr>
+        <!-- REPORTS -->
+        <a href="#"><i class="bi bi-bar-chart me-2"></i> Reports</a>
 
-        <a href="{% url 'logout' %}">
-            <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
+        {% endif %}
+
+        <hr class="border-gray-600">
+
+        <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
 
     </div>
 
@@ -190,23 +230,13 @@
     <div class="content" id="content">
 
         <!-- NAVBAR -->
-        <nav class="navbar mb-4 p-3 rounded shadow-sm d-flex justify-content-between">
-
-            <!-- ☰ Toggle -->
+        <nav class="navbar mb-4 p-3 rounded shadow-sm d-flex justify-content-between sticky-top bg-white">
             <button class="btn btn-outline-primary" id="toggleBtn">
                 <i class="bi bi-list"></i>
             </button>
 
-            <div>
-                Welcome, <strong>{{ request.user.username }}</strong>
-            </div>
-
-            <div>
-                <span class="badge bg-primary">
-                    {{ request.user.role }}
-                </span>
-            </div>
-
+            <div>Welcome, <strong>{{ request.user.username }}</strong></div>
+            <div><span class="badge bg-primary">{{ request.user.role }}</span></div>
         </nav>
 
         {% block content %}

@@ -1,0 +1,234 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+
+    <!-- 🔷 HEADER -->
+    <div class="card p-3 mb-3 shadow-sm d-flex justify-content-between align-items-center flex-wrap">
+        <h5 class="fw-bold mb-2 mb-md-0">🚚 Assigned Vehicles</h5>
+
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" placeholder="Search Order / Vehicle / Driver...">
+        </div>
+    </div>
+
+    <!-- 🔷 TABLE -->
+    <div class="card shadow-sm border-0">
+        <div class="table-container">
+            <table class="table table-hover align-middle" id="vehicleTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th class="sortable">FTL No</th>
+                        <th class="sortable">Vehicle No</th>
+                        <th>Driver</th>
+                        <th class="sortable">Freight</th>
+                        <th class="sortable">Balance</th>
+                        <th>Status</th>
+                        <th>Assigned At</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    {% for vehicle in vehicles %}
+                    <tr class="vehicle-row">
+                        <td class="text-muted">{{ forloop.counter }}</td>
+
+                        <td class="fw-semibold">{{ vehicle.ftl_no }}</td>
+
+                        <td>
+                            <span class="vehicle-tag">
+                                {{ vehicle.vehicle_number }}
+                            </span>
+                        </td>
+
+                        <td>{{ vehicle.driver_number }}</td>
+
+                        <td>
+                            <span class="badge badge-primary">
+                                ₹ {{ vehicle.total_freight }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if vehicle.balance == 0 %}
+                                <span class="badge badge-success">₹ {{ vehicle.balance }}</span>
+                            {% elif vehicle.balance < vehicle.total_freight %}
+                                <span class="badge badge-warning">₹ {{ vehicle.balance }}</span>
+                            {% else %}
+                                <span class="badge badge-danger">₹ {{ vehicle.balance }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            <span class="badge tracking-badge" id="tracking-{{ vehicle.order.id }}">
+                                {% if vehicle.order.tracking %}
+                                    {% if vehicle.order.tracking.delivered %}
+                                        Delivered
+                                    {% elif vehicle.order.tracking.fleet_departed %}
+                                        In Transit
+                                    {% else %}
+                                        Pending
+                                    {% endif %}
+                                {% else %}
+                                    No Tracking
+                                {% endif %}
+                            </span>
+                        </td>
+
+                        <td class="text-muted">
+                            {{ vehicle.created_at|date:"d M Y H:i" }}
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{% url 'edit_vehicle' vehicle.id %}" class="btn btn-sm btn-light action-btn" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <a href="{% url 'tracking_page' vehicle.order.id %}" class="btn btn-sm btn-light action-btn" title="Tracking">
+                                <i class="bi bi-geo-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            🚫 No vehicles assigned yet
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🔹 JS: SAME (UNCHANGED) -->
+<script>
+    const rows = Array.from(document.querySelectorAll(".vehicle-row"));
+    let filteredRows = [...rows];
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const val = this.value.toLowerCase();
+        filteredRows = rows.filter(row => row.innerText.toLowerCase().includes(val));
+        rows.forEach(r => r.style.display = 'none');
+        filteredRows.forEach(r => r.style.display = '');
+    });
+
+    document.querySelectorAll(".sortable").forEach((th, colIndex) => {
+        th.addEventListener("click", () => {
+            const asc = th.classList.toggle("asc");
+            filteredRows.sort((a, b) => {
+                const A = a.children[colIndex].innerText.trim();
+                const B = b.children[colIndex].innerText.trim();
+                return asc ? A.localeCompare(B, undefined, { numeric: true }) : B.localeCompare(A, undefined, { numeric: true });
+            });
+            filteredRows.forEach(r => r.parentNode.appendChild(r));
+        });
+    });
+
+    const tableContainer = document.querySelector(".table-container");
+    tableContainer.addEventListener("scroll", function () {
+        const { scrollTop, scrollHeight, clientHeight } = this;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+            console.log("Reached bottom - Load more if needed");
+        }
+    });
+</script>
+
+<!-- 🔹 SaaS STYLE -->
+<style>
+    .table-container {
+        max-height: 520px;
+        overflow-y: auto;
+        border-radius: 10px;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background: #f8fafc;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .vehicle-row:hover {
+        background: #f9fbfd;
+        transition: 0.2s ease;
+    }
+
+    .sortable::after {
+        content: ' ⬍';
+        font-size: 11px;
+        color: #9ca3af;
+    }
+
+    /* 🔍 Search */
+    .search-box {
+        position: relative;
+        width: 280px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 8px 12px 8px 35px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    .search-box i {
+        position: absolute;
+        top: 9px;
+        left: 10px;
+        color: #9ca3af;
+    }
+
+    /* 🎨 Badges */
+    .badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .badge-primary { background: #3b82f6; color: #fff; }
+    .badge-success { background: #10b981; color: #fff; }
+    .badge-warning { background: #f59e0b; color: #000; }
+    .badge-danger  { background: #ef4444; color: #fff; }
+
+    /* 🚚 Vehicle Tag */
+    .vehicle-tag {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    /* ⚙️ Action Buttons */
+    .action-btn {
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #f1f5f9;
+        transform: scale(1.05);
+    }
+</style>
+
+{% endblock %}

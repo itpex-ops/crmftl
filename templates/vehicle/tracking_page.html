@@ -1,0 +1,229 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- 🔷 HEADER -->
+    <div class="card p-3 mb-3 shadow-sm d-flex justify-content-between align-items-center flex-wrap">
+        <h5 class="fw-bold mb-0">
+            📍 Tracking - {{ vehicle.vehicle_number }}
+            <span class="text-muted">({{ vehicle.order.order_no }})</span>
+        </h5>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card p-4 shadow-sm border-0">
+
+            <div class="row g-4">
+
+                <!-- LEFT COLUMN -->
+                <div class="col-md-6">
+                    <div class="step-card">
+
+                        <label class="step-item">
+                            <input type="checkbox" name="vehicle_placed"
+                                   class="tracking-checkbox"
+                                   {% if tracking.vehicle_placed %}checked{% endif %}>
+                            <span>🚚 Vehicle Placed</span>
+                            {% if tracking.vehicle_placed_at %}
+                                <small>{{ tracking.vehicle_placed_at|date:"d M Y H:i" }}</small>
+                            {% endif %}
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="vehicle_document"
+                                   class="tracking-checkbox"
+                                   {% if tracking.vehicle_document %}checked{% endif %}>
+                            <span>📄 Vehicle Document</span>
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="invoice_eway"
+                                   class="tracking-checkbox"
+                                   {% if tracking.invoice_eway %}checked{% endif %}>
+                            <span>🧾 Invoice / E-way</span>
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="advance_to_fleet"
+                                   class="tracking-checkbox"
+                                   {% if tracking.advance_to_fleet %}checked{% endif %}>
+                            <span>💰 Advance to Fleet</span>
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="fleet_departed"
+                                   class="tracking-checkbox"
+                                   {% if tracking.fleet_departed %}checked{% endif %}>
+                            <span>🚛 Fleet Departed</span>
+                            {% if tracking.fleet_departed_at %}
+                                <small>{{ tracking.fleet_departed_at|date:"d M Y H:i" }}</small>
+                            {% endif %}
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="col-md-6">
+                    <div class="step-card">
+
+                        <label class="step-item">
+                            <input type="checkbox" name="advance_received"
+                                   class="tracking-checkbox"
+                                   {% if tracking.advance_received %}checked{% endif %}>
+                            <span>💵 Advance Received</span>
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="arrived"
+                                   class="tracking-checkbox"
+                                   {% if tracking.arrived %}checked{% endif %}>
+                            <span>📍 Arrived</span>
+                            {% if tracking.arrived_at %}
+                                <small>{{ tracking.arrived_at|date:"d M Y H:i" }}</small>
+                            {% endif %}
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="delivered"
+                                   class="tracking-checkbox"
+                                   {% if tracking.delivered %}checked{% endif %}>
+                            <span>✅ Delivered</span>
+                            {% if tracking.delivered_at %}
+                                <small>{{ tracking.delivered_at|date:"d M Y H:i" }}</small>
+                            {% endif %}
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="pod_received"
+                                   class="tracking-checkbox"
+                                   {% if tracking.pod_received %}checked{% endif %}>
+                            <span>📦 POD Received</span>
+                        </label>
+
+                        <label class="step-item">
+                            <input type="checkbox" name="settled"
+                                   class="tracking-checkbox"
+                                   {% if tracking.settled %}checked{% endif %}>
+                            <span>🧮 Settled</span>
+                        </label>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <!-- REMARKS -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Remarks</label>
+                <textarea name="remarks" class="form-control remarks-box"
+                          rows="4" placeholder="Add notes...">{{ tracking.remarks }}</textarea>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success px-4">
+                    💾 Save
+                </button>
+
+                <a href="{% url 'all_assigned_vehicles' %}" class="btn btn-light border">
+                    ← Back
+                </a>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+<!-- 🔹 SAME JS (UNCHANGED LOGIC) -->
+<script>
+document.querySelectorAll(".tracking-checkbox").forEach(cb => {
+    cb.addEventListener("change", () => {
+        const field = cb.dataset.field;
+        const value = cb.checked;
+        const orderId = "{{ tracking.order.id }}";
+
+        fetch("{% url 'update_tracking_ajax' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ order_id: orderId, field: field, value: value })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const badge = document.getElementById(`tracking-${orderId}`);
+                badge.innerText = data.status;
+                badge.className = 'badge ' + data.badge_class;
+            } else {
+                alert("Update failed!");
+            }
+        });
+    });
+});
+</script>
+
+<!-- 🔹 SaaS STYLE -->
+<style>
+    .step-card {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 15px;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #fff;
+        border: 1px solid #eef0f2;
+        transition: 0.2s;
+        font-size: 14px;
+    }
+
+    .step-item:hover {
+        background: #f3f6f9;
+    }
+
+    .step-item input {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
+    .step-item span {
+        flex-grow: 1;
+        font-weight: 500;
+    }
+
+    .step-item small {
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    .remarks-box {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-success {
+        background: #10b981;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+    }
+</style>
+
+{% endblock %}

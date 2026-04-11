@@ -1,123 +1,185 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5>Order Details - {{ order.order_no }}</h5>
-            <span class="badge bg-success">{{ order.order_status|capfirst }}</span>
-        </div>
+<div class="container mt-3">
 
-        <div class="card-body">
-            <!-- CUSTOMER DETAILS -->
-            <h6 class="text-success mb-3">👤 Customer Details</h6>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label>Name</label>
-                    <input class="form-control" value="{{ order.customer_name }}" disabled>
-                </div>
-                <div class="col-md-4">
-                    <label>Contact</label>
-                    <input class="form-control" value="{{ order.customer_contact }}" disabled>
-                </div>
-                <div class="col-md-4">
-                    <label>Vehicle Type</label>
-                    <input class="form-control" value="{{ order.vehicle_type }}" disabled>
-                </div>
-            </div>
+<form method="POST" id="mainForm">
+    {% csrf_token %}
 
-            <!-- ROUTES -->
-            <hr>
-            <h6>📍 Route</h6>
-            {% if order.routes %}
-                {% for r in order.routes %}
-                    <div class="row g-3 mb-2">
-                        <div class="col-md-3">
-                            <label>Origin</label>
-                            <input class="form-control" value="{{ r.origin }}" disabled>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Destination</label>
-                            <input class="form-control" value="{{ r.destination }}" disabled>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-muted">No routes defined.</p>
-            {% endif %}
-
-            <!-- PRICING -->
-            <hr>
-            <h6 class="text-warning">💰 Pricing</h6>
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label>Final Rate</label>
-                    <input class="form-control" value="{{ order.final_rate }}" disabled>
-                </div>
-               
-                <div class="col-md-3">
-                    <label>GST %</label>
-                    <input class="form-control" value="{{ order.gst_percent }}" disabled>
-                </div>
-                <div class="col-md-3">
-                    <label>Total Amount</label>
-                    <input class="form-control bg-light" value="{{ order.total_rate }}" disabled>
-                </div>
-            </div>
-
-            <!-- PAYMENT -->
-            <hr>
-            <h6>💳 Payment</h6>
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label>Payment Terms</label>
-                    <input class="form-control" value="{{ order.payment_terms }}" disabled>
-                </div>
-                <div class="col-md-3">
-                    <label>Advance</label>
-                    <input class="form-control" value="{{ order.advance }}" disabled>
-                </div>
-                <div class="col-md-3">
-                    <label>Balance</label>
-                    <input class="form-control" value="{{ order.balance }}" disabled>
-                </div>
-                <div class="col-md-3">
-                    <label>Payment Status</label>
-                    <input class="form-control" value="{{ order.payment_status|capfirst }}" disabled>
-                </div>
-            </div>
-
-            <!-- VEHICLES -->
-            <hr>
-            <h6>🚚 Assigned Vehicles</h6>
-            {% if order.vehicles.all %}
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Vehicle No</th>
-                            <th>Driver</th>
-                            <th>Freight</th>
-                            <th>Advance</th>
-                            <th>Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for v in order.vehicles.all %}
-                            <tr>
-                                <td>{{ v.vehicle_number }}</td>
-                                <td>{{ v.driver_number }}</td>
-                                <td>{{ v.total_freight }}</td>
-                                <td>{{ v.advance }}</td>
-                                <td>{{ v.balance }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-muted">No vehicles assigned yet.</p>
-            {% endif %}
-        </div>
+    <!-- 🔷 HEADER -->
+    <div class="card header-bar mb-3 p-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">
+            ✏ Enquiry {{ order.enquiry.enquiry_no|default:"N/A" }}
+        </h5>
     </div>
-</div>
+
+    <div class="row g-3">
+
+        <!-- PRICING -->
+        <div class="col-lg-6">
+            {% if order.enquiry and order.enquiry.status == "confirmed" or order.enquiry and order.enquiry.approval_rate %}
+            <div id="pricing_section" class="card section-card mb-3">
+                <div class="section-title">💰 Pricing</div>
+                <div class="p-3">
+                    <input name="finalized_rate" id="final_rate" class="form-control mb-2"
+                        placeholder="Final Rate"
+                        value="{{ approval_rate|default:'' }}">
+
+                    <input name="loading_charges" id="loading_unloading" class="form-control mb-2"
+                        placeholder="Loading/Unloading"
+                        value="{{ request.POST.loading_charges|default:order.loading_charges|default:'' }}">
+
+                    <input name="halting_charges" id="halting_charges" class="form-control mb-2"
+                        placeholder="Halting Charges"
+                        value="{{ request.POST.halting_charges|default:order.halting_charges|default:'' }}">
+
+                    <input name="gst_percent" id="gst_percent" class="form-control mb-2"
+                        placeholder="GST %"
+                        value="{{ request.POST.gst_percent|default:order.gst_percent|default:'' }}">
+
+                    <input name="total_rate" id="total_rate" class="form-control bg-light" readonly
+                        placeholder="Total"
+                        value="{{ request.POST.total_rate|default:order.total_rate|default:'' }}">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- PAYMENT -->
+        <div class="col-lg-6">
+            {% if order.enquiry and order.enquiry.status == "confirmed" %}
+            <div class="card section-card mb-3">
+                <div class="section-title">💳 Payment</div>
+                <div class="p-3">
+                    <select name="payment_terms" id="payment_terms" class="form-select mb-2">
+                        <option value="">Select</option>
+                        <option value="advance_balance" {% if request.POST.payment_terms == "advance_balance" or order.payment_terms == "advance_balance" %}selected{% endif %}>Advance</option>
+                        <option value="topay" {% if request.POST.payment_terms == "topay" or order.payment_terms == "topay" %}selected{% endif %}>Topay</option>
+                        <option value="full" {% if request.POST.payment_terms == "full" or order.payment_terms == "full" %}selected{% endif %}>Full</option>
+                    </select>
+
+                    <input id="advance" name="advance" class="form-control mb-2"
+                        placeholder="Advance"
+                        value="{{ request.POST.advance|default:order.advance|default:'' }}">
+
+                    <input id="balance" name="balance" class="form-control mb-2"
+                        placeholder="Balance"
+                        value="{{ request.POST.balance|default:order.balance|default:'' }}">
+
+                    <input id="topay" name="topay" class="form-control mb-2"
+                        placeholder="To Pay"
+                        value="{{ request.POST.topay|default:order.topay|default:'' }}">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- CONVERT TO ORDER -->
+        <div class="col-md-3 ms-auto">
+            <div class="card text-center p-3 section-card">
+                {% if order.is_converted_to_order %}
+                    <span class="status-chip success">✅ Converted</span>
+                {% else %}
+                    <button formaction="{% url 'convert_to_order' order.id %}" class="btn btn-success btn-sm">
+                        🚀 Convert to Order
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<!-- SaaS CSS -->
+<style>
+.header-bar {
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.section-card {
+    border-radius: 14px;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+    transition: 0.2s;
+}
+
+.section-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.section-title {
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.status-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.status-chip.success { background:#d4edda; color:#155724; }
+.status-chip.warning { background:#fff3cd; color:#856404; }
+.status-chip.danger { background:#f8d7da; color:#721c24; }
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px;
+}
+</style>
+
+<!-- SaaS JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Remove "None" values
+    document.querySelectorAll("input, textarea").forEach(el => { if (el.value === "None") el.value = ""; });
+
+    // Total Rate Calculation
+    const finalRate = document.getElementById("final_rate");
+    const gst = document.getElementById("gst_percent");
+    const load = document.getElementById("loading_unloading");
+    const halt = document.getElementById("halting_charges");
+    const total = document.getElementById("total_rate");
+
+    [finalRate, gst, load, halt].forEach(el => el?.addEventListener("input", calcTotal));
+
+    function calcTotal() {
+        let base = parseFloat(finalRate?.value) || 0;
+        let g = parseFloat(gst?.value) || 0;
+        let l = parseFloat(load?.value) || 0;
+        let h = parseFloat(halt?.value) || 0;
+        total.value = (base + (base*g/100) + l + h).toFixed(2);
+        calcPayment();
+    }
+
+    // Payment Calculation
+    const paymentType = document.getElementById("payment_terms");
+    const adv = document.getElementById("advance");
+    const bal = document.getElementById("balance");
+
+    [paymentType, adv].forEach(el => el?.addEventListener("input", calcPayment));
+
+    function calcPayment() {
+        let t = parseFloat(total?.value) || 0;
+        let a = parseFloat(adv?.value) || 0;
+        let type = paymentType?.value;
+
+        if (type === "advance_balance") {
+            bal.value = (t - a).toFixed(2);
+        } else if (type === "full") {
+            adv.value = t.toFixed(2);
+            bal.value = "0.00";
+        }
+    }
+
+    calcTotal();
+});
+</script>
 
 {% endblock %}

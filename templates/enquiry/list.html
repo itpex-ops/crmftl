@@ -1,89 +1,473 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<!-- ICONS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+<div class="container-fluid mt-3">
+
+    <!-- 🔷 HEADER + KPI -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="kpi-card">
+                <small>Total</small>
+                <h5>{{ enquiries|length }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card success">
+                <small>Confirmed</small>
+                <h5>{{ confirmed_count }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card warning">
+                <small>Pending</small>
+                <h5>{{ pending_count }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card danger">
+                <small>Cancelled</small>
+                <h5>{{ cancelled_count }}</h5>
+            </div>
+        </div>
+    </div>
+    {{ e.status }}
+    <!-- 🔷 TOOLBAR -->
+    <div class="card toolbar-card p-3 mb-3">
+        <div class="d-flex justify-content-between">
+            <input type="text" id="searchInput" class="form-control search-box"
+                placeholder="🔍 Search enquiry, customer...">
+            <!-- <select id="statusFilter" class="form-select w-auto ms-2">
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+            </select> -->
+        </div>
+    </div>
+
+    <!-- 🔷 TABLE -->
+    <div class="card table-card p-3">
+        <div class="table-responsive">
+            <table id="enquiryTable" class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Enquiry</th>
+                        <th>Customer</th>
+                        <th>Route</th>
+                        <th>Vehicle</th>
+                        <th>Expected Rate ₹</th>
+                        <th>Approval Rate</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for e in enquiries %}
+                    <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}"
+                        data-search="{{ e.enquiry_no }} {{ e.customer_name }}" data-pitch1="{{ e.pitch1 }}"
+                        data-pitch2="{{ e.pitch2 }}" data-pitch3="{{ e.pitch3 }}"
+                        data-pitch1-remarks="{{ e.pitch1_remarks }}" data-pitch2-remarks="{{ e.pitch2_remarks }}"
+                        data-pitch3-remarks="{{ e.pitch3_remarks }}" data-pitch-rate="{{ e.approval_rate }}"
+                        data-search="{{ e.enquiry_no }} {{ e.customer_name }}">
+                        <td>
+                            <strong>{{ e.enquiry_no }}</strong><br>
+                            <small class="text-muted">{{ e.date|date:"d M" }}</small>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ e.customer_name }}</div>
+                            <small class="text-muted">{{ e.customer_contact }}</small>
+                        </td>
+                        <td>
+                            {% for r in e.routes %}
+                            <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
+                            {% empty %}-{% endfor %}
+                        </td>
+                        <td>{{ e.vehicle_type }}</td>
+                        <td class="text-warning">{{ e.expected_rate|default_if_none:"" }}</td>
+                        <td class="text-success">{{ e.approval_rate}}</td>
+                        <td>
+                            <span class="status-pill 
+                                {% if e.status == 'confirmed' %}success
+                                {% elif 'pending' in e.status %}warning
+                                {% else %}danger{% endif %}">
+                                <span class="dot"></span>{{ e.status|capfirst }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                {% if e.status != 'confirmed' %}
+                                <!-- ✅ CONFIRM -->
+                                <a href="#" class="icon-btn success action-btn" data-action="confirm"
+                                    data-id="{{ e.id }}">
+                                    <i class="bi bi-check-lg"></i>
+                                </a>
+                                <!-- ❌ DISAGREE -->
+                                <a href="#" class="icon-btn warning action-btn" data-action="disagree"
+                                    data-id="{{ e.id }}">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+
+                                <!-- 🚫 CANCEL -->
+                                <a href="#" class="icon-btn danger action-btn" data-action="cancel"
+                                    data-id="{{ e.id }}">
+                                    <i class="bi bi-slash-circle"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- ================= CONFIRM BOX ================= -->
+                            <div class="inline-box mt-2" id="confirm-box-{{ e.id }}" style="display:none;">
+                                <input type="number" class="form-control mb-2" placeholder="Approval Rate"
+                                    id="rate-{{ e.id }}">
+                                <button class="btn btn-sm btn-success save-btn" data-action="confirm"
+                                    data-id="{{ e.id }}">Save</button>
+                            </div>
+
+                            <!-- ================= DISAGREE BOX ================= -->
+                            <div class="inline-box mt-2" id="disagree-box-{{ e.id }}" style="display:none;">
+                                <textarea class="form-control mb-2" placeholder="Disagree Reason"
+                                    id="disagree-{{ e.id }}"></textarea>
+                                <button class="btn btn-sm btn-warning save-btn" data-action="disagree"
+                                    data-id="{{ e.id }}">Save</button>
+                            </div>
+
+                            <!-- ================= CANCEL BOX ================= -->
+                            <div class="inline-box mt-2" id="cancel-box-{{ e.id }}" style="display:none;">
+                                <textarea class="form-control mb-2" placeholder="Cancel Reason"
+                                    id="cancel-{{ e.id }}"></textarea>
+                                <button class="btn btn-sm btn-danger save-btn" data-action="cancel"
+                                    data-id="{{ e.id }}">Save</button>
+                            </div>
+                        </td>
+                    </tr>
+        </div>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="text-center text-muted">No enquiries found</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 🔷 PITCH MODAL (Single Instance) -->
+<div class="modal fade" id="pitchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="pitchModalLabel">Update Pitch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pitch_enquiry_id">
+                <input type="hidden" id="pitch_type">
+
+                <label class="form-label" id="pitch_label">Remarks</label>
+                <input type="text" id="pitch_input" class="form-control" placeholder="Enter remarks">
+
+                <label class="form-label mt-2">Pitch Rate ₹</label>
+                <input type="number" id="pitch_rate" class="form-control" placeholder="Enter rate">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="save_pitch">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% if e.status == 'confirmed' %}
+{% endif %}
 <style>
-    /* PREMIUM CARD */
-    .card {
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        border: none;
-    }
-
-    /* TABLE */
-    .table {
+    /* Table basics */
+    #enquiryTable {
+        width: 100%;
         border-collapse: separate;
-        border-spacing: 0 6px;
+        border-spacing: 0 8px;
+        /* space between rows */
     }
 
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #f1f5f9;
-        font-size: 12px;
-        text-transform: uppercase;
-        border: none;
-    }
-
-    .table tbody tr {
-        background: #fff;
-        transition: 0.2s;
-    }
-
-    .table tbody tr:hover {
-        transform: scale(1.002);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .table td {
-        border: none;
-        padding: 10px;
+    #enquiryTable th,
+    #enquiryTable td {
         vertical-align: middle;
+        padding: 12px 10px;
     }
 
-    /* STATUS */
-    .badge-status {
+    #enquiryTable th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    /* Column widths */
+    #enquiryTable th:nth-child(1),
+    #enquiryTable td:nth-child(1) {
+        width: 12%;
+    }
+
+    /* Enquiry */
+    #enquiryTable th:nth-child(2),
+    #enquiryTable td:nth-child(2) {
+        width: 15%;
+    }
+
+    /* Customer */
+    #enquiryTable th:nth-child(3),
+    #enquiryTable td:nth-child(3) {
+        width: 20%;
+    }
+
+    /* Route */
+    #enquiryTable th:nth-child(4),
+    #enquiryTable td:nth-child(4) {
+        width: 10%;
+    }
+
+    /* Vehicle */
+    #enquiryTable th:nth-child(5),
+    #enquiryTable td:nth-child(5) {
+        width: 10%;
+        text-align: right;
+    }
+
+    /* Expected Rate */
+    #enquiryTable th:nth-child(6),
+    #enquiryTable td:nth-child(6) {
+        width: 10%;
+        text-align: right;
+    }
+
+    /* Pitch Rate */
+    #enquiryTable th:nth-child(7),
+    #enquiryTable td:nth-child(7) {
+        width: 10%;
+        text-align: center;
+    }
+
+    /* Status */
+    #enquiryTable th:nth-child(8),
+    #enquiryTable td:nth-child(8) {
+        width: 13%;
+        text-align: right;
+    }
+
+    /* Actions */
+
+    /* Row styling */
+    #enquiryTable tbody tr {
+        background-color: #fff;
+        border-radius: 8px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #enquiryTable tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Status pills */
+    .status-pill {
         padding: 6px 12px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .pitch1 {
-        background: #fff3cd;
-        color: #856404;
+    .status-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
     }
 
-    .pitch2 {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .pitch3 {
-        background: #e2d9f3;
-        color: #4b0082;
-    }
-
-    .confirmed {
+    .status-pill.success {
         background: #d4edda;
         color: #155724;
     }
 
-    .waiting-rate {
-        background: #ffe5d0;
-        color: #e8590c;
+    .status-pill.warning {
+        background: #fff3cd;
+        color: #856404;
     }
 
-    .rejected {
+    .status-pill.danger {
         background: #f8d7da;
         color: #721c24;
     }
 
-    /* ACTION BUTTONS */
-    .action-btn {
+    /* Action buttons */
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: #f1f5f9;
+        padding: 0;
+    }
+
+    .icon-btn i {
+        font-size: 16px;
+    }
+
+    .d-inline-flex.gap-1 {
+        display: inline-flex;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    /* Route pill styling */
+    .route-pill {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 8px;
+        margin-bottom: 3px;
+        font-size: 12px;
+    }
+
+    /* Responsive scroll */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .tooltip-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Tooltip box */
+    .tooltip-text {
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+
+        background: #111;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+
+        opacity: 0;
+        visibility: hidden;
+
+        transition: all 0.25s ease;
+        z-index: 100;
+    }
+
+    /* Arrow */
+    .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #111 transparent transparent transparent;
+    }
+
+    /* 🔥 Hover Animation */
+    .tooltip-wrap:hover .tooltip-text {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+        /* smooth slide up */
+    }
+
+    /* KPI */
+    .kpi-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 14px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .kpi-card.success {
+        border-left: 4px solid #1cc88a;
+    }
+
+    .kpi-card.warning {
+        border-left: 4px solid #f6c23e;
+    }
+
+    .kpi-card.danger {
+        border-left: 4px solid #e74a3b;
+    }
+
+    /* Toolbar */
+    .toolbar-card {
+        border-radius: 12px;
+        background: #ffffffcc;
+        backdrop-filter: blur(8px);
+    }
+
+    /* Table */
+    .table-card {
+        border-radius: 14px;
+    }
+
+    .row-card {
+        background: #fff;
+        transition: 0.2s;
+    }
+
+    .row-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Route */
+    .route-pill {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 8px;
+        margin-bottom: 3px;
+        font-size: 12px;
+    }
+
+    /* Status */
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-pill.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-pill.warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pill.danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Buttons */
+    .icon-btn {
         width: 34px;
         height: 34px;
         border-radius: 10px;
@@ -91,222 +475,143 @@
         align-items: center;
         justify-content: center;
         border: none;
-        transition: 0.2s;
+        background: #f1f5f9;
     }
 
-    .action-edit {
-        background: #eef2ff;
+    .icon-btn.edit {
         color: #4f46e5;
     }
 
-    .action-delete {
-        background: #ffe2e2;
+    .icon-btn.success {
+        color: #16a34a;
+    }
+
+    .icon-btn.delete {
         color: #dc2626;
     }
 
-    .action-btn:hover {
+    .icon-btn:hover {
         transform: translateY(-2px);
     }
 
-    /* SEARCH */
+    /* Search */
     .search-box {
+        width: 280px;
         border-radius: 10px;
-        width: 250px;
-    }
-
-    /* PAGINATION */
-    .pagination button {
-        margin: 2px;
     }
 </style>
-
-<div class="container-fluid mt-3">
-
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="fw-bold mb-0">🚚 Enquiry Management</h4>
-            <small class="text-muted">Smart logistics CRM</small>
-        </div>
-
-        <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 Search...">
-    </div>
-
-    <!-- TABLE -->
-    <div class="card p-3">
-        <div class="table-responsive">
-            <table class="table align-middle" id="enquiryTable">
-                <thead>
-                    <tr>
-                        <th>Enquiry</th>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Contact</th>
-                        <th>Route</th>
-                        <th>Vehicle</th>
-                        <th>Qty</th>
-                        <th>Weight</th>
-                        <th>Expected ₹</th>
-                        <th>Approved ₹</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tableBody">
-                    {% for e in enquiries %}
-                    <tr>
-                        <td><strong>{{ e.enquiry_no }}</strong></td>
-                        <td>{{ e.date|date:"d M Y" }}</td>
-
-                        <td>
-                            <div class="fw-semibold">{{ e.customer_name }}</div>
-                            <small class="text-muted">{{ e.email }}</small>
-                        </td>
-
-                        <td>{{ e.customer_contact }}</td>
-
-                        <td style="white-space: normal;">
-                            {% for r in e.routes %}
-                            {{ r.origin }} → {{ r.destination }}<br>
-                            {% empty %}-{% endfor %}
-                        </td>
-
-                        <td>{{ e.vehicle_type }}</td>
-                        <td>{{ e.pieces }}</td>
-                        <td>{{ e.weight }}</td>
-
-                        <td>{{ e.expected_rate|default:"-" }}</td>
-
-                        <td>
-                            {% if e.approved_rate %}
-                            <strong class="text-success">₹ {{ e.approved_rate }}</strong>
-                            {% elif e.pitch3 %}
-                            <span class="text-primary">₹ {{ e.pitch3 }}</span>
-                            {% elif e.pitch2 %}
-                            <span class="text-info">₹ {{ e.pitch2 }}</span>
-                            {% elif e.pitch1 %}
-                            <span class="text-warning">₹ {{ e.pitch1 }}</span>
-                            {% else %}
-                            -
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if e.status == "Waiting For Rate Approval" %}
-                            <span class="badge-status waiting-rate">Waiting For Rate Approval</span>
-                            {% elif e.status == "pending_pitch1" %}
-                            <span class="badge-status pitch1">Pending For Pitch1</span>
-                            {% elif e.status == "pending_pitch2" %}
-                            <span class="badge-status pitch2">Pending For Pitch2</span>
-                            {% elif e.status == "pending_pitch3" %}
-                            <span class="badge-status pitch3">Pending For Pitch3</span>
-                            {% elif e.status == "confirmed" %}
-                            <span class="badge-status confirmed">Confirmed</span>
-                            {% else %}
-                            <span class="badge-status rejected">Rejected</span>
-                            {% endif %}
-                        </td>
-
-                        <!-- ACTION -->
-                        <td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center">
-
-                                <!-- EDIT -->
-                                <a href="{% url 'edit_enquiry' e.id %}" class="action-btn action-edit" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-
-                                <!-- ✅ CONFIRM BUTTON -->
-                                {% if e.status != "confirmed"  %}
-                                <a href="{% url 'confirm_enquiry' e.id %}" class="action-btn"
-                                    style="background:#d4edda;color:#155724;"
-                                    onclick="return confirm('Confirm this enquiry?')" title="Confirm">
-                                    ✔
-                                </a>
-                                {% endif %}
-
-                                <!-- DELETE -->
-                                {% if request.user.role == 'admin' or e.created_by == request.user %}
-                                <form action="{% url 'delete_enquiry' e.id %}" method="POST">
-                                    {% csrf_token %}
-                                    <button class="action-btn action-delete" onclick="return confirm('Delete?')"
-                                        title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-
-                            </div>
-                        </td>
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- PAGINATION -->
-        <div class="d-flex justify-content-between mt-3">
-            <small class="text-muted">
-                Showing <span id="startRow"></span> - <span id="endRow"></span>
-            </small>
-
-            <div id="paginationControls"></div>
-        </div>
-
-    </div>
-</div>
-
-<!-- JS -->
+<!-- 🔷 JS -->
 <script>
-    const rowsPerPage = 10;
-    let currentPage = 1;
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const rows = Array.from(document.querySelectorAll("#tableBody tr"));
-
-    function displayTable(page) {
-        currentPage = page;
-        let start = (page - 1) * rowsPerPage;
-        let end = start + rowsPerPage;
-
-        rows.forEach((row, index) => {
-            row.style.display = (index >= start && index < end) ? "" : "none";
+        // ================= REMOVE "None" =================
+        document.querySelectorAll("td, input, textarea").forEach(el => {
+            if (el.tagName === "TD" && el.innerText.trim() === "None") {
+                el.innerText = "";
+            }
+            if ((el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.value === "None") {
+                el.value = "";
+            }
         });
 
-        document.getElementById("startRow").innerText = start + 1;
-        document.getElementById("endRow").innerText = Math.min(end, rows.length);
+        // ================= SHOW INLINE BOX =================
+        document.querySelectorAll(".action-btn").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
 
-        setupPagination();
-    }
+                const id = this.dataset.id;
+                const action = this.dataset.action;
 
-    function setupPagination() {
-        let pageCount = Math.ceil(rows.length / rowsPerPage);
-        let container = document.getElementById("paginationControls");
-        container.innerHTML = "";
+                ["confirm", "disagree", "cancel"].forEach(type => {
+                    const el = document.getElementById(`${type}-box-${id}`);
+                    if (el) el.style.display = "none";
+                });
 
-        for (let i = 1; i <= pageCount; i++) {
-            let btn = document.createElement("button");
-            btn.innerText = i;
-            btn.className = "btn btn-sm " + (i === currentPage ? "btn-primary" : "btn-outline-primary");
-
-            btn.onclick = () => displayTable(i);
-            container.appendChild(btn);
-        }
-    }
-
-    // SEARCH
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        let val = this.value.toLowerCase();
-
-        rows.forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+                const activeBox = document.getElementById(`${action}-box-${id}`);
+                if (activeBox) activeBox.style.display = "block";
+            });
         });
+
+        // ================= SAVE ACTION =================
+        document.querySelectorAll(".save-btn").forEach(btn => {
+            btn.addEventListener("click", function () {
+
+                const id = this.dataset.id;
+                const action = this.dataset.action;
+
+                let payload = {};
+
+                if (action === "confirm") {
+                    payload.approval_rate = document.getElementById(`rate-${id}`)?.value || "";
+                }
+
+                if (action === "disagree") {
+                    payload.disagree_reason = document.getElementById(`disagree-${id}`)?.value || "";
+                }
+
+                if (action === "cancel") {
+                    payload.cancel_reason = document.getElementById(`cancel-${id}`)?.value || "";
+                }
+
+                fetch(`/enquiry/update-status/${id}/${action}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (!data.success) {
+                            alert("Error saving");
+                            return;
+                        }
+
+                        alert(data.message || "Saved successfully");
+                        // ✅ Auto refresh page
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+
+                        // ✅ Update status
+                        const statusEl = document.getElementById(`status-${id}`);
+                        if (statusEl && data.status) {
+                            statusEl.innerText = data.status;
+                        }
+
+                        // ✅ Update approval rate (ONLY for confirm)
+                        if (data.approval_rate !== undefined) {
+                            const rateEl = document.getElementById(`approval-${id}`);
+                            if (rateEl) {
+                                rateEl.innerText = data.approval_rate;
+                            }
+                        }
+
+                        // ✅ hide boxes
+                        ["confirm", "disagree", "cancel"].forEach(type => {
+                            const el = document.getElementById(`${type}-box-${id}`);
+                            if (el) el.style.display = "none";
+                        });
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Something went wrong");
+                    });
+
+            });
+        });
+
     });
 
-    displayTable(1);
+    // ================= CSRF =================
+    function getCSRFToken() {
+        return document.cookie.split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+    }
 </script>
 
 {% endblock %}

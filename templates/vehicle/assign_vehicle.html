@@ -1,0 +1,226 @@
+{% extends 'layouts/base.html' %} 
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- 🔷 HEADER -->
+    <div class="card p-3 mb-4 shadow-sm border-0 d-flex flex-row justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">🚚 Assign Vehicle</h5>
+        <span class="order-badge">{{ order.order_no }}</span>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- 🔷 VEHICLE -->
+        <div class="card saas-card mb-4">
+            <div class="card-header">
+                🚚 Vehicle Details
+            </div>
+
+            <div class="card-body row g-4">
+
+                <div class="col-md-4">
+                    <label>Vehicle Number</label>
+                    <input name="vehicle_number" class="form-control input-style" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Driver Number</label>
+                    <input name="driver_number" class="form-control input-style" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Owner Number</label>
+                    <input name="owner_number" class="form-control input-style">
+                </div>
+
+                <div class="col-md-4">
+                    <label>Source</label>
+                    <input name="source" class="form-control input-style">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 FREIGHT -->
+        <div class="card saas-card mb-4">
+            <div class="card-header text-success">
+                💰 Freight Details
+            </div>
+
+            <div class="card-body row g-4">
+
+                <div class="col-md-3">
+                    <label>Freight</label>
+                    <input type="number" step="0.01" name="freight_amount" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Advance</label>
+                    <input type="number" step="0.01" name="advance" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Brokerage</label>
+                    <input type="number" step="0.01" name="brokerage" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Loading</label>
+                    <input type="number" step="0.01" name="loading" class="form-control input-style">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 UPI -->
+        <div class="card saas-card mb-4">
+            <div class="card-header text-info">
+                💳 UPI Payment
+            </div>
+
+            <div class="card-body row g-4">
+
+                <div class="col-md-4">
+                    <label>UPI App</label>
+                    <select name="upi_app" class="form-control input-style">
+                        <option value="phonepe">📱 PhonePe</option>
+                        <option value="gpay">💰 Google Pay</option>
+                        <option value="paytm">🏦 Paytm</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label>UPI ID</label>
+                    <input name="upi_number" class="form-control input-style" placeholder="example@upi">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 BANK -->
+        <div class="card saas-card mb-5">
+            <div class="card-header text-warning">
+                🏦 Bank Details
+            </div>
+
+            <div class="card-body row g-4">
+
+                <div class="col-md-3">
+                    <label>Account Name</label>
+                    <input name="account_name" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Account Number</label>
+                    <input name="account_number" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>IFSC</label>
+                    <input name="ifsc" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Type</label>
+                    <select name="ac_type" class="form-control input-style">
+                        <option value="saving">Saving</option>
+                        <option value="current">Current</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 ACTION BAR -->
+        <div class="action-bar">
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
+                ⬅ Back
+            </a>
+
+            <button class="btn btn-success px-4">
+                💾 Save Vehicle
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- 🔥 SaaS STYLE -->
+<style>
+
+    /* HEADER BADGE */
+    .order-badge {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    /* CARD */
+    .saas-card {
+        border: 1px solid #eef0f2;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .saas-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid #f1f3f5;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 14px 18px;
+    }
+
+    /* INPUT */
+    .input-style {
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .input-style:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    }
+
+    /* LABEL */
+    label {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: #374151;
+    }
+
+    /* ACTION BAR */
+    .action-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 15px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 10px;
+    }
+
+    /* BUTTON */
+    .btn-success {
+        background: #10b981;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+    }
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+<td>
+    <span class="badge tracking-badge" id="tracking-{{ vehicle.order.id }}">
+        {% if vehicle.order.tracking %}
+            {% if vehicle.order.tracking.delivered %}
+                Delivered
+            {% elif vehicle.order.tracking.fleet_departed %}
+                In Transit
+            {% else %}
+                Pending
+            {% endif %}
+        {% else %}
+            No Tracking
+        {% endif %}
+    </span>
+</td>

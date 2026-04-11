@@ -4,15 +4,16 @@ from django.db import models
 from django.db import models
 from orders.models import Order
 from decimal import Decimal
+from django.db.models import Max
+from django.db import transaction
 
 class Vehicle(models.Model):
-
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
         related_name='vehicles'   # 🔥 IMPORTANT
     )
-
+    ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
     vehicle_number = models.CharField(max_length=50)
     driver_number = models.CharField(max_length=15)
     owner_number = models.CharField(max_length=15, blank=True, null=True)
@@ -43,23 +44,35 @@ class Vehicle(models.Model):
     ]
 
     upi_app = models.CharField(max_length=10, choices=UPI_CHOICES, default='phonepe')
+    upi_id = models.CharField(max_length=200,blank=True,null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # 🔥 AUTO CALCULATIONS
         self.balance = (self.freight_amount or 0) - (self.advance or 0)
-
         self.total_freight = (
             (self.freight_amount or 0)
             + (self.brokerage or 0)
             + (self.loading or 0)
         )
+        if not self.ftl_no:
+            with transaction.atomic():
+                last_vehicle = (
+                    Vehicle.objects
+                    .select_for_update()
+                    .order_by('-id')
+                    .first()
+                )
+                if last_vehicle and last_vehicle.ftl_no:
+                    last_num = int(last_vehicle.ftl_no.split('_')[1])
+                    new_num = last_num + 1
+                else:
+                    new_num = 1
 
+                self.ftl_no = f"FTL_{new_num:03d}"
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.vehicle_number} ({self.order.order_no})"
+        def __str__(self):
+            return f"{self.vehicle_number} ({self.order.order_no})"
 
 class Tracking(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="tracking")
@@ -87,3 +100,4 @@ class Tracking(models.Model):
 
     def __str__(self):
         return f"Tracking - {self.order.order_no}"
+    

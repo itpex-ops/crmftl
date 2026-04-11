@@ -1,0 +1,203 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <!-- 🔷 HEADER -->
+    <div class="card p-3 mb-3 shadow-sm d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">💰 Accounts Dashboard</h5>
+
+        <input type="text" id="searchInput" class="form-control"
+               placeholder="🔍 Search Order / Customer..."
+               style="width:280px">
+    </div>
+
+    <!-- 🔷 KPI CARDS -->
+    <div class="row mb-3">
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <small>Total Revenue</small>
+                <h5 class="text-success" id="totalRevenue">₹ 0</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <small>Total Expense</small>
+                <h5 class="text-danger" id="totalExpense">₹ 0</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <small>Total Profit</small>
+                <h5 id="totalProfit">₹ 0</h5>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔷 TABLE -->
+    <div class="card shadow-sm">
+        <div class="table-container">
+
+            <table class="table align-middle table-hover" id="accountTable">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th class="sortable">Revenue</th>
+                        <th class="sortable">Expense</th>
+                        <th class="sortable">Profit</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+
+                    {% for acc in accounts %}
+                   <tr class="account-row"
+    onclick="location.href='{% url "account_dashboard" acc.order.id %}'">
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>
+                            <strong>{{ acc.order.order_no }}</strong><br>
+                            <small class="text-muted">{{ acc.order.date }}</small>
+                        </td>
+
+                        <td>
+                            {{ acc.order.customer_name }}<br>
+                            <small>{{ acc.order.customer_contact }}</small>
+                        </td>
+
+                        <td data-value="{{ acc.total_revenue }}" class="text-success">
+                            ₹ {{ acc.total_revenue }}
+                        </td>
+
+                        <td data-value="{{ acc.total_expense }}" class="text-danger">
+                            ₹ {{ acc.total_expense }}
+                        </td>
+
+                        <td data-value="{{ acc.profit }}">
+                            {% if acc.profit >= 0 %}
+                                <span class="badge bg-success">₹ {{ acc.profit }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">₹ {{ acc.profit }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if acc.profit > 0 %}
+                                <span class="badge bg-success">Profit</span>
+                            {% elif acc.profit < 0 %}
+                                <span class="badge bg-danger">Loss</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Break-even</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 🔷 SCRIPT -->
+<script>
+let rows = Array.from(document.querySelectorAll(".account-row"));
+let filteredRows = [...rows];
+
+// 🔍 SEARCH
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    let val = this.value.toLowerCase();
+
+    filteredRows = rows.filter(row =>
+        row.innerText.toLowerCase().includes(val)
+    );
+
+    renderTable();
+});
+
+// 🔽 SORTING
+document.querySelectorAll(".sortable").forEach((th, colIndex) => {
+    th.addEventListener("click", () => {
+        let asc = th.classList.toggle("asc");
+
+        filteredRows.sort((a, b) => {
+            let A = a.children[colIndex].dataset.value;
+            let B = b.children[colIndex].dataset.value;
+
+            return asc ? A - B : B - A;
+        });
+
+        renderTable();
+    });
+});
+
+// 📊 KPI CALCULATION
+function updateKPI() {
+    let revenue = 0, expense = 0, profit = 0;
+
+    filteredRows.forEach(row => {
+        revenue += parseFloat(row.children[3].dataset.value || 0);
+        expense += parseFloat(row.children[4].dataset.value || 0);
+        profit += parseFloat(row.children[5].dataset.value || 0);
+    });
+
+    document.getElementById("totalRevenue").innerText = "₹ " + revenue.toFixed(2);
+    document.getElementById("totalExpense").innerText = "₹ " + expense.toFixed(2);
+
+    let profitEl = document.getElementById("totalProfit");
+    profitEl.innerText = "₹ " + profit.toFixed(2);
+    profitEl.className = profit >= 0 ? "text-success" : "text-danger";
+}
+
+// 📄 RENDER
+function renderTable() {
+    rows.forEach(r => r.style.display = "none");
+    filteredRows.forEach(r => r.style.display = "");
+
+    updateKPI();
+}
+
+// INIT
+renderTable();
+</script>
+
+<!-- 🔷 STYLE -->
+<style>
+.kpi-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.table-container {
+    max-height: 550px;
+    overflow-y: auto;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+.account-row:hover {
+    background: #f9fafb;
+    cursor: pointer;
+}
+</style>
+
+{% endblock %}

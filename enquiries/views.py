@@ -10,6 +10,9 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from orders.models import Order
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 #@allowed_roles(['sales'])
 @login_required
 def create_enquiry(request):
@@ -19,8 +22,8 @@ def create_enquiry(request):
         email = request.POST.get("email")
         lead_source = request.POST.get("lead_source")
         reference_name = request.POST.get("reference_name")
-        pickups = int(request.POST.get("pickup_count") or 1)
-        deliveries = int(request.POST.get("delivery_count") or 1)
+        pickups = int(request.POST.get("pickup") or 1)
+        deliveries = int(request.POST.get("delivery") or 1)
         vehicle_type = request.POST.get("vehicle_type")
         vehicle_description = request.POST.get('vehicle_desc')
         kms = request.POST.get('kms')
@@ -87,93 +90,37 @@ def is_fleet(user):
 
 @login_required
 @user_passes_test(is_sales)
-def enquiry_list1(request):
-    if request.user.role == 'admin':
-        enquiries = Enquiry.objects.exclude(status='confirmed')
+def enquiry_list(request):
+    # Base queryset depending on user role
+    if request.user.role == 'sales':
+        base_qs = Enquiry.objects.order_by('-created_at')
     else:
-        enquiries = Enquiry.objects.filter(
-            created_by=request.user
-        ).exclude(status='confirmed')
-    query = request.GET.get('q')
-    if query:
-        enquiries = enquiries.filter(
-            Q(customer_name__icontains=query) |
-            Q(customer_contact__icontains=query)
-        )
-    enquiries = enquiries.order_by('-id')
-    return render(request, 'enquiry/list.html', {
-        'enquiries': enquiries,
-        'query': query or ''
-    })
-
-from django.db.models import Q
-
-def enquiry_list1(request):
-    # Get enquiries based on user role
-    if request.user.role == 'admin':
-        enquiries = Enquiry.objects.exclude(status='confirmed')
-    else:
-        enquiries = Enquiry.objects.filter(
-            created_by=request.user
-        ).exclude(status='confirmed')
+        base_qs = Enquiry.objects.filter(created_by=request.user)
 
     # Search filter
     query = request.GET.get('q')
     if query:
-        enquiries = enquiries.filter(
+        base_qs = base_qs.filter(
             Q(customer_name__icontains=query) |
             Q(customer_contact__icontains=query)
         )
 
-    # Order by newest first
-    enquiries = enquiries.order_by('-id')
-
-    # Include is_converted_to_order field for each enquiry
-    # (This assumes is_converted_to_order is a BooleanField in Enquiry model)
-    # If you want to filter only non-converted enquiries, you could do:
-    # enquiries = enquiries.filter(is_converted_to_order=False)
-
-    return render(request, 'enquiry/list.html', {
-        'enquiries': enquiries,
-        'query': query or ''
-    })
-
-def enquiry_list(request):
-    enquiries = Enquiry.objects.filter(
-        is_converted_to_order=False 
+    # Counts for dashboard
+    total_count = base_qs.count()
+    confirmed_count = base_qs.filter(status='confirmed').count()
+    pending_count = base_qs.filter(status__icontains='pending').count()
+    cancelled_count = base_qs.filter(status='cancelled').count()
+    enquiries = base_qs.filter(
+        created_by=request.user,
+        status='Waiting For Rate Approval'
     ).order_by('-id')
     return render(request, 'enquiry/list.html', {
-        'enquiries': enquiries
-    })
-
-def enquiry_list2(request):
-    # Get enquiries based on user role
-    if request.user.role == 'admin':
-        enquiries = Enquiry.objects.exclude(status='confirmed')
-    else:
-        enquiries = Enquiry.objects.filter(
-            created_by=request.user
-        ).exclude(status='confirmed')
-
-    # Search filter
-    query = request.GET.get('q')
-    if query:
-        enquiries = enquiries.filter(
-            Q(customer_name__icontains=query) |
-            Q(customer_contact__icontains=query)
-        )
-
-    # Order by newest first
-    enquiries = enquiries.order_by('-id')
-
-    # Include is_converted_to_order field for each enquiry
-    # (This assumes is_converted_to_order is a BooleanField in Enquiry model)
-    # If you want to filter only non-converted enquiries, you could do:
-    # enquiries = enquiries.filter(is_converted_to_order=False)
-
-    return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
-        'query': query or ''
+        'query': query or '',
+        'total_count': total_count,
+        'confirmed_count': confirmed_count,
+        'pending_count': pending_count,
+        'cancelled_count': cancelled_count,
     })
 
 @login_required
@@ -193,7 +140,7 @@ def delete_enquiry(request, id):
 
 @login_required
 # @allowed_roles(['admin'])
-def update_pitch(request, enquiry_id, status):
+def update_pitch1(request, enquiry_id, status):
     enquiry = get_object_or_404(Enquiry, id=enquiry_id)
     allowed_status = [
         'Waiting For Rate Approval',
@@ -201,7 +148,8 @@ def update_pitch(request, enquiry_id, status):
         'pending_pitch2',
         'pending_pitch3',
         'confirmed',
-        'rejected'
+        'cancelled',
+        'pending'
     ]
     if status in allowed_status:
         enquiry.status = status
@@ -212,152 +160,145 @@ def update_pitch(request, enquiry_id, status):
     return redirect('enquiry_list')  # removed comma
 
 #@allowed_roles(['admin')
-
-@login_required
-def reject_pitch(request, enquiry_id):
-    enquiry = get_object_or_404(Enquiry, id=enquiry_id)
-
-    # Define the rejection flow
-    rejection_flow = {
-        "pending_pitch1": "pending_pitch2",
-        "pending_pitch2": "pending_pitch3",
-        "pending_pitch3": "rejected"  # final stage
-    }
-
-    # Update status if it exists in the flow
-    if enquiry.status in rejection_flow:
-        enquiry.status = rejection_flow[enquiry.status]
-        enquiry.save()
-        messages.success(request, f"Enquiry status updated to '{enquiry.status}'")
-    else:
-        messages.warning(request, "Enquiry status cannot be rejected further")
-
-    return redirect('enquiry_list')
-
-def approve_enquiry_logic(enquiry, user):
-    if enquiry.status == 'pending_pitch1' and enquiry.pitch1:
-        enquiry.approved_rate = enquiry.pitch1
-
-    elif enquiry.status == 'pending_pitch2' and enquiry.pitch2:
-        enquiry.approved_rate = enquiry.pitch2
-
-    elif enquiry.status == 'pending_pitch3' and enquiry.pitch3:
-        enquiry.approved_rate = enquiry.pitch3
-        enquiry.status = "confirmed"  # only final stage confirms
-
-    enquiry.approved_by = user
-    enquiry.save()
-
 @login_required
 @user_passes_test(is_sales)
+@csrf_exempt
 def edit_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
     if request.method == "POST":
-        enquiry.pitch1 = request.POST.get("pitch1") or None
-        enquiry.pitch2 = request.POST.get("pitch2") or None
-        enquiry.pitch3 = request.POST.get("pitch3") or None
-        enquiry.remarks = request.POST.get("remarks")
-        if enquiry.pitch3:
-            enquiry.status = "pending_pitch3"
-        elif enquiry.pitch2:
+        data = json.loads(request.body)
+        pitch = data.get("pitch")
+        remarks = data.get("remarks")
+        # Save only the relevant pitch based on current status
+        if enquiry.status in ["pending_pitch3", "confirmed"] and pitch:
+            enquiry.pitch3 = pitch
+            enquiry.approval_rate = pitch
+            enquiry.status = "confirmed"
+        elif enquiry.status == "pending_pitch2" and pitch:
+            enquiry.pitch2 = pitch
+            enquiry.approval_rate = pitch
             enquiry.status = "pending_pitch2"
-        elif enquiry.pitch1:
+        elif enquiry.status in ["pending_pitch1", "Waiting For Rate Approval"] and pitch:
+            enquiry.pitch1 = pitch
+            enquiry.approval_rate = pitch
             enquiry.status = "pending_pitch1"
         else:
             enquiry.status = "Waiting For Rate Approval"
+        enquiry.remarks = remarks
         enquiry.save()
-        # ✅ Apply approval logic
-        approve_enquiry_logic(enquiry, request.user)
-        messages.success(request, "Enquiry updated successfully")
-        return redirect('enquiry_list')
-    return render(request, 'enquiry/edit.html', {'e': enquiry})
 
-@login_required
-@allowed_roles(['admin','sales'])
-def approve_pitch(request, enquiry_id):
-    enquiry = get_object_or_404(Enquiry, id=enquiry_id)
-    #enquiry.approved_rate = enquiry.pitch3 or enquiry.pitch2 or enquiry.pitch1
-    if request.method == "POST":
-        enquiry.pitch1 = request.POST.get("pitch1") or None
-        enquiry.pitch2 = request.POST.get("pitch2") or None
-        enquiry.pitch3 = request.POST.get("pitch3") or None
-        enquiry.remarks = request.POST.get("remarks")
+        return JsonResponse({"success": True})
 
-        # 🔥 LOGIC: assign approved_rate based on status
-        if enquiry.status == "pending_pitch1" and enquiry.pitch1:
-            enquiry.approved_rate = enquiry.pitch1
-            enquiry.created_by = request.user
-
-        elif enquiry.status == "pending_pitch2" and enquiry.pitch2:
-            enquiry.approved_rate = enquiry.pitch2
-            enquiry.created_by = request.user
-
-
-        elif enquiry.status == "pending_pitch3" and enquiry.pitch3:
-            enquiry.approved_rate = enquiry.pitch3
-            enquiry.created_by = request.user
-
-        enquiry.save()
-    return redirect('enquiry_list')
+    return JsonResponse({"success": False})
 
 @login_required
 @user_passes_test(is_sales)
 def confirm_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
-
-    # Allow only if any pitch exists
     if enquiry.pitch1 or enquiry.pitch2 or enquiry.pitch3:
-
         enquiry.status = "confirmed"
         enquiry.approved_by = request.user
-
-        # Priority: pitch3 > pitch2 > pitch1
         enquiry.approved_rate = (
             enquiry.pitch3 or
             enquiry.pitch2 or
             enquiry.pitch1
         )
+        enquiry.save()
+        messages.success(request, "✅ Enquiry Confirmed")
+    else:
+        messages.error(request, "❌ No pitch available to confirm")
+    return redirect('enquiry_list')
+
+def cancel_enquiry(request, id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            reason = data.get("reason", "")
+
+            enquiry = get_object_or_404(Enquiry, id=id)
+
+            # 🔒 Prevent double cancel
+            if enquiry.status == "cancelled":
+                return JsonResponse({"success": False, "msg": "Already cancelled"})
+
+            enquiry.status = "cancelled"
+            enquiry.cancel_reason = reason
+            enquiry.save()
+
+            return JsonResponse({"success": True})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False})
+
+@csrf_exempt
+def update_pitch(request, enquiry_id, status):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            remarks = (data.get("remarks") or "").strip()
+            pitch_rate = data.get("pitch_rate")
+            enquiry = get_object_or_404(Enquiry, id=enquiry_id)
+            status = status.lower().strip()
+            if status in ["pending_pitch1", "waiting for rate approval"]:
+                enquiry.pitch1_remarks = remarks
+                enquiry.pitch1 = pitch_rate
+                enquiry.status = "pending_pitch2"
+            elif status == "pending_pitch2":
+                enquiry.pitch2_remarks = remarks
+                enquiry.pitch2 = pitch_rate
+                enquiry.status = "pending_pitch3"
+            elif status == "pending_pitch3":
+                enquiry.pitch3_remarks = remarks
+                enquiry.pitch3 = pitch_rate
+                enquiry.status = "confirmed"
+                if pitch_rate is not None:
+                    enquiry.approval_rate = pitch_rate
+            if enquiry.status == "confirmed" and enquiry.approval_rate is None:
+                enquiry.approval_rate = pitch_rate
+            enquiry.save()
+            return JsonResponse({"success": True, "status": enquiry.status})
+        except Exception as e:
+            return JsonResponse({"success": False, "msg": str(e)})
+    return JsonResponse({"success": False, "msg": "Invalid request"})
+
+def update_enquiry_status(request, id, action):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        enquiry = Enquiry.objects.get(id=id)
+
+        if action == "confirm":
+            enquiry.status = "confirmed"
+            enquiry.approval_rate = data.get("approval_rate")
+            enquiry.save()
+
+            order = Order.objects.create(
+                enquiry=enquiry,
+                finalized_rate=enquiry.approval_rate
+            )
+
+            return JsonResponse({
+                "success": True,
+                "message": "Enquiry confirmed successfully",
+                "status": enquiry.status,
+                "approval_rate": enquiry.approval_rate,   # ✅ ADD THIS
+            })
+
+        elif action == "disagree":
+            enquiry.status = "disagree"
+            enquiry.disagree_reason = data.get("disagree_reason")
+
+        elif action == "cancel":
+            enquiry.status = "cancelled"
+            enquiry.cancel_reason = data.get("cancel_reason")
 
         enquiry.save()
 
-        messages.success(request, "✅ Enquiry Confirmed")
+        return JsonResponse({
+            "success": True,
+            "message": "Updated successfully",
+            "status": enquiry.status
+        })
 
-    else:
-        messages.error(request, "❌ No pitch available to confirm")
-
-    return redirect('enquiry_list')
-
-@login_required
-@user_passes_test(is_sales)
-def convert_to_order(request, id):
-    enquiry = get_object_or_404(Enquiry, id=id)
-    # Prevent duplicate
-    if enquiry.is_converted_to_order:
-        messages.warning(request, "Order already created")
-        return redirect("edit_enquiry", id=enquiry.id)
-    # Only confirmed
-    if enquiry.status != "confirmed":
-        messages.error(request, "Enquiry not confirmed")
-        return redirect("edit_enquiry", id=enquiry.id)
-    # CREATE ORDER safely
-    try:
-        order = Order.objects.create(
-            enquiry=enquiry,
-            customer_name=enquiry.customer_name,
-            customer_contact=enquiry.customer_contact,
-            routes=enquiry.routes,
-            vehicle_type=enquiry.vehicle_type,
-            final_rate=enquiry.approved_rate,
-            gst_percent=getattr(enquiry, 'gstbill', 0),
-            created_by=request.user
-        )
-    except Exception as e:
-        messages.error(request, f"Order creation failed: {e}")
-        return redirect("edit_enquiry", id=enquiry.id)
-
-    # Update enquiry
-    enquiry.is_converted_to_order = True
-    enquiry.save()
-
-    messages.success(request, f"Order {order.order_no} created")
-    return redirect("order_list", id=order.id)
+    return JsonResponse({"success": False})

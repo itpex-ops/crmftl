@@ -1,0 +1,85 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <!-- KPI -->
+    <div class="row mb-3">
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <small>Revenue</small>
+                <h5 class="text-success">₹ {{ account.total_revenue }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <small>Expense</small>
+                <h5 class="text-danger">₹ {{ account.total_expense }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <small>Profit</small>
+                <h5 class="{% if account.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ₹ {{ account.profit }}
+                </h5>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ADD TRANSACTION -->
+    <div class="card p-3 mb-3">
+        <form method="POST" action="{% url 'add_transaction' account.order.id %}">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    <input name="amount" class="form-control" placeholder="Amount">
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-control">
+                        <option value="credit">Credit</option>
+                        <option value="debit">Debit</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input name="desc" class="form-control" placeholder="Description">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- LEDGER -->
+    <div class="card p-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.created_at|date:"d M H:i" }}</td>
+                    <td>{{ t.transaction_type }}</td>
+                    <td>₹ {{ t.amount }}</td>
+                    <td>{{ t.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <!-- 🔔 Alerts -->
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 🔷 HEADER -->
+    <div class="card shadow-sm border-0 mb-4 p-4">
+        <h4 class="fw-semibold mb-1">🚚 Create Manual Order</h4>
+        <small class="text-muted">Fill all required details</small>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <!-- 🔵 LEFT SIDE -->
+            <div class="col-lg-8">
+
+                <!-- 👤 CUSTOMER -->
+                <div class="card section-card mb-3">
+                    <div class="section-title">👤 Customer Details</div>
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-4">
+                            <label>Customer Name</label>
+                            <input name="customer_name" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Mobile</label>
+                            <input name="customer_contact" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Email</label>
+                            <input name="email" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Lead Source</label>
+                            <select name="lead_source" class="form-select">
+                                <option value="">Select</option>
+                                <option value="justdial">Just Dial</option>
+                                <option value="inbound">Inbound</option>
+                                <option value="outbound">Outbound</option>
+                                <option value="reference">Reference</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Reference Name</label>
+                            <input name="reference_name" class="form-control">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 📍 ROUTE -->
+                <div class="card section-card mb-3">
+                    <div class="section-title">📍 Route & Vehicle</div>
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-6">
+                            <label>Origin</label>
+                            <input name="origin" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Destination</label>
+                            <input name="destination" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Vehicle Type</label>
+                            <input name="vehicle_type" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Description</label>
+                            <input name="vehicle_description" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Material</label>
+                            <input name="material" class="form-control">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 📦 LOAD -->
+                <div class="card section-card mb-3">
+                    <div class="section-title">📦 Load Details</div>
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-3">
+                            <label>Pieces</label>
+                            <input name="pieces" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tonnage</label>
+                            <input name="tonnage" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Expected Rate</label>
+                            <input name="expected_rate" class="form-control">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 💰 PRICING -->
+                <div class="card section-card mb-3">
+                    <div class="section-title">💰 Pricing</div>
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-3">
+                            <label>Base Freight</label>
+                            <input name="base_freight" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Extra Charges</label>
+                            <input name="extra_charges" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Total</label>
+                            <input name="total_amount" class="form-control bg-light" readonly>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Advance</label>
+                            <input name="advance_amount" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Balance</label>
+                            <input name="balance_amount" class="form-control">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 💳 PAYMENT -->
+                <div class="card section-card mb-3">
+                    <div class="section-title">💳 Payment</div>
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-3">
+                            <label>Mode</label>
+                            <select name="payment_mode" class="form-select">
+                                <option value="">Select</option>
+                                <option value="cash">Cash</option>
+                                <option value="upi">UPI</option>
+                                <option value="bank">Bank</option>
+                                <option value="credit">Credit</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Status</label>
+                            <select name="payment_status" class="form-select">
+                                <option value="pending">Pending</option>
+                                <option value="partial">Partial</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Transaction ID</label>
+                            <input name="transaction_id" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Remarks</label>
+                            <input name="payment_remarks" class="form-control">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ✅ SUBMIT -->
+                <div class="text-end">
+                    <button class="btn btn-primary px-4">💾 Create Order</button>
+                </div>
+
+            </div>
+
+            <!-- 🟢 RIGHT SIDE -->
+            <div class="col-lg-4">
+
+                <div class="card section-card">
+                    <div class="section-title">👤 Generated By</div>
+                    <div class="card-body">
+                        <div class="form-control bg-light">
+                            {{ request.user.username }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+<!-- 🎨 STYLE -->
+<style>
+.section-card {
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+}
+
+.section-title {
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    background: #f8fafc;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+}
+
+input[readonly] {
+    background-color: #f1f5f9;
+}
+</style>
+
+<!-- ⚡ AUTO TOTAL -->
+<script>
+document.addEventListener("input", function () {
+    let base = parseFloat(document.querySelector('[name=base_freight]').value) || 0;
+    let extra = parseFloat(document.querySelector('[name=extra_charges]').value) || 0;
+
+    document.querySelector('[name=total_amount]').value = base + extra;
+});
+</script>
+
+{% endblock %}

@@ -62,7 +62,7 @@ def auth_page(request):
 
                 context['success'] = "Account created! Please login."
 
-    return render(request, "accounts/auth.html", context)
+    return render(request, "authentication/auth.html", context)
 
 
 def auth_page0(request):
@@ -134,7 +134,7 @@ def auth_page0(request):
             except User.DoesNotExist:
                 context['forgot_error'] = "User not found"
             context['active_tab'] = "forgot"
-    return render(request, "accounts/auth.html", context)
+    return render(request, "authentication/auth.html", context)
 
 def auth_page1(request):
     context = {}
@@ -195,7 +195,7 @@ def auth_page1(request):
             # except User.DoesNotExist:
             #     context['forgot_error'] = "User not found"
             context['active_tab'] = "forgot"
-    return render(request, "accounts/auth.html", context)
+    return render(request, "authentication/auth.html", context)
 
 # @login_required
 # def sales_dashboard(request):

@@ -25,8 +25,14 @@ SECRET_KEY = 'django-insecure-z5)r#58f*hg4+5=kv2p!568b4=pg-&(f4!ce7h390b-7d6w=2(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost']
-
+ALLOWED_HOSTS = [ '.onrender.com',
+    "127.0.0.1",
+    "localhost",
+     ".ngrok-free.dev",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.ngrok-free.dev",
+]
 
 # Application definition
 
@@ -42,7 +48,8 @@ INSTALLED_APPS = [
     'enquiries',
     'orders',
     'reports',
-    'vehicles'
+    'vehicles',
+    'manual_order'
 ]
 AUTH_USER_MODEL = 'authentications.User'
 
@@ -54,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'crmftl.urls'

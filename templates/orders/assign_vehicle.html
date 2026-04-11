@@ -1,136 +1,192 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<style>
-    .card {
-        border-radius: 12px;
-    }
-</style>
-
 <div class="container mt-4">
 
-    <div class="card shadow">
-
-        <!-- HEADER -->
-        <div class="card-header bg-warning">
-            <h5>🚚 Assign Vehicle - {{ order.order_no }}</h5>
-        </div>
-
-        <!-- BODY -->
-        <div class="card-body">
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <div class="row g-3">
-
-                    <!-- 🚚 BASIC -->
-                    <div class="col-md-4">
-                        <label>Vehicle Number</label>
-                        <input name="vehicle_number" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Driver Number</label>
-                        <input name="driver_number" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Owner Number</label>
-                        <input name="owner_number" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Source</label>
-                        <input name="source" class="form-control">
-                    </div>
-
-                    <!-- 💰 FREIGHT -->
-                    <div class="col-md-4">
-                        <label>Freight Amount</label>
-                        <input type="number" step="0.01" name="freight_amount" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Advance</label>
-                        <input type="number" step="0.01" name="advance" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Brokerage</label>
-                        <input type="number" step="0.01" name="brokerage" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Loading</label>
-                        <input type="number" step="0.01" name="loading" class="form-control">
-                    </div>
-
-                    <!-- 💳 PAYMENT -->
-                    <hr>
-                    <h6 class="text-primary">💳 UPI Payment Details</h6>
-
-                    <div class="row g-3">
-
-                        <div class="col-md-4">
-                            <label>UPI App</label>
-                            <select name="upi_app" class="form-control">
-                                <option value="phonepe">📱 PhonePe</option>
-                                <option value="gpay">💰 Google Pay</option>
-                                <option value="paytm">🏦 Paytm</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label>UPI ID / Number</label>
-                            <input name="upi_number" class="form-control" placeholder="example@upi">
-                        </div>
-
-                    </div>
-            
- <h6 class="text-primary">💳 Account Details</h6>
-                    <div class="col-md-4">
-                        <label>Account Name</label>
-                        <input name="account_name" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Account Number</label>
-                        <input name="account_number" class="form-control">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>IFSC</label>
-                        <input name="ifsc" class="form-control">
-                    </div>
-                     <div class="col-md-4">
-                        <label>Saving / Current </label>
-                        <input name="ac_type" class="form-control">
-                    </div>
-
-
-                </div>
-
-                <!-- ACTIONS -->
-                <div class="mt-4">
-
-                    <button class="btn btn-success">
-                        💾 Save Vehicle
-                    </button>
-
-                    <a href="{% url 'order_detail' order.id %}" class="btn btn-secondary">
-                        ⬅ Back
-                    </a>
-
-                </div>
-
-            </form>
-
-        </div>
-
+    <!-- 🔷 HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">🚚 Assign Vehicle</h4>
+        <span class="badge bg-light text-dark">{{ order.order_no }}</span>
     </div>
 
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- 🔷 BASIC DETAILS -->
+        <div class="card premium-card mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="fw-bold text-primary">🚚 Vehicle Details</h6>
+            </div>
+
+            <div class="card-body row g-3">
+
+                <div class="col-md-4">
+                    <label>Vehicle Number</label>
+                    <input name="vehicle_number" class="form-control input-style" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Driver Number</label>
+                    <input name="driver_number" class="form-control input-style" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Owner Number</label>
+                    <input name="owner_number" class="form-control input-style">
+                </div>
+
+                <div class="col-md-4">
+                    <label>Source</label>
+                    <input name="source" class="form-control input-style">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 FREIGHT -->
+        <div class="card premium-card mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="fw-bold text-success">💰 Freight Details</h6>
+            </div>
+
+            <div class="card-body row g-3">
+
+                <div class="col-md-3">
+                    <label>Freight</label>
+                    <input type="number" step="0.01" name="freight_amount" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Advance</label>
+                    <input type="number" step="0.01" name="advance" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Brokerage</label>
+                    <input type="number" step="0.01" name="brokerage" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Loading</label>
+                    <input type="number" step="0.01" name="loading" class="form-control input-style">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 UPI -->
+        <div class="card premium-card mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="fw-bold text-info">💳 UPI Payment</h6>
+            </div>
+
+            <div class="card-body row g-3">
+
+                <div class="col-md-4">
+                    <label>UPI App</label>
+                    <select name="upi_app" class="form-control input-style">
+                        <option value="phonepe">📱 PhonePe</option>
+                        <option value="gpay">💰 Google Pay</option>
+                        <option value="paytm">🏦 Paytm</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label>UPI ID</label>
+                    <input name="upi_number" class="form-control input-style" placeholder="example@upi">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 BANK -->
+        <div class="card premium-card mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="fw-bold text-warning">🏦 Bank Details</h6>
+            </div>
+
+            <div class="card-body row g-3">
+
+                <div class="col-md-3">
+                    <label>Account Name</label>
+                    <input name="account_name" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Account Number</label>
+                    <input name="account_number" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>IFSC</label>
+                    <input name="ifsc" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Type</label>
+                    <select name="ac_type" class="form-control input-style">
+                        <option value="saving">Saving</option>
+                        <option value="current">Current</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 ACTIONS -->
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-light px-4">
+                ⬅ Back
+            </a>
+
+            <button class="btn btn-success px-4 shadow-sm">
+                💾 Save Vehicle
+            </button>
+        </div>
+
+    </form>
+
 </div>
+
+<!-- 🔥 PREMIUM CSS -->
+<style>
+    /* Card */
+    .premium-card {
+        border-radius: 14px;
+        border: 1px solid #f1f1f1;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04);
+        transition: 0.2s;
+    }
+
+    .premium-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Inputs */
+    .input-style {
+        border-radius: 10px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        transition: 0.2s;
+    }
+
+    .input-style:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.1);
+    }
+
+    /* Labels */
+    label {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    /* Section spacing */
+    .card-header h6 {
+        margin-bottom: 0;
+    }
+</style>
 
 {% endblock %}

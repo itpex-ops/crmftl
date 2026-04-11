@@ -41,6 +41,8 @@ class Enquiry(models.Model):
     pitch1 = models.CharField(max_length=200 , blank=True , null = True)
     pitch2 = models.CharField(max_length=200,blank =True,null=True)
     pitch3 = models.CharField(max_length=200,blank=True,null=True)
+
+    cancel_reason = models.CharField(max_length=200,blank=True,null=True)
                                                            
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

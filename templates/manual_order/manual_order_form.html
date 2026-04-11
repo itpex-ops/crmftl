@@ -1,0 +1,206 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <!-- Alerts -->
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- HEADER CARD -->
+    <div class="card shadow-sm border-0 mb-4 p-4">
+        <h4 class="fw-semibold mb-1">🚚 Create Enquiry Existing Customers</h4>
+        <small class="text-muted">Fill all required details</small>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <!-- LEFT PANEL -->
+            <div class="col-lg-8">
+
+                <!-- CUSTOMER DETAILS -->
+                <div class="card mb-3 section-card">
+                    <div class="section-title">👤 Customer Details</div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4"><input name="customer_name" class="form-control"
+                                placeholder="Customer Name" required></div>
+                        <div class="col-md-4"><input name="customer_contact" class="form-control"
+                                placeholder="Mobile No" required></div>
+                        <div class="col-md-4"><input type="email" name="email" class="form-control" placeholder="Email">
+                        </div>
+                        <div class="col-md-3"><input name="pickups" id="pickups" class="form-control"
+                                placeholder="No. of Pickups">
+                        </div>
+                        <div class="col-md-3"><input name="deliveries" id="deliveries" class="form-control"
+                                placeholder="No. of Deliveries"></div>
+                        <div id="origin-container" class="col-12"></div>
+                        <div id="destination-container" class="col-12"></div>
+                    </div>
+                </div>
+
+                <!-- ROUTE & VEHICLE -->
+                <div class="card mb-3 section-card">
+                    <div class="section-title">📍 Route & Vehicle</div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4"><input name="vehicle_type" class="form-control"
+                                placeholder="Vehicle Type"></div>
+                        <div class="col-md-4"><input name="vehicle_description" class="form-control"
+                                placeholder="Vehicle Description"></div>
+                        <div class="col-md-4"><input name="material" class="form-control" placeholder="Material"></div>
+
+                    </div>
+                </div>
+
+                <!-- LOAD DETAILS -->
+                <div class="card mb-3 section-card">
+                    <div class="section-title">📦 Load Details</div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-3"><input name="pieces" class="form-control" placeholder="Pieces"></div>
+                        <div class="col-md-3"><input name="tonnage" class="form-control" placeholder="Tonnage"></div>
+                        <div class="col-md-3">
+                            <select name="dimension_unit" class="form-select">
+                                <option value="">Dimension Unit</option>
+                                <option value="cm">cm</option>
+                                <option value="inch">inch</option>
+                                <option value="feet">feet</option>
+                                <option value="meter">meter</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3"><input name="length" class="form-control" placeholder="Length"></div>
+                        <div class="col-md-3"><input name="breadth" class="form-control" placeholder="Breadth"></div>
+                        <div class="col-md-3"><input name="height" class="form-control" placeholder="Height"></div>
+                        <div class="col-md-3"><input name="expected_rate" class="form-control"
+                                placeholder="Expected Rate ₹"></div>
+                        <div class="card text-left p-3 m-3 col-md-3 ms-auto">
+                            <button type="submit" class="btn btn-success btn-sm ">💾 Save Enquiry</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pricing -->
+                 <!-- 💰 PRICING -->
+<div class="card mb-3 section-card">
+    <div class="section-title">💰 Pricing Details</div>
+    <div class="card-body row g-3">
+
+        <div class="col-md-3">
+            <label>Base Freight</label>
+            <input name="base_freight" class="form-control" placeholder="₹ Base Freight">
+        </div>
+
+        <div class="col-md-3">
+            <label>Extra Charges</label>
+            <input name="extra_charges" class="form-control" placeholder="₹ Extra">
+        </div>
+
+        <div class="col-md-3">
+            <label>Advance</label>
+            <input name="advance_amount" class="form-control" placeholder="₹ Advance">
+        </div>
+
+        <div class="col-md-3">
+            <label>Balance</label>
+            <input name="balance_amount" class="form-control" placeholder="₹ Balance">
+        </div>
+
+        <div class="col-md-3">
+            <label>Total Amount</label>
+            <input name="total_amount" class="form-control bg-light" placeholder="Auto / Manual">
+        </div>
+
+    </div>
+</div>
+<!--Payment -->
+<!-- 💳 PAYMENT DETAILS -->
+<div class="card mb-3 section-card">
+    <div class="section-title">💳 Payment Details</div>
+    <div class="card-body row g-3">
+
+        <div class="col-md-3">
+            <label>Payment Mode</label>
+            <select name="payment_mode" class="form-select">
+                <option value="">Select</option>
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="bank">Bank Transfer</option>
+                <option value="credit">Credit</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label>Payment Status</label>
+            <select name="payment_status" class="form-select">
+                <option value="pending">Pending</option>
+                <option value="partial">Partial</option>
+                <option value="paid">Paid</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label>Transaction ID</label>
+            <input name="transaction_id" class="form-control" placeholder="Txn ID">
+        </div>
+
+        <div class="col-md-3">
+            <label>Payment Remarks</label>
+            <input name="payment_remarks" class="form-control" placeholder="Notes">
+        </div>
+
+    </div>
+</div>
+
+            </div>
+            <div class="col-lg-4">
+                <!-- GENERATED BY -->
+                <div class="card mb-3 section-card">
+                    <div class="section-title">👤 Enquiry Generated By</div>
+                    <div class="card-body">
+                        <div class="form-control bg-light">
+                            <strong>{{ request.user.username }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- SaaS CSS -->
+<style>
+    .section-card {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+        font-weight: 600;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        background: #f9f9f9;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+    }
+</style>
+
+<script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/enquiry/css/enquiry.css' %}">
+
+{% endblock %}

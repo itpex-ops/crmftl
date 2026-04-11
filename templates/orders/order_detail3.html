@@ -1,0 +1,217 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- 🔷 HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">📦 Order {{ order.order_no }}</h4>
+            <small class="text-muted">Created on {{ order.date }}</small>
+        </div>
+
+        <span class="badge px-3 py-2 
+            {% if order.order_status == 'completed' %}bg-success
+            {% elif order.order_status == 'pending' %}bg-warning
+            {% else %}bg-secondary{% endif %}">
+            {{ order.order_status|capfirst }}
+        </span>
+    </div>
+
+    <!-- 🔷 TOP SUMMARY -->
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card info-card primary">
+                <small>Customer</small>
+                <h6>{{ order.customer_name }}</h6>
+                <span class="text-muted">{{ order.customer_contact }}</span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card info-card success">
+                <small>Total Amount</small>
+                <h5>₹ {{ order.total_rate }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card info-card warning">
+                <small>Advance</small>
+                <h6>₹ {{ order.advance }}</h6>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card info-card danger">
+                <small>Balance</small>
+                <h6>₹ {{ order.balance }}</h6>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔷 MAIN GRID -->
+    <div class="row">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+
+            <!-- ROUTE -->
+            <div class="card section-card mb-4">
+                <div class="card-header">📍 Route Details</div>
+                <div class="card-body">
+
+                    {% if order.routes %}
+                    {% for r in order.routes %}
+                    <div class="route-box mb-2">
+                        <span class="fw-semibold text-primary">
+                            {{ r.origin }} → {{ r.destination }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No routes available</p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- VEHICLES -->
+            <div class="card section-card mb-4">
+                <div class="card-header">🚚 Assigned Vehicles</div>
+                <div class="card-body">
+
+                    {% if order.vehicles.all %}
+                    {% for v in order.vehicles.all %}
+                    <div class="vehicle-card mb-3">
+
+                        <div class="d-flex justify-content-between">
+                            <strong>🚚 {{ v.vehicle_number }}</strong>
+                            <span class="text-success">₹ {{ v.total_freight }}</span>
+                        </div>
+
+                        <small class="text-muted">📞 {{ v.driver_number }}</small>
+
+                        <div class="mt-2 small">
+                            Advance: ₹ {{ v.advance }} |
+                            Balance: ₹ {{ v.balance }}
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No vehicles assigned</p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-4">
+
+            <!-- PAYMENT -->
+            <div class="card section-card mb-4">
+                <div class="card-header">💳 Payment Info</div>
+                <div class="card-body small">
+
+                    <p><strong>Terms:</strong> {{ order.payment_terms }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="badge 
+                            {% if order.payment_status == 'paid' %}bg-success
+                            {% else %}bg-warning{% endif %}">
+                            {{ order.payment_status|capfirst }}
+                        </span>
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- PRICING -->
+            <div class="card section-card mb-4">
+                <div class="card-header">💰 Pricing</div>
+                <div class="card-body small">
+
+                    <p>Rate: ₹ {{ order.final_rate }}</p>
+                    <p>GST: {{ order.gst_percent }}%</p>
+                    <hr>
+                    <h6>Total: ₹ {{ order.total_rate }}</h6>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 🔥 PREMIUM CSS -->
+<style>
+    /* Info cards (top) */
+    .info-card {
+        border-radius: 14px;
+        padding: 15px;
+        border: none;
+        color: #fff;
+    }
+
+    .primary {
+        background: linear-gradient(120deg, #4e73df, #6f8cff);
+    }
+
+    .success {
+        background: linear-gradient(120deg, #1cc88a, #4be3b1);
+    }
+
+    .warning {
+        background: linear-gradient(120deg, #f6c23e, #ffd86b);
+    }
+
+    .danger {
+        background: linear-gradient(120deg, #e74a3b, #ff7b6b);
+    }
+
+    /* Sections */
+    .section-card {
+        border-radius: 14px;
+        border: 1px solid #f1f1f1;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-card .card-header {
+        background: transparent;
+        font-weight: 600;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    /* Route box */
+    .route-box {
+        padding: 10px;
+        background: #f8f9fc;
+        border-radius: 8px;
+    }
+
+    /* Vehicle card */
+    .vehicle-card {
+        padding: 12px;
+        border-radius: 10px;
+        background: #f9fafb;
+        border: 1px solid #eee;
+        transition: 0.2s;
+    }
+
+    .vehicle-card:hover {
+        background: #f1f5ff;
+    }
+
+    /* Hover */
+    .section-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    input[readonly] {
+        background-color: #f8fafc;
+    }
+
+    .window-card {
+        border-radius: 12px;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .window-header {
+        background: #1e293b;
+        color: white;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .window-body {
+        padding: 20px;
+        background: white;
+    }
+
+    .badge-status {
+        font-size: 13px;
+    }
+</style>
+<div class="container mt-4">
+    <div class="window-card">
+        <!-- 🔷 HEADER -->
+        <div class="window-header">
+            <div>
+                📦 <strong>{{ order.order_no }}</strong>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                <span class="badge bg-success badge-status">
+                    ORDER CREATED
+                </span>
+            </div>
+
+        </div>
+        <!-- 🔷 BODY -->
+        <div class="window-body">
+
+            <!-- 👤 CUSTOMER -->
+            <h6 class="text-success mb-3">👤 Customer Details</h6>
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label>Customer Name</label>
+                    <input value="{{ order.customer_name }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Contact</label>
+                    <input value="{{ order.customer_contact }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Created By</label>
+                    <input value="{{ order.created_by }}" class="form-control" readonly>
+                </div>
+
+            </div>
+
+            <!-- 📍 ROUTE -->
+            <hr>
+            <h6>📍 Route Details</h6>
+            <div class="row g-3">
+                {% for r in order.routes %}
+                <div class="col-md-3">
+                    <label>Origin</label>
+                    <input value="{{ r.origin }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Destination</label>
+                    <input value="{{ r.destination }}" class="form-control" readonly>
+                </div>
+                {% empty %}-{% endfor %}
+                <div class="col-md-3">
+                    <label>Vehicle Type</label>
+                    <input value="{{ order.vehicle_type }}" class="form-control" readonly>
+                </div>
+
+            </div>
+
+            <!-- 🔗 LINKED ENQUIRY -->
+            <hr>
+            <h6 class="text-warning">🔗 Linked Enquiry</h6>
+
+            {% if order.enquiry %}
+            <div class="alert alert-info">
+                Enquiry No:
+                <strong>
+                    <a href="{% url 'edit_enquiry' order.enquiry.id %}">
+                        {{ order.enquiry.enquiry_no }}
+                    </a>
+                </strong>
+            </div>
+            {% else %}
+            <div class="alert alert-secondary">
+                No enquiry linked
+            </div>
+            {% endif %}
+
+            <!-- 🚚 VEHICLE DETAILS -->
+            <hr>
+            <h6 class="text-primary">🚚 Vehicle Details</h6>
+
+            {% if order.vehicles.all %}
+            {% with v=order.vehicles.first %}
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label>Vehicle No</label>
+                    <input value="{{ v.vehicle_number }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Driver</label>
+                    <input value="{{ v.driver_number }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Owner</label>
+                    <input value="{{ v.owner_number }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Freight</label>
+                    <input value="{{ v.freight_amount }}" class="form-control" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>UPI App</label>
+                    <input value="{{ v.get_upi_app_display  }}" class="form-control" readonly>
+                </div>
+
+                <div class="col-md-3">
+                    <label>UPI ID</label>
+                    <input value="{{ v.upi_id  }}" class="form-control" readonly>
+                </div>
+
+            </div>
+            {% endwith %}
+            {% else %}
+            <div class="alert alert-warning">
+                No vehicle assigned
+            </div>
+            {% endif %}
+
+            <!-- 🔙 BACK -->
+            <hr>
+            <div class="row">
+
+            <div class="col-md-3">
+              <a href="{% url 'assign_vehicle' order.id %}" class="btn btn-warning btn-sm">
+                    🚚 Assign Vehicle
+                </a>
+                </div>
+                <div class="col-md-3">
+            <a href="{% url 'order_list' %}" class="btn btn-secondary btn-sm">
+                ⬅ Back to Orders
+            </a>
+            </div></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
