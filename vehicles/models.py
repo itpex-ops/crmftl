@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from orders.models import Order
 from decimal import Decimal
 from django.db.models import Max
@@ -18,24 +15,36 @@ class Vehicle(models.Model):
     driver_number = models.CharField(max_length=15)
     owner_number = models.CharField(max_length=15, blank=True, null=True)
 
-    source = models.CharField(max_length=100, blank=True, null=True)
+    SOURCE_TYPES = [
+        ('directors','Directors'),
+        ('transporters','Transporters'),
+        ('brokers','Brokers'),
+        ('drivers','Drivers'),
+        ('others','Others')
+    ]
+    
+    source = models.CharField(max_length=100, choices = SOURCE_TYPES, blank=True, null=True )
 
     # 💰 MONEY FIELDS (use DecimalField)
     freight_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    halting = models.DecimalField(max_digits=200,decimal_places=2,default=0)
+    loading_unloading = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    brokerage = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_freight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
     advance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    brokerage = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    loading = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    total_freight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
     # 💳 PAYMENT
-    upi_number = models.CharField(max_length=20, blank=True, null=True)
     account_name = models.CharField(max_length=100, blank=True, null=True)
     account_number = models.CharField(max_length=30, blank=True, null=True)
     ifsc = models.CharField(max_length=20, blank=True, null=True)
     ac_type = models.CharField(max_length=20, blank = True, null=True)
+    bank_verified = models.BooleanField(default=False)
+    bank_verified_at = models.DateTimeField(null=True, blank=True)
+    beneficiary_name = models.CharField(max_length=100, blank=True, null=True)
+
     UPI_CHOICES = [
     ('phonepe', 'PhonePe'),
     ('gpay', 'Google Pay'),
@@ -45,15 +54,17 @@ class Vehicle(models.Model):
 
     upi_app = models.CharField(max_length=10, choices=UPI_CHOICES, default='phonepe')
     upi_id = models.CharField(max_length=200,blank=True,null=True)
+    upi_number = models.CharField(max_length=200, blank=True,null=True)
+    vehicle_reassign_date = models.DateTimeField(blank=True,null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.balance = (self.freight_amount or 0) - (self.advance or 0)
+        self.balance = Decimal(self.freight_amount or 0) - Decimal(self.advance or 0)
         self.total_freight = (
-            (self.freight_amount or 0)
-            + (self.brokerage or 0)
-            + (self.loading or 0)
+            Decimal(self.freight_amount or 0)
+            + Decimal(self.brokerage or 0)
+            + Decimal(self.loading_unloading or 0)
         )
         if not self.ftl_no:
             with transaction.atomic():
@@ -86,6 +97,9 @@ class Tracking(models.Model):
     arrived = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
     pod_received = models.BooleanField(default=False)
+    lr_no_b = models.BooleanField(default=False)
+    lr_no = models.TextField(max_length=200, blank=True,null=True)
+
     transporter_paid = models.BooleanField(default=False)
     customer_paid = models.BooleanField(default=False)
     settled = models.BooleanField(default=False)
@@ -100,4 +114,4 @@ class Tracking(models.Model):
 
     def __str__(self):
         return f"Tracking - {self.order.order_no}"
-    
+

@@ -1,85 +1,82 @@
 from django.db import models
-from django.conf import settings
-from orders.models import Order
+from enquiries.models import Enquiry
 from vehicles.models import Vehicle
+from django.conf import settings
 
-User = settings.AUTH_USER_MODEL
 
+class CustomerTransaction(models.Model):
+    TYPE_CHOICES = [
+        ('invoice', 'Invoice'),
+        ('payment', 'Payment Received'),
+        ('advance', 'Advance Received'),
+    ]
 
-# ===============================
-# 💰 MAIN ACCOUNT (Per Order)
-# ===============================
-class Account(models.Model):
-    order = models.OneToOneField(
-        Order,
-        on_delete=models.CASCADE,
-        related_name="account"
-    )
-
-    total_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    total_expense = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    profit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def calculate(self):
-        # Revenue = Order value
-        self.total_revenue = self.order.total_rate or 0
-
-        # Expense = sum of vehicle costs
-        vehicle_cost = sum(v.total_freight for v in self.order.vehicles.all())
-
-        self.total_expense = vehicle_cost
-        self.profit = self.total_revenue - self.total_expense
-
-    def save(self, *args, **kwargs):
-        self.calculate()
-        super().save(*args, **kwargs)
+    enquiry = models.ForeignKey(Enquiry, on_delete=models.CASCADE)
+    transaction_type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"Account - {self.order.order_no}"
+        return self.enquiry.customer_name
 
 
-# ===============================
-# 📒 LEDGER (Transactions)
-# ===============================
-class Transaction(models.Model):
+class VehicleTransaction(models.Model):
+    TYPE_CHOICES = [
+        ('fuel', 'Fuel'),
+        ('driver_advance', 'Driver Advance'),
+        ('toll', 'Toll'),
+        ('rent', 'Vehicle Rent'),
+        ('maintenance', 'Maintenance'),
+    ]
 
-    TRANSACTION_TYPE = [
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    transaction_type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.vehicle.vehicle_no
+
+class BankTransaction(models.Model):
+    TYPE_CHOICES = [
         ('credit', 'Credit'),
         ('debit', 'Debit'),
     ]
 
-    account = models.ForeignKey(
-        Account,
-        on_delete=models.CASCADE,
-        related_name="transactions"
-    )
-
-    vehicle = models.ForeignKey(
-        Vehicle,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
+    bank_name = models.CharField(max_length=100)
+    txn_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-
-    transaction_type = models.CharField(
-        max_length=10,
-        choices=TRANSACTION_TYPE
-    )
-
-    description = models.TextField(blank=True)
-
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    reference_no = models.CharField(max_length=120, blank=True, null=True)
+    party_name = models.CharField(max_length=150)
+    purpose = models.CharField(max_length=150)
+    remarks = models.TextField(blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.transaction_type} - ₹{self.amount}"
+        return f"{self.bank_name} - {self.txn_type} - {self.amount}"
+    
+class LedgerEntry(models.Model):
+
+    ACCOUNT_TYPES = [
+        ('customer', 'Customer'),
+        ('vehicle', 'Vehicle'),
+        ('bank', 'Bank'),
+    ]
+
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
+
+    date = models.DateTimeField(auto_now_add=True)
+
+    # links (optional)
+    enquiry = models.ForeignKey('enquiries.Enquiry', null=True, blank=True, on_delete=models.CASCADE)
+    order = models.ForeignKey('orders.Order', null=True, blank=True, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey('vehicles.Vehicle', null=True, blank=True, on_delete=models.CASCADE)
+
+    debit = models.FloatField(default=0)   # outgoing
+    credit = models.FloatField(default=0)  # incoming
+
+    remarks = models.CharField(max_length=255, blank=True, null=True)

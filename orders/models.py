@@ -13,6 +13,7 @@ class Order(models.Model):
 
     routes = models.JSONField(null=True, blank=True)
     vehicle_type = models.CharField(max_length=100)
+    vehicle_place_date = models.DateTimeField(blank=True,null=True)
 
     # 💰 Pricing
     finalized_rate = models.FloatField(null=True, blank=True)
@@ -26,6 +27,10 @@ class Order(models.Model):
     advance = models.FloatField(null=True, blank=True)
     balance = models.FloatField(null=True, blank=True)
     topay = models.FloatField(null=True, blank=True)
+    credit = models.FloatField(null = True , blank = True)
+    credit_date = models.DateTimeField(blank=True,null=True)
+    credit_days = models.IntegerField(blank=True,null=True)
+    due_date = models.DateTimeField(blank= True,null = True)
 
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

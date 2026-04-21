@@ -5,7 +5,6 @@
 
 <div class="container-fluid mt-3">
 
-    <!-- Alerts -->
     {% if messages %}
     <div class="mb-3">
         {% for message in messages %}
@@ -17,7 +16,7 @@
     </div>
     {% endif %}
 
-    <!-- HEADER CARD -->
+    <!-- HEADER -->
     <div class="card shadow-sm border-0 mb-4 p-4">
         <h4 class="fw-semibold mb-1">🚚 Create Enquiry</h4>
         <small class="text-muted">Fill all required details</small>
@@ -28,49 +27,138 @@
 
         <div class="row g-4">
 
-            <!-- LEFT PANEL -->
+            <!-- LEFT SIDE -->
             <div class="col-lg-8">
 
                 <!-- CUSTOMER DETAILS -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">👤 Customer Details</div>
+
                     <div class="card-body row g-3">
-                        <div class="col-md-4"><input name="customer_name" class="form-control"
-                                placeholder="Customer Name" required></div>
-                        <div class="col-md-4"><input name="customer_contact" class="form-control"
-                                placeholder="Mobile No" required></div>
-                        <div class="col-md-4"><input type="email" name="email" class="form-control" placeholder="Email">
+
+                        <div class="col-md-4">
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" name="customer_name" class="form-control" required>
                         </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" name="customer_contact" class="form-control" maxlength="10"
+                                pattern="[0-9]{10}" inputmode="numeric" required
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                            <small class="text-muted">Enter 10 digit mobile number</small>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control">
+                        </div>
+
                         <div class="col-md-3">
+                            <label class="form-label">Lead Source</label>
                             <select name="lead_source" class="form-select">
-                                <option value="">Lead Source</option>
+                                <option value="">Select</option>
                                 <option value="justdial">Just Dial</option>
                                 <option value="inbound">Inbound</option>
                                 <option value="outbound">Outbound</option>
+                                <option value="social media">Social Media</option>
                                 <option value="reference">Reference</option>
                             </select>
                         </div>
-                        <div class="col-md-3"><input name="reference_name" class="form-control"
-                                placeholder="Reference Name"></div>
-                        <div class="col-md-3"><input name="pickups" id="pickups" class="form-control"
-                                placeholder="No. of Pickups">
+
+                        <div class="col-md-3">
+                            <label class="form-label">Reference/SocialMedia</label>
+                            <input type="text" name="reference_name" class="form-control">
                         </div>
-                        <div class="col-md-3"><input name="deliveries" id="deliveries" class="form-control"
-                                placeholder="No. of Deliveries"></div>
-                        <div id="origin-container" class="col-12"></div>
-                        <div id="destination-container" class="col-12"></div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">No. of Pickups</label>
+                            <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10"
+                                value="1">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">No. of Deliveries</label>
+                            <input type="number" name="deliveries" id="deliveries" class="form-control" min="1" max="10"
+                                value="1">
+                        </div>
+
+                        <div id="origin-container" class="col-12">
+                            <label class="form-label">Pickup PIN Code</label>
+                            <input type="tel" name="origin_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
+                                inputmode="numeric" required
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+                            <small class="text-muted">Enter 6 digit pincode</small>
+                        </div>
+
+                        <div id="destination-container" class="col-12">
+                            <label class="form-label">Delivery PIN Code</label>
+                            <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
+                                pattern="[0-9]{6}" inputmode="numeric" required
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+                            <small class="text-muted">Enter 6 digit pincode</small>
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- ROUTE & VEHICLE -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">📍 Route & Vehicle</div>
+
                     <div class="card-body row g-3">
-                        <div class="col-md-4"><input name="vehicle_type" class="form-control"
-                                placeholder="Vehicle Type"></div>
-                        <div class="col-md-4"><input name="vehicle_description" class="form-control"
-                                placeholder="Vehicle Description"></div>
-                        <div class="col-md-4"><input name="material" class="form-control" placeholder="Material"></div>
+                        <div class="col-md-4">
+                            <label class="form-label">Vehicle Type</label>
+
+                            <select name="vehicle_type" class="form-select vehicle-select" required>
+
+                                <option value="">Select Vehicle</option>
+
+                                {% for value,label in vehicle_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <!-- Tom Select CSS -->
+                        <link rel="stylesheet"
+                            href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+
+                        <!-- Tom Select JS -->
+                        <script
+                            src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+
+                                new TomSelect(".vehicle-select", {
+                                    create: false,
+                                    sortField: {
+                                        field: "text",
+                                        direction: "asc"
+                                    },
+                                    placeholder: "Search Vehicle Type..."
+                                });
+
+                            });
+                        </script>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Vehicle Description</label>
+                            <input type="text" name="vehicle_description" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">KMs</label>
+                            <input type="number" name="kilometers" class="form-control">
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label class="form-label">Material</label>
+                            <input type="text" name="material" class="form-control">
+                        </div>
 
                     </div>
                 </div>
@@ -78,36 +166,65 @@
                 <!-- LOAD DETAILS -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">📦 Load Details</div>
+
                     <div class="card-body row g-3">
-                        <div class="col-md-3"><input name="pieces" class="form-control" placeholder="Pieces"></div>
-                        <div class="col-md-3"><input name="tonnage" class="form-control" placeholder="Tonnage"></div>
+
                         <div class="col-md-3">
+                            <label class="form-label">Pieces</label>
+                            <input type="number" name="pieces" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Tonnage</label>
+                            <input type="number" name="tonnage" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Dimension Unit</label>
                             <select name="dimension_unit" class="form-select">
-                                <option value="">Dimension Unit</option>
+                                <option value="">Select</option>
                                 <option value="cm">cm</option>
                                 <option value="inch">inch</option>
                                 <option value="feet">feet</option>
                                 <option value="meter">meter</option>
                             </select>
                         </div>
-                        <div class="col-md-3"><input name="length" class="form-control" placeholder="Length"></div>
-                        <div class="col-md-3"><input name="breadth" class="form-control" placeholder="Breadth"></div>
-                        <div class="col-md-3"><input name="height" class="form-control" placeholder="Height"></div>
-                        <div class="col-md-3"><input name="expected_rate" class="form-control"
-                                placeholder="Expected Rate ₹"></div>
-                        <div class="card text-left p-3 m-3 col-md-3 ms-auto">
-                            <button type="submit" class="btn btn-success btn-sm ">💾 Save Enquiry</button>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Length</label>
+                            <input type="number" name="length" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Breadth</label>
+                            <input type="number" name="breadth" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Height</label>
+                            <input type="number" name="height" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Expected Rate ₹</label>
+                            <input type="number" name="expected_rate" class="form-control">
+                        </div>
+
+                        <div class="col-md-3 ms-auto d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">
+                                💾 Save Enquiry
+                            </button>
                         </div>
                     </div>
-
                 </div>
-
             </div>
+
+            <!-- RIGHT SIDE -->
             <div class="col-lg-4">
-                <!-- GENERATED BY -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">👤 Enquiry Generated By</div>
                     <div class="card-body">
+                        <label class="form-label">User Name</label>
                         <div class="form-control bg-light">
                             <strong>{{ request.user.username }}</strong>
                         </div>
@@ -118,27 +235,71 @@
     </form>
 </div>
 
-<!-- SaaS CSS -->
 <style>
-    .section-card {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    .ts-wrapper.single .ts-control {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        overflow: hidden;
     }
 
-    .section-title {
-        font-weight: 600;
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        background: #f9f9f9;
+    .ts-wrapper.single .ts-control input {
+        width: 1px !important;
+        min-width: 1px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    .form-control,
-    .form-select {
-        border-radius: 8px;
+    .ts-wrapper.single .item {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+
+input[type="text"],
+textarea {
+text-transform: uppercase;
+}
+
+.section-card {
+border-radius: 12px;
+border: 1px solid #eee;
+box-shadow: 0 3px 12px rgba(0, 0, 0, .05);
+}
+
+.section-title {
+font-weight: 600;
+padding: 12px;
+border-bottom: 1px solid #eee;
+background: #f9f9f9;
+}
+
+.form-control,
+.form-select {
+border-radius: 8px;
+text-transform: uppercase;
+}
+
+.form-label {
+font-size: 13px;
+font-weight: 600;
+margin-bottom: 6px;
+}
 </style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
+        document.querySelectorAll('input[type="text"]').forEach(function (input) {
+
+            input.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+
+        });
+
+    });
+</script>
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
 <link rel="stylesheet" href="{% static 'assets/enquiry/css/enquiry.css' %}">
 

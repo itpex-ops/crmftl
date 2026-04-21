@@ -7,7 +7,6 @@ from django.conf import settings
 from .models import User, PasswordResetRequest
 from .decorators import allowed_roles
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, get_user_model
@@ -16,9 +15,12 @@ from django.shortcuts import render, redirect
 User = get_user_model()
 
 def auth_page(request):
+    # ✅ If already logged in → go to dashboard (no loop)
     if request.user.is_authenticated:
-        return redirect('user_dashboard')   # keep consistent
+        if request.path == '/auth/':  # or your auth URL
+            return redirect('user_dashboard')
     context = {}
+
     if request.method == "POST":
         action = request.POST.get("action")
 
@@ -31,7 +33,14 @@ def auth_page(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('user_dashboard')   # ✅ FIXED (was dashboard)
+                        
+                next_url = request.GET.get('next')
+
+                if next_url:
+                    return redirect(next_url)
+                else:
+                    return redirect ('user_dashboard') # ✅' correct
+
             else:
                 context['login_error'] = "Invalid username or password"
 
@@ -50,19 +59,45 @@ def auth_page(request):
                 context['register_error'] = "Username already exists"
 
             else:
+                role = request.POST.get("role")  # from form
+
                 user = User.objects.create_user(
                     username=username,
                     password=password
                 )
 
-                # ✅ assign custom fields AFTER creation
                 user.employee_code = employee_code
                 user.phone = phone
-                user.save()
+                user.role = role   # ✅ IMPORTANT
+                user.save() 
 
                 context['success'] = "Account created! Please login."
 
     return render(request, "authentication/auth.html", context)
+
+def redirect_user_dashboard(user):
+
+    if not user.role:
+        return redirect('/auth/')  # fallback safe
+
+    role_redirect_map = {
+        "sales": "sales_dashboard",
+        "admin": "admin_dashboard",
+        "fleet": "fleet_dashboard",
+        "accounts": "accounts_dashboard",
+        "it": "it_dashboard",
+    }
+
+    url_name = role_redirect_map.get(user.role.lower())
+
+    if not url_name:
+        return redirect('user_dashboard')
+
+    return redirect(url_name)
+
+
+def user_dashboard(request):
+    return render(request,"enquiry/create.html") # "dashboards/user.html")
 
 
 def auth_page0(request):
@@ -211,12 +246,10 @@ def auth_page1(request):
 #     return render(request, "dashboards/fleet.html")
 
 # @login_required
-# def it_dashboard(request):
-#     return render(request, "dashboards/it.html")
+def it_dashboard(request):
+    return render(request, "dashboards/it.html")
 
-#@login_required
-def user_dashboard(request):
-    return render(request,"enquiry/create.html")# "dashboards/user.html")
+#@login_requiredz
 
 
 # @login_required
@@ -226,19 +259,6 @@ def user_dashboard(request):
 #     return render(request, "accounts/accounts_dashboard.html") #, {"orders": orders})
 
 # # # 🔁 ROLE BASED REDIRECT
-def redirect_user_dashboard(user):
-    if user.role == "sales":
-        return redirect("sales_dashboard")
-    if user.role == "admin":
-        return redirect('admin_dashboard')
-    elif user.role == "fleet":
-        return redirect('fleet_dashboard')
-    elif user.role == "accounts":
-        return redirect('accounts_dashboard')
-    elif user.role == 'it':
-        return redirect('it_dashboard')
-    else:
-        return redirect('user_dashboard')
 
 # def role_required(role):
 #     def decorator(view_func):
@@ -256,6 +276,17 @@ def redirect_user_dashboard(user):
 def logout_user(request):
     logout(request)
     request.session.flush()
+    return redirect('auth')
+
+# def clear_session(request):
+#     response = redirect('auth')
+#     response.delete_cookie('sessionid')  # Django session cookie
+#     return response
+
+# from django.shortcuts import redirect
+
+def clear_session(request):
+    request.session.flush()   # ✅ clears everything properly
     return redirect('auth')
 
 # @allowed_roles(['admin', 'it'])

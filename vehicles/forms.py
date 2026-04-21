@@ -7,7 +7,7 @@ class VehicleForm(forms.ModelForm):
         model = Vehicle
         fields = [
             'vehicle_number', 'driver_number', 'owner_number', 'source',
-            'freight_amount', 'advance', 'brokerage', 'loading',
+            'freight_amount', 'advance', 'brokerage', 'loading_unloading',
             'upi_number', 'upi_app', 'account_name', 'account_number', 'ifsc', 'ac_type'
         ]
         widgets = {
@@ -18,7 +18,7 @@ class VehicleForm(forms.ModelForm):
             'freight_amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'advance': forms.NumberInput(attrs={'class': 'form-control'}),
             'brokerage': forms.NumberInput(attrs={'class': 'form-control'}),
-            'loading': forms.NumberInput(attrs={'class': 'form-control'}),
+            'loading_unloading': forms.NumberInput(attrs={'class': 'form-control'}),
             'upi_number': forms.TextInput(attrs={'class': 'form-control'}),
             'upi_app': forms.Select(attrs={'class': 'form-select'}),
             'account_name': forms.TextInput(attrs={'class': 'form-control'}),

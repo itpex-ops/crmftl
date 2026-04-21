@@ -1,83 +1,83 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<div class="container-fluid mt-3">
+<style>
 
-    <!-- KPI -->
-    <div class="row mb-3">
+.card-box{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <small>Revenue</small>
-                <h5 class="text-success">₹ {{ account.total_revenue }}</h5>
+.title{
+    font-size:22px;
+    font-weight:700;
+}
+
+.label{
+    font-size:13px;
+    color:#64748b;
+}
+
+.value{
+    font-size:22px;
+    font-weight:700;
+}
+
+.green{ color:#16a34a; }
+.red{ color:#dc2626; }
+.blue{ color:#2563eb; }
+.orange{ color:#f97316; }
+
+</style>
+
+<div class="container-fluid">
+
+    <div class="title mb-3">ERP Dashboard</div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Total Income</div>
+                <div class="value green">₹{{ income }}</div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <small>Expense</small>
-                <h5 class="text-danger">₹ {{ account.total_expense }}</h5>
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Total Expense</div>
+                <div class="value red">₹{{ expense }}</div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <small>Profit</small>
-                <h5 class="{% if account.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
-                    ₹ {{ account.profit }}
-                </h5>
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Profit</div>
+                <div class="value blue">₹{{ profit }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Bank Balance</div>
+                <div class="value orange">₹{{ bank_balance }}</div>
             </div>
         </div>
 
     </div>
 
-    <!-- ADD TRANSACTION -->
-    <div class="card p-3 mb-3">
-        <form method="POST" action="{% url 'add_transaction' account.order.id %}">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-md-3">
-                    <input name="amount" class="form-control" placeholder="Amount">
-                </div>
-                <div class="col-md-3">
-                    <select name="type" class="form-control">
-                        <option value="credit">Credit</option>
-                        <option value="debit">Debit</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <input name="desc" class="form-control" placeholder="Description">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary w-100">Add</button>
-                </div>
+    <div class="row mt-4">
+
+        <div class="col-md-6">
+            <div class="card-box">
+                <h5>Customer Due</h5>
+                <h3 class="red">₹{{ customer_due }}</h3>
             </div>
-        </form>
-    </div>
+        </div>
 
-    <!-- LEDGER -->
-    <div class="card p-3">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for t in transactions %}
-                <tr>
-                    <td>{{ t.created_at|date:"d M H:i" }}</td>
-                    <td>{{ t.transaction_type }}</td>
-                    <td>₹ {{ t.amount }}</td>
-                    <td>{{ t.description }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 
 </div>

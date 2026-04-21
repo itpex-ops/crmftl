@@ -1,6 +1,6 @@
 
 from django.shortcuts import render, redirect
-from .models import Manual_Order, Customer, Pricing, Payment,exist_cus_Vehicle
+from .models import ManualOrder, Customer, Pricing, Payment,ExistingCustomerVehicle
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -15,7 +15,7 @@ def generate_customer_code():
     return f"CUST{num:04d}"
 
 def generate_order_no():
-    last = Manual_Order.objects.order_by('-id').first()
+    last = ManualOrder.objects.order_by('-id').first()
     if last:
         num = int(last.order_no.replace("ORD", "")) + 1
     else:
@@ -23,7 +23,7 @@ def generate_order_no():
     return f"ORD{num:05d}"
 
 @login_required
-def create_manual_order(request):
+def create_ManualOrder(request):
     if request.method == "POST":
         # 👤 Customer
         name = request.POST.get("customer_name")
@@ -40,7 +40,7 @@ def create_manual_order(request):
         )
 
         # 🚚 Order
-        order = Manual_Order.objects.create(
+        order = ManualOrder.objects.create(
             order_no=generate_order_no(),
             customer=customer,
 
@@ -90,14 +90,14 @@ def create_manual_order(request):
         messages.success(request, "✅ Order Created Successfully")
         return redirect("order_list")
 
-    return render(request, "orders/create_manual_order.html")
+    return render(request, "manual_order/form.html")
 
 @login_required
 def assign_vehicle_ajax(request, order_id):
     if request.method == "POST":
         data = json.loads(request.body)
-        order = Manual_Order.objects.get(id=order_id)
-        vehicle = exist_cus_Vehicle.objects.create(
+        order = ManualOrder.objects.get(id=order_id)
+        vehicle = ExistingCustomerVehicle.objects.create(
             order=order,
             vehicle_number=data.get("vehicle_number"),
             driver_number=data.get("driver_number"),
@@ -115,3 +115,4 @@ def assign_vehicle_ajax(request, order_id):
             "upi_app": vehicle.get_upi_app_display(),
             "upi_id": vehicle.upi_id,
         })
+

@@ -1,5 +1,6 @@
-
 # Create your views here.
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from django.shortcuts import render ,redirect ,get_object_or_404
 from authentications.decorators import allowed_roles
 from django.views.decorators.http import require_POST
@@ -12,75 +13,128 @@ from django.utils import timezone
 from orders.models import Order
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.conf import settings
+from django.urls import reverse
+from django.http import JsonResponse, HttpResponseForbidden
+
 import json
+# from authentications.models import User
+
+# User.objects.create_superuser(
+#     username="admin",
+#     email="admin@parcelex.in",
+#     password="admin123",
+#     employee_code="EMP001"   # ✅ REQUIRED
+# )
 #@allowed_roles(['sales'])
-@login_required
+#@login_required
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Enquiry, VEHICLE_TYPES
+
+
 def create_enquiry(request):
+
     if request.method == "POST":
+
         customer_name = request.POST.get("customer_name")
         customer_contact = request.POST.get("customer_contact")
         email = request.POST.get("email")
+
         lead_source = request.POST.get("lead_source")
         reference_name = request.POST.get("reference_name")
+
         pickups = int(request.POST.get("pickup") or 1)
         deliveries = int(request.POST.get("delivery") or 1)
+
         vehicle_type = request.POST.get("vehicle_type")
-        vehicle_description = request.POST.get('vehicle_desc')
-        kms = request.POST.get('kms')
+        vehicle_description = request.POST.get("vehicle_desc")
+        kms = request.POST.get("kms")
+
         material = request.POST.get("material")
         pieces = request.POST.get("pieces") or None
         tonnage = request.POST.get("tonnage") or None
+
         dimension_unit = request.POST.get("dimension_unit")
+
         length = request.POST.get("length") or None
         breadth = request.POST.get("breadth") or None
         height = request.POST.get("height") or None
+
         expected_rate = request.POST.get("expected_rate") or None
-        status="Waiting For Rate Approval"
-        # Build routes JSON
+
+        status = "Waiting For Rate Approval"
+
+        # ROUTES
         origins = request.POST.getlist("origin[]")
         origin_pins = request.POST.getlist("origin_pin[]")
+
         destinations = request.POST.getlist("destination[]")
         destination_pins = request.POST.getlist("destination_pin[]")
 
         routes = []
+
         for i in range(max(len(origins), len(destinations))):
+
             route = {
                 "origin": origins[i] if i < len(origins) else "",
                 "origin_pin": origin_pins[i] if i < len(origin_pins) else "",
+
                 "destination": destinations[i] if i < len(destinations) else "",
                 "destination_pin": destination_pins[i] if i < len(destination_pins) else "",
             }
+
             if route["origin"] or route["destination"]:
                 routes.append(route)
 
-        # Save Enquiry
         enquiry = Enquiry.objects.create(
+
             customer_name=customer_name,
             customer_contact=customer_contact,
             email=email,
+
             lead_source=lead_source,
             reference_name=reference_name,
+
             pickups=pickups,
             deliveries=deliveries,
+
             vehicle_type=vehicle_type,
-            vehicle_description = vehicle_description,
-            kms = kms ,
+            vehicle_description=vehicle_description,
+            kms=kms,
+
             material=material,
+
             pieces=int(pieces) if pieces else None,
             tonnage=float(tonnage) if tonnage else None,
+
             dimension_unit=dimension_unit,
+
             length=float(length) if length else None,
             breadth=float(breadth) if breadth else None,
             height=float(height) if height else None,
+
             expected_rate=float(expected_rate) if expected_rate else None,
+
             status=status,
             routes=routes,
+
             created_by=request.user
         )
-        messages.success(request, f"Enquiry #{enquiry.id} created successfully!")
-        return redirect('create_enquiry')
-    return render(request, 'enquiry/create.html')
 
+        messages.success(
+            request,
+            f"{enquiry.enquiry_no} created successfully!"
+        )
+
+        return redirect("create_enquiry")
+
+    context = {
+        "vehicle_types": VEHICLE_TYPES
+    }
+
+    return render(request, "enquiry/create.html", context)
 # Only sales or admin users can access
 def is_sales(user):
     return user.is_authenticated and (user.role in ['sales', 'admin'])
@@ -88,16 +142,31 @@ def is_sales(user):
 def is_fleet(user):
     return user.is_authenticated and (user.role in ['fleet','admin'])
 
-@login_required
-@user_passes_test(is_sales)
+#@login_required
+#@user_passes_test(is_sales)
 def enquiry_list(request):
-    # Base queryset depending on user role
-    if request.user.role == 'sales':
-        base_qs = Enquiry.objects.order_by('-created_at')
-    else:
-        base_qs = Enquiry.objects.filter(created_by=request.user)
 
-    # Search filter
+    user = request.user
+
+    # ================= ROLE FLAGS =================
+    is_manager = (
+        user.is_superuser or
+        user.groups.filter(name="Managers").exists()
+    )
+
+    is_sales = user.groups.filter(name="Sales").exists()
+
+    is_admin = getattr(user, "role", None) == "admin"
+
+
+    # ================= BASE QUERY =================
+    if is_admin or is_manager:
+        base_qs = Enquiry.objects.all()
+    else:
+        base_qs = Enquiry.objects.filter(created_by=user)
+
+
+    # ================= SEARCH =================
     query = request.GET.get('q')
     if query:
         base_qs = base_qs.filter(
@@ -105,15 +174,24 @@ def enquiry_list(request):
             Q(customer_contact__icontains=query)
         )
 
-    # Counts for dashboard
+
+    # ================= COUNTS =================
     total_count = base_qs.count()
     confirmed_count = base_qs.filter(status='confirmed').count()
     pending_count = base_qs.filter(status__icontains='pending').count()
     cancelled_count = base_qs.filter(status='cancelled').count()
-    enquiries = base_qs.filter(
-        created_by=request.user,
-        status='Waiting For Rate Approval'
-    ).order_by('-id')
+
+
+    # ================= FINAL LIST =================
+    # 👉 Managers see "Waiting For Rate Approval"
+    # 👉 Sales see their own records
+    if is_manager:
+       enquiries = base_qs.exclude(status='confirmed').order_by('-id')
+    else:
+        enquiries = base_qs.order_by('-id')
+
+
+    # ================= RENDER =================
     return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
         'query': query or '',
@@ -121,9 +199,10 @@ def enquiry_list(request):
         'confirmed_count': confirmed_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
+        'is_manager': is_manager,
+        'is_sales': is_sales,
     })
-
-@login_required
+#@login_required
 def delete_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
 
@@ -138,7 +217,7 @@ def delete_enquiry(request, id):
     
     return redirect('enquiry_list')
 
-@login_required
+#@login_required
 # @allowed_roles(['admin'])
 def update_pitch1(request, enquiry_id, status):
     enquiry = get_object_or_404(Enquiry, id=enquiry_id)
@@ -160,8 +239,8 @@ def update_pitch1(request, enquiry_id, status):
     return redirect('enquiry_list')  # removed comma
 
 #@allowed_roles(['admin')
-@login_required
-@user_passes_test(is_sales)
+#@login_required
+#@user_passes_test(is_sales)
 @csrf_exempt
 def edit_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
@@ -191,8 +270,8 @@ def edit_enquiry(request, id):
 
     return JsonResponse({"success": False})
 
-@login_required
-@user_passes_test(is_sales)
+#@login_required
+#@user_passes_test(is_sales)
 def confirm_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
     if enquiry.pitch1 or enquiry.pitch2 or enquiry.pitch3:
@@ -233,7 +312,7 @@ def cancel_enquiry(request, id):
     return JsonResponse({"success": False})
 
 @csrf_exempt
-def update_pitch(request, enquiry_id, status):
+def update_pitch2(request, enquiry_id, status):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -263,11 +342,42 @@ def update_pitch(request, enquiry_id, status):
             return JsonResponse({"success": False, "msg": str(e)})
     return JsonResponse({"success": False, "msg": "Invalid request"})
 
-def update_enquiry_status(request, id, action):
+def update_status(request, id, status):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        enquiry = Enquiry.objects.get(id=id)
+
+        if status == "confirmed":
+            enquiry.status = "confirmed"
+            enquiry.approval_rate = data.get("approval_rate")
+
+        enquiry.save()
+
+        return JsonResponse({"success": True})
+
+def enquiry_action(request, id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+
+        enquiry = Enquiry.objects.get(id=id)
+
+        if action == "cancel":
+            enquiry.status = "cancelled"
+            enquiry.cancel_reason = data.get("reason")
+
+        elif action == "disagree":
+            enquiry.status = "disagreed"
+
+        enquiry.save()
+
+        return JsonResponse({"success": True})
+
+def update_enquiry_status1(request, id, action):
     if request.method == "POST":
         data = json.loads(request.body)
         enquiry = Enquiry.objects.get(id=id)
-
         if action == "confirm":
             enquiry.status = "confirmed"
             enquiry.approval_rate = data.get("approval_rate")
@@ -275,30 +385,174 @@ def update_enquiry_status(request, id, action):
 
             order = Order.objects.create(
                 enquiry=enquiry,
-                finalized_rate=enquiry.approval_rate
+               finalized_rate=enquiry.approval_rate
             )
 
             return JsonResponse({
                 "success": True,
-                "message": "Enquiry confirmed successfully",
-                "status": enquiry.status,
-                "approval_rate": enquiry.approval_rate,   # ✅ ADD THIS
+                "redirect": True,
+                "order_id": order.id
             })
-
         elif action == "disagree":
             enquiry.status = "disagree"
             enquiry.disagree_reason = data.get("disagree_reason")
-
         elif action == "cancel":
             enquiry.status = "cancelled"
             enquiry.cancel_reason = data.get("cancel_reason")
-
         enquiry.save()
-
         return JsonResponse({
             "success": True,
-            "message": "Updated successfully",
-            "status": enquiry.status
+            "redirect": action == "confirm"
         })
-
     return JsonResponse({"success": False})
+
+# enquiries/views.py
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
+from enquiries.models import Enquiry
+from orders.models import Order
+
+
+@login_required
+def update_enquiry_status(request, id, action):
+
+    enquiry = get_object_or_404(Enquiry, id=id)
+
+    if request.method == "POST":
+
+        # ----------------------------------
+        # CONFIRM ENQUIRY
+        # ----------------------------------
+        if action == "confirm":
+
+            enquiry.status = "confirmed"
+            enquiry.approval_rate = request.POST.get("approve_rate") or 0
+            enquiry.save()
+
+            # Order create only once
+            order, created = Order.objects.get_or_create(
+                enquiry=enquiry,
+                defaults={
+                    "finalized_rate": enquiry.approval_rate,
+                    "customer_name": enquiry.customer_name,
+                    "customer_contact": enquiry.customer_contact,
+                    "routes": enquiry.routes,
+                    "vehicle_type": enquiry.vehicle_type,
+                    "created_by": request.user,
+                }
+            )
+
+            # If already exists, update finalized rate
+            if not created:
+                order.finalized_rate = enquiry.approval_rate
+                order.save()
+
+            messages.success(request, "Enquiry confirmed successfully.")
+
+            # IMPORTANT:
+            # pricing page now expects enquiry_id
+            return redirect("pricing_page", enquiry_id=enquiry.id)
+
+        # ----------------------------------
+        # DISAGREE
+        # ----------------------------------
+        elif action == "disagree":
+
+            enquiry.status = "disagree"
+            enquiry.disagree_reason = request.POST.get("disagree_reason", "")
+            enquiry.save()
+
+            messages.warning(request, "Enquiry marked as disagree.")
+            return redirect("enquiry_list")
+
+        # ----------------------------------
+        # CANCEL
+        # ----------------------------------
+        elif action == "cancel":
+
+            enquiry.status = "cancelled"
+            enquiry.cancel_reason = request.POST.get("cancel_reason", "")
+            enquiry.save()
+
+            messages.error(request, "Enquiry cancelled.")
+            return redirect("enquiry_list")
+
+    return redirect("enquiry_list")
+
+def update_pitch(request, id):
+
+    if request.method != "POST":
+        return JsonResponse({"success": False, "msg": "Invalid request method"})
+
+    enquiry = get_object_or_404(Enquiry, id=id)
+
+    remarks = request.POST.get("remarks") or ""
+    pitch_rate = request.POST.get("pitch_rate")
+    is_approved = request.POST.get("is_approved") == "true"
+
+    # 🔐 Check Manager permission
+    can_approve = (
+        request.user.is_superuser or
+        request.user.groups.filter(name="Managers").exists()
+    )
+
+    # ================= SAVE CURRENT STAGE =================
+    status = (enquiry.status or "").lower()
+
+    if status in ["pending_pitch1", "waiting for rate approval"]:
+        enquiry.pitch1 = pitch_rate
+        enquiry.pitch1_remarks = remarks
+
+        next_status = "pending_pitch2"
+
+    elif status == "pending_pitch2":
+        enquiry.pitch2 = pitch_rate
+        enquiry.pitch2_remarks = remarks
+
+        next_status = "pending_pitch3"
+
+    elif status == "pending_pitch3":
+        enquiry.pitch3 = pitch_rate
+        enquiry.pitch3_remarks = remarks
+
+        next_status = "confirmed"
+
+    else:
+        next_status = "pending_pitch1"
+
+
+    # ================= APPROVAL (WORKS AT ANY STAGE) =================
+    if is_approved:
+        if not can_approve:
+            return HttpResponseForbidden("Only managers can approve")
+
+        enquiry.status = "confirmed"
+        enquiry.approval_rate = pitch_rate
+
+    else:
+        enquiry.status = next_status
+
+
+    # ================= CREATE ORDER =================
+    order = None
+    if enquiry.status == "confirmed":
+        order, created = Order.objects.get_or_create(
+            enquiry=enquiry,
+            defaults={
+                "finalized_rate": enquiry.approval_rate,
+                "customer_name": enquiry.customer_name,
+                "customer_contact": enquiry.customer_contact,
+                "routes": enquiry.routes,
+            }
+        )
+
+    enquiry.save()
+
+    # ================= REDIRECT =================
+    if order:
+        return redirect("pricing_page", id=order.id)
+
+    return redirect("enquiry_list")

@@ -15,7 +15,7 @@ class User(AbstractUser):
         ('support', 'Support'),
         ('accounts', 'Accounts'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='sales')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):
@@ -37,3 +37,4 @@ class PasswordResetRequest(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"{self.user.username} - {self.status}"
+

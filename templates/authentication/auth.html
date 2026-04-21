@@ -132,12 +132,14 @@
 
         /* RESPONSIVE */
         @media (max-width: 767px) {
+
             .left-panel,
             .right-panel {
                 height: auto;
                 text-align: center;
                 padding: 20px;
             }
+
             .auth-card {
                 width: 100%;
             }
@@ -221,11 +223,12 @@
                                 {% if register_success %}
                                 <div class="alert alert-success">{{ register_success }}</div>
                                 {% endif %}
-                                <input type="text" name="emp_code" class="form-control mb-2"
-                                    placeholder="Employee Code" required>
+                                <input type="text" name="emp_code" class="form-control mb-2" placeholder="Employee Code"
+                                    required>
                                 <input type="text" name="phone" class="form-control mb-2" placeholder="Phone" required>
                                 <input type="text" name="username" class="form-control mb-2" placeholder="Username"
                                     required>
+                                <input type="text" name="role" class="form-control mb-2" placeholder="Role" required>
                                 <input type="password" name="password" id="regPassword" class="form-control mb-2"
                                     placeholder="Password" required>
 

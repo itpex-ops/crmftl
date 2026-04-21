@@ -1,60 +1,60 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
-
 <div class="container-fluid mt-3">
-
-    <!-- 🔷 HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">📦 Orders Management</h5>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h5 class="fw-bold mb-2 mb-md-0">📦 Orders Management</h5>
     </div>
-
-    <!-- 🔷 STATS -->
+    <!-- STATS -->
     <div class="row g-3 mb-4">
+
         <div class="col-md-3">
-            <div class="card premium-card stat-card primary">
+            <div class="card premium-card primary">
                 <small>Total Orders</small>
-                <h4>{{ orders|length }}</h4>
+                <h4>{{ total_orders }}</h4>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card premium-card stat-card success">
+            <div class="card premium-card success">
                 <small>Assigned</small>
                 <h4>{{ assigned_count }}</h4>
             </div>
         </div>
 
+
         <div class="col-md-3">
-            <div class="card premium-card stat-card danger">
+            <div class="card premium-card info">
+                <small>Not Assigned</small>
+                <h4> {{ not_assigned_count|default:"0" }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card danger">
                 <small>Pending</small>
                 <h4>{{ pending_count }}</h4>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card premium-card stat-card info">
-                <small>Revenue</small>
-                <h4>₹ {{ total_revenue|default:"0" }}</h4>
-            </div>
-        </div>
-    </div>
 
-    <!-- 🔷 FILTER -->
-    <div class="card premium-card p-3 mb-4 glass">
+    </div>
+    <!-- FILTER -->
+    <div class="card premium-card p-3 mb-4">
         <div class="row g-3">
+
             <div class="col-md-4">
                 <input type="text" id="searchInput" class="form-control search-box"
-                    placeholder="🔍 Search orders...">
+                    placeholder="🔍 Search order / customer / route">
             </div>
+
         </div>
     </div>
-
-    <!-- 🔷 TABLE -->
-    <div class="card table-card shadow-sm">
+    <!-- TABLE -->
+    <div class="card table-card shadow-sm border-0">
         <div class="table-container">
             <table class="table table-hover align-middle mb-0" id="orderTable">
-
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>#</th>
                         <th class="sortable">Order No</th>
@@ -63,66 +63,126 @@
                         <th>Vehicle</th>
                         <th class="sortable">Freight ₹</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     {% for order in orders %}
-                    <tr class="order-row fade-in">
+                    <tr class="order-row">
                         <td>{{ forloop.counter }}</td>
-                        <td data-value="{{ order.order_no }}">   <i class="bi bi-eye"></i>
-                            <a href="{% url 'view_order' order.id %}" class="btn btn-sm ">
-                             
-                             <strong>{{ order.order_no }}</strong></a><br>
-                            <small class="text-muted">{{ order.date }}</small>
+                        <!-- ORDER NO -->
+                        <td>
+                            <i class="bi bi-eye text-primary"></i>
+                            <a href="{% url 'view_order' order.id %}" class="text-decoration-none fw-semibold">
+                                {{ order.order_no }}
+                            </a>
+                            <br>
+                            <small class="text-muted">
+                                {{ order.vehicle_place_date|date:"d M Y h:i A" }}
+                            </small>
                         </td>
-
+                        <!-- CUSTOMER -->
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <img src="{{ order.customer_avatar|default:'/static/assets/images/avatar/4.png' }}"
                                     class="avatar-sm rounded-circle">
                                 <div>
-                                    {{ order.customer_name }}<br>
-                                    <small class="text-muted">{{ order.customer_contact }}</small>
+                                    {{ order.customer_name }} <br>
+
+                                    <small class="text-muted">
+                                        {{ order.customer_contact }}
+                                    </small>
                                 </div>
                             </div>
                         </td>
-
+                        <!-- ROUTES -->
                         <td>
                             {% for r in order.routes %}
-                                <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
-                            {% empty %}-{% endfor %}
+                            <div class="route-pill">
+                                {{ r.origin }} → {{ r.destination }}
+                            </div>
+                            {% empty %}
+                            -
+                            {% endfor %}
                         </td>
-
+                        <!-- VEHICLE -->
                         <td>
                             {% if order.vehicles.count %}
-                                <span class="badge bg-success">Assigned</span><br>
-                                🚚 {{ order.vehicles.first.vehicle_number }}
+                            <span class="badge bg-success">
+                                Assigned
+                            </span>
+                            <br>
+                            🚚 {{ order.vehicles.first.vehicle_number }}
                             {% else %}
-                                <span class="badge bg-danger">Not Assigned</span>
+                            <span class="badge bg-danger">
+                                Not Assigned
+                            </span>
                             {% endif %}
                         </td>
-
-                        <td data-value="{{ order.total_rate }}">
+                        <!-- FREIGHT -->
+                        <td>
                             ₹ {{ order.total_rate|default:"0" }}
                         </td>
-
+                        <!-- STATUS -->
                         <td>
-                            {% if order.tracking and order.tracking.delivered %}
-                                <span class="badge bg-success">Delivered</span>
-                            {% elif order.tracking and order.tracking.fleet_departed %}
-                                <span class="badge bg-warning text-dark">In Transit</span>
+
+                            {% if order.tracking %}
+
+                            {% if order.tracking.settled %}
+                            <span class="badge bg-dark">
+                                Settled
+                            </span>
+
+                            {% elif order.tracking.delivered %}
+                            <span class="badge bg-success">
+                                Delivered
+                            </span>
+
+                            {% elif order.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">
+                                In Transit
+                            </span>
+
+                            {% elif order.tracking.invoice_eway %}
+                            <span class="badge bg-info">
+                                Invoice / Eway
+                            </span>
+
                             {% else %}
-                                <span class="badge bg-secondary">Pending</span>
+                            <span class="badge bg-secondary">
+                                Pending
+                            </span>
+
+                            {% endif %}
+
+                            {% else %}
+
+                            <span class="badge bg-secondary">
+                                Pending
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            {% if order.vehicles.first %}
+                            <a href="{% url 'edit_vehicle' order.vehicles.first.id %}"
+                                class="btn btn-sm btn-light action-btn" title="Edit Vehicle">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% else %}
+
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="text-center text-muted">No Orders Found</td>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No Orders Found
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-
             </table>
         </div>
     </div>
@@ -130,86 +190,147 @@
 
 <style>
     .avatar-sm {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-}
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+    }
 
-.route-pill {
-    background: #eef4ff;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    margin-bottom: 4px;
-    display: inline-block;
-}
+    .route-pill {
+        background: #eef4ff;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-bottom: 4px;
+        display: inline-block;
+    }
 
-.table-card {
-    border-radius: 14px;
-    overflow: hidden;
-}
+    .table-card {
+        border-radius: 14px;
+    }
 
-.table-container {
-    max-height: 500px;
-    overflow-y: auto;
-}
+    .table-container {
+        max-height: 520px;
+        overflow-y: auto;
+    }
 
-thead th {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 2;
-}
+    thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 2;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
 
-.order-row:hover {
-    background: #f8fafc;
-}
+    .order-row:hover {
+        background: #f8fafc;
+    }
 
-.premium-card {
-    border-radius: 14px;
-    padding: 18px;
-    background: #fff;
-    border: 1px solid #eee;
-    transition: 0.25s;
-}
+    .premium-card {
+        border-radius: 14px;
+        padding: 18px;
+        background: #fff;
+        border: 1px solid #eee;
+        transition: 0.25s;
+    }
 
-.premium-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-}
+    .premium-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    }
 
-.primary { border-left: 4px solid #4e73df; }
-.success { border-left: 4px solid #1cc88a; }
-.danger  { border-left: 4px solid #e74a3b; }
-.info    { border-left: 4px solid #36b9cc; }
+    .primary {
+        border-left: 4px solid #4e73df;
+    }
 
-.search-box {
-    border-radius: 10px;
-    padding: 10px;
-}
+    .success {
+        border-left: 4px solid #1cc88a;
+    }
+
+    .danger {
+        border-left: 4px solid #e74a3b;
+    }
+
+    .info {
+        border-left: 4px solid #36b9cc;
+    }
+
+    .search-box {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .sortable {
+        cursor: pointer;
+    }
+
+    .sortable::after {
+        content: " ⬍";
+        font-size: 11px;
+        color: #94a3b8;
+    }
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    const searchInput = document.getElementById("searchInput");
-    const rows = document.querySelectorAll(".order-row");
+    document.addEventListener("DOMContentLoaded", function () {
 
-    searchInput.addEventListener("keyup", function () {
-        const value = this.value.toLowerCase();
+        /* SEARCH */
 
-        rows.forEach(row => {
-            let text = row.innerText.toLowerCase();
+        const searchInput = document.getElementById("searchInput");
+        const rows = document.querySelectorAll(".order-row");
 
-            if (text.includes(value)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+        searchInput.addEventListener("keyup", function () {
+
+            const value = this.value.toLowerCase();
+
+            rows.forEach(row => {
+
+                row.style.display =
+                    row.innerText.toLowerCase().includes(value)
+                        ? ""
+                        : "none";
+
+            });
+
         });
+
+
+        /* SORT */
+
+        document.querySelectorAll(".sortable").forEach((th, index) => {
+
+            th.addEventListener("click", function () {
+
+                const tbody = document.getElementById("tableBody");
+                const rows = Array.from(tbody.querySelectorAll(".order-row"));
+
+                const asc = !this.classList.contains("asc");
+
+                document.querySelectorAll(".sortable").forEach(x => {
+                    x.classList.remove("asc", "desc");
+                });
+
+                this.classList.add(asc ? "asc" : "desc");
+
+                rows.sort((a, b) => {
+
+                    const A = a.children[index].innerText.trim();
+                    const B = b.children[index].innerText.trim();
+
+                    return asc
+                        ? A.localeCompare(B, undefined, { numeric: true })
+                        : B.localeCompare(A, undefined, { numeric: true });
+
+                });
+
+                rows.forEach(r => tbody.appendChild(r));
+
+            });
+
+        });
+
     });
 
-});
 </script>
-
 {% endblock %}

@@ -113,7 +113,9 @@
 
                     <p>
                         📍 <span class="fw-semibold text-primary">
-                            {{ order.origin }} → {{ order.destination }}
+                             {% for r in e.routes %}
+                            <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
+                            {% empty %}-{% endfor %}
                         </span>
                     </p>
 

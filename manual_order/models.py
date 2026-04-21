@@ -11,7 +11,7 @@ class Customer(models.Model):
     def __str__(self):
         return f"{self.customer_code} - {self.name}"
 
-class Manual_Order(models.Model):
+class ManualOrder(models.Model):
     order_no = models.CharField(max_length=20, unique=True)
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -41,7 +41,7 @@ class Manual_Order(models.Model):
         return self.order_no
     
 class Pricing(models.Model):
-    order = models.OneToOneField(Manual_Order, on_delete=models.CASCADE)
+    order = models.OneToOneField(ManualOrder, on_delete=models.CASCADE)
 
     base_freight = models.FloatField(default=0)
     extra_charges = models.FloatField(default=0)
@@ -63,7 +63,7 @@ class Payment(models.Model):
         ('paid', 'Paid'),
     )
 
-    order = models.OneToOneField(Manual_Order, on_delete=models.CASCADE)
+    order = models.OneToOneField(ManualOrder, on_delete=models.CASCADE)
 
     payment_mode = models.CharField(max_length=20, choices=PAYMENT_MODE)
     payment_status = models.CharField(max_length=20, choices=STATUS)
@@ -71,8 +71,8 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=100, blank=True)
     remarks = models.TextField(blank=True)
 
-class exist_cus_Vehicle(models.Model):
-    order = models.ForeignKey(Manual_Order, on_delete=models.CASCADE, related_name="exvehicles")
+class ExistingCustomerVehicle(models.Model):
+    order = models.ForeignKey(ManualOrder, on_delete=models.CASCADE, related_name="exvehicles")
     vehicle_number = models.CharField(max_length=50)
     driver_number = models.CharField(max_length=15)
     owner_number = models.CharField(max_length=15)

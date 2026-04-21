@@ -1,0 +1,188 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-box {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .05);
+    }
+
+    .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .info-row {
+        padding: 10px 0;
+        border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .info-title {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .info-value {
+        font-weight: 600;
+    }
+
+    .summary-box {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .big-balance {
+        font-size: 26px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="mb-3">
+        <div class="page-title">Pay Vehicle Final Balance</div>
+        <div class="sub-title">
+            Clear pending vehicle payment after delivery / POD / document settlement
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-5">
+
+            <div class="card-box">
+
+                <div class="info-row d-flex justify-content-between">
+                    <div class="info-title">FTL No</div>
+                    <div class="info-value">{{ vehicle.ftl_no }}</div>
+                </div>
+
+                <div class="info-row d-flex justify-content-between">
+                    <div class="info-title">Vehicle No</div>
+                    <div class="info-value">{{ vehicle.vehicle_number }}</div>
+                </div>
+
+                <div class="info-row d-flex justify-content-between">
+                    <div class="info-title">Driver No</div>
+                    <div class="info-value">{{ vehicle.driver_number|default_if_none:"" }}</div>
+                </div>
+
+                <div class="info-row d-flex justify-content-between">
+                    <div class="info-title">Freight Amount</div>
+                    <div class="info-value text-primary">₹{{ vehicle.freight_amount }}</div>
+                </div>
+
+                <div class="info-row d-flex justify-content-between">
+                    <div class="info-title">Advance Paid</div>
+                    <div class="info-value text-success">₹{{ vehicle.advance }}</div>
+                </div>
+
+                <div class="pt-3 d-flex justify-content-between align-items-center">
+                    <div class="info-title">Pending Balance</div>
+                    <div class="big-balance text-danger">
+                        ₹{{ vehicle.balance }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-7">
+
+            <div class="card-box">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="label">Balance Amount</label>
+                        <input type="number" name="amount" step="0.01" min="1" max="{{ vehicle.balance }}"
+                            class="form-control" placeholder="Enter amount" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="label">Payment Mode</label>
+                        <select name="mode" class="form-select" required>
+                            <option value="">Select</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Cheque">Cheque</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="label">Remarks</label>
+                        <textarea name="remarks" rows="3" class="form-control"
+                            placeholder="Optional remarks"></textarea>
+                    </div>
+
+                    <!-- <div class="summary-box mb-3">
+                        <small class="text-muted d-block">
+                            This payment will:
+                        </small>
+
+                        <ul class="mb-0 mt-2 ps-3">
+                            <li>Reduce pending balance</li>
+                            <li>Create vehicle ledger entry</li>
+                            <li>Create bank/cash payment entry</li>
+                            <li>Mark trip as completed if balance becomes zero</li>
+                        </ul>
+                    </div> -->
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit" class="btn btn-dark">
+                            Pay Final Balance
+                        </button>
+
+                        <a href="{% url 'vehicle_accounts' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Remove None text
+        document.querySelectorAll("*").forEach(el => {
+            if (el.children.length === 0 && el.textContent.trim() === "None") {
+                el.textContent = "";
+            }
+        });
+
+    });
+</script>
+
+{% endblock %}

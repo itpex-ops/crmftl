@@ -23,8 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-z5)r#58f*hg4+5=kv2p!568b4=pg-&(f4!ce7h390b-7d6w=2('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
+DEBUG = True
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = True
 ALLOWED_HOSTS = [ '.onrender.com',
     "127.0.0.1",
     "localhost",
@@ -33,7 +34,9 @@ ALLOWED_HOSTS = [ '.onrender.com',
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com',
     "https://*.ngrok-free.dev",
 ]
-
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,16 +46,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',
+    'accounts.apps.AccountsConfig',
     'authentications',
     'enquiries',
     'orders',
     'reports',
     'vehicles',
-    'manual_order'
+    'manual_order',
+    'channels',
+   
 ]
 AUTH_USER_MODEL = 'authentications.User'
-
+SECURE_SSL_REDIRECT = False
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -65,8 +70,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crmftl.urls'
+
+LOGIN_URL = 'auth'
+LOGIN_REDIRECT_URL = 'user_dashboard'
 LOGOUT_REDIRECT_URL = 'auth'
-LOGIN_REDIRECT_URL = 'create_enquiry'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -86,7 +94,13 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 
 WSGI_APPLICATION = 'crmftl.wsgi.application'
 
+ASGI_APPLICATION = "crmftl.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

@@ -1,126 +1,210 @@
-{% extends 'layouts/base.html' %} 
+{% extends 'layouts/base.html' %}
 {% block content %}
 
 <div class="container mt-4">
 
-    <!-- 🔷 HEADER -->
-    <div class="card p-3 mb-4 shadow-sm border-0 d-flex flex-row justify-content-between align-items-center">
+    <!-- HEADER -->
+    <div class="card p-3 mb-4 shadow-sm border-0 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold mb-0">🚚 Assign Vehicle</h5>
         <span class="order-badge">{{ order.order_no }}</span>
     </div>
 
-    <form method="POST">
+    <form method="POST" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+
         {% csrf_token %}
 
-        <!-- 🔷 VEHICLE -->
+        <!-- Hidden Anti Autofill -->
+        <input type="text" name="fake_user" autocomplete="username" style="position:absolute;left:-9999px;opacity:0;">
+        <input type="password" name="fake_pass" autocomplete="current-password"
+            style="position:absolute;left:-9999px;opacity:0;">
+
+        <!-- VEHICLE -->
         <div class="card saas-card mb-4">
-            <div class="card-header">
-                🚚 Vehicle Details
-            </div>
+            <div class="card-header">🚚 Vehicle Details</div>
 
             <div class="card-body row g-4">
 
                 <div class="col-md-4">
                     <label>Vehicle Number</label>
-                    <input name="vehicle_number" class="form-control input-style" required>
+                    <input type="text" name="vehicle_number" class="form-control input-style" autocomplete="off"
+                        required>
                 </div>
 
+                <!-- DRIVER OTP -->
                 <div class="col-md-4">
                     <label>Driver Number</label>
-                    <input name="driver_number" class="form-control input-style" required>
+
+                    <div class="input-group">
+                        <input type="text" name="driver_number" id="driver_number" maxlength="10"
+                            class="form-control input-style" autocomplete="off" required>
+
+                        <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
+                            Send OTP
+                        </button>
+                    </div>
+
+                    <small id="driverMsg"></small>
+
+                    <div class="mt-2" id="otpBox" style="display:none;">
+                        <input type="text" id="otp_input" maxlength="6" class="form-control input-style"
+                            placeholder="Enter OTP">
+
+                        <button type="button" class="btn btn-success btn-sm mt-2" id="verifyOtpBtn">
+                            Verify OTP
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="driver_verified" id="driver_verified" value="0">
                 </div>
 
                 <div class="col-md-4">
                     <label>Owner Number</label>
-                    <input name="owner_number" class="form-control input-style">
+                    <input type="text" name="owner_number" maxlength="10" class="form-control input-style"
+                        autocomplete="off">
                 </div>
 
+                <!-- SOURCE -->
                 <div class="col-md-4">
                     <label>Source</label>
-                    <input name="source" class="form-control input-style">
+
+                    <select name="source" id="source_select" class="form-control input-style">
+                        <option value="">Select Source</option>
+                        <option value="directors">Directors</option>
+                        <option value="transporters">Transporters</option>
+                        <option value="brokers">Brokers</option>
+                        <option value="drivers">Drivers</option>
+                        <option value="others">Others</option>
+                    </select>
+
+                    <input type="text" name="source_other" id="source_other" class="form-control input-style mt-2"
+                        placeholder="Enter Source Name" style="display:none;">
                 </div>
 
             </div>
         </div>
 
-        <!-- 🔷 FREIGHT -->
+        <!-- FREIGHT -->
         <div class="card saas-card mb-4">
-            <div class="card-header text-success">
-                💰 Freight Details
-            </div>
+            <div class="card-header text-success">💰 Freight Details</div>
 
             <div class="card-body row g-4">
 
                 <div class="col-md-3">
                     <label>Freight</label>
-                    <input type="number" step="0.01" name="freight_amount" class="form-control input-style">
+                    <input type="number" step="0.01" name="freight_amount" id="freight_amount"
+                        class="form-control input-style">
                 </div>
 
                 <div class="col-md-3">
-                    <label>Advance</label>
-                    <input type="number" step="0.01" name="advance" class="form-control input-style">
+                    <label>Halting</label>
+                    <input type="number" step="0.01" name="halting" id="halting" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Loading / Unloading</label>
+                    <input type="number" step="0.01" name="loading" id="loading" class="form-control input-style">
                 </div>
 
                 <div class="col-md-3">
                     <label>Brokerage</label>
-                    <input type="number" step="0.01" name="brokerage" class="form-control input-style">
+                    <input type="number" step="0.01" name="brokerage" id="brokerage" class="form-control input-style">
                 </div>
 
                 <div class="col-md-3">
-                    <label>Loading</label>
-                    <input type="number" step="0.01" name="loading" class="form-control input-style">
+                    <label>Total Freight</label>
+                    <input type="number" step="0.01" name="total_freight" id="total_freight" readonly
+                        class="form-control input-style bg-light">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Advance</label>
+                    <input type="number" step="0.01" name="advance" id="advance" class="form-control input-style">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Balance</label>
+                    <input type="number" step="0.01" name="balance" id="balance" readonly
+                        class="form-control input-style bg-light">
                 </div>
 
             </div>
         </div>
 
-        <!-- 🔷 UPI -->
+        <!-- UPI -->
         <div class="card saas-card mb-4">
-            <div class="card-header text-info">
-                💳 UPI Payment
-            </div>
+            <div class="card-header text-info">💳 UPI Payment</div>
 
             <div class="card-body row g-4">
 
                 <div class="col-md-4">
                     <label>UPI App</label>
                     <select name="upi_app" class="form-control input-style">
-                        <option value="phonepe">📱 PhonePe</option>
-                        <option value="gpay">💰 Google Pay</option>
-                        <option value="paytm">🏦 Paytm</option>
+                        <option value="">Select</option>
+                        <option value="phonepe">PhonePe</option>
+                        <option value="gpay">Google Pay</option>
+                        <option value="paytm">Paytm</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label>UPI ID</label>
-                    <input name="upi_number" class="form-control input-style" placeholder="example@upi">
+                    <input type="text" name="upi_id" id="upi_id" class="form-control input-style"
+                        placeholder="example@upi" autocomplete="off">
+
+                    <small id="upiMsg"></small>
+                </div>
+
+                <div class="col-md-4">
+                    <label>UPI Number</label>
+                    <input type="text" name="upi_number" id="upi_number" maxlength="10" class="form-control input-style"
+                        autocomplete="off">
+
+                    <small id="numMsg"></small>
+                </div>
+
+                <div class="col-md-4 d-grid">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-primary" id="verifyUpiBtn">
+                        Verify UPI
+                    </button>
+                </div>
+
+                <div class="col-md-8">
+                    <label>UPI Beneficiary Name</label>
+                    <input type="text" name="upi_name" id="upi_name" class="form-control input-style bg-light" readonly
+                        placeholder="Auto Fetch After Verify">
+                </div>
+
+                <div class="col-md-12">
+                    <small id="upiVerifyMsg"></small>
+                    <input type="hidden" name="upi_verified" id="upi_verified" value="0">
                 </div>
 
             </div>
         </div>
-
-        <!-- 🔷 BANK -->
+        <!-- BANK -->
         <div class="card saas-card mb-5">
-            <div class="card-header text-warning">
-                🏦 Bank Details
-            </div>
+            <div class="card-header text-warning">🏦 Bank Details</div>
 
             <div class="card-body row g-4">
 
                 <div class="col-md-3">
-                    <label>Account Name</label>
-                    <input name="account_name" class="form-control input-style">
+                    <label>Account Number</label>
+                    <input name="account_number" id="account_number" class="form-control input-style"
+                        autocomplete="new-password">
                 </div>
 
                 <div class="col-md-3">
-                    <label>Account Number</label>
-                    <input name="account_number" class="form-control input-style">
+                    <label>Retype Account Number</label>
+                    <input type="password" id="re_account_number" class="form-control input-style"
+                        placeholder="Retype Account Number" autocomplete="new-password">
+                    <small id="accMsg"></small>
                 </div>
 
                 <div class="col-md-3">
                     <label>IFSC</label>
-                    <input name="ifsc" class="form-control input-style">
+                    <input type="text" name="ifsc" id="ifsc" class="form-control input-style" autocomplete="off">
                 </div>
 
                 <div class="col-md-3">
@@ -131,10 +215,28 @@
                     </select>
                 </div>
 
+                <div class="col-md-3">
+                    <label>Beneficiary Name</label>
+                    <input type="text" name="account_name" id="account_name" class="form-control input-style"
+                        placeholder="Optional" autocomplete="off">
+                </div>
+
+                <div class="col-md-3 d-grid">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-primary" id="verifyBankBtn">
+                        Verify Beneficiary
+                    </button>
+                </div>
+
+                <div class="col-md-12">
+                    <small id="bankMsg"></small>
+                    <input type="hidden" name="bank_verified" id="bank_verified" value="0">
+                </div>
+
             </div>
         </div>
 
-        <!-- 🔷 ACTION BAR -->
+        <!-- ACTION -->
         <div class="action-bar">
             <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
                 ⬅ Back
@@ -144,62 +246,342 @@
                 💾 Save Vehicle
             </button>
         </div>
-
     </form>
-
 </div>
 
-<!-- 🔥 SaaS STYLE -->
-<style>
+<!-- SEARCH SELECT -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
 
-    /* HEADER BADGE */
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+<script>
+    /* UPI VERIFY LIKE AMAZON / DELIVERY APP */
+
+    const upiId = document.getElementById("upi_id");
+    const upiNo = document.getElementById("upi_number");
+    const verifyUpiBtn = document.getElementById("verifyUpiBtn");
+    const upiMsg = document.getElementById("upiMsg");
+    const numMsg = document.getElementById("numMsg");
+    const upiVerifyMsg = document.getElementById("upiVerifyMsg");
+    const upiName = document.getElementById("upi_name");
+    const upiVerified = document.getElementById("upi_verified");
+
+    /* live validation */
+    upiId.addEventListener("input", function () {
+
+        if (this.value.includes("@")) {
+            upiMsg.innerHTML = "✅ Valid Format";
+            upiMsg.style.color = "green";
+        } else {
+            upiMsg.innerHTML = "❌ Invalid UPI ID";
+            upiMsg.style.color = "red";
+        }
+
+    });
+
+    upiNo.addEventListener("input", function () {
+
+        this.value = this.value.replace(/\D/g, '');
+
+        if (this.value.length === 10) {
+            numMsg.innerHTML = "✅ Valid Number";
+            numMsg.style.color = "green";
+        } else {
+            numMsg.innerHTML = "❌ Enter 10 digits";
+            numMsg.style.color = "red";
+        }
+
+    });
+
+
+    /* verify button */
+    verifyUpiBtn.addEventListener("click", function () {
+
+        let upi = upiId.value.trim();
+        let num = upiNo.value.trim();
+
+        if (upi === "" && num === "") {
+            upiVerifyMsg.innerHTML = "❌ Enter UPI ID or UPI Number";
+            upiVerifyMsg.style.color = "red";
+            return;
+        }
+
+        verifyUpiBtn.disabled = true;
+        verifyUpiBtn.innerHTML = "Checking...";
+
+        /* DEMO MODE
+           Future replace with Razorpay / Cashfree / Paytm API */
+
+        setTimeout(function () {
+
+            if (
+                (upi.includes("@") && upi.length >= 6) ||
+                num.length === 10
+            ) {
+
+                upiVerified.value = "1";
+
+                /* fake beneficiary name */
+                upiName.value = "Verified UPI Holder";
+
+                upiVerifyMsg.innerHTML = "✅ UPI Verified Successfully";
+                upiVerifyMsg.style.color = "green";
+
+            } else {
+
+                upiVerified.value = "0";
+                upiName.value = "";
+
+                upiVerifyMsg.innerHTML = "❌ UPI Verification Failed";
+                upiVerifyMsg.style.color = "red";
+            }
+
+            verifyUpiBtn.disabled = false;
+            verifyUpiBtn.innerHTML = "Verify UPI";
+
+        }, 1500);
+
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* SOURCE SEARCH */
+        new TomSelect("#source_select", {
+            create: false,
+            placeholder: "Search Source..."
+        });
+
+        const source = document.getElementById("source_select");
+        const otherBox = document.getElementById("source_other");
+
+        source.addEventListener("change", function () {
+            if (this.value === "others") {
+                otherBox.style.display = "block";
+            } else {
+                otherBox.style.display = "none";
+                otherBox.value = "";
+            }
+        });
+
+        /* ACCOUNT MATCH */
+        const acc1 = document.getElementById("account_number");
+        const acc2 = document.getElementById("re_account_number");
+        const accMsg = document.getElementById("accMsg");
+
+        function checkAccount() {
+            if (acc2.value === "") {
+                accMsg.innerHTML = "";
+                return;
+            }
+
+            if (acc1.value === acc2.value) {
+                accMsg.innerHTML = "✅ Account Number Matched";
+                accMsg.style.color = "green";
+            } else {
+                accMsg.innerHTML = "❌ Account Number Not Matched";
+                accMsg.style.color = "red";
+            }
+        }
+
+        acc1.addEventListener("input", checkAccount);
+        acc2.addEventListener("input", checkAccount);
+
+        /* FREIGHT CALC */
+        const freight = document.getElementById("freight_amount");
+        const halting = document.getElementById("halting");
+        const loading = document.getElementById("loading");
+        const brokerage = document.getElementById("brokerage");
+        const total = document.getElementById("total_freight");
+        const advance = document.getElementById("advance");
+        const balance = document.getElementById("balance");
+
+        function calcFreight() {
+            let f = parseFloat(freight.value) || 0;
+            let h = parseFloat(halting.value) || 0;
+            let l = parseFloat(loading.value) || 0;
+            let b = parseFloat(brokerage.value) || 0;
+            let a = parseFloat(advance.value) || 0;
+
+            let t = f + h + l + b;
+            let bal = t - a;
+
+            total.value = t.toFixed(2);
+            balance.value = bal.toFixed(2);
+        }
+
+        [freight, halting, loading, brokerage, advance].forEach(el => {
+            el.addEventListener("input", calcFreight);
+        });
+
+        calcFreight();
+
+        /* OTP */
+        let generatedOtp = "";
+        let timer;
+
+        const sendBtn = document.getElementById("sendOtpBtn");
+        const verifyBtn = document.getElementById("verifyOtpBtn");
+        const otpBox = document.getElementById("otpBox");
+        const otpInput = document.getElementById("otp_input");
+        const driver = document.getElementById("driver_number");
+        const driverMsg = document.getElementById("driverMsg");
+        const verified = document.getElementById("driver_verified");
+
+        sendBtn.addEventListener("click", function () {
+
+            driver.value = driver.value.replace(/\D/g, '');
+
+            if (driver.value.length !== 10) {
+                driverMsg.innerHTML = "❌ Enter valid mobile number";
+                driverMsg.style.color = "red";
+                return;
+            }
+
+            generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            otpBox.style.display = "block";
+            otpInput.value = "";
+            verified.value = "0";
+
+            let seconds = 60;
+
+            clearInterval(timer);
+
+            timer = setInterval(function () {
+
+                seconds--;
+
+                driverMsg.innerHTML = "OTP sent. Expires in " + seconds + " sec";
+                driverMsg.style.color = "#0d6efd";
+
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    otpBox.style.display = "none";
+                    driverMsg.innerHTML = "⌛ OTP expired";
+                    driverMsg.style.color = "red";
+                }
+
+            }, 1000);
+
+        });
+
+        verifyBtn.addEventListener("click", function () {
+
+            if (otpInput.value === generatedOtp) {
+
+                clearInterval(timer);
+
+                driverMsg.innerHTML = "✅ Verified";
+                driverMsg.style.color = "green";
+
+                otpBox.style.display = "none";
+                sendBtn.style.display = "none";
+                driver.readOnly = true;
+                verified.value = "1";
+
+            } else {
+                driverMsg.innerHTML = "❌ Invalid OTP";
+                driverMsg.style.color = "red";
+            }
+
+        });
+
+        /* UPI */
+        const upiId = document.getElementById("upi_id");
+        const upiNo = document.getElementById("upi_number");
+
+        upiId.addEventListener("input", function () {
+            document.getElementById("upiMsg").innerHTML =
+                this.value.includes("@") ? "✅ Valid" : "❌ Invalid";
+        });
+
+        upiNo.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, '');
+            document.getElementById("numMsg").innerHTML =
+                this.value.length === 10 ? "✅ Valid" : "❌ Enter 10 digits";
+        });
+
+        /* BANK VERIFY DEMO */
+        const verifyBankBtn = document.getElementById("verifyBankBtn");
+        const bankMsg = document.getElementById("bankMsg");
+        const bankVerified = document.getElementById("bank_verified");
+
+        verifyBankBtn.addEventListener("click", function () {
+
+            const acc = acc1.value.trim();
+            const ifsc = document.getElementById("ifsc").value.trim();
+
+            if (acc === "" || ifsc === "") {
+                bankMsg.innerHTML = "❌ Enter Account Number + IFSC";
+                bankMsg.style.color = "red";
+                return;
+            }
+
+            verifyBankBtn.disabled = true;
+            verifyBankBtn.innerHTML = "Checking...";
+
+            setTimeout(function () {
+
+                if (acc.length >= 8 && ifsc.length >= 8) {
+
+                    bankVerified.value = "1";
+
+                    if (document.getElementById("account_name").value === "") {
+                        document.getElementById("account_name").value = "Verified Beneficiary";
+                    }
+
+                    bankMsg.innerHTML = "✅ Beneficiary Verified";
+                    bankMsg.style.color = "green";
+
+                } else {
+
+                    bankVerified.value = "0";
+                    bankMsg.innerHTML = "❌ Invalid Bank Details";
+                    bankMsg.style.color = "red";
+                }
+
+                verifyBankBtn.disabled = false;
+                verifyBankBtn.innerHTML = "Verify Beneficiary";
+
+            }, 1500);
+
+        });
+
+    });
+</script>
+
+<style>
     .order-badge {
         background: #eef2ff;
         color: #4338ca;
         padding: 6px 12px;
         border-radius: 8px;
         font-weight: 600;
-        font-size: 13px;
     }
 
-    /* CARD */
     .saas-card {
         border: 1px solid #eef0f2;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
     }
 
     .saas-card .card-header {
         background: transparent;
         border-bottom: 1px solid #f1f3f5;
         font-weight: 600;
-        font-size: 14px;
-        padding: 14px 18px;
     }
 
-    /* INPUT */
     .input-style {
         border-radius: 10px;
-        padding: 10px 12px;
-        border: 1px solid #e5e7eb;
-        font-size: 14px;
-        transition: 0.2s;
     }
 
-    .input-style:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-    }
-
-    /* LABEL */
     label {
         font-size: 13px;
         font-weight: 500;
-        margin-bottom: 4px;
-        color: #374151;
     }
 
-    /* ACTION BAR */
     .action-bar {
         position: sticky;
         bottom: 0;
@@ -208,19 +590,20 @@
         border-top: 1px solid #eee;
         display: flex;
         justify-content: space-between;
-        border-radius: 10px;
     }
 
-    /* BUTTON */
     .btn-success {
         background: #10b981;
         border: none;
     }
 
-    .btn-success:hover {
-        background: #059669;
+    /* Autofill remove */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+        -webkit-text-fill-color: #000 !important;
     }
-
 </style>
 
 {% endblock %}
