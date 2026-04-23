@@ -26,14 +26,8 @@ SECRET_KEY = 'django-insecure-z5)r#58f*hg4+5=kv2p!568b4=pg-&(f4!ce7h390b-7d6w=2(
 DEBUG = True
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
-ALLOWED_HOSTS = [ '.onrender.com',
-    "127.0.0.1",
-    "localhost",
-     ".ngrok-free.dev",
-]
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com',
-    "https://*.ngrok-free.dev",
-]
+ALLOWED_HOSTS = ['168.144.71.218']
+  # CSRF_TRUSTED_ORIGINS = ['*'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]

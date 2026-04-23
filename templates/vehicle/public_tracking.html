@@ -1,6 +1,31 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
+<style>
+#collapseButton {
+    transition: transform 0.3s ease;
+}
+
+[aria-expanded="true"] #collapseButton {
+    transform: rotate(180deg);
+}
+</style>
+<div class="card-title focus-row-active" id="cardHeading" aria-controls="collapse" aria-expanded="false">
+    <div id="title-left-content">
+      <div id="device-name"><!--?lit$453477102$-->SM-A146B</div>
+      <span id="last-update-time"><!--?lit$453477102$-->– 4 hours ago</span>
+    </div>
+    <div id="right-buttons">
+      <cr-icon-button id="menuButton" iron-icon="cr:more-vert" title="Actions" role="button" tabindex="0" aria-disabled="false" focus-type="menu">
+      </cr-icon-button>
+      <cr-icon-button id="collapseButton" iron-icon="cr:expand-more" title="Expand list" role="button" tabindex="0" aria-disabled="false" focus-type="collapse">
+      </cr-icon-button>
+    </div>
+  </div>
+<cr-icon-button id="collapseButton"
+  iron-icon="cr:expand-more"
+  title="Expand list">
+</cr-icon-button>
 <div class="page-wrap">
 
     <!-- HERO -->
@@ -14,9 +39,7 @@
         </div>
 
         <form method="GET" class="hero-search">
-            <input type="text" name="q"
-                   value="{{ request.GET.q }}"
-                   placeholder="Enter FTL001 / LR1234">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by e.g. FTL_001 / LR1234">
             <button type="submit">Track</button>
         </form>
     </section>
@@ -40,28 +63,28 @@
             <span class="label">Current Status</span>
 
             {% if tracking.settled %}
-                <div class="status green">💰 Settled</div>
+            <div class="status green">💰 Settled</div>
 
             {% elif tracking.customer_paid %}
-                <div class="status blue">💳 Customer Paid</div>
+            <div class="status blue">💳 Customer Paid</div>
 
             {% elif tracking.transporter_paid %}
-                <div class="status teal">🏦 Transporter Paid</div>
+            <div class="status teal">🏦 Transporter Paid</div>
 
             {% elif tracking.delivered %}
-                <div class="status violet">📦 Delivered</div>
+            <div class="status violet">📦 Delivered</div>
 
             {% elif tracking.arrived %}
-                <div class="status orange">📍 Arrived</div>
+            <div class="status orange">📍 Arrived</div>
 
             {% elif tracking.fleet_departed %}
-                <div class="status yellow">🚛 In Transit</div>
+            <div class="status yellow">🚛 In Transit</div>
 
             {% elif tracking.vehicle_placed %}
-                <div class="status purple">🚚 Vehicle Assigned</div>
+            <div class="status purple">🚚 Vehicle Assigned</div>
 
             {% else %}
-                <div class="status gray">⏳ Processing</div>
+            <div class="status gray">⏳ Processing</div>
             {% endif %}
         </div>
 
@@ -94,9 +117,9 @@
                     <h4>Vehicle Assigned</h4>
                     <p>
                         {% if tracking.vehicle_placed_at %}
-                            {{ tracking.vehicle_placed_at|date:"d M Y h:i A" }}
+                        {{ tracking.vehicle_placed_at|date:"d M Y h:i A" }}
                         {% else %}
-                            Waiting for vehicle
+                        Waiting for vehicle
                         {% endif %}
                     </p>
                 </div>
@@ -148,9 +171,9 @@
                     <h4>Vehicle Departed</h4>
                     <p>
                         {% if tracking.fleet_departed_at %}
-                            {{ tracking.fleet_departed_at|date:"d M Y h:i A" }}
+                        {{ tracking.fleet_departed_at|date:"d M Y h:i A" }}
                         {% else %}
-                            Shipment started
+                        Shipment started
                         {% endif %}
                     </p>
                 </div>
@@ -166,9 +189,9 @@
                     <h4>Arrived Destination</h4>
                     <p>
                         {% if tracking.arrived_at %}
-                            {{ tracking.arrived_at|date:"d M Y h:i A" }}
+                        {{ tracking.arrived_at|date:"d M Y h:i A" }}
                         {% else %}
-                            On route
+                        On route
                         {% endif %}
                     </p>
                 </div>
@@ -184,9 +207,9 @@
                     <h4>Delivered</h4>
                     <p>
                         {% if tracking.delivered_at %}
-                            {{ tracking.delivered_at|date:"d M Y h:i A" }}
+                        {{ tracking.delivered_at|date:"d M Y h:i A" }}
                         {% else %}
-                            Pending delivery
+                        Pending delivery
                         {% endif %}
                     </p>
                 </div>
@@ -253,220 +276,307 @@
     {% endif %}
 
 </div>
+<script>
+    const heading = document.getElementById("cardHeading");
+const button = document.getElementById("collapseButton");
+const collapseArea = document.getElementById("collapse");
 
+button.addEventListener("click", () => {
+    const expanded = heading.getAttribute("aria-expanded") === "true";
+
+    heading.setAttribute("aria-expanded", !expanded);
+
+    if (expanded) {
+        collapseArea.style.display = "none";
+        button.setAttribute("iron-icon", "cr:expand-more");
+        button.setAttribute("title", "Expand list");
+    } else {
+        collapseArea.style.display = "block";
+        button.setAttribute("iron-icon", "cr:expand-less");
+        button.setAttribute("title", "Collapse list");
+    }
+});
+</script>
 <style>
+    body {
+        background: #f6f8fc;
+        font-family: Inter, sans-serif;
+    }
 
-body{
-    background:#f6f8fc;
-    font-family:Inter,sans-serif;
-}
+    .page-wrap {
+        max-width: 1180px;
+        margin: auto;
+        padding: 28px;
+    }
 
-.page-wrap{
-    max-width:1180px;
-    margin:auto;
-    padding:28px;
-}
+    .hero-card,
+    .glass-card {
+        background: #fff;
+        border-radius: 26px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, .05);
+    }
 
-.hero-card,.glass-card{
-    background:#fff;
-    border-radius:26px;
-    box-shadow:0 12px 35px rgba(0,0,0,.05);
-}
+    .hero-card {
+        padding: 28px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 24px;
+    }
 
-.hero-card{
-    padding:28px;
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    align-items:center;
-    margin-bottom:24px;
-}
+    .hero-left {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
 
-.hero-left{
-    display:flex;
-    gap:15px;
-    align-items:center;
-}
+    .hero-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
 
-.hero-icon{
-    width:70px;
-    height:70px;
-    border-radius:20px;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:30px;
-}
+    .hero-search {
+        display: flex;
+        gap: 12px;
+        min-width: 420px;
+    }
 
-.hero-search{
-    display:flex;
-    gap:12px;
-    min-width:420px;
-}
+    .hero-search input {
+        flex: 1;
+        border: none;
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 16px;
+    }
 
-.hero-search input{
-    flex:1;
-    border:none;
-    background:#f1f5f9;
-    padding:15px;
-    border-radius:16px;
-}
+    .hero-search button {
+        border: none;
+        background: #2563eb;
+        color: #fff;
+        padding: 0 22px;
+        border-radius: 16px;
+    }
 
-.hero-search button{
-    border:none;
-    background:#2563eb;
-    color:#fff;
-    padding:0 22px;
-    border-radius:16px;
-}
+    .top-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+        margin-bottom: 24px;
+    }
 
-.top-grid{
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:22px;
-    margin-bottom:24px;
-}
+    .glass-card {
+        padding: 26px;
+    }
 
-.glass-card{padding:26px;}
+    .label {
+        color: #64748b;
+        font-size: 13px;
+    }
 
-.label{color:#64748b;font-size:13px;}
+    .chip-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-.chip-row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
+    .chip {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+    }
 
-.chip{
-    background:#eef2ff;
-    color:#4338ca;
-    padding:10px 14px;
-    border-radius:14px;
-    font-size:14px;
-}
+    .status {
+        margin-top: 15px;
+        padding: 14px;
+        border-radius: 18px;
+        font-weight: 800;
+    }
 
-.status{
-    margin-top:15px;
-    padding:14px;
-    border-radius:18px;
-    font-weight:800;
-}
+    .green {
+        background: #dcfce7;
+        color: #15803d;
+    }
 
-.green{background:#dcfce7;color:#15803d;}
-.blue{background:#dbeafe;color:#1d4ed8;}
-.teal{background:#ccfbf1;color:#0f766e;}
-.violet{background:#ede9fe;color:#6d28d9;}
-.orange{background:#ffedd5;color:#ea580c;}
-.yellow{background:#fef3c7;color:#92400e;}
-.purple{background:#ede9fe;color:#6d28d9;}
-.gray{background:#e5e7eb;color:#111827;}
+    .blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
 
-.track-head{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:26px;
-}
+    .teal {
+        background: #ccfbf1;
+        color: #0f766e;
+    }
 
-.timeline{
-    position:relative;
-    padding-left:42px;
-}
+    .violet {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
 
-.timeline:before{
-    content:"";
-    position:absolute;
-    left:18px;
-    top:0;
-    bottom:0;
-    width:3px;
-    background:#e5e7eb;
-}
+    .orange {
+        background: #ffedd5;
+        color: #ea580c;
+    }
 
-.step{
-    display:flex;
-    gap:18px;
-    margin-bottom:24px;
-    opacity:.35;
-}
+    .yellow {
+        background: #fef3c7;
+        color: #92400e;
+    }
 
-.step.done,
-.step.active{
-    opacity:1;
-}
+    .purple {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
 
-.node{
-    width:56px;
-    height:56px;
-    min-width:56px;
-    border-radius:18px;
-    background:#f1f5f9;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-}
+    .gray {
+        background: #e5e7eb;
+        color: #111827;
+    }
 
-.done .node{background:#dcfce7;}
-.active .node{background:#ffedd5;}
-.success .node{background:#dcfce7;}
+    .track-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 26px;
+    }
 
-.active{
-    background:#fff7ed;
-    border-radius:20px;
-    padding:12px;
-}
+    .timeline {
+        position: relative;
+        padding-left: 42px;
+    }
 
-.step-body h4{
-    margin:0 0 6px;
-    font-size:18px;
-}
+    .timeline:before {
+        content: "";
+        position: absolute;
+        left: 18px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #e5e7eb;
+    }
 
-.step-body p{
-    margin:0;
-    color:#64748b;
-}
+    .step {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 24px;
+        opacity: .35;
+    }
 
-.success h4{color:#16a34a;}
+    .step.done,
+    .step.active {
+        opacity: 1;
+    }
 
-.live-pill{
-    background:#ecfdf5;
-    color:#15803d;
-    padding:10px 15px;
-    border-radius:999px;
-}
+    .node {
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
+        border-radius: 18px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
 
-.pulse{
-    width:8px;
-    height:8px;
-    background:#22c55e;
-    border-radius:50%;
-    display:inline-block;
-    margin-right:7px;
-}
+    .done .node {
+        background: #dcfce7;
+    }
 
-.remarks-box{
-    margin-top:20px;
-    padding:18px;
-    border-radius:18px;
-    background:#eff6ff;
-    color:#1d4ed8;
-}
+    .active .node {
+        background: #ffedd5;
+    }
 
-@media(max-width:992px){
-.hero-card{flex-direction:column;}
-.hero-search{width:100%;min-width:auto;}
-.top-grid{grid-template-columns:1fr;}
-}
+    .success .node {
+        background: #dcfce7;
+    }
 
-@media(max-width:768px){
-.page-wrap{padding:16px;}
-.hero-search{flex-direction:column;}
-.node{width:48px;height:48px;min-width:48px;}
-.step-body h4{font-size:16px;}
-}
+    .active {
+        background: #fff7ed;
+        border-radius: 20px;
+        padding: 12px;
+    }
 
+    .step-body h4 {
+        margin: 0 0 6px;
+        font-size: 18px;
+    }
+
+    .step-body p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .success h4 {
+        color: #16a34a;
+    }
+
+    .live-pill {
+        background: #ecfdf5;
+        color: #15803d;
+        padding: 10px 15px;
+        border-radius: 999px;
+    }
+
+    .pulse {
+        width: 8px;
+        height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 7px;
+    }
+
+    .remarks-box {
+        margin-top: 20px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    @media(max-width:992px) {
+        .hero-card {
+            flex-direction: column;
+        }
+
+        .hero-search {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .top-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media(max-width:768px) {
+        .page-wrap {
+            padding: 16px;
+        }
+
+        .hero-search {
+            flex-direction: column;
+        }
+
+        .node {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+        }
+
+        .step-body h4 {
+            font-size: 16px;
+        }
+    }
 </style>
 
 {% endblock %}
