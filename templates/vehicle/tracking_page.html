@@ -22,7 +22,7 @@
     </div>
 
     <!-- FORM -->
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="card shadow-sm border-0 p-4">
@@ -34,31 +34,40 @@
                     <div class="step-box">
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="vehicle_placed"
+                            <input type="checkbox" name="vehicle_placed"
                                 {% if tracking.vehicle_placed %}checked{% endif %}>
                             🚚 Vehicle Placed
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="vehicle_document"
+                            <input type="checkbox" name="vehicle_document"
                                 {% if tracking.vehicle_document %}checked{% endif %}>
                             📄 Vehicle Document
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="invoice_eway"
+                            <input type="checkbox" name="invoice_eway"
                                 {% if tracking.invoice_eway %}checked{% endif %}>
                             🧾 Invoice / E-way
                         </label>
 
+                        <!-- ✅ LR NO ADDED HERE -->
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="advance_to_fleet"
+                            📄 LR No:
+                            <input type="text" class="form-control"
+                                name="lr_no"
+                                value="{{ tracking.lr_no|default:'' }}"
+                                placeholder="Enter LR No">
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="advance_to_fleet"
                                 {% if tracking.advance_to_fleet %}checked{% endif %}>
                             💰 Advance To Fleet
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="fleet_departed"
+                            <input type="checkbox" name="fleet_departed"
                                 {% if tracking.fleet_departed %}checked{% endif %}>
                             🚛 Fleet Departed
                         </label>
@@ -71,38 +80,31 @@
                     <div class="step-box">
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="advance_received"
+                            <input type="checkbox" name="advance_received"
                                 {% if tracking.advance_received %}checked{% endif %}>
                             💵 Advance Received
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="arrived"
+                            <input type="checkbox" name="arrived"
                                 {% if tracking.arrived %}checked{% endif %}>
                             📍 Arrived
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="delivered"
+                            <input type="checkbox" name="delivered"
                                 {% if tracking.delivered %}checked{% endif %}>
                             ✅ Delivered
                         </label>
 
                         <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" name="pod_received"
+                            <input type="checkbox" id="podBox" name="pod_received"
                                 {% if tracking.pod_received %}checked{% endif %}>
                             📦 POD Received
                         </label>
 
                         <label class="track-item">
-                            <input type="text" class="form-control" name="lr_no"
-                                value="{{ tracking.lr_no|default:'' }}"
-                                placeholder="LR No">
-                        </label>
-
-                        <!-- SETTLED -->
-                        <label class="track-item">
-                            <input type="checkbox" class="tracking-checkbox" id="settledBox" name="settled"
+                            <input type="checkbox" name="settled"
                                 {% if tracking.settled %}checked{% endif %}>
                             🧮 Settled
                         </label>
@@ -110,6 +112,42 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- ✅ POD DOCUMENT UPLOAD (AFTER POD RECEIVED ONLY) -->
+            <div id="uploadBox" class="mt-4"
+                 style="{% if not tracking.pod_received %}display:none;{% endif %}">
+
+                <div class="step-box">
+
+                    <h6 class="mb-3">📎 Upload POD Documents</h6>
+
+                    <input type="file"
+                           name="documents"
+                           multiple
+                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                           class="form-control">
+
+                    <small class="text-muted d-block mt-2">
+                        Upload POD, invoice copy, delivery proof, etc.
+                    </small>
+
+                    {% if tracking.documents.all %}
+                    <div class="mt-3">
+                        <strong>Uploaded Files:</strong>
+                        <ul>
+                            {% for doc in tracking.documents.all %}
+                            <li>
+                                <a href="{{ doc.file.url }}" target="_blank">
+                                    📎 {{ doc.file.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                </div>
             </div>
 
             <!-- REMARKS -->
@@ -129,94 +167,142 @@
 
 </div>
 
-<!-- JS: SINGLE SELECT + SETTLED LOCK -->
+<!-- JS -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const checkboxes = document.querySelectorAll(".tracking-checkbox");
+    const podBox = document.getElementById("podBox");
+    const uploadBox = document.getElementById("uploadBox");
+
+    function toggleUpload() {
+        uploadBox.style.display = podBox.checked ? "block" : "none";
+    }
+
+    podBox.addEventListener("change", toggleUpload);
+    toggleUpload();
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const items = document.querySelectorAll(".track-item input");
     const settledBox = document.getElementById("settledBox");
+    const podBox = document.getElementById("podBox");
+    const uploadBox = document.getElementById("uploadBox");
+    const lrInput = document.querySelector("input[name='lr_no']");
 
-    function lockSingle(selected) {
+    // =========================
+    // POD TOGGLE
+    // =========================
+    function toggleUpload() {
+        if (!uploadBox) return;
+        uploadBox.style.display = podBox.checked ? "block" : "none";
+    }
 
-        checkboxes.forEach(box => {
+    if (podBox) {
+        podBox.addEventListener("change", toggleUpload);
+        toggleUpload();
+    }
 
-            const row = box.closest(".track-item");
+    // =========================
+    // DISABLE ALL
+    // =========================
+    function disableAll(except = null, lock = false) {
 
-            if (box !== selected) {
-                box.checked = false;
-                box.disabled = true;
-                row.classList.add("disabled-row");
+        items.forEach(el => {
+
+            const parent = el.closest(".track-item");
+
+            if (except && el !== except) {
+                el.checked = false;
+            }
+
+            if (lock) {
+                el.disabled = true;
             } else {
-                box.disabled = false;
-                row.classList.add("selected-row");
+                el.disabled = el !== except;
+            }
+
+            if (parent) {
+                parent.classList.add("disabled-row");
             }
 
         });
 
+        // LR input also must follow same rule
+        if (lrInput) {
+            lrInput.disabled = lock || (except !== lrInput);
+        }
     }
 
-    function unlockAll() {
+    // =========================
+    // ENABLE ALL
+    // =========================
+    function enableAll() {
 
-        checkboxes.forEach(box => {
-            const row = box.closest(".track-item");
-            box.disabled = false;
-            row.classList.remove("disabled-row", "selected-row");
+        items.forEach(el => {
+            el.disabled = false;
+            const parent = el.closest(".track-item");
+            if (parent) parent.classList.remove("disabled-row", "selected-row");
         });
 
+        if (lrInput) lrInput.disabled = false;
     }
 
-    // 🔥 SINGLE CHECK RULE
-    checkboxes.forEach(box => {
+    // =========================
+    // NORMAL RULE
+    // =========================
+    items.forEach(el => {
 
-        if (box === settledBox) return;
+        if (el === settledBox) return;
 
-        box.addEventListener("change", function () {
+        el.addEventListener("change", function () {
 
             if (this.checked) {
-                lockSingle(this);
+                disableAll(this, false);
 
-                // unset settled if any other selected
-                if (settledBox) settledBox.checked = false;
+                if (settledBox) {
+                    settledBox.checked = false;
+                    settledBox.disabled = true;
+                }
 
             } else {
-                unlockAll();
+                enableAll();
             }
 
         });
 
     });
 
-    // 🔥 SETTLED LOCK EVERYTHING
-    if (settledBox && settledBox.checked) {
-        checkboxes.forEach(box => {
-
-            if (box !== settledBox) {
-                box.checked = false;
-                box.disabled = true;
-                box.closest(".track-item").classList.add("disabled-row");
-            }
-
-        });
-    }
-
+    // =========================
+    // SETTLED RULE (FULL LOCK)
+    // =========================
     if (settledBox) {
+
         settledBox.addEventListener("change", function () {
 
             if (this.checked) {
-                checkboxes.forEach(box => {
 
-                    if (box !== settledBox) {
-                        box.checked = false;
-                        box.disabled = true;
-                        box.closest(".track-item").classList.add("disabled-row");
-                    }
-
+                items.forEach(el => {
+                    el.checked = false;
+                    el.disabled = true;
                 });
+
+                if (lrInput) lrInput.disabled = true;
+
             } else {
-                unlockAll();
+                enableAll();
             }
 
         });
+
+        // page load state
+        if (settledBox.checked) {
+            items.forEach(el => el.disabled = true);
+            if (lrInput) lrInput.disabled = true;
+        }
+
     }
 
 });
@@ -224,6 +310,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <!-- STYLE -->
 <style>
+.upload-box {
+    border-radius: 14px;
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    transition: 0.3s;
+}
+
+/* ❌ NOT ACTIVE (RED LINE) */
+.upload-box.inactive {
+    border-left: 6px solid #ef4444;  /* RED */
+    opacity: 0.6;
+}
+
+/* ⚠️ READY BUT NOT USED (YELLOW LINE) */
+.upload-box.warning {
+    border-left: 6px solid #f59e0b;  /* YELLOW */
+    opacity: 0.8;
+}
+
+/* ✅ ACTIVE (GREEN LINE) */
+.upload-box.active {
+    border-left: 6px solid #22c55e;  /* GREEN */
+    opacity: 1;
+}
+
 body {
     background: #f5f7fb;
 }
@@ -247,24 +358,12 @@ body {
     border: 1px solid #eef1f4;
     border-radius: 12px;
     margin-bottom: 12px;
-    cursor: pointer;
     background: #fafbfc;
     font-weight: 500;
 }
 
 .track-item input {
-    transform: scale(1.1);
-}
-
-.disabled-row {
-    opacity: 0.5;
-    background: #f1f3f5;
-    pointer-events: none;
-}
-
-.selected-row {
-    background: #e8fff4;
-    border-color: #16a34a;
+    transform: scale(1.05);
 }
 
 .remarks-box {

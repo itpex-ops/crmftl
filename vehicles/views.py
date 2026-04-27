@@ -17,7 +17,73 @@ from django.shortcuts import render
 from vehicles.models import Vehicle, Tracking
 from django.db.models import Q
 
+def tracking_view(request):
+    query = request.GET.get("q")
+    tracking = None
+    vehicle = None
 
+    if query:
+        tracking = Tracking.objects.select_related("order").filter(
+            lr_no__icontains=query
+        ).first()
+
+        if not tracking:
+            tracking = Tracking.objects.select_related("order").filter(
+                order__ftl_no__icontains=query
+            ).first()
+
+        if tracking:
+            vehicle = tracking.order  # adjust if your FK is different
+
+    return render(request, "tracking.html", {
+        "tracking": tracking,
+        "vehicle": vehicle
+    })
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+
+from .models import Tracking, TrackingDocument
+
+
+@require_POST
+def upload_tracking_docs(request, id):
+    tracking = get_object_or_404(Tracking, id=id)
+
+    # ✅ Safety check: allow upload only after POD received
+    if not tracking.pod_received:
+        messages.error(request, "Cannot upload documents before POD is received.")
+        return redirect(request.META.get("HTTP_REFERER", "/"))
+
+    files = request.FILES.getlist("documents")
+
+    # ✅ Validate files
+    if not files:
+        messages.error(request, "Please select at least one file.")
+        return redirect(request.META.get("HTTP_REFERER", "/"))
+
+    allowed_types = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ]
+
+    for f in files:
+        # optional file validation
+        if hasattr(f, "content_type") and f.content_type not in allowed_types:
+            messages.warning(request, f"{f.name} skipped (unsupported format)")
+            continue
+
+        TrackingDocument.objects.create(
+            tracking=tracking,
+            file=f
+        )
+
+    messages.success(request, "Documents uploaded successfully.")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 def public_tracking(request):
     """
     Search by FTL No or LR No

@@ -115,3 +115,7 @@ class Tracking(models.Model):
     def __str__(self):
         return f"Tracking - {self.order.order_no}"
 
+class TrackingDocument(models.Model):
+    tracking = models.ForeignKey(Tracking, related_name="documents", on_delete=models.CASCADE)
+    file = models.FileField(upload_to="tracking_docs/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)

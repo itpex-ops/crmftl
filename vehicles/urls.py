@@ -10,4 +10,5 @@ urlpatterns = [
     path('vehicle/<int:vehicle_id>/tracking/', views.tracking_page , name='tracking_page'),
     path('tracking/update-ajax/', views.update_tracking_ajax, name='update_tracking_ajax'),
     path('public_tracking/',views.public_tracking,name='public_tracking'),
+    path('tracking/<int:id>/upload-docs/', views.upload_tracking_docs, name='upload_tracking_docs')
 ]

@@ -2,29 +2,16 @@
 {% block content %}
 
 <style>
-#collapseButton {
-    transition: transform 0.3s ease;
-}
+    #collapseButton {
+        transition: transform 0.3s ease;
+    }
 
-[aria-expanded="true"] #collapseButton {
-    transform: rotate(180deg);
-}
+    [aria-expanded="true"] #collapseButton {
+        transform: rotate(180deg);
+    }
 </style>
-<div class="card-title focus-row-active" id="cardHeading" aria-controls="collapse" aria-expanded="false">
-    <div id="title-left-content">
-      <div id="device-name"><!--?lit$453477102$-->SM-A146B</div>
-      <span id="last-update-time"><!--?lit$453477102$-->– 4 hours ago</span>
-    </div>
-    <div id="right-buttons">
-      <cr-icon-button id="menuButton" iron-icon="cr:more-vert" title="Actions" role="button" tabindex="0" aria-disabled="false" focus-type="menu">
-      </cr-icon-button>
-      <cr-icon-button id="collapseButton" iron-icon="cr:expand-more" title="Expand list" role="button" tabindex="0" aria-disabled="false" focus-type="collapse">
-      </cr-icon-button>
-    </div>
-  </div>
-<cr-icon-button id="collapseButton"
-  iron-icon="cr:expand-more"
-  title="Expand list">
+
+<cr-icon-button id="collapseButton" iron-icon="cr:expand-more" title="Expand list">
 </cr-icon-button>
 <div class="page-wrap">
 
@@ -278,24 +265,24 @@
 </div>
 <script>
     const heading = document.getElementById("cardHeading");
-const button = document.getElementById("collapseButton");
-const collapseArea = document.getElementById("collapse");
+    const button = document.getElementById("collapseButton");
+    const collapseArea = document.getElementById("collapse");
 
-button.addEventListener("click", () => {
-    const expanded = heading.getAttribute("aria-expanded") === "true";
+    button.addEventListener("click", () => {
+        const expanded = heading.getAttribute("aria-expanded") === "true";
 
-    heading.setAttribute("aria-expanded", !expanded);
+        heading.setAttribute("aria-expanded", !expanded);
 
-    if (expanded) {
-        collapseArea.style.display = "none";
-        button.setAttribute("iron-icon", "cr:expand-more");
-        button.setAttribute("title", "Expand list");
-    } else {
-        collapseArea.style.display = "block";
-        button.setAttribute("iron-icon", "cr:expand-less");
-        button.setAttribute("title", "Collapse list");
-    }
-});
+        if (expanded) {
+            collapseArea.style.display = "none";
+            button.setAttribute("iron-icon", "cr:expand-more");
+            button.setAttribute("title", "Expand list");
+        } else {
+            collapseArea.style.display = "block";
+            button.setAttribute("iron-icon", "cr:expand-less");
+            button.setAttribute("title", "Collapse list");
+        }
+    });
 </script>
 <style>
     body {
