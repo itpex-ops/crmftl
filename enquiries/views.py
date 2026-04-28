@@ -136,6 +136,7 @@ def create_enquiry(request):
 
     return render(request, "enquiry/create.html", context)
 # Only sales or admin users can access
+
 def is_sales(user):
     return user.is_authenticated and (user.role in ['sales', 'admin'])
 
@@ -149,18 +150,18 @@ def enquiry_list(request):
     user = request.user
 
     # ================= ROLE FLAGS =================
-    is_manager = (
+    is_admin = (
         user.is_superuser or
-        user.groups.filter(name="Managers").exists()
+        user.groups.filter(name="admin").exists()
     )
-
-    is_sales = user.groups.filter(name="Sales").exists()
+    print(is_admin)
+    is_sales = user.groups.filter(name="sales").exists()
 
     is_admin = getattr(user, "role", None) == "admin"
 
 
     # ================= BASE QUERY =================
-    if is_admin or is_manager:
+    if is_admin or is_admin:
         base_qs = Enquiry.objects.all()
     else:
         base_qs = Enquiry.objects.filter(created_by=user)
@@ -184,8 +185,8 @@ def enquiry_list(request):
 
     # ================= FINAL LIST =================
     # 👉 Managers see "Waiting For Rate Approval"
-    # 👉 Sales see their own records
-    if is_manager:
+    # 👉 sales see their own records
+    if is_admin:
        enquiries = base_qs.exclude(status='confirmed').order_by('-id')
     else:
         enquiries = base_qs.order_by('-id')
@@ -199,9 +200,11 @@ def enquiry_list(request):
         'confirmed_count': confirmed_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
-        'is_manager': is_manager,
+        'is_admin': is_admin,
         'is_sales': is_sales,
     })
+
+1
 #@login_required
 def delete_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
@@ -406,33 +409,14 @@ def update_enquiry_status1(request, id, action):
         })
     return JsonResponse({"success": False})
 
-# enquiries/views.py
-
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-
-from enquiries.models import Enquiry
-from orders.models import Order
-
-
 @login_required
 def update_enquiry_status(request, id, action):
-
     enquiry = get_object_or_404(Enquiry, id=id)
-
     if request.method == "POST":
-
-        # ----------------------------------
-        # CONFIRM ENQUIRY
-        # ----------------------------------
         if action == "confirm":
-
             enquiry.status = "confirmed"
             enquiry.approval_rate = request.POST.get("approve_rate") or 0
             enquiry.save()
-
-            # Order create only once
             order, created = Order.objects.get_or_create(
                 enquiry=enquiry,
                 defaults={
@@ -444,115 +428,73 @@ def update_enquiry_status(request, id, action):
                     "created_by": request.user,
                 }
             )
-
-            # If already exists, update finalized rate
             if not created:
                 order.finalized_rate = enquiry.approval_rate
                 order.save()
-
             messages.success(request, "Enquiry confirmed successfully.")
-
-            # IMPORTANT:
-            # pricing page now expects enquiry_id
             return redirect("pricing_page", enquiry_id=enquiry.id)
-
-        # ----------------------------------
-        # DISAGREE
-        # ----------------------------------
         elif action == "disagree":
-
             enquiry.status = "disagree"
             enquiry.disagree_reason = request.POST.get("disagree_reason", "")
             enquiry.save()
-
             messages.warning(request, "Enquiry marked as disagree.")
             return redirect("enquiry_list")
-
-        # ----------------------------------
-        # CANCEL
-        # ----------------------------------
         elif action == "cancel":
-
             enquiry.status = "cancelled"
             enquiry.cancel_reason = request.POST.get("cancel_reason", "")
             enquiry.save()
-
             messages.error(request, "Enquiry cancelled.")
             return redirect("enquiry_list")
-
     return redirect("enquiry_list")
 
 def update_pitch(request, id):
-
     if request.method != "POST":
         return JsonResponse({"success": False, "msg": "Invalid request method"})
-
     enquiry = get_object_or_404(Enquiry, id=id)
-
     remarks = request.POST.get("remarks") or ""
     pitch_rate = request.POST.get("pitch_rate")
     is_approved = request.POST.get("is_approved") == "true"
-
-    # 🔐 Check Manager permission
     can_approve = (
         request.user.is_superuser or
         request.user.groups.filter(name="Managers").exists()
     )
-
-    # ================= SAVE CURRENT STAGE =================
     status = (enquiry.status or "").lower()
-
     if status in ["pending_pitch1", "waiting for rate approval"]:
         enquiry.pitch1 = pitch_rate
         enquiry.pitch1_remarks = remarks
-
         next_status = "pending_pitch2"
-
     elif status == "pending_pitch2":
         enquiry.pitch2 = pitch_rate
         enquiry.pitch2_remarks = remarks
-
         next_status = "pending_pitch3"
-
     elif status == "pending_pitch3":
         enquiry.pitch3 = pitch_rate
         enquiry.pitch3_remarks = remarks
-
         next_status = "confirmed"
-
     else:
         next_status = "pending_pitch1"
-
-
-    # ================= APPROVAL (WORKS AT ANY STAGE) =================
     if is_approved:
         if not can_approve:
             return HttpResponseForbidden("Only managers can approve")
-
         enquiry.status = "confirmed"
         enquiry.approval_rate = pitch_rate
-
     else:
         enquiry.status = next_status
-
-
-    # ================= CREATE ORDER =================
     order = None
     if enquiry.status == "confirmed":
         order, created = Order.objects.get_or_create(
             enquiry=enquiry,
-            defaults={
-                "finalized_rate": enquiry.approval_rate,
-                "customer_name": enquiry.customer_name,
-                "customer_contact": enquiry.customer_contact,
-                "routes": enquiry.routes,
-            }
+           defaults={
+                    "finalized_rate": enquiry.approval_rate,
+                    "customer_name": enquiry.customer_name,
+                    "customer_contact": enquiry.customer_contact,
+                    "routes": enquiry.routes,
+                    "vehicle_type": enquiry.vehicle_type,
+                    "created_by": request.user,
+                }
         )
-
     enquiry.save()
-
-    # ================= REDIRECT =================
     if order:
-        return redirect("pricing_page", id=order.id)
-
+        return redirect("pricing_page", enquiry_id=order.id)
     return redirect("enquiry_list")
+
