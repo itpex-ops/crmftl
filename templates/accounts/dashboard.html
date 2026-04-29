@@ -1,0 +1,85 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+
+.card-box{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+    font-size:22px;
+    font-weight:700;
+}
+
+.label{
+    font-size:13px;
+    color:#64748b;
+}
+
+.value{
+    font-size:22px;
+    font-weight:700;
+}
+
+.green{ color:#16a34a; }
+.red{ color:#dc2626; }
+.blue{ color:#2563eb; }
+.orange{ color:#f97316; }
+
+</style>
+
+<div class="container-fluid">
+
+    <div class="title mb-3">ERP Dashboard</div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Total Income</div>
+                <div class="value green">₹{{ income }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Total Expense</div>
+                <div class="value red">₹{{ expense }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Profit</div>
+                <div class="value blue">₹{{ profit }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <div class="label">Bank Balance</div>
+                <div class="value orange">₹{{ bank_balance }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-md-6">
+            <div class="card-box">
+                <h5>Customer Due</h5>
+                <h3 class="red">₹{{ customer_due }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

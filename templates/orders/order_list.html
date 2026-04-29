@@ -1,0 +1,237 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- 🔷 HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">📦 Orders Dashboard</h4>
+    </div>
+
+    <!-- 🔷 STATS -->
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card primary">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <small>Total Orders</small>
+                        <h4>{{ orders|length }}</h4>
+                    </div>
+                    <div class="icon">📦</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card success">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <small>Assigned</small>
+                        <h4>{{ assigned_count }}</h4>
+                    </div>
+                    <div class="icon">🚚</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card danger">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <small>Pending</small>
+                        <h4>{{ pending_count }}</h4>
+                    </div>
+                    <div class="icon">⏳</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card premium-card stat-card info">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <small>Revenue</small>
+                        <h4>₹ {{ total_revenue|default:"0" }}</h4>
+                    </div>
+                    <div class="icon">💰</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔷 FILTER -->
+    <div class="card premium-card p-3 mb-4 glass">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 Search orders...">
+            </div>
+            <div class="col-md-3">
+                <select id="filterStatus" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="not_assigned">Pending</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔷 ORDERS -->
+    <div class="row" id="ordersContainer">
+
+        {% for order in orders %}
+        <div class="col-md-6 col-lg-4 mb-4 order-item"
+             data-name="{{ order.customer_name }}"
+             data-order="{{ order.order_no }}"
+             data-status="{% if order.vehicles.count %}assigned{% else %}not_assigned{% endif %}">
+
+            <div class="card premium-card order-card 
+                {% if order.vehicles.count %}success{% else %}danger{% endif %}">
+
+                <!-- HEADER -->
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between">
+                    <div>
+                        <strong>{{ order.order_no }}</strong><br>
+                        <small class="text-muted">{{ order.date }}</small>
+                    </div>
+
+                    {% if order.vehicles.count %}
+                        <span class="badge bg-success">Assigned</span>
+                    {% else %}
+                        <span class="badge bg-danger">Pending</span>
+                    {% endif %}
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    <p>
+                        👤 <strong>{{ order.customer_name }}</strong><br>
+                        <small>{{ order.customer_contact }}</small>
+                    </p>
+
+                    <p>
+                        📍 <span class="fw-semibold text-primary">
+                             {% for r in e.routes %}
+                            <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
+                            {% empty %}-{% endfor %}
+                        </span>
+                    </p>
+
+                    <hr>
+
+                    {% if order.vehicles.count %}
+                        {% with v=order.vehicles.first %}
+                        <p>🚚 {{ v.vehicle_number }}</p>
+                        <small>📞 {{ v.driver_number }}</small>
+                        {% endwith %}
+                    {% else %}
+                        <p class="text-muted">Vehicle not assigned</p>
+                    {% endif %}
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                    <strong class="text-success">₹ {{ order.total_rate|default:"0" }}</strong>
+
+                    <div>
+                        <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-light">View</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- 🔥 PREMIUM CSS -->
+<style>
+
+/* Glass effect */
+.glass {
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.6);
+}
+
+/* Base card */
+.premium-card {
+    border-radius: 16px;
+    border: none;
+    padding: 15px;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+/* Glow border (gradient) */
+/* Premium gradient border without mask */
+.premium-card {
+    border-radius: 16px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid transparent;
+    background-image: 
+        linear-gradient(#ffffff, #ffffff), 
+        linear-gradient(120deg, #4e73df, #1cc88a, #36b9cc);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.premium-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+/* Color themes */
+.primary { border-left: 4px solid #4e73df; }
+.success { border-left: 4px solid #1cc88a; }
+.danger  { border-left: 4px solid #e74a3b; }
+.info    { border-left: 4px solid #36b9cc; }
+
+/* Icons */
+.icon {
+    font-size: 22px;
+    opacity: 0.8;
+}
+
+/* Search */
+.search-box {
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Order card spacing */
+.order-card {
+    min-height: 260px;
+}
+
+</style>
+
+<!-- 🔷 FILTER SCRIPT -->
+<script>
+document.getElementById("searchInput").addEventListener("keyup", function() {
+    let value = this.value.toLowerCase();
+    document.querySelectorAll(".order-item").forEach(el => {
+        let name = el.dataset.name.toLowerCase();
+        let order = el.dataset.order.toLowerCase();
+        el.style.display = (name.includes(value) || order.includes(value)) ? "" : "none";
+    });
+});
+
+document.getElementById("filterStatus").addEventListener("change", function() {
+    let value = this.value;
+    document.querySelectorAll(".order-item").forEach(el => {
+        let status = el.dataset.status;
+        el.style.display = (!value || status === value) ? "" : "none";
+    });
+});
+</script>
+
+{% endblock %}

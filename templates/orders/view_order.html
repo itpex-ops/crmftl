@@ -1,0 +1,292 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+body{
+    background:#f5f7fb;
+}
+
+.panel-card{
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #dbe3f1;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    margin-bottom:20px;
+}
+
+.panel-header{
+    background:#738dca;
+    color:#fff;
+    padding:14px 18px;
+    font-weight:700;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.panel-body{
+    padding:18px;
+}
+
+.hide-section{
+    display:none;
+}
+
+.detail-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+.detail-table tr{
+    border-bottom:1px solid #eef2f7;
+}
+
+.detail-table th{
+    width:38%;
+    padding:10px 8px;
+    color:#475569;
+    font-weight:600;
+}
+
+.detail-table td{
+    padding:10px 8px;
+    color:#111827;
+    font-weight:500;
+}
+
+.toggle-btn{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:8px;
+    background:rgba(255,255,255,.18);
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+}
+
+.toggle-btn:hover{
+    background:rgba(255,255,255,.30);
+}
+
+.route-pill{
+    display:inline-block;
+    background:#eef4ff;
+    color:#1d4ed8;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    margin:3px;
+}
+
+.vehicle-box{
+    background:#f8fafc;
+    border-radius:12px;
+    padding:10px;
+}
+
+.action-btn{
+    min-width:180px;
+    border-radius:10px;
+}
+</style>
+
+
+<div class="container-fluid mt-4">
+
+    <!-- Header -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <span>📦 {{ order.order_no }}</span>
+
+            <span>
+                {% if order.tracking and order.tracking.delivered %}
+                    Delivered
+                {% elif order.tracking and order.tracking.fleet_departed %}
+                    In Transit
+                {% else %}
+                    Pending
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+
+    <div class="row">
+
+        <!-- Enquiry -->
+        <div class="col-md-6">
+            <div class="panel-card">
+
+                <div class="panel-header">
+                    <span>🔗 Enquiry Details</span>
+
+                    <button type="button"
+                            class="toggle-btn"
+                            onclick="toggleBox('enquiryBody',this)">+</button>
+                </div>
+
+                <div class="panel-body hide-section" id="enquiryBody">
+
+                    {% if order.enquiry %}
+                    <table class="detail-table">
+                        <tr><th>Enquiry No</th><td>{{ order.enquiry.enquiry_no }}</td></tr>
+                        <tr><th>Status</th><td>{{ order.enquiry.status }}</td></tr>
+                        <tr><th>Customer</th><td>{{ order.enquiry.customer_name }}</td></tr>
+                        <tr><th>Contact</th><td>{{ order.enquiry.customer_contact }}</td></tr>
+                        <tr><th>Email</th><td>{{ order.enquiry.email }}</td></tr>
+                        <tr><th>Lead Source</th><td>{{ order.enquiry.lead_source }}</td></tr>
+                        <tr><th>Reference</th><td>{{ order.enquiry.reference_name }}</td></tr>
+                        <tr><th>Vehicle Type</th><td>{{ order.enquiry.vehicle_type }}</td></tr>
+                        <tr><th>Pickup</th><td>{{ order.enquiry.pickups }}</td></tr>
+                        <tr><th>Delivery</th><td>{{ order.enquiry.deliveries }}</td></tr>
+                        <tr><th>Remarks</th><td>{{ order.enquiry.remarks }}</td></tr>
+                    </table>
+                    {% else %}
+                        <div class="alert alert-secondary mb-0">
+                            No enquiry found
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <!-- Order -->
+        <div class="col-md-6">
+            <div class="panel-card">
+
+                <div class="panel-header">
+                    <span>💰 Order Details</span>
+
+                    <button type="button"
+                            class="toggle-btn"
+                            onclick="toggleBox('orderBody',this)">+</button>
+                </div>
+
+                <div class="panel-body hide-section" id="orderBody">
+
+                    <table class="detail-table">
+                        <tr><th>Order No</th><td>{{ order.order_no }}</td></tr>
+                        <tr><th>Customer</th><td>{{ order.customer_name }}</td></tr>
+                        <tr><th>Contact</th><td>{{ order.customer_contact }}</td></tr>
+                        <tr><th>Vehicle Type</th><td>{{ order.vehicle_type }}</td></tr>
+                        <tr><th>Total Freight</th><td>₹ {{ order.total_rate }}</td></tr>
+                        <tr><th>Created By</th><td>{{ order.created_by }}</td></tr>
+                        <tr><th>Assigned At</th><td>{{ order.vehicle_place_date|date:"d M Y h:i A" }}</td></tr>
+
+                        <tr>
+                            <th>Routes</th>
+                            <td>
+                                {% for r in order.routes %}
+                                    <span class="route-pill">
+                                        {{ r.origin }} → {{ r.destination }}
+                                    </span>
+                                {% empty %}
+                                    No Route
+                                {% endfor %}
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Vehicle -->
+    <div class="panel-card">
+
+        <div class="panel-header">
+            <span>🚚 Vehicle Details</span>
+
+            <button type="button"
+                    class="toggle-btn"
+                    onclick="toggleBox('vehicleBody',this)">+</button>
+        </div>
+
+        <div class="panel-body hide-section" id="vehicleBody">
+
+            {% if order.vehicles.count %}
+            {% with v=order.vehicles.first %}
+
+            <div class="vehicle-box">
+
+                <table class="detail-table">
+                    <tr><th>Vehicle No</th><td>{{ v.vehicle_number }}</td></tr>
+                    <tr><th>Driver No</th><td>{{ v.driver_number }}</td></tr>
+                    <tr><th>Owner No</th><td>{{ v.owner_number }}</td></tr>
+                    <tr><th>Total Freight</th><td>₹ {{ v.total_freight }}</td></tr>
+                    <tr><th>Balance</th><td>₹ {{ v.balance }}</td></tr>
+                    <tr><th>UPI App</th><td>{{ v.get_upi_app_display }}</td></tr>
+                    <tr><th>UPI ID</th><td>{{ v.upi_id }}</td></tr>
+                </table>
+
+            </div>
+
+            {% endwith %}
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    No vehicle assigned
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+
+        <a href="{% url 'assign_vehicle' order.id %}"
+           class="btn btn-warning action-btn">
+            🚚 Assign Vehicle
+        </a>
+
+        {% if order.vehicles.count %}
+        {% with v=order.vehicles.first %}
+        <a href="{% url 'tracking_page' v.id %}"
+           class="btn btn-info text-white action-btn">
+            📍 Tracking
+        </a>
+        {% endwith %}
+        {% endif %}
+
+        <a href="{% url 'order_list' %}"
+           class="btn btn-secondary action-btn">
+            ⬅ Back Orders
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+function toggleBox(id,btn){
+
+    let body = document.getElementById(id);
+
+    if(body.classList.contains("hide-section")){
+        body.classList.remove("hide-section");
+        btn.innerHTML = "−";
+    }else{
+        body.classList.add("hide-section");
+        btn.innerHTML = "+";
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<h4>Receive Payment</h4>
+
+<form method="post">
+{% csrf_token %}
+
+<label>Customer</label>
+<input class="form-control mb-2" value="{{ enquiry.customer_name }}" readonly>
+
+<label>Amount</label>
+<input type="number" name="amount" class="form-control mb-3" required>
+
+<button class="btn btn-success">Receive Payment</button>
+
+</form>
+
+{% endblock %}

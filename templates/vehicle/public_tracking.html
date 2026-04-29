@@ -1,0 +1,569 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    #collapseButton {
+        transition: transform 0.3s ease;
+    }
+
+    [aria-expanded="true"] #collapseButton {
+        transform: rotate(180deg);
+    }
+</style>
+
+<cr-icon-button id="collapseButton" iron-icon="cr:expand-more" title="Expand list">
+</cr-icon-button>
+<div class="page-wrap">
+
+    <!-- HERO -->
+    <section class="hero-card">
+        <div class="hero-left">
+            <div class="hero-icon">🚚</div>
+            <div>
+                <h1>Track Shipment</h1>
+                <p>Live transport progress using FTL No / LR No</p>
+            </div>
+        </div>
+
+        <form method="GET" class="hero-search">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by e.g. FTL_001 / LR1234">
+            <button type="submit">Track</button>
+        </form>
+    </section>
+
+    {% if tracking %}
+
+    <!-- TOP GRID -->
+    <section class="top-grid">
+
+        <div class="glass-card">
+            <span class="label">Shipment ID</span>
+            <h2>{{ vehicle.ftl_no }}</h2>
+
+            <div class="chip-row">
+                <span class="chip">📄 LR : {{ tracking.lr_no|default:"Pending" }}</span>
+                <span class="chip">🚛 {{ vehicle.vehicle_number }}</span>
+            </div>
+        </div>
+
+        <div class="glass-card status-card">
+            <span class="label">Current Status</span>
+
+            {% if tracking.settled %}
+            <div class="status green">💰 Settled</div>
+
+            {% elif tracking.customer_paid %}
+            <div class="status blue">💳 Customer Paid</div>
+
+            {% elif tracking.transporter_paid %}
+            <div class="status teal">🏦 Transporter Paid</div>
+
+            {% elif tracking.delivered %}
+            <div class="status violet">📦 Delivered</div>
+
+            {% elif tracking.arrived %}
+            <div class="status orange">📍 Arrived</div>
+
+            {% elif tracking.fleet_departed %}
+            <div class="status yellow">🚛 In Transit</div>
+
+            {% elif tracking.vehicle_placed %}
+            <div class="status purple">🚚 Vehicle Assigned</div>
+
+            {% else %}
+            <div class="status gray">⏳ Processing</div>
+            {% endif %}
+        </div>
+
+    </section>
+
+    <!-- TRACK CARD -->
+    <section class="glass-card track-card">
+
+        <div class="track-head">
+            <div>
+                <h3>Live Shipment Timeline</h3>
+                <small>Current stage auto highlighted</small>
+            </div>
+
+            <div class="live-pill">
+                <span class="pulse"></span>
+                Live
+            </div>
+        </div>
+
+        <div class="timeline">
+
+            <!-- 1 -->
+            <div class="step
+                {% if tracking.vehicle_placed %}done{% endif %}
+                {% if tracking.vehicle_placed and not tracking.vehicle_document %}active{% endif %}
+            ">
+                <div class="node">🚚</div>
+                <div class="step-body">
+                    <h4>Vehicle Assigned</h4>
+                    <p>
+                        {% if tracking.vehicle_placed_at %}
+                        {{ tracking.vehicle_placed_at|date:"d M Y h:i A" }}
+                        {% else %}
+                        Waiting for vehicle
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="step
+                {% if tracking.vehicle_document %}done{% endif %}
+                {% if tracking.vehicle_document and not tracking.invoice_eway %}active{% endif %}
+            ">
+                <div class="node">📄</div>
+                <div class="step-body">
+                    <h4>Documents Received</h4>
+                    <p>RC / Insurance / DL</p>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="step
+                {% if tracking.invoice_eway %}done{% endif %}
+                {% if tracking.invoice_eway and not tracking.advance_to_fleet %}active{% endif %}
+            ">
+                <div class="node">🧾</div>
+                <div class="step-body">
+                    <h4>Invoice & E-way Ready</h4>
+                    <p>Dispatch documents ready</p>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="step
+                {% if tracking.advance_to_fleet %}done{% endif %}
+                {% if tracking.advance_to_fleet and not tracking.fleet_departed %}active{% endif %}
+            ">
+                <div class="node">💸</div>
+                <div class="step-body">
+                    <h4>Advance Sent</h4>
+                    <p>Advance paid to fleet owner</p>
+                </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="step
+                {% if tracking.fleet_departed %}done{% endif %}
+                {% if tracking.fleet_departed and not tracking.arrived %}active{% endif %}
+            ">
+                <div class="node">🚛</div>
+                <div class="step-body">
+                    <h4>Vehicle Departed</h4>
+                    <p>
+                        {% if tracking.fleet_departed_at %}
+                        {{ tracking.fleet_departed_at|date:"d M Y h:i A" }}
+                        {% else %}
+                        Shipment started
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 6 -->
+            <div class="step
+                {% if tracking.arrived %}done{% endif %}
+                {% if tracking.arrived and not tracking.delivered %}active{% endif %}
+            ">
+                <div class="node">📍</div>
+                <div class="step-body">
+                    <h4>Arrived Destination</h4>
+                    <p>
+                        {% if tracking.arrived_at %}
+                        {{ tracking.arrived_at|date:"d M Y h:i A" }}
+                        {% else %}
+                        On route
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 7 -->
+            <div class="step
+                {% if tracking.delivered %}done{% endif %}
+                {% if tracking.delivered and not tracking.pod_received %}active{% endif %}
+            ">
+                <div class="node">📦</div>
+                <div class="step-body">
+                    <h4>Delivered</h4>
+                    <p>
+                        {% if tracking.delivered_at %}
+                        {{ tracking.delivered_at|date:"d M Y h:i A" }}
+                        {% else %}
+                        Pending delivery
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 8 -->
+            <div class="step
+                {% if tracking.pod_received %}done{% endif %}
+                {% if tracking.pod_received and not tracking.transporter_paid %}active{% endif %}
+            ">
+                <div class="node">✅</div>
+                <div class="step-body">
+                    <h4>POD Received</h4>
+                    <p>Proof of delivery updated</p>
+                </div>
+            </div>
+
+            <!-- 9 -->
+            <div class="step
+                {% if tracking.transporter_paid %}done{% endif %}
+                {% if tracking.transporter_paid and not tracking.customer_paid %}active{% endif %}
+            ">
+                <div class="node">🏦</div>
+                <div class="step-body">
+                    <h4>Transporter Paid</h4>
+                    <p>Vendor payment completed</p>
+                </div>
+            </div>
+
+            <!-- 10 -->
+            <div class="step
+                {% if tracking.customer_paid %}done{% endif %}
+                {% if tracking.customer_paid and not tracking.settled %}active{% endif %}
+            ">
+                <div class="node">💳</div>
+                <div class="step-body">
+                    <h4>Customer Paid</h4>
+                    <p>Customer payment received</p>
+                </div>
+            </div>
+
+            <!-- 11 -->
+            <div class="step
+                {% if tracking.settled %}done active success{% endif %}
+            ">
+                <div class="node">💰</div>
+                <div class="step-body">
+                    <h4>Settlement Completed</h4>
+                    <p>Shipment closed</p>
+                </div>
+            </div>
+
+        </div>
+
+        {% if tracking.remarks %}
+        <div class="remarks-box">
+            <strong>Remarks</strong><br>
+            {{ tracking.remarks }}
+        </div>
+        {% endif %}
+
+    </section>
+
+    {% endif %}
+
+</div>
+<script>
+    const heading = document.getElementById("cardHeading");
+    const button = document.getElementById("collapseButton");
+    const collapseArea = document.getElementById("collapse");
+
+    button.addEventListener("click", () => {
+        const expanded = heading.getAttribute("aria-expanded") === "true";
+
+        heading.setAttribute("aria-expanded", !expanded);
+
+        if (expanded) {
+            collapseArea.style.display = "none";
+            button.setAttribute("iron-icon", "cr:expand-more");
+            button.setAttribute("title", "Expand list");
+        } else {
+            collapseArea.style.display = "block";
+            button.setAttribute("iron-icon", "cr:expand-less");
+            button.setAttribute("title", "Collapse list");
+        }
+    });
+</script>
+<style>
+    body {
+        background: #f6f8fc;
+        font-family: Inter, sans-serif;
+    }
+
+    .page-wrap {
+        max-width: 1180px;
+        margin: auto;
+        padding: 28px;
+    }
+
+    .hero-card,
+    .glass-card {
+        background: #fff;
+        border-radius: 26px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, .05);
+    }
+
+    .hero-card {
+        padding: 28px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .hero-left {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .hero-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .hero-search {
+        display: flex;
+        gap: 12px;
+        min-width: 420px;
+    }
+
+    .hero-search input {
+        flex: 1;
+        border: none;
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .hero-search button {
+        border: none;
+        background: #2563eb;
+        color: #fff;
+        padding: 0 22px;
+        border-radius: 16px;
+    }
+
+    .top-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+        margin-bottom: 24px;
+    }
+
+    .glass-card {
+        padding: 26px;
+    }
+
+    .label {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .chip-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .chip {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+    }
+
+    .status {
+        margin-top: 15px;
+        padding: 14px;
+        border-radius: 18px;
+        font-weight: 800;
+    }
+
+    .green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .teal {
+        background: #ccfbf1;
+        color: #0f766e;
+    }
+
+    .violet {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
+
+    .orange {
+        background: #ffedd5;
+        color: #ea580c;
+    }
+
+    .yellow {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .purple {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
+
+    .gray {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+    .track-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 26px;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 42px;
+    }
+
+    .timeline:before {
+        content: "";
+        position: absolute;
+        left: 18px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #e5e7eb;
+    }
+
+    .step {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 24px;
+        opacity: .35;
+    }
+
+    .step.done,
+    .step.active {
+        opacity: 1;
+    }
+
+    .node {
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
+        border-radius: 18px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .done .node {
+        background: #dcfce7;
+    }
+
+    .active .node {
+        background: #ffedd5;
+    }
+
+    .success .node {
+        background: #dcfce7;
+    }
+
+    .active {
+        background: #fff7ed;
+        border-radius: 20px;
+        padding: 12px;
+    }
+
+    .step-body h4 {
+        margin: 0 0 6px;
+        font-size: 18px;
+    }
+
+    .step-body p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .success h4 {
+        color: #16a34a;
+    }
+
+    .live-pill {
+        background: #ecfdf5;
+        color: #15803d;
+        padding: 10px 15px;
+        border-radius: 999px;
+    }
+
+    .pulse {
+        width: 8px;
+        height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 7px;
+    }
+
+    .remarks-box {
+        margin-top: 20px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    @media(max-width:992px) {
+        .hero-card {
+            flex-direction: column;
+        }
+
+        .hero-search {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .top-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media(max-width:768px) {
+        .page-wrap {
+            padding: 16px;
+        }
+
+        .hero-search {
+            flex-direction: column;
+        }
+
+        .node {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+        }
+
+        .step-body h4 {
+            font-size: 16px;
+        }
+    }
+</style>
+
+{% endblock %}

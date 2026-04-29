@@ -1,0 +1,233 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    body {
+        background: #f6f8fb;
+    }
+
+    .dash-card {
+        border: 0;
+        border-radius: 18px;
+        transition: all 0.25s ease;
+        background: #fff;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .soft-shadow {
+        box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    }
+
+    .gradient-primary {
+        background: linear-gradient(135deg, #4f46e5, #3b82f6);
+        color: #fff;
+    }
+
+    .gradient-success {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: #fff;
+    }
+
+    .muted-small {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Dashboard</h3>
+            <p class="text-muted mb-0">Welcome back, {{ request.user.username }}</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <span class="badge gradient-primary rounded-pill px-3 py-2">
+                {{ request.user.role|title }}
+            </span>
+            <span class="badge bg-white text-dark soft-shadow rounded-pill px-3 py-2">
+                {{ now|date:"d M Y" }}
+            </span>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-xl-3">
+            <div class="card dash-card soft-shadow">
+                <div class="card-body">
+                    <div class="muted-small text-muted">Total Enquiries</div>
+                    <div class="kpi-value">{{ total_enquiries }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="card dash-card soft-shadow">
+                <div class="card-body">
+                    <div class="muted-small text-muted">Total Orders</div>
+                    <div class="kpi-value">{{ total_orders }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="card dash-card gradient-primary">
+                <div class="card-body">
+                    <div class="muted-small">Running Vehicles</div>
+                    <div class="kpi-value">{{ running_vehicles }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="card dash-card gradient-success">
+                <div class="card-body">
+                    <div class="muted-small">Revenue</div>
+                    <div class="kpi-value">₹{{ revenue }}</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chart + Overview -->
+    <div class="row g-4 mb-4">
+
+        <!-- Chart -->
+        <div class="col-lg-8">
+            <div class="card dash-card soft-shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h6 class="fw-bold mb-0">Orders Trend</h6>
+                        <small class="text-muted">Last 7 Days</small>
+                    </div>
+                    <canvas id="ordersChart" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side -->
+        <div class="col-lg-4">
+            <div class="card dash-card soft-shadow h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Overview</h6>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Delivered</span>
+                        <strong class="text-success">{{ delivered_orders }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Pending Payments</span>
+                        <strong class="text-danger">{{ pending_payments }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Manual Orders</span>
+                        <strong>{{ manual_orders }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Outstanding</span>
+                        <strong class="text-danger">₹{{ pending_amount }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted">Users</span>
+                        <strong>{{ total_users }}</strong>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card dash-card soft-shadow">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="fw-bold">Recent Orders</h6>
+                <a href="/orders/" class="btn btn-sm btn-outline-primary rounded-pill">
+                    View All
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order No</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td class="fw-semibold">{{ order.order_no }}</td>
+                            <td>{{ order.customer_name }}</td>
+                            <td>{{ order.vehicle_type }}</td>
+                            <td class="text-success fw-semibold">
+                                ₹{{ order.total_rate }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                No recent orders found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = JSON.parse('{{ weekly_labels|safe|escapejs }}');
+    const dataValues = JSON.parse('{{ weekly_orders|safe|escapejs }}');
+
+    new Chart(document.getElementById('ordersChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,385 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 p-3 mb-4 header-card">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+                <h4 class="mb-1 fw-bold text-dark">📍 Vehicle Tracking</h4>
+                <small class="text-muted">
+                    {{ vehicle.vehicle_number }} | Order : {{ vehicle.order.order_no }}
+                </small>
+            </div>
+
+            <a href="{% url 'all_assigned_vehicles' %}" class="btn btn-light border">
+                ← Back
+            </a>
+
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0 p-4">
+
+            <div class="row g-4">
+
+                <!-- LEFT -->
+                <div class="col-md-6">
+                    <div class="step-box">
+
+                        <label class="track-item">
+                            <input type="checkbox" name="vehicle_placed"
+                                {% if tracking.vehicle_placed %}checked{% endif %}>
+                            🚚 Vehicle Placed
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="vehicle_document"
+                                {% if tracking.vehicle_document %}checked{% endif %}>
+                            📄 Vehicle Document
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="invoice_eway"
+                                {% if tracking.invoice_eway %}checked{% endif %}>
+                            🧾 Invoice / E-way
+                        </label>
+
+                        <!-- ✅ LR NO ADDED HERE -->
+                        <label class="track-item">
+                            📄 LR No:
+                            <input type="text" class="form-control"
+                                name="lr_no"
+                                value="{{ tracking.lr_no|default:'' }}"
+                                placeholder="Enter LR No">
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="advance_to_fleet"
+                                {% if tracking.advance_to_fleet %}checked{% endif %}>
+                            💰 Advance To Fleet
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="fleet_departed"
+                                {% if tracking.fleet_departed %}checked{% endif %}>
+                            🚛 Fleet Departed
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-md-6">
+                    <div class="step-box">
+
+                        <label class="track-item">
+                            <input type="checkbox" name="advance_received"
+                                {% if tracking.advance_received %}checked{% endif %}>
+                            💵 Advance Received
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="arrived"
+                                {% if tracking.arrived %}checked{% endif %}>
+                            📍 Arrived
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="delivered"
+                                {% if tracking.delivered %}checked{% endif %}>
+                            ✅ Delivered
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" id="podBox" name="pod_received"
+                                {% if tracking.pod_received %}checked{% endif %}>
+                            📦 POD Received
+                        </label>
+
+                        <label class="track-item">
+                            <input type="checkbox" name="settled"
+                                {% if tracking.settled %}checked{% endif %}>
+                            🧮 Settled
+                        </label>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ✅ POD DOCUMENT UPLOAD (AFTER POD RECEIVED ONLY) -->
+            <div id="uploadBox" class="mt-4"
+                 style="{% if not tracking.pod_received %}display:none;{% endif %}">
+
+                <div class="step-box">
+
+                    <h6 class="mb-3">📎 Upload POD Documents</h6>
+
+                    <input type="file"
+                           name="documents"
+                           multiple
+                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                           class="form-control">
+
+                    <small class="text-muted d-block mt-2">
+                        Upload POD, invoice copy, delivery proof, etc.
+                    </small>
+
+                    {% if tracking.documents.all %}
+                    <div class="mt-3">
+                        <strong>Uploaded Files:</strong>
+                        <ul>
+                            {% for doc in tracking.documents.all %}
+                            <li>
+                                <a href="{{ doc.file.url }}" target="_blank">
+                                    📎 {{ doc.file.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- REMARKS -->
+            <div class="mt-4">
+                <label class="fw-semibold mb-2">Remarks</label>
+                <textarea name="remarks" rows="4" class="form-control remarks-box">{{ tracking.remarks }}</textarea>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success px-4">💾 Save</button>
+                <a href="{% url 'all_assigned_vehicles' %}" class="btn btn-light border px-4">Cancel</a>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+<!-- JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const podBox = document.getElementById("podBox");
+    const uploadBox = document.getElementById("uploadBox");
+
+    function toggleUpload() {
+        uploadBox.style.display = podBox.checked ? "block" : "none";
+    }
+
+    podBox.addEventListener("change", toggleUpload);
+    toggleUpload();
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const items = document.querySelectorAll(".track-item input");
+    const settledBox = document.getElementById("settledBox");
+    const podBox = document.getElementById("podBox");
+    const uploadBox = document.getElementById("uploadBox");
+    const lrInput = document.querySelector("input[name='lr_no']");
+
+    // =========================
+    // POD TOGGLE
+    // =========================
+    function toggleUpload() {
+        if (!uploadBox) return;
+        uploadBox.style.display = podBox.checked ? "block" : "none";
+    }
+
+    if (podBox) {
+        podBox.addEventListener("change", toggleUpload);
+        toggleUpload();
+    }
+
+    // =========================
+    // DISABLE ALL
+    // =========================
+    function disableAll(except = null, lock = false) {
+
+        items.forEach(el => {
+
+            const parent = el.closest(".track-item");
+
+            if (except && el !== except) {
+                el.checked = false;
+            }
+
+            if (lock) {
+                el.disabled = true;
+            } else {
+                el.disabled = el !== except;
+            }
+
+            if (parent) {
+                parent.classList.add("disabled-row");
+            }
+
+        });
+
+        // LR input also must follow same rule
+        if (lrInput) {
+            lrInput.disabled = lock || (except !== lrInput);
+        }
+    }
+
+    // =========================
+    // ENABLE ALL
+    // =========================
+    function enableAll() {
+
+        items.forEach(el => {
+            el.disabled = false;
+            const parent = el.closest(".track-item");
+            if (parent) parent.classList.remove("disabled-row", "selected-row");
+        });
+
+        if (lrInput) lrInput.disabled = false;
+    }
+
+    // =========================
+    // NORMAL RULE
+    // =========================
+    items.forEach(el => {
+
+        if (el === settledBox) return;
+
+        el.addEventListener("change", function () {
+
+            if (this.checked) {
+                disableAll(this, false);
+
+                if (settledBox) {
+                    settledBox.checked = false;
+                    settledBox.disabled = true;
+                }
+
+            } else {
+                enableAll();
+            }
+
+        });
+
+    });
+
+    // =========================
+    // SETTLED RULE (FULL LOCK)
+    // =========================
+    if (settledBox) {
+
+        settledBox.addEventListener("change", function () {
+
+            if (this.checked) {
+
+                items.forEach(el => {
+                    el.checked = false;
+                    el.disabled = true;
+                });
+
+                if (lrInput) lrInput.disabled = true;
+
+            } else {
+                enableAll();
+            }
+
+        });
+
+        // page load state
+        if (settledBox.checked) {
+            items.forEach(el => el.disabled = true);
+            if (lrInput) lrInput.disabled = true;
+        }
+
+    }
+
+});
+</script>
+
+<!-- STYLE -->
+<style>
+.upload-box {
+    border-radius: 14px;
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    transition: 0.3s;
+}
+
+/* ❌ NOT ACTIVE (RED LINE) */
+.upload-box.inactive {
+    border-left: 6px solid #ef4444;  /* RED */
+    opacity: 0.6;
+}
+
+/* ⚠️ READY BUT NOT USED (YELLOW LINE) */
+.upload-box.warning {
+    border-left: 6px solid #f59e0b;  /* YELLOW */
+    opacity: 0.8;
+}
+
+/* ✅ ACTIVE (GREEN LINE) */
+.upload-box.active {
+    border-left: 6px solid #22c55e;  /* GREEN */
+    opacity: 1;
+}
+
+body {
+    background: #f5f7fb;
+}
+
+.header-card {
+    border-radius: 16px;
+}
+
+.step-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #edf0f5;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #eef1f4;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background: #fafbfc;
+    font-weight: 500;
+}
+
+.track-item input {
+    transform: scale(1.05);
+}
+
+.remarks-box {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+}
+
+.btn-success {
+    background: #16a34a;
+    border-radius: 10px;
+}
+
+.btn-light {
+    border-radius: 10px;
+}
+</style>
+
+{% endblock %}

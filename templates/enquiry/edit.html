@@ -1,0 +1,167 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<form method="POST" id="mainForm">
+    {% csrf_token %}
+    <div class="container-fluid mt-3">
+        <div class="card header-bar mb-3 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h5 class="fw-bold mb-0">✏ Enquiry {{ e.enquiry_no }}</h5>
+                    <small class="text-muted">{{ e.customer_name }}</small>
+                </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <!-- ✅ PRICING (after pitch approved) -->
+                {% if e.status == "confirmed" or e.approval_rate %}
+                <div id="pricing_section" class="card section-card mb-3">
+                    <div class="section-title">💰 Pricing</div>
+
+                    <div class="p-3">
+                        <input name="finalized_rate" id="final_rate" class="form-control mb-2"
+                            placeholder="Final Rate"
+                            value="{{ request.POST.finalized_rate|default:e.approval_rate|default:e.expected_rate|default:'' }}">
+
+                        <input name="loading_charges" id="loading_unloading" class="form-control mb-2"
+                            placeholder="Loading/Unloading"
+                            value="{{ request.POST.loading_charges|default:'' }}">
+
+                        <input name="halting_charges" id="halting_charges" class="form-control mb-2"
+                            placeholder="Halting Charges"
+                            value="{{ request.POST.halting_charges|default:'' }}">
+
+                        <input name="gst_percent" id="gst_percent" class="form-control mb-2"
+                            placeholder="GST %"
+                            value="{{ request.POST.gst_percent|default:'' }}">
+
+                        <input name="total_rate" id="total_rate" class="form-control bg-light"
+                            readonly placeholder="Total"
+                            value="{{ request.POST.total_rate|default:'' }}">
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ✅ PAYMENT (only after confirmed) -->
+                {% if e.status == "confirmed" %}
+                <div class="card section-card mb-3">
+                    <div class="section-title">💳 Payment</div>
+
+                    <div class="p-3">
+                        <select name="payment_terms" id="payment_terms" class="form-select mb-2">
+                            <option value="">Select</option>
+                            <option value="advance_balance" {% if request.POST.payment_terms == "advance_balance" %}selected{% endif %}>Advance</option>
+                            <option value="topay" {% if request.POST.payment_terms == "topay" %}selected{% endif %}>Topay</option>
+                            <option value="full" {% if request.POST.payment_terms == "full" %}selected{% endif %}>Full</option>
+                        </select>
+
+                        <input id="advance" name="advance" class="form-control mb-2"
+                            placeholder="Advance"
+                            value="{{ request.POST.advance|default:'' }}">
+
+                        <input id="balance" name="balance" class="form-control mb-2"
+                            placeholder="Balance"
+                            value="{{ request.POST.balance|default:'' }}">
+
+                        <input id="topay" name="topay" class="form-control mb-2"
+                            placeholder="To Pay"
+                            value="{{ request.POST.topay|default:'' }}">
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ✅ CONVERT (only after confirmed) -->
+                {% if e.status == "confirmed" %}
+                <div class="card section-card text-center p-3">
+                    {% if e.is_converted_to_order %}
+                        <span class="text-success">✅ Converted</span>
+                    {% else %}
+                        <button formaction="{% url 'convert_to_order' e.id %}" class="btn btn-success w-100">
+                            🚀 Convert to Order
+                        </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<!-- 🔥 SaaS CSS -->
+<style>
+.header-bar {
+    border-radius: 14px;
+    background: #fff;
+}
+.section-card {
+    border-radius: 14px;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+}
+.section-title {
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+.status-chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+.status-chip.success { background:#d4edda; color:#155724; }
+.status-chip.warning { background:#fff3cd; color:#856404; }
+.status-chip.danger { background:#f8d7da; color:#721c24; }
+.form-control, .form-select { border-radius: 10px; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll("input, textarea").forEach(el => {
+        if (el.value === "None") el.value = "";
+    });
+
+    document.getElementById("final_rate")?.addEventListener("input", calcTotal);
+    document.getElementById("loading_unloading")?.addEventListener("input", calcTotal);
+    document.getElementById("gst_percent")?.addEventListener("input", calcTotal);
+
+    document.getElementById("payment_terms")?.addEventListener("change", calcPayment);
+    document.getElementById("advance")?.addEventListener("input", calcPayment);
+
+    calcTotal();
+});
+
+function calcTotal() {
+    let base = parseFloat(document.getElementById("final_rate")?.value) || 0;
+    let gst = parseFloat(document.getElementById("gst_percent")?.value) || 0;
+    let load = parseFloat(document.getElementById("loading_unloading")?.value) || 0;
+
+    let total = base + (base * gst / 100) + load;
+
+    document.getElementById("total_rate").value = total.toFixed(2);
+}
+
+function calcPayment() {
+    let total = parseFloat(document.getElementById("total_rate")?.value) || 0;
+    let adv = parseFloat(document.getElementById("advance")?.value) || 0;
+    let type = document.getElementById("payment_terms")?.value;
+
+    if (type === "advance_balance") {
+        document.getElementById("balance").value = (total - adv).toFixed(2);
+    } else if (type === "full") {
+        document.getElementById("advance").value = total.toFixed(2);
+        document.getElementById("balance").value = "0.00";
+    }
+}
+</script>
+
+{% endblock %}

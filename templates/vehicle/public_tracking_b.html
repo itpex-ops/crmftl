@@ -1,0 +1,395 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 hero-card">
+        <div class="card-body p-4">
+
+            <div class="row align-items-center g-4">
+
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="hero-icon">🚚</div>
+                        <div>
+                            <h3 class="fw-bold mb-1">Track Your Load</h3>
+                            <p class="text-muted mb-0">
+                                Search using <b>FTL No</b> or <b>LR No</b>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <form method="GET">
+                        <div class="input-group search-box">
+                            <input type="text" name="q"
+                                value="{{ request.GET.q }}"
+                                class="form-control border-0"
+                                placeholder="Enter FTL001 / LR1234">
+
+                            <button class="btn btn-primary px-4">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if tracking %}
+
+    <!-- TOP STATUS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <small class="text-muted">Shipment ID</small>
+                    <h2 class="fw-bold mb-3">{{ vehicle.ftl_no }}</h2>
+
+                    <div class="mini-pill mb-2">
+                        📄 LR No :
+                        {{ tracking.lr_no|default:"Not Updated" }}
+                    </div>
+
+                    <div class="mini-pill">
+                        🚛 Vehicle :
+                        {{ vehicle.vehicle_number }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 text-center">
+
+                    <small class="text-muted d-block mb-2">
+                        Current Status
+                    </small>
+
+                    {% if tracking.settled %}
+                    <div class="status-pill green">
+                        💰 Completed
+                    </div>
+
+                    {% elif tracking.delivered %}
+                    <div class="status-pill blue">
+                        📦 Delivered
+                    </div>
+
+                    {% elif tracking.arrived %}
+                    <div class="status-pill purple">
+                        📍 Arrived
+                    </div>
+
+                    {% elif tracking.fleet_departed %}
+                    <div class="status-pill orange">
+                        🚚 In Transit
+                    </div>
+
+                    {% else %}
+                    <div class="status-pill gray">
+                        ⏳ Processing
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0">Live Shipment Progress</h4>
+
+                <span class="live-badge">
+                    <span class="pulse"></span>
+                    Live
+                </span>
+            </div>
+
+            <div class="timeline">
+
+                <!-- STEP -->
+                <div class="step {% if tracking.vehicle_placed %}done{% endif %}">
+                    <div class="circle">🚚</div>
+                    <div class="content">
+                        <h6>Vehicle Assigned</h6>
+                        <small>Vehicle allocated for shipment</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.vehicle_document %}done{% endif %}">
+                    <div class="circle">📄</div>
+                    <div class="content">
+                        <h6>Documents Received</h6>
+                        <small>RC / DL / Insurance updated</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.invoice_eway %}done{% endif %}">
+                    <div class="circle">🧾</div>
+                    <div class="content">
+                        <h6>Invoice Ready</h6>
+                        <small>E-way bill completed</small>
+                    </div>
+                </div>
+
+                <!-- CURRENT -->
+                <div class="step active {% if tracking.fleet_departed %}done{% endif %}">
+                    <div class="circle">🚛</div>
+                    <div class="content">
+                        <h6>
+                            Vehicle Departed
+                            <span class="current-tag">
+                                Current
+                            </span>
+                        </h6>
+                        <small>Shipment moving to destination</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.arrived %}done{% endif %}">
+                    <div class="circle">📍</div>
+                    <div class="content">
+                        <h6>Arrived Destination</h6>
+                        <small>Reached unloading point</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.delivered %}done{% endif %}">
+                    <div class="circle">📦</div>
+                    <div class="content">
+                        <h6>Delivered</h6>
+                        <small>Shipment delivered</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.pod_received %}done{% endif %}">
+                    <div class="circle">✅</div>
+                    <div class="content">
+                        <h6>POD Received</h6>
+                        <small>Proof uploaded</small>
+                    </div>
+                </div>
+
+                <div class="step {% if tracking.settled %}done success{% endif %}">
+                    <div class="circle">💰</div>
+                    <div class="content">
+                        <h6>Settlement Completed</h6>
+                        <small>Shipment closed</small>
+                    </div>
+                </div>
+
+            </div>
+
+            {% if tracking.remarks %}
+            <div class="remarks mt-4">
+                <strong>Remarks:</strong>
+                {{ tracking.remarks }}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% elif request.GET.q %}
+
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+        <h4 class="fw-bold">No Shipment Found</h4>
+        <p class="text-muted mb-0">
+            Please check FTL No or LR No
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<style>
+
+body{
+    background:#f4f7fb;
+}
+
+/* HERO */
+.hero-card{
+    background:linear-gradient(135deg,#ffffff,#f8fbff);
+}
+
+.hero-icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:#eaf1ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+}
+
+.search-box{
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid #e6edf5;
+}
+
+/* PILLS */
+.mini-pill{
+    display:inline-block;
+    padding:10px 16px;
+    background:#eef4ff;
+    border-radius:14px;
+    color:#3157d6;
+    margin-right:8px;
+}
+
+.status-pill{
+    display:inline-block;
+    padding:14px 24px;
+    border-radius:40px;
+    font-weight:700;
+    font-size:16px;
+}
+
+.green{background:#dcfce7;color:#15803d;}
+.blue{background:#dbeafe;color:#1d4ed8;}
+.orange{background:#ffedd5;color:#ea580c;}
+.purple{background:#ede9fe;color:#6d28d9;}
+.gray{background:#e5e7eb;color:#111827;}
+
+/* LIVE */
+.live-badge{
+    background:#ecfdf5;
+    color:#15803d;
+    padding:8px 14px;
+    border-radius:40px;
+    font-weight:600;
+    font-size:14px;
+}
+
+.pulse{
+    width:8px;
+    height:8px;
+    background:#22c55e;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:6px;
+}
+
+/* TIMELINE */
+.timeline{
+    position:relative;
+    padding-left:34px;
+}
+
+.timeline:before{
+    content:"";
+    position:absolute;
+    left:16px;
+    top:0;
+    bottom:0;
+    width:3px;
+    background:#e5e7eb;
+}
+
+.step{
+    position:relative;
+    display:flex;
+    gap:18px;
+    margin-bottom:24px;
+    opacity:.45;
+}
+
+.step.done,
+.step.active{
+    opacity:1;
+}
+
+.circle{
+    width:56px;
+    height:56px;
+    min-width:56px;
+    border-radius:50%;
+    background:#f1f5f9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    position:relative;
+    z-index:2;
+}
+
+.step.done .circle{
+    background:#dcfce7;
+}
+
+.step.active .circle{
+    background:#ffedd5;
+}
+
+.content{
+    padding-top:6px;
+}
+
+.content h6{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+.content small{
+    color:#64748b;
+}
+
+.current-tag{
+    font-size:11px;
+    background:#fed7aa;
+    color:#c2410c;
+    padding:4px 10px;
+    border-radius:20px;
+    margin-left:8px;
+}
+
+.success h6{
+    color:#16a34a;
+}
+
+.remarks{
+    background:#eef4ff;
+    color:#3157d6;
+    border-radius:16px;
+    padding:16px;
+}
+
+@media(max-width:768px){
+
+.content h6{
+    font-size:16px;
+}
+
+.circle{
+    width:48px;
+    height:48px;
+    min-width:48px;
+    font-size:20px;
+}
+
+}
+
+</style>
+
+{% endblock %}

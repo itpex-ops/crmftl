@@ -1,0 +1,308 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .05);
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .badge-soft {
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-due {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-partial {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-doc {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .action-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .search-box {
+        max-width: 260px;
+    }
+
+    .amount {
+        font-weight: 600;
+    }
+
+    .timeline {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <div class="page-title">Vehicle Accounts</div>
+
+            <div class="sub-title">
+                Vehicle Accounts | Advance Payment | Delivery Stage Payment | Document Clearance Balance
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <input type="text" id="searchInput" class="form-control form-control-sm search-box"
+                placeholder="Search vehicle / FTL">
+        </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Total Trips</small>
+                <div class="stat-value">{{ data|length }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Freight Amount</small>
+                <div class="stat-value text-primary" id="sumFreight">₹0</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Advance Paid</small>
+                <div class="stat-value text-success" id="sumAdvance">₹0</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Pending Balance</small>
+                <div class="stat-value text-danger" id="sumBalance">₹0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-box">
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered align-middle" id="vehicleTable">
+
+                <thead>
+                    <tr>
+                        <th>FTL No</th>
+                        <th>Vehicle</th>
+                        <th>Order</th>
+                        <th>Freight</th>
+                        <th>Advance</th>
+                        <th>Balance</th>
+                        <th>Process</th>
+                        <th>Status</th>
+                        <th width="240">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for v in data %}
+                    {% if v.ftlno %}
+                    <tr>
+
+                        <!-- Ledger -->
+                        <td>
+                            <a href="{% url 'vehicle_ledger' v.vehicle_id %}" class="fw-semibold text-decoration-none">
+                                {{ v.ftlno }}
+                            </a>
+                        </td>
+
+                        <td>{{ v.vehicle|default_if_none:"" }}</td>
+                        <td>{{ v.order_no|default_if_none:"" }}</td>
+
+                        <td class="amount freight">₹{{ v.freight|default:0 }}</td>
+                        <td class="amount advance text-success">₹{{ v.advance|default:0 }}</td>
+                        <td class="amount balance text-danger">₹{{ v.balance|default:0 }}</td>
+
+                        <!-- FULL PROCESS -->
+                        <td class="timeline">
+
+                            {% if v.balance|default:0 == 0 %}
+
+                            ✔ Advance Released<br>
+                            ✔ Delivered<br>
+                            ✔ Documents Cleared<br>
+                            ✔ Final Balance Paid
+
+                            {% elif v.advance|default:0 > 0 %}
+
+                            ✔ Advance Released<br>
+                            ⏳ Awaiting Delivery<br>
+                            ⏳ Awaiting Documents
+
+                            {% else %}
+
+                            ⏳ Advance Pending<br>
+                            ⏳ Dispatch Pending
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if v.balance|default:0 == 0 %}
+
+                            <span class="badge-soft badge-paid">Completed</span>
+
+                            {% elif v.advance|default:0 > 0 %}
+
+                            <span class="badge-soft badge-partial">Running</span>
+
+                            {% else %}
+
+                            <span class="badge-soft badge-due">Pending</span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td class="d-flex gap-1 flex-wrap">
+
+                            <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
+                                class="btn btn-sm btn-outline-primary action-btn">
+                                Ledger
+                            </a>
+
+                            <a href="{% url 'pay_vehicle_advance' v.vehicle_id %}"
+                                class="btn btn-sm btn-outline-success action-btn">
+                                Advance
+                            </a>
+
+                            <a href="{% url 'pay_vehicle_balance' v.vehicle_id %}"
+                                class="btn btn-sm btn-outline-dark action-btn">
+                                Balance
+                            </a>
+
+                            <a href="{% url 'edit_vehicle_account' v.vehicle_id %}"
+                                class="btn btn-sm btn-outline-warning action-btn">
+                                Edit
+                            </a>
+
+                        </td>
+
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Remove None
+        document.querySelectorAll("td").forEach(td => {
+            if (td.innerText.trim() === "None") td.innerText = "";
+        });
+
+        // Search
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+
+            let val = this.value.toLowerCase();
+
+            document.querySelectorAll("#vehicleTable tbody tr").forEach(row => {
+                row.style.display =
+                    row.innerText.toLowerCase().includes(val) ? "" : "none";
+            });
+
+        });
+
+        // Totals
+        let freight = 0, adv = 0, bal = 0;
+
+        document.querySelectorAll("#vehicleTable tbody tr").forEach(row => {
+
+            freight += parseFloat(
+                row.querySelector(".freight").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            adv += parseFloat(
+                row.querySelector(".advance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            bal += parseFloat(
+                row.querySelector(".balance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+        });
+
+        document.getElementById("sumFreight").innerText =
+            "₹" + freight.toLocaleString('en-IN');
+
+        document.getElementById("sumAdvance").innerText =
+            "₹" + adv.toLocaleString('en-IN');
+
+        document.getElementById("sumBalance").innerText =
+            "₹" + bal.toLocaleString('en-IN');
+
+    });
+</script>
+
+{% endblock %}

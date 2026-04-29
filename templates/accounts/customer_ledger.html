@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<h4>Customer Ledger - {{ enquiry.customer_name }}</h4>
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Remarks</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Balance</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for row in ledger %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.remarks }}</td>
+            <td>₹{{ row.debit }}</td>
+            <td>₹{{ row.credit }}</td>
+            <td><b>₹{{ row.balance }}</b></td>
+            <td class="d-flex gap-1 flex-wrap">
+
+                <!-- Edit -->
+                <a href="{% url 'edit_customer_account' row.enquiry_id %}"
+                    class="btn btn-sm btn-outline-success action-btn">
+                    Edit
+                </a>
+
+                <!-- Payment -->
+                <a href="{% url 'receive_customer_payment' row.enquiry_id %}"
+                    class="btn btn-sm btn-outline-dark action-btn">
+                    Receive
+                </a>
+
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
