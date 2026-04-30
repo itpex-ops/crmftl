@@ -145,13 +145,16 @@ def is_fleet(user):
 
 #@login_required
 #@user_passes_test(is_sales)
+@login_required
 def enquiry_list(request):
 
     user = request.user
+
     is_admin = (
         user.is_superuser or
         user.groups.filter(name="admin").exists()
     )
+
     is_sales = user.groups.filter(name="sales").exists()
 
     # ================= BASE QUERY =================
@@ -159,7 +162,6 @@ def enquiry_list(request):
         base_qs = Enquiry.objects.all()
     else:
         base_qs = Enquiry.objects.filter(created_by=user)
-
 
     # ================= SEARCH =================
     query = request.GET.get('q')
@@ -169,24 +171,18 @@ def enquiry_list(request):
             Q(customer_contact__icontains=query)
         )
 
-
     # ================= COUNTS =================
     total_count = base_qs.count()
     confirmed_count = base_qs.filter(status='confirmed').count()
     pending_count = base_qs.filter(status__icontains='pending').count()
     cancelled_count = base_qs.filter(status='cancelled').count()
 
-
     # ================= FINAL LIST =================
-    # 👉 Managers see "Waiting For Rate Approval"
-    # 👉 Sales see their own records
-    if is_manager:
-       enquiries = base_qs.exclude(status='confirmed').order_by('-id')
+    if is_admin:
+        enquiries = base_qs.exclude(status='confirmed').order_by('-id')
     else:
         enquiries = base_qs.order_by('-id')
 
-
-    # ================= RENDER =================
     return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
         'query': query or '',
@@ -194,10 +190,9 @@ def enquiry_list(request):
         'confirmed_count': confirmed_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
-        'is_manager': is_manager,
+        'is_admin': is_admin,
         'is_sales': is_sales,
     })
-
 #@login_required
 def delete_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
