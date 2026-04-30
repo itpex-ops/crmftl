@@ -6,7 +6,7 @@ from authentications.decorators import allowed_roles
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib import messages
-from .models import Enquiry ,Notification
+from .models import Enquiry
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.urls import reverse
 from django.http import JsonResponse, HttpResponseForbidden
+
 import json
 # from authentications.models import User
 
@@ -149,18 +150,18 @@ def enquiry_list(request):
     user = request.user
 
     # ================= ROLE FLAGS =================
-    is_admin = (
+    is_manager = (
         user.is_superuser or
         user.groups.filter(name="admin").exists()
     )
-    print(is_admin)
-    is_sales = user.groups.filter(name="sales").exists()
+    print(is_manager)
+    is_sales = user.groups.filter(name="Sales").exists()
 
     is_admin = getattr(user, "role", None) == "admin"
 
 
     # ================= BASE QUERY =================
-    if is_admin or is_admin:
+    if is_admin or is_manager:
         base_qs = Enquiry.objects.all()
     else:
         base_qs = Enquiry.objects.filter(created_by=user)
@@ -184,8 +185,8 @@ def enquiry_list(request):
 
     # ================= FINAL LIST =================
     # 👉 Managers see "Waiting For Rate Approval"
-    # 👉 sales see their own records
-    if is_admin:
+    # 👉 Sales see their own records
+    if is_manager:
        enquiries = base_qs.exclude(status='confirmed').order_by('-id')
     else:
         enquiries = base_qs.order_by('-id')
@@ -199,7 +200,7 @@ def enquiry_list(request):
         'confirmed_count': confirmed_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
-        'is_admin': is_admin,
+        'is_manager': is_manager,
         'is_sales': is_sales,
     })
 
@@ -409,7 +410,7 @@ def update_enquiry_status1(request, id, action):
     return JsonResponse({"success": False})
 
 @login_required
-def update_enquiry_status2(request, id, action):
+def update_enquiry_status(request, id, action):
     enquiry = get_object_or_404(Enquiry, id=id)
     if request.method == "POST":
         if action == "confirm":
@@ -446,154 +447,54 @@ def update_enquiry_status2(request, id, action):
             return redirect("enquiry_list")
     return redirect("enquiry_list")
 
-def update_pitch3(request, id):
-    enquiry = get_object_or_404(Enquiry, id=id)
-
-    # 🔒 LOCK CHECK
-    if enquiry.status == "confirmed":
-        messages.error(request, "Already confirmed. Locked.")
-        return redirect('enquiry_list')
-
-    if request.method == "POST":
-
-        rate = request.POST.get("pitch_rate")
-        remarks = request.POST.get("remarks")
-        is_approved = request.POST.get("is_approved") == "true"
-
-        # ----------- SAVE PITCH -----------
-        if not enquiry.pitch1:
-            enquiry.pitch1 = rate
-            enquiry.pitch1_remarks = remarks
-            enquiry.status = "pending_pitch2"
-
-        elif not enquiry.pitch2:
-            enquiry.pitch2 = rate
-            enquiry.pitch2_remarks = remarks
-            enquiry.status = "pending_pitch3"
-
-        elif not enquiry.pitch3:
-            enquiry.pitch3 = rate
-            enquiry.pitch3_remarks = remarks
-
-        # ----------- CONFIRM ANYTIME -----------
-        if is_approved and request.user.role == "admin":
-            enquiry.approval_rate = rate
-            enquiry.status = "confirmed"
-            enquiry.confirmed_at = timezone.now()
-
-        enquiry.save()
-
-        # 🔔 notify
-        create_notification(enquiry, request.user, "Pitch Updated")
-
-    return redirect('enquiry_list')
-
-def create_notification(enquiry, actor, action):
-
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-
-    # notify admins when sales acts
-    if actor.role == "sales":
-        users = User.objects.filter(role="admin")
-
-    # notify sales when admin acts
-    else:
-        users = User.objects.filter(role="sales")
-
-    for user in users:
-        Notification.objects.create(
-            user=user,
-            enquiry=enquiry,
-            message=f"{actor.username} {action} - {enquiry.enquiry_no}"
-        )
-
-def update_enquiry_status(request, id, action):
-    enquiry = get_object_or_404(Enquiry, id=id)
-
-    # 🔒 LOCK
-    if enquiry.status == "confirmed":
-        messages.error(request, "This enquiry is locked")
-        return redirect("enquiry_list")
-
-    if request.user.role != "sales":
-        messages.error(request, "Not allowed")
-        return redirect("enquiry_list")
-
-    if request.method == "POST":
-
-        if action == "confirm":
-            messages.error(request, "Only admin can confirm")
-            return redirect("enquiry_list")
-
-        elif action == "disagree":
-            enquiry.status = "disagreed"
-            enquiry.cancel_reason = request.POST.get("disagree_reason")
-
-        elif action == "cancel":
-            enquiry.status = "cancelled"
-            enquiry.cancel_reason = request.POST.get("cancel_reason")
-
-        enquiry.save()
-
-        create_notification(enquiry, request.user, "updated status")
-
-    return redirect("enquiry_list")
-
-
 def update_pitch(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "msg": "Invalid request method"})
     enquiry = get_object_or_404(Enquiry, id=id)
-
-    # 🔒 LOCK
+    remarks = request.POST.get("remarks") or ""
+    pitch_rate = request.POST.get("pitch_rate")
+    is_approved = request.POST.get("is_approved") == "true"
+    can_approve = (
+        request.user.is_superuser or
+        request.user.groups.filter(name="Managers").exists()
+    )
+    status = (enquiry.status or "").lower()
+    if status in ["pending_pitch1", "waiting for rate approval"]:
+        enquiry.pitch1 = pitch_rate
+        enquiry.pitch1_remarks = remarks
+        next_status = "pending_pitch2"
+    elif status == "pending_pitch2":
+        enquiry.pitch2 = pitch_rate
+        enquiry.pitch2_remarks = remarks
+        next_status = "pending_pitch3"
+    elif status == "pending_pitch3":
+        enquiry.pitch3 = pitch_rate
+        enquiry.pitch3_remarks = remarks
+        next_status = "confirmed"
+    else:
+        next_status = "pending_pitch1"
+    if is_approved:
+        if not can_approve:
+            return HttpResponseForbidden("Only managers can approve")
+        enquiry.status = "confirmed"
+        enquiry.approval_rate = pitch_rate
+    else:
+        enquiry.status = next_status
+    order = None
     if enquiry.status == "confirmed":
-        messages.error(request, "Already confirmed. Locked.")
-        return redirect("enquiry_list")
-
-    if request.method == "POST":
-
-        rate = request.POST.get("pitch_rate")
-        remarks = request.POST.get("remarks")
-        is_approved = request.POST.get("is_approved") == "true"
-
-        # -------- SAVE PITCH --------
-        if not enquiry.pitch1:
-            enquiry.pitch1 = rate
-            enquiry.pitch1_remarks = remarks
-            enquiry.status = "pending_pitch2"
-
-        elif not enquiry.pitch2:
-            enquiry.pitch2 = rate
-            enquiry.pitch2_remarks = remarks
-            enquiry.status = "pending_pitch3"
-
-        elif not enquiry.pitch3:
-            enquiry.pitch3 = rate
-            enquiry.pitch3_remarks = remarks
-
-        # -------- ADMIN CONFIRM ANYTIME --------
-        if is_approved and request.user.role == "admin":
-            enquiry.approval_rate = rate
-            enquiry.status = "confirmed"
-            enquiry.confirmed_at = timezone.now()
-
-        enquiry.save()
-
-        create_notification(enquiry, request.user, "updated pitch")
-
+        order, created = Order.objects.get_or_create(
+            enquiry=enquiry,
+           defaults={
+                    "finalized_rate": enquiry.approval_rate,
+                    "customer_name": enquiry.customer_name,
+                    "customer_contact": enquiry.customer_contact,
+                    "routes": enquiry.routes,
+                    "vehicle_type": enquiry.vehicle_type,
+                    "created_by": request.user,
+                }
+        )
+    enquiry.save()
+    if order:
+        return redirect("pricing_page", enquiry_id=order.id)
     return redirect("enquiry_list")
 
-def notifications(request):
-    notes = Notification.objects.filter(user=request.user).order_by('-id')
-    return render(request, "notifications.html", {"notes": notes})
-
-
-def mark_read(request, id):
-    note = Notification.objects.get(id=id, user=request.user)
-    note.is_read = True
-    note.save()
-    return JsonResponse({"status": "ok"})
-
-
-def mark_all_read(request):
-    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    return JsonResponse({"status": "ok"})
