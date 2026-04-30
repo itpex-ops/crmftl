@@ -198,51 +198,60 @@
 
             </div>
             <script>
-                document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("click", function (e) {
 
-                    // REMOVE "None"
-                    document.querySelectorAll("td, input, textarea").forEach(el => {
-                        if (el.tagName === "TD" && el.innerText.trim() === "None") {
-                            el.innerText = "";
-                        }
-                        if ((el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.value === "None") {
-                            el.value = "";
-                        }
-                    });
+                    const btn = e.target.closest(".open-pitch-modal");
+                    if (!btn) return;
 
-                    // SHOW / HIDE ACTION BOXES
-                    document.querySelectorAll(".action-btn").forEach(btn => {
-                        btn.addEventListener("click", function () {
+                    const id = btn.dataset.id;
 
-                            const id = this.dataset.id;
-                            const action = this.dataset.action;
+                    const p1 = btn.dataset.p1;
+                    const p1r = btn.dataset.p1r;
 
-                            if (!id || !action) return;
+                    const p2 = btn.dataset.p2;
+                    const p2r = btn.dataset.p2r;
 
-                            ["confirm", "disagree", "cancel"].forEach(type => {
-                                const el = document.getElementById(`${type}-box-${id}`);
-                                if (el) el.style.display = "none";
-                            });
+                    const p3 = btn.dataset.p3;
+                    const p3r = btn.dataset.p3r;
 
-                            const activeBox = document.getElementById(`${action}-box-${id}`);
-                            if (activeBox) {
-                                activeBox.style.display =
-                                    (activeBox.style.display === "block") ? "none" : "block";
-                            }
-                        });
-                    });
+                    const status = (btn.dataset.status || "").toLowerCase();
 
-                    // DISABLE BUTTON ON SUBMIT
-                    document.querySelectorAll("form").forEach(form => {
-                        form.addEventListener("submit", function () {
-                            const btn = this.querySelector("button[type='submit']");
-                            if (btn) {
-                                btn.disabled = true;
-                                btn.innerText = "Processing...";
-                            }
-                        });
-                    });
+                    // ✅ SET FORM ACTION
+                    document.getElementById("pitchForm").action = `/enquiry/update-pitch/${id}/`;
 
+                    // ✅ BUILD HISTORY
+                    let html = "";
+
+                    function row(label, rate, remarks, active) {
+                        if (!rate && !remarks) return "";
+
+                        return `
+            <div class="border rounded p-2 mb-2 ${active ? 'bg-light border-primary' : ''}">
+                <strong>${label}</strong><br>
+                Rate: ${rate || '-'}<br>
+                <small>${remarks || ''}</small>
+            </div>
+        `;
+                    }
+
+                    html += row("Pitch 1", p1, p1r, status === "pending_pitch2");
+                    html += row("Pitch 2", p2, p2r, status === "pending_pitch3");
+                    html += row("Pitch 3", p3, p3r, false);
+
+                    if (!html) {
+                        html = "<small class='text-muted'>No previous pitches</small>";
+                    }
+
+                    document.getElementById("pitchHistory").innerHTML = html;
+
+                    // ✅ RESET INPUTS
+                    document.getElementById("remarks").value = "";
+                    document.getElementById("pitch_rate").value = "";
+
+                    // ✅ OPEN MODAL (SAFE)
+                    const modalEl = document.getElementById('pitchModal');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
                 });
             </script>
             {% endblock %}
