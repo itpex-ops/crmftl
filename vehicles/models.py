@@ -16,7 +16,7 @@ class Vehicle(models.Model):
     owner_number = models.CharField(max_length=15, blank=True, null=True)
 
     SOURCE_TYPES = [
-        ('directors','Directors'),
+        ('direct','Direct'),
         ('transporters','Transporters'),
         ('brokers','Brokers'),
         ('drivers','Drivers'),
