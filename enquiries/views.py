@@ -148,20 +148,14 @@ def is_fleet(user):
 def enquiry_list(request):
 
     user = request.user
-
-    # ================= ROLE FLAGS =================
-    is_manager = (
+    is_admin = (
         user.is_superuser or
         user.groups.filter(name="admin").exists()
     )
-    print(is_manager)
-    is_sales = user.groups.filter(name="Sales").exists()
-
-    is_admin = getattr(user, "role", None) == "admin"
-
+    is_sales = user.groups.filter(name="sales").exists()
 
     # ================= BASE QUERY =================
-    if is_admin or is_manager:
+    if is_admin:
         base_qs = Enquiry.objects.all()
     else:
         base_qs = Enquiry.objects.filter(created_by=user)
@@ -204,7 +198,6 @@ def enquiry_list(request):
         'is_sales': is_sales,
     })
 
-1
 #@login_required
 def delete_enquiry(request, id):
     enquiry = get_object_or_404(Enquiry, id=id)
