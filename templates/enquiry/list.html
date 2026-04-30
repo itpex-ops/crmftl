@@ -116,7 +116,6 @@
 
                                         {% if is_admin %}
                                         <div class="d-flex gap-2 justify-content-end">
-
                                             <button type="button" class="icon-btn text-info open-pitch-modal"
                                                 data-id="{{ e.id }}" data-p1="{{ e.pitch1|default:'' }}"
                                                 data-p1r="{{ e.pitch1_remarks|default:'' }}"
@@ -127,10 +126,11 @@
                                                 data-status="{{ e.status }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
+                                        </div>
+                                        {% endif %}
 
-                                            {% endif %}
-
-                                            {% if e.status != 'confirmed' and is_sales %}
+                                        {% if e.status != 'confirmed' and is_sales %}
+                                        <div class="d-flex gap-2 justify-content-end">
 
                                             <button type="button" class="icon-btn text-success action-btn"
                                                 data-id="{{ e.id }}" data-action="confirm">✔️</button>
@@ -140,7 +140,6 @@
 
                                             <button type="button" class="icon-btn text-danger action-btn"
                                                 data-id="{{ e.id }}" data-action="cancel">❌</button>
-
                                         </div>
 
                                         <div class="mt-2">
@@ -178,7 +177,6 @@
                                             </div>
 
                                         </div>
-
                                         {% endif %}
 
                                     </td>
@@ -186,72 +184,158 @@
 
                                 {% empty %}
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">
-                                        No enquiries found
-                                    </td>
+                                    <td colspan="8" class="text-center text-muted">No enquiries found</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
+
                         </table>
                     </div>
                 </div>
 
+                <!-- PITCH MODAL -->
+                <div class="modal fade" id="pitchModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content p-3">
+
+                            <h6 class="mb-2">Pitch History</h6>
+                            <div id="pitchHistory" class="mb-3"></div>
+
+                            <form method="POST" id="pitchForm">
+                                {% csrf_token %}
+
+                                <input type="text" name="remarks" id="remarks" class="form-control mb-2"
+                                    placeholder="Remarks" required>
+
+                                <input type="number" name="pitch_rate" id="pitch_rate" class="form-control mb-2"
+                                    placeholder="Enter rate" required>
+
+                                <div class="d-flex gap-2">
+                                    {% if is_admin %}
+                                    <button type="submit" name="is_approved" value="true"
+                                        class="btn btn-success btn-sm">
+                                        Approve & Confirm
+                                    </button>
+                                    {% endif %}
+
+                                    <button type="submit" name="is_approved" value="false"
+                                        class="btn btn-primary btn-sm">
+                                        Save & Continue
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+
+            <!-- 🔷 JS -->
             <script>
-                document.addEventListener("click", function (e) {
+                document.querySelectorAll(".open-pitch-modal").forEach(btn => {
+                    btn.addEventListener("click", function () {
 
-                    const btn = e.target.closest(".open-pitch-modal");
-                    if (!btn) return;
+                        const id = this.dataset.id;
 
-                    const id = btn.dataset.id;
+                        const p1 = this.dataset.p1;
+                        const p1r = this.dataset.p1r;
 
-                    const p1 = btn.dataset.p1;
-                    const p1r = btn.dataset.p1r;
+                        const p2 = this.dataset.p2;
+                        const p2r = this.dataset.p2r;
 
-                    const p2 = btn.dataset.p2;
-                    const p2r = btn.dataset.p2r;
+                        const p3 = this.dataset.p3;
+                        const p3r = this.dataset.p3r;
 
-                    const p3 = btn.dataset.p3;
-                    const p3r = btn.dataset.p3r;
+                        const status = (this.dataset.status || "").toLowerCase();
 
-                    const status = (btn.dataset.status || "").toLowerCase();
+                        // ✅ Set form action
+                        document.getElementById("pitchForm").action = `/enquiry/update-pitch/${id}/`;
 
-                    // ✅ SET FORM ACTION
-                    document.getElementById("pitchForm").action = `/enquiry/update-pitch/${id}/`;
+                        // ✅ Build history UI
+                        let html = "";
 
-                    // ✅ BUILD HISTORY
-                    let html = "";
+                        function row(label, rate, remarks, active) {
+                            if (!rate && !remarks) return "";
 
-                    function row(label, rate, remarks, active) {
-                        if (!rate && !remarks) return "";
+                            return `
+                <div class="border rounded p-2 mb-2 ${active ? 'bg-light border-primary' : ''}">
+                    <strong>${label}</strong><br>
+                    Rate: ${rate || '-'}<br>
+                    <small>${remarks || ''}</small>
+                </div>
+            `;
+                        }
 
-                        return `
-            <div class="border rounded p-2 mb-2 ${active ? 'bg-light border-primary' : ''}">
-                <strong>${label}</strong><br>
-                Rate: ${rate || '-'}<br>
-                <small>${remarks || ''}</small>
-            </div>
-        `;
-                    }
+                        html += row("Pitch 1", p1, p1r, status === "pending_pitch2");
+                        html += row("Pitch 2", p2, p2r, status === "pending_pitch3");
+                        html += row("Pitch 3", p3, p3r, false);
 
-                    html += row("Pitch 1", p1, p1r, status === "pending_pitch2");
-                    html += row("Pitch 2", p2, p2r, status === "pending_pitch3");
-                    html += row("Pitch 3", p3, p3r, false);
+                        if (!html) {
+                            html = "<small class='text-muted'>No previous pitches</small>";
+                        }
 
-                    if (!html) {
-                        html = "<small class='text-muted'>No previous pitches</small>";
-                    }
+                        document.getElementById("pitchHistory").innerHTML = html;
 
-                    document.getElementById("pitchHistory").innerHTML = html;
+                        // Clear inputs
+                        document.getElementById("remarks").value = "";
+                        document.getElementById("pitch_rate").value = "";
 
-                    // ✅ RESET INPUTS
-                    document.getElementById("remarks").value = "";
-                    document.getElementById("pitch_rate").value = "";
+                        // Open modal
+                        new bootstrap.Modal(document.getElementById('pitchModal')).show();
+                    });
+                });
+            </script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
 
-                    // ✅ OPEN MODAL (SAFE)
-                    const modalEl = document.getElementById('pitchModal');
-                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                    modal.show();
+                    // ================= REMOVE "None" =================
+                    document.querySelectorAll("td, input, textarea").forEach(el => {
+                        if (el.tagName === "TD" && el.innerText.trim() === "None") {
+                            el.innerText = "";
+                        }
+                        if ((el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.value === "None") {
+                            el.value = "";
+                        }
+                    });
+
+                    // ================= SHOW/HIDE BOX =================
+                    document.querySelectorAll(".action-btn").forEach(btn => {
+                        btn.addEventListener("click", function () {
+
+                            const id = this.dataset.id;
+                            const action = this.dataset.action;
+
+                            if (!id || !action) return; // safety
+
+                            // hide all boxes
+                            ["confirm", "disagree", "cancel"].forEach(type => {
+                                const el = document.getElementById(`${type}-box-${id}`);
+                                if (el) el.style.display = "none";
+                            });
+
+                            // toggle selected box
+                            const activeBox = document.getElementById(`${action}-box-${id}`);
+                            if (activeBox) {
+                                activeBox.style.display =
+                                    (activeBox.style.display === "block") ? "none" : "block";
+                            }
+                        });
+                    });
+
+                    // ================= DISABLE BUTTON ON SUBMIT =================
+                    document.querySelectorAll("form").forEach(form => {
+                        form.addEventListener("submit", function () {
+                            const btn = this.querySelector("button[type='submit']");
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.innerText = "Processing...";
+                            }
+                        });
+                    });
+
                 });
             </script>
             {% endblock %}
