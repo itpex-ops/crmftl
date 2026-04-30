@@ -111,7 +111,7 @@ class Enquiry(models.Model):
         null=True,
         blank=True
     )
-
+    confirmed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -138,3 +138,14 @@ class Enquiry(models.Model):
 
     def __str__(self):
         return f"{self.enquiry_no} - {self.customer_name}"
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    enquiry = models.ForeignKey(Enquiry, on_delete=models.CASCADE, null=True, blank=True)
+
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message

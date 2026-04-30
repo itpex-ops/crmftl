@@ -6,393 +6,258 @@
     <meta charset="UTF-8">
     <title>Parcelex</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-/* KEEP ALL YOUR ORIGINAL STYLES */
-html,body,table,th,td,input,textarea,select,button,a,label,span,div{
-    font-family:'Poppins',sans-serif !important;
-}
+    <style>
+        html,
+        body,
+        table,
+        th,
+        td,
+        input,
+        textarea,
+        select,
+        button,
+        a,
+        label,
+        span,
+        div {
+            font-family: 'Poppins', sans-serif !important;
+        }
 
-input,textarea,select{
-    text-transform:none !important;
-}
+        body {
+            background-color: #f5f7fb;
+        }
 
-input::placeholder,
-textarea::placeholder{
-    text-transform:none !important;
-}
+        /* SIDEBAR */
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 240px;
+        }
 
-.form-control,.form-select{
-    font-size:14px;
-    font-weight:500;
-    letter-spacing:.2px;
-}
+        .content {
+            margin-left: 240px;
+            padding: 25px 30px;
+        }
 
-input[type="text"],textarea{
-    text-transform:uppercase;
-}
+        /* NAVBAR */
+        .navbar {
+            background: white;
+        }
 
-body{
-    background-color:#f5f7fb;
-    font-family:'Inter',sans-serif;
-}
+        /* 🔔 NOTIFICATIONS */
+        .notif-dropdown {
+            position: absolute;
+            right: 0;
+            top: 40px;
+            width: 320px;
+            background: #fff;
+            border-radius: 12px;
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
 
-input,textarea,select,.form-control,.form-select{
-    text-transform:none !important;
-    text-transform:lowercase;
-}
+        .notif-header {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
 
-input::placeholder,
-textarea::placeholder{
-    text-transform:none !important;
-}
+        #notifList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
-/* SIDEBAR */
-.sidebar{
-    height:100vh;
-    background:#1e293b;
-    color:white;
-    position:fixed;
-    width:240px;
-    transition:all .3s;
-    z-index:1000;
-    box-shadow:3px 0 10px rgba(0,0,0,.1);
-    overflow-y:auto;
-}
+        .notif-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
 
-.sidebar.hide{
-    margin-left:-240px;
-}
-
-.sidebar img{
-    border:2px solid #0ea5e9;
-    padding:3px;
-}
-
-.sidebar h5{
-    color:#f8fafc;
-    font-weight:600;
-}
-
-.sidebar a{
-    color:#cbd5e1;
-    display:block;
-    padding:12px 15px;
-    text-decoration:none;
-    border-radius:8px;
-    margin-bottom:3px;
-    transition:all .2s;
-    position:relative;
-}
-
-.sidebar a:hover,
-.sidebar a.active{
-    background:#0ea5e9;
-    color:white;
-    box-shadow:inset 0 0 10px rgba(255,255,255,.1);
-}
-
-.submenu a{
-    font-size:14px;
-    padding-left:35px;
-    color:#e2e8f0;
-}
-
-/* CONTENT */
-.content{
-    margin-left:240px;
-    padding:25px 30px;
-    transition:all .3s;
-}
-
-.content.full{
-    margin-left:0;
-}
-
-/* NAVBAR */
-.navbar{
-    background:white;
-    border-bottom:1px solid #e2e8f0;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
-    border-radius:8px;
-}
-
-.navbar .btn{
-    border-radius:8px;
-}
-
-/* MOBILE */
-@media (max-width:768px){
-    .sidebar{
-        margin-left:-240px;
-    }
-
-    .sidebar.show{
-        margin-left:0;
-    }
-
-    .content{
-        margin-left:0;
-    }
-}
-
-/* SCROLLBAR */
-.sidebar::-webkit-scrollbar{
-    width:6px;
-}
-
-.sidebar::-webkit-scrollbar-track{
-    background:transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb{
-    background:rgba(255,255,255,.2);
-    border-radius:3px;
-}
-
-/* ===== ONLY GRAPHICS ADDED (NO STYLE CHANGES) ===== */
-
-.logo-wrap{
-    position:relative;
-}
-
-.logo-glow{
-    position:absolute;
-    width:90px;
-    height:90px;
-    border-radius:50%;
-    background:rgba(14,165,233,.15);
-    left:50%;
-    top:8px;
-    transform:translateX(-50%);
-    filter:blur(18px);
-    z-index:0;
-}
-
-.logo-wrap img{
-    position:relative;
-    z-index:2;
-}
-
-.graphic-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:#38bdf8;
-    display:inline-block;
-    margin-right:8px;
-}
-
-.menu-chip{
-    float:right;
-    font-size:10px;
-    padding:2px 7px;
-    border-radius:20px;
-    background:rgba(255,255,255,.08);
-    color:#cbd5e1;
-}
-
-.top-wave{
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    height:90px;
-    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);
-    pointer-events:none;
-}
-
-.user-pill{
-    padding:4px 10px;
-    background:#eff6ff;
-    border-radius:30px;
-    font-size:12px;
-}
-
-</style>
+        .notif-item.unread {
+            background: #eef6ff;
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar p-3" id="sidebar">
+    <!-- SIDEBAR -->
+    <div class="sidebar p-3">
+        <h5 class="text-center">FTL</h5>
+        <hr>
 
-    <div class="top-wave"></div>
-
-    <div class="logo-wrap text-center mb-3">
-        <div class="logo-glow"></div>
-        <img src="{% static 'assets/images/com_logo.JPG' %}"
-             class="img-fluid rounded mx-auto d-block mb-3"
-             width="120">
+        <a href="{% url 'user_dashboard' %}">Dashboard</a>
+        <a href="{% url 'enquiry_list' %}">Enquiries</a>
+        <a href="{% url 'order_list' %}">Orders</a>
+        <a href="{% url 'logout' %}">Logout</a>
     </div>
 
-    <h5 class="text-center mb-3">FTL</h5>
-    <hr class="border-gray-600">
+    <!-- CONTENT -->
+    <div class="content">
 
-    <!-- Dashboard -->
-    <a href="{% url 'user_dashboard' %}"
-       class="{% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2 me-2"></i> Dashboard
-        <span class="menu-chip">LIVE</span>
-    </a>
+        <nav class="navbar mb-4 p-3 d-flex justify-content-between">
 
-    <!-- ENQUIRY -->
-    <a data-bs-toggle="collapse" href="#enquiryMenu">
-        <i class="bi bi-telephone me-2"></i> Enquiries
-        <i class="bi bi-chevron-down float-end"></i>
-    </a>
+            <strong>Dashboard</strong>
 
-    <div class="collapse submenu {% if 'enquiry' in request.resolver_match.url_name %}show{% endif %}"
-         id="enquiryMenu">
-        <a href="{% url 'create_enquiry' %}">➕ Create</a>
-        <a href="{% url 'enquiry_list' %}">📋 List</a>
+            <!-- 🔔 NOTIFICATION -->
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="position-relative">
+
+                    <div id="notifBell" style="cursor:pointer;font-size:20px;">🔔</div>
+
+                    <span id="notif-count" class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                        {{ request.user.notification_set.filter(is_read=False).count }}
+                    </span>
+
+                    <div id="notifDropdown" class="notif-dropdown shadow">
+
+                        <div class="notif-header d-flex justify-content-between">
+                            <strong>Notifications</strong>
+                            <a href="{% url 'notifications' %}">View All</a>
+                        </div>
+
+                        <div id="notifList">
+                            {% for n in request.user.notification_set.all|slice:":5" %}
+                            <div class="notif-item {% if not n.is_read %}unread{% endif %}" data-id="{{ n.id }}">
+                                {{ n.message }}
+                                <br>
+                                <small>{{ n.created_at|date:"d M h:i A" }}</small>
+                            </div>
+                            {% empty %}
+                            <div class="p-3 text-center text-muted">No notifications</div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <span class="badge bg-primary">{{ request.user.role }}</span>
+            </div>
+
+        </nav>
+
+        {% block content %}{% endblock %}
+
     </div>
 
-    <!-- ORDERS -->
-    <a data-bs-toggle="collapse" href="#orderMenu">
-        <i class="bi bi-box-seam me-2"></i> Orders
-        <i class="bi bi-chevron-down float-end"></i>
-    </a>
+    <!-- 🔊 SOUND -->
+    <script>
+        let notifySound = new Audio("{% static 'assets/sounds/notify.mp3' %}");
+        notifySound.preload = "auto";
 
-    <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
-        <a href="{% url 'create_manual_order' %}">
-            <i class="bi bi-plus-circle me-1"></i> Manual
-        </a>
-        <a href="{% url 'order_list' %}">
-            <i class="bi bi-list me-1"></i> List
-        </a>
-    </div>
+        // unlock sound
+        document.addEventListener("click", function () {
+            notifySound.play().then(() => {
+                notifySound.pause();
+                notifySound.currentTime = 0;
+            }).catch(() => { });
+        }, { once: true });
+    </script>
 
-    <!-- VEHICLES -->
-    <a data-bs-toggle="collapse" href="#vehicleMenu">
-        <i class="bi bi-truck me-2"></i> Vehicles
-        <i class="bi bi-chevron-down float-end"></i>
-    </a>
+    <!-- ⚡ WEBSOCKET -->
+    <script>
+        function connectSocket() {
 
-    <div class="collapse submenu {% if 'vehicles' in request.path or 'tracking' in request.path %}show{% endif %}"
-         id="vehicleMenu">
-        <a href="{% url 'all_assigned_vehicles' %}">
-            <i class="bi bi-plus-circle me-1"></i> Placements
-        </a>
-        <a href="{% url 'public_tracking' %}">
-            <i class="bi bi-list me-1"></i> Tracking
-        </a>
-    </div>
+            const socket = new WebSocket(
+                (location.protocol === "https:" ? "wss://" : "ws://")
+                + location.host + "/ws/notifications/"
+            );
 
-    <!-- ACCOUNTS -->
-    <a data-bs-toggle="collapse"
-       href="#accountsMenu"
-       class="d-flex justify-content-between align-items-center {% if 'accounts' in request.path %}active{% endif %}">
-        <span><i class="bi bi-wallet2 me-2"></i> Accounts</span>
-        <i class="bi bi-chevron-down"></i>
-    </a>
+            socket.onmessage = function (e) {
 
-    <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
-        <a href="{% url 'customer_accounts' %}">
-            <i class="bi bi-people me-2"></i> Customer
-        </a>
-        <a href="{% url 'vehicle_accounts' %}">
-            <i class="bi bi-truck me-2"></i> Vehicle
-        </a>
-        <a href="{% url 'bank_accounts' %}">
-            🏦 Bank
-        </a>
-    </div>
+                const data = JSON.parse(e.data);
 
-    <!-- REPORTS -->
-    <a href="#">
-        <i class="bi bi-bar-chart me-2"></i> Reports
-        <span class="menu-chip">NEW</span>
-    </a>
+                notifySound.currentTime = 0;
+                notifySound.play().catch(() => { });
 
-    <!-- LOGOUT -->
-    <a href="{% url 'logout' %}">
-        <i class="bi bi-box-arrow-right me-2"></i> Logout
-    </a>
+                showToast(data.message);
 
-</div>
+                let badge = document.getElementById("notif-count");
+                badge.innerText = parseInt(badge.innerText || "0") + 1;
 
-<!-- CONTENT -->
-<div class="content" id="content">
+                const list = document.getElementById("notifList");
 
-    <!-- NAVBAR -->
-    <nav class="navbar mb-4 p-3 rounded shadow-sm d-flex justify-content-between sticky-top bg-white">
+                const item = document.createElement("div");
+                item.className = "notif-item unread";
+                item.dataset.id = data.id;
 
-        <button class="btn btn-outline-primary" id="toggleBtn">
-            <i class="bi bi-list"></i>
-        </button>
+                item.innerHTML = data.message + "<br><small>Just now</small>";
 
-        <div class="user-pill">
-            <span class="graphic-dot"></span>
-            Welcome, <strong>{{ request.user.username }}</strong>
-        </div>
+                list.prepend(item);
+            };
 
-        <div>
-            <span class="badge bg-primary">{{ request.user.role }}</span>
-        </div>
-
-    </nav>
-
-    {% block content %}
-    {% endblock %}
-
-</div>
-
-<script>
-const toggleBtn = document.getElementById("toggleBtn");
-const sidebar = document.getElementById("sidebar");
-const content = document.getElementById("content");
-
-toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("show");
-    sidebar.classList.toggle("hide");
-    content.classList.toggle("full");
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    document.querySelectorAll("*").forEach(el => {
-        if (el.children.length === 0 && el.textContent.trim() === "None") {
-            el.textContent = "";
+            socket.onclose = () => setTimeout(connectSocket, 2000);
         }
-    });
 
-    document.querySelectorAll("input, textarea, select").forEach(el => {
-        if (el.value.trim() === "None") {
-            el.value = "";
-        }
-    });
+        connectSocket();
+    </script>
 
-});
-</script>
+    <!-- 🔔 UI CONTROL -->
+    <script>
+        const bell = document.getElementById("notifBell");
+        const dropdown = document.getElementById("notifDropdown");
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        bell.onclick = () => {
+            dropdown.style.display =
+                dropdown.style.display === "block" ? "none" : "block";
+        };
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const fields = document.querySelectorAll('input[type="text"], textarea');
-
-    fields.forEach(function (field) {
-        field.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+        document.addEventListener("click", function (e) {
+            if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = "none";
+            }
         });
-    });
+    </script>
 
-});
-</script>
+    <!-- 📩 CLICK ACTION -->
+    <script>
+        document.addEventListener("click", function (e) {
+
+            const item = e.target.closest(".notif-item");
+            if (!item) return;
+
+            fetch(`/notifications/read/${item.dataset.id}/`);
+
+            item.classList.remove("unread");
+
+            let badge = document.getElementById("notif-count");
+            let count = parseInt(badge.innerText || "0");
+            if (count > 0) badge.innerText = count - 1;
+
+            window.location.href = "/notifications/";
+        });
+    </script>
+
+    <!-- 💬 TOAST -->
+    <script>
+        function showToast(message) {
+
+            let toast = document.createElement("div");
+
+            toast.innerHTML = "🔔 " + message;
+
+            toast.style.position = "fixed";
+            toast.style.top = "20px";
+            toast.style.right = "20px";
+            toast.style.background = "#111";
+            toast.style.color = "#fff";
+            toast.style.padding = "10px 15px";
+            toast.style.borderRadius = "8px";
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
 
 </body>
+
 </html>
