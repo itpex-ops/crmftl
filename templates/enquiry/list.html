@@ -10,198 +10,239 @@
 
         {% if is_sales %}
         <div class="col-md-3 col-sm-6 mb-3">
-        {% else %}
-        <div class="col-md-4 col-sm-6 mb-3">
-        {% endif %}
-            <div class="kpi-card">
-                <small>New Enquiries</small>
-                <h5>{{ enquiries|length }}</h5>
+            {% else %}
+            <div class="col-md-4 col-sm-6 mb-3">
+                {% endif %}
+                <div class="kpi-card">
+                    <small>New Enquiries</small>
+                    <h5>{{ enquiries|length }}</h5>
+                </div>
             </div>
-        </div>
 
-        {% if is_sales %}
-        <div class="col-md-3 col-sm-6 mb-3">
-        {% else %}
-        <div class="col-md-4 col-sm-6 mb-3">
-        {% endif %}
-            <div class="kpi-card success">
-                <small>Confirmed</small>
-                <h5>{{ confirmed_count }}</h5>
-            </div>
-        </div>
+            {% if is_sales %}
+            <div class="col-md-3 col-sm-6 mb-3">
+                {% else %}
+                <div class="col-md-4 col-sm-6 mb-3">
+                    {% endif %}
+                    <div class="kpi-card success">
+                        <small>Confirmed</small>
+                        <h5>{{ confirmed_count }}</h5>
+                    </div>
+                </div>
 
-        {% if is_sales %}
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="kpi-card warning">
-                <small>Pending</small>
-                <h5>{{ pending_count }}</h5>
-            </div>
-        </div>
-        {% endif %}
+                {% if is_sales %}
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="kpi-card warning">
+                        <small>Pending</small>
+                        <h5>{{ pending_count }}</h5>
+                    </div>
+                </div>
+                {% endif %}
 
-        {% if is_sales %}
-        <div class="col-md-3 col-sm-6 mb-3">
-        {% else %}
-        <div class="col-md-4 col-sm-6 mb-3">
-        {% endif %}
-            <div class="kpi-card danger">
-                <small>Cancelled</small>
-                <h5>{{ cancelled_count }}</h5>
-            </div>
-        </div>
+                {% if is_sales %}
+                <div class="col-md-3 col-sm-6 mb-3">
+                    {% else %}
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        {% endif %}
+                        <div class="kpi-card danger">
+                            <small>Cancelled</small>
+                            <h5>{{ cancelled_count }}</h5>
+                        </div>
+                    </div>
 
-    </div>
+                </div>
 
-    <!-- TOOLBAR -->
-    <div class="card toolbar-card p-3 mb-3">
-        <div class="d-flex justify-content-between">
-            <input type="text" id="searchInput" class="form-control search-box"
-                   placeholder="🔍 Search enquiry, customer...">
-        </div>
-    </div>
+                <!-- TOOLBAR -->
+                <div class="card toolbar-card p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <input type="text" id="searchInput" class="form-control search-box"
+                            placeholder="🔍 Search enquiry, customer...">
+                    </div>
+                </div>
 
-    <!-- TABLE -->
-    <div class="card table-card p-3">
-        <div class="table-responsive">
-            <table id="enquiryTable" class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>Enquiry</th>
-                        <th>Customer</th>
-                        <th>Route</th>
-                        <th>Vehicle</th>
-                        <th>Expected Rate ₹</th>
-                        <th>Approval Rate ₹</th>
-                        <th>Status</th>
-                        <th class="text-end">Action</th>
-                    </tr>
-                </thead>
+                <!-- TABLE -->
+                <div class="card table-card p-3">
+                    <div class="table-responsive">
+                        <table id="enquiryTable" class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Enquiry</th>
+                                    <th>Customer</th>
+                                    <th>Route</th>
+                                    <th>Vehicle</th>
+                                    <th>Expected Rate ₹</th>
+                                    <th>Approval Rate ₹</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
 
-                <tbody id="tableBody">
-                    {% for e in enquiries %}
-                    <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
+                            <tbody id="tableBody">
+                                {% for e in enquiries %}
+                                <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
 
-                        <td>
-                            <strong>{{ e.enquiry_no }}</strong><br>
-                            <small class="text-muted">{{ e.date|date:"d M" }}</small>
-                        </td>
+                                    <td>
+                                        <strong>{{ e.enquiry_no }}</strong><br>
+                                        <small class="text-muted">{{ e.date|date:"d M" }}</small>
+                                    </td>
 
-                        <td>
-                            <div class="fw-semibold">{{ e.customer_name }}</div>
-                            <small class="text-muted">{{ e.customer_contact }}</small>
-                        </td>
+                                    <td>
+                                        <div class="fw-semibold">{{ e.customer_name }}</div>
+                                        <small class="text-muted">{{ e.customer_contact }}</small>
+                                    </td>
 
-                        <td>
-                            {% for r in e.routes %}
-                            <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
-                            {% empty %}-{% endfor %}
-                        </td>
+                                    <td>
+                                        {% for r in e.routes %}
+                                        <div class="route-pill">{{ r.origin }} → {{ r.destination }}</div>
+                                        {% empty %}-{% endfor %}
+                                    </td>
 
-                        <td>{{ e.vehicle_type }}</td>
+                                    <td>{{ e.vehicle_type }}</td>
 
-                        <td class="text-warning">{{ e.expected_rate|default_if_none:"" }}</td>
+                                    <td class="text-warning">{{ e.expected_rate|default_if_none:"" }}</td>
 
-                        <td class="text-success">{{ e.approval_rate }}</td>
+                                    <td class="text-success">{{ e.approval_rate }}</td>
 
-                        <td>
-                            <span class="status-pill 
+                                    <td>
+                                        <span class="status-pill 
                                 {% if e.status == 'confirmed' %}success
                                 {% elif 'pending' in e.status %}warning
                                 {% else %}danger{% endif %}">
-                                <span class="dot"></span>{{ e.status|capfirst }}
-                            </span>
-                        </td>
+                                            <span class="dot"></span>{{ e.status|capfirst }}
+                                        </span>
+                                    </td>
 
-                        <td class="text-end">
+                                    <td class="text-end">
 
-                            {% if is_admin %}
-                            <div class="d-flex gap-2 justify-content-end">
+                                        {% if is_admin %}
+                                        <div class="d-flex gap-2 justify-content-end">
 
-                                <button type="button"
-                                    class="icon-btn text-info open-pitch-modal"
-                                    data-id="{{ e.id }}"
-                                    data-p1="{{ e.pitch1|default:'' }}"
-                                    data-p1r="{{ e.pitch1_remarks|default:'' }}"
-                                    data-p2="{{ e.pitch2|default:'' }}"
-                                    data-p2r="{{ e.pitch2_remarks|default:'' }}"
-                                    data-p3="{{ e.pitch3|default:'' }}"
-                                    data-p3r="{{ e.pitch3_remarks|default:'' }}"
-                                    data-status="{{ e.status }}">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
+                                            <button type="button" class="icon-btn text-info open-pitch-modal"
+                                                data-id="{{ e.id }}" data-p1="{{ e.pitch1|default:'' }}"
+                                                data-p1r="{{ e.pitch1_remarks|default:'' }}"
+                                                data-p2="{{ e.pitch2|default:'' }}"
+                                                data-p2r="{{ e.pitch2_remarks|default:'' }}"
+                                                data-p3="{{ e.pitch3|default:'' }}"
+                                                data-p3r="{{ e.pitch3_remarks|default:'' }}"
+                                                data-status="{{ e.status }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
 
-                            {% endif %}
+                                            {% endif %}
 
-                            {% if e.status != 'confirmed' and is_sales %}
+                                            {% if e.status != 'confirmed' and is_sales %}
 
-                                <button type="button" class="icon-btn text-success action-btn"
-                                    data-id="{{ e.id }}" data-action="confirm">✔️</button>
+                                            <button type="button" class="icon-btn text-success action-btn"
+                                                data-id="{{ e.id }}" data-action="confirm">✔️</button>
 
-                                <button type="button" class="icon-btn text-warning action-btn"
-                                    data-id="{{ e.id }}" data-action="disagree">⚠️</button>
+                                            <button type="button" class="icon-btn text-warning action-btn"
+                                                data-id="{{ e.id }}" data-action="disagree">⚠️</button>
 
-                                <button type="button" class="icon-btn text-danger action-btn"
-                                    data-id="{{ e.id }}" data-action="cancel">❌</button>
+                                            <button type="button" class="icon-btn text-danger action-btn"
+                                                data-id="{{ e.id }}" data-action="cancel">❌</button>
 
-                            </div>
+                                        </div>
 
-                            <div class="mt-2">
+                                        <div class="mt-2">
 
-                                <div class="inline-box" id="confirm-box-{{ e.id }}" style="display:none;">
-                                    <form method="POST"
-                                        action="{% url 'update_enquiry_status' e.id 'confirm' %}">
-                                        {% csrf_token %}
-                                        <input type="number" name="approve_rate"
-                                            class="form-control mb-2"
-                                            placeholder="Approval Rate" required>
-                                        <button type="submit"
-                                            class="btn btn-sm btn-success">Confirm</button>
-                                    </form>
-                                </div>
+                                            <div class="inline-box" id="confirm-box-{{ e.id }}" style="display:none;">
+                                                <form method="POST"
+                                                    action="{% url 'update_enquiry_status' e.id 'confirm' %}">
+                                                    {% csrf_token %}
+                                                    <input type="number" name="approve_rate" class="form-control mb-2"
+                                                        placeholder="Approval Rate" required>
+                                                    <button type="submit"
+                                                        class="btn btn-sm btn-success">Confirm</button>
+                                                </form>
+                                            </div>
 
-                                <div class="inline-box" id="disagree-box-{{ e.id }}" style="display:none;">
-                                    <form method="POST"
-                                        action="{% url 'update_enquiry_status' e.id 'disagree' %}">
-                                        {% csrf_token %}
-                                        <textarea name="disagree_reason"
-                                            class="form-control mb-2"
-                                            placeholder="Disagree Reason" required></textarea>
-                                        <button type="submit"
-                                            class="btn btn-sm btn-warning">Disagree</button>
-                                    </form>
-                                </div>
+                                            <div class="inline-box" id="disagree-box-{{ e.id }}" style="display:none;">
+                                                <form method="POST"
+                                                    action="{% url 'update_enquiry_status' e.id 'disagree' %}">
+                                                    {% csrf_token %}
+                                                    <textarea name="disagree_reason" class="form-control mb-2"
+                                                        placeholder="Disagree Reason" required></textarea>
+                                                    <button type="submit"
+                                                        class="btn btn-sm btn-warning">Disagree</button>
+                                                </form>
+                                            </div>
 
-                                <div class="inline-box" id="cancel-box-{{ e.id }}" style="display:none;">
-                                    <form method="POST"
-                                        action="{% url 'update_enquiry_status' e.id 'cancel' %}">
-                                        {% csrf_token %}
-                                        <textarea name="cancel_reason"
-                                            class="form-control mb-2"
-                                            placeholder="Cancel Reason" required></textarea>
-                                        <button type="submit"
-                                            class="btn btn-sm btn-danger">Cancel</button>
-                                    </form>
-                                </div>
+                                            <div class="inline-box" id="cancel-box-{{ e.id }}" style="display:none;">
+                                                <form method="POST"
+                                                    action="{% url 'update_enquiry_status' e.id 'cancel' %}">
+                                                    {% csrf_token %}
+                                                    <textarea name="cancel_reason" class="form-control mb-2"
+                                                        placeholder="Cancel Reason" required></textarea>
+                                                    <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                                </form>
+                                            </div>
 
-                            </div>
+                                        </div>
 
-                            {% endif %}
+                                        {% endif %}
 
-                        </td>
-                    </tr>
+                                    </td>
+                                </tr>
 
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center text-muted">
-                            No enquiries found
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">
+                                        No enquiries found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-</div>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
 
-{% endblock %}
+                    // REMOVE "None"
+                    document.querySelectorAll("td, input, textarea").forEach(el => {
+                        if (el.tagName === "TD" && el.innerText.trim() === "None") {
+                            el.innerText = "";
+                        }
+                        if ((el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.value === "None") {
+                            el.value = "";
+                        }
+                    });
+
+                    // SHOW / HIDE ACTION BOXES
+                    document.querySelectorAll(".action-btn").forEach(btn => {
+                        btn.addEventListener("click", function () {
+
+                            const id = this.dataset.id;
+                            const action = this.dataset.action;
+
+                            if (!id || !action) return;
+
+                            ["confirm", "disagree", "cancel"].forEach(type => {
+                                const el = document.getElementById(`${type}-box-${id}`);
+                                if (el) el.style.display = "none";
+                            });
+
+                            const activeBox = document.getElementById(`${action}-box-${id}`);
+                            if (activeBox) {
+                                activeBox.style.display =
+                                    (activeBox.style.display === "block") ? "none" : "block";
+                            }
+                        });
+                    });
+
+                    // DISABLE BUTTON ON SUBMIT
+                    document.querySelectorAll("form").forEach(form => {
+                        form.addEventListener("submit", function () {
+                            const btn = this.querySelector("button[type='submit']");
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.innerText = "Processing...";
+                            }
+                        });
+                    });
+
+                });
+            </script>
+            {% endblock %}
