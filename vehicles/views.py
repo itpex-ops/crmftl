@@ -42,9 +42,7 @@ def tracking_view(request):
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-
 from .models import Tracking, TrackingDocument
-
 
 @require_POST
 def upload_tracking_docs(request, id):
@@ -118,7 +116,6 @@ def public_tracking(request):
 
     return render(request, "vehicle/public_tracking.html", context)
 
-
 @login_required
 def assign_vehicle(request, order_id):
 
@@ -182,6 +179,7 @@ def assign_vehicle(request, order_id):
             "order": order
         }
     )
+
 def assigned_vehicles(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     vehicles = order.vehicles.all().order_by('-created_at')  # newest first
@@ -338,7 +336,6 @@ def tracking_page(request, vehicle_id):
         "tracking": tracking
     })
 
-
 @csrf_exempt
 def update_tracking_ajax(request):
 
@@ -421,4 +418,3 @@ def update_vehicle_inline(request):
 
         return JsonResponse({"success": True, "balance_html": balance_html, "total_freight": vehicle.total_freight})
     return JsonResponse({"success": False})
-

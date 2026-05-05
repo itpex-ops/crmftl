@@ -3,197 +3,244 @@
 
 {% block content %}
 
-<div class="container-fluid mt-3">
+<div class="container-fluid py-3">
 
-    <!-- Alerts -->
-    {% if messages %}
-    <div class="mb-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold">Create Shipment Order</h4>
+            <small class="text-muted">Capture freight details and generate dispatch request</small>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
-    <!-- HEADER CARD -->
-    <div class="card shadow-sm border-0 mb-4 p-4">
-        <h4 class="fw-semibold mb-1">🚚 Create Manual Order </h4>
-        <small class="text-muted">Fill all required details</small>
+        <button type="submit" form="orderForm" class="btn btn-primary">
+            💾 Save Order
+        </button>
     </div>
-    <form method="POST">
+
+    <form method="POST" id="orderForm">
         {% csrf_token %}
-        <div class="row g-4">
-            <!-- LEFT PANEL -->
+
+        <div class="row g-3">
+
+            <!-- LEFT SIDE -->
             <div class="col-lg-8">
-                <!-- CUSTOMER DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">👤 Customer Details</div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-4"><input name="customer_name" class="form-control"
-                                placeholder="Customer Name" required></div>
-                        <div class="col-md-4"><input name="customer_contact" class="form-control"
-                                placeholder="Mobile No" required></div>
-                        <div class="col-md-4"><input type="email" name="email" class="form-control" placeholder="Email">
-                        </div>
-                        <div class="col-md-3">
-                            <select name="lead_source" class="form-select">
-                                <option value="">Lead Source</option>
-                                <option value="justdial">Just Dial</option>
-                                <option value="inbound">Inbound</option>
-                                <option value="outbound">Outbound</option>
-                                <option value="reference">Reference</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3"><input name="reference_name" class="form-control"
-                                placeholder="Reference Name"></div>
-                        <div class="col-md-3"><input name="pickups" id="pickups" class="form-control"
-                                placeholder="No. of Pickups">
-                        </div>
-                        <div class="col-md-3"><input name="deliveries" id="deliveries" class="form-control"
-                                placeholder="No. of Deliveries"></div>
-                        <div id="origin-container" class="col-12"></div>
-                        <div id="destination-container" class="col-12"></div>
-                    </div>
-                </div>
 
-                <!-- ROUTE & VEHICLE -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📍 Route & Vehicle</div>
+                <!-- CUSTOMER -->
+                <div class="card saas-card">
+                    <div class="card-header saas-title">👤 Customer</div>
                     <div class="card-body row g-3">
-                        <div class="col-md-4"><input name="vehicle_type" class="form-control"
-                                placeholder="Vehicle Type"></div>
-                        <div class="col-md-4"><input name="vehicle_description" class="form-control"
-                                placeholder="Vehicle Description"></div>
-                        <div class="col-md-4"><input name="material" class="form-control" placeholder="Material"></div>
+
+                        <div class="col-md-6">
+                            <input name="customer_name" class="form-control" placeholder="Customer Name" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <input name="customer_contact" class="form-control" placeholder="Mobile" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <input name="email" class="form-control" placeholder="Email">
+                        </div>
 
                     </div>
                 </div>
 
-                <!-- LOAD DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📦 Load Details</div>
+                <!-- ROUTE -->
+                <div class="card saas-card mt-3">
+                    <div class="card-header saas-title">📍 Route</div>
                     <div class="card-body row g-3">
-                        <div class="col-md-3"><input name="pieces" class="form-control" placeholder="Pieces"></div>
-                        <div class="col-md-3"><input name="tonnage" class="form-control" placeholder="Tonnage"></div>
-                        <div class="col-md-3">
-                            <select name="dimension_unit" class="form-select">
-                                <option value="">Dimension Unit</option>
-                                <option value="cm">cm</option>
-                                <option value="inch">inch</option>
-                                <option value="feet">feet</option>
-                                <option value="meter">meter</option>
+
+                        <div class="col-md-6">
+                            <input name="origin" class="form-control" placeholder="Origin">
+                        </div>
+
+                        <div class="col-md-6">
+                            <input name="destination" class="form-control" placeholder="Destination">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- VEHICLE & LOAD -->
+                <div class="card saas-card mt-3">
+                    <div class="card-header saas-title">🚚 Vehicle & Load</div>
+
+                    <div class="card-body row g-3">
+
+                        <div class="col-md-4">
+                            <!-- <label class="form-label">Vehicle Type</label> -->
+
+                            <select name="vehicle_type" class="form-select vehicle-select">
+                                <option value="">Select Vehicle</option>
+                                {% for value, label in vehicle_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-3"><input name="length" class="form-control" placeholder="Length"></div>
-                        <div class="col-md-3"><input name="breadth" class="form-control" placeholder="Breadth"></div>
-                        <div class="col-md-3"><input name="height" class="form-control" placeholder="Height"></div>
-                        <div class="col-md-3"><input name="expected_rate" class="form-control"
-                                placeholder="Expected Rate ₹"></div>
-                    </div>
-                    <div class="card mb-3 section-card">
-                        <div class="section-title"> Payment Details </div>
-                        <div class="card-body row g-3">
-                            <div class="col-lg-4">
-                                <!-- ✅ PRICING (after pitch approved) -->
-                                {% if e.status == "confirmed" or e.approval_rate %}
-                                <div id="pricing_section" class="card section-card mb-3">
-                                    <div class="section-title">💰 Pricing</div>
 
-                                    <div class="p-3">
-                                        <input name="finalized_rate" id="final_rate" class="form-control mb-2"
-                                            placeholder="Final Rate"
-                                            value="{{ request.POST.finalized_rate|default:e.approval_rate|default:e.expected_rate|default:'' }}">
-
-                                        <input name="loading_charges" id="loading_unloading" class="form-control mb-2"
-                                            placeholder="Loading/Unloading"
-                                            value="{{ request.POST.loading_charges|default:'' }}">
-
-                                        <input name="halting_charges" id="halting_charges" class="form-control mb-2"
-                                            placeholder="Halting Charges"
-                                            value="{{ request.POST.halting_charges|default:'' }}">
-
-                                        <input name="gst_percent" id="gst_percent" class="form-control mb-2"
-                                            placeholder="GST %" value="{{ request.POST.gst_percent|default:'' }}">
-
-                                        <input name="total_rate" id="total_rate" class="form-control bg-light" readonly
-                                            placeholder="Total" value="{{ request.POST.total_rate|default:'' }}">
-                                    </div>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="col-lg-4">
-                                <!-- ✅ PAYMENT (only after confirmed) -->
-                                {% if e.status == "confirmed" %}
-                                <div class="card section-card mb-3">
-                                    <div class="section-title">💳 Payment</div>
-
-                                    <div class="p-3">
-                                        <select name="payment_terms" id="payment_terms" class="form-select mb-2">
-                                            <option value="">Select</option>
-                                            <option value="advance_balance" {% if
-                                                request.POST.payment_terms=="advance_balance" %}selected{% endif %}>
-                                                Advance</option>
-                                            <option value="topay" {% if request.POST.payment_terms=="topay" %}selected{%
-                                                endif %}>Topay</option>
-                                            <option value="full" {% if request.POST.payment_terms=="full" %}selected{%
-                                                endif %}>Full</option>
-                                        </select>
-
-                                        <input id="advance" name="advance" class="form-control mb-2"
-                                            placeholder="Advance" value="{{ request.POST.advance|default:'' }}">
-
-                                        <input id="balance" name="balance" class="form-control mb-2"
-                                            placeholder="Balance" value="{{ request.POST.balance|default:'' }}">
-
-                                        <input id="topay" name="topay" class="form-control mb-2" placeholder="To Pay"
-                                            value="{{ request.POST.topay|default:'' }}">
-                                    </div>
-                                </div>
-                                {% endif %}
-                                <div class="col-md-3">
-                                    <button type="submit" class="btn btn-primary btn-sm">💾 Save Enquiry</button>
-                                </div>
-                            </div>
+                        <div class="col-md-4">
+                            <input name="vehicle_description" class="form-control" placeholder="Vehicle Description">
                         </div>
-                        <div class="col-lg-4">
-                            <!-- GENERATED BY -->
-                            <div class="card mb-3 section-card">
-                                <div class="section-title">👤 Generated By</div>
-                                <div class="card-body">
-                                    <div class="form-control bg-light">
-                                        <strong>{{ request.user.username }}</strong>
-                                    </div>
-                                </div>
-                            </div>
+
+                        <div class="col-md-4">
+                            <input name="kilometers" id="kilometers" class="form-control" placeholder="Distance (KM)">
+                        </div>
+
+                        <div class="col-md-4">
+                            <input name="material" class="form-control" placeholder="Material">
+                        </div>
+
+                        <div class="col-md-4">
+                            <input name="pieces" class="form-control" placeholder="Pieces">
+                        </div>
+
+                        <div class="col-md-4">
+                            <input name="tonnage" class="form-control" placeholder="Tonnage">
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-4">
+
+                <!-- PRICING -->
+                <div class="card saas-card">
+                    <div class="card-header saas-title">💰 Pricing Engine</div>
+
+                    <div class="card-body">
+
+                        <input name="base_freight" id="base_freight" class="form-control mb-2"
+                            placeholder="Base Freight">
+
+                        <input name="extra_charges" id="extra_charges" class="form-control mb-2"
+                            placeholder="Extra Charges">
+
+                        <input name="advance_amount" id="advance_amount" class="form-control mb-2"
+                            placeholder="Advance">
+
+                        <input name="balance_amount" id="balance_amount" class="form-control mb-2" placeholder="Balance"
+                            readonly>
+
+                        <hr>
+
+                        <input id="total_amount" class="form-control bg-light" placeholder="Total" readonly>
+
+                    </div>
+                </div>
+
+                <!-- PAYMENT -->
+                <div class="card saas-card mt-3">
+                    <div class="card-header saas-title">💳 Payment</div>
+
+                    <div class="card-body">
+
+                        <select name="payment_mode" class="form-select mb-2">
+                            <option value="">Mode</option>
+                            <option>Cash</option>
+                            <option>UPI</option>
+                            <option>Bank</option>
+                            <option>Credit</option>
+                        </select>
+
+                        <select name="payment_status" class="form-select mb-2">
+                            <option value="">Status</option>
+                            <option>Pending</option>
+                            <option>Partial</option>
+                            <option>Paid</option>
+                        </select>
+
+                        <input name="transaction_id" class="form-control mb-2" placeholder="Transaction ID">
+                        <input name="payment_remarks" class="form-control mb-2" placeholder="Remarks">
+
+                    </div>
+                </div>
+
+                <!-- USER -->
+                <div class="card saas-card mt-3">
+                    <div class="card-header saas-title">👤 Created By</div>
+                    <div class="card-body">
+                        <div class="form-control bg-light">
+                            {{ request.user.username }}
                         </div>
                     </div>
+                </div>
+
+            </div>
+
+        </div>
     </form>
 </div>
 
-<!-- SaaS CSS -->
+<!-- STYLE -->
 <style>
-    .section-card {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    .saas-card {
+        border: 1px solid #eef0f3;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
     }
 
-    .section-title {
+    .saas-title {
+        background: #f8fafc;
         font-weight: 600;
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        background: #f9f9f9;
+        border-bottom: 1px solid #eef0f3;
     }
 
     .form-control,
     .form-select {
-        border-radius: 8px;
+        border-radius: 10px;
     }
 </style>
 
+<!-- TOMSELECT -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+<!-- AUTO CALCULATION -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Vehicle Search Dropdown
+        new TomSelect(".vehicle-select", {
+            create: false,
+            placeholder: "Search Vehicle Type..."
+        });
+
+        // Pricing calculation
+        function calculatePricing() {
+
+            let base = parseFloat(document.getElementById("base_freight").value) || 0;
+            let extra = parseFloat(document.getElementById("extra_charges").value) || 0;
+            let advance = parseFloat(document.getElementById("advance_amount").value) || 0;
+
+            let total = base + extra;
+            let balance = total - advance;
+
+            document.getElementById("total_amount").value = total.toFixed(2);
+            document.getElementById("balance_amount").value = balance.toFixed(2);
+        }
+
+        document.getElementById("base_freight").addEventListener("input", calculatePricing);
+        document.getElementById("extra_charges").addEventListener("input", calculatePricing);
+        document.getElementById("advance_amount").addEventListener("input", calculatePricing);
+
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll('input[type="text"]').forEach(function (input) {
+
+            input.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+
+        });
+
+    });
+</script>
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
 <link rel="stylesheet" href="{% static 'assets/enquiry/css/enquiry.css' %}">
-
 {% endblock %}

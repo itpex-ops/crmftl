@@ -5,75 +5,94 @@ from django.db.models import Max
 from django.db import transaction
 
 class Vehicle(models.Model):
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name='vehicles'   # 🔥 IMPORTANT
-    )
+
+    order = models.OneToOneField(
+    'orders.Order',   # ✅ CORRECT
+    on_delete=models.CASCADE,
+    related_name='vehicles'   # ✅ singular for OneToOne
+)
+
     ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
+
     vehicle_number = models.CharField(max_length=50)
     driver_number = models.CharField(max_length=15)
     owner_number = models.CharField(max_length=15, blank=True, null=True)
 
+    # 🚚 SOURCE
     SOURCE_TYPES = [
-        ('direct','Direct'),
-        ('transporters','Transporters'),
-        ('brokers','Brokers'),
-        ('drivers','Drivers'),
-        ('others','Others')
+        ('direct', 'Direct'),
+        ('transporters', 'Transporters'),
+        ('brokers', 'Brokers'),
+        ('drivers', 'Drivers'),
+        ('others', 'Others')
     ]
-    
-    source = models.CharField(max_length=100, choices = SOURCE_TYPES, blank=True, null=True )
 
-    # 💰 MONEY FIELDS (use DecimalField)
+    source = models.CharField(max_length=100, choices=SOURCE_TYPES, blank=True, null=True)
+
+    # 💰 MONEY (FIXED)
     freight_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    halting = models.DecimalField(max_digits=200,decimal_places=2,default=0)
+
+    # ❌ WAS WRONG (200) → ✅ FIXED
+    halting = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     loading_unloading = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
     brokerage = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     total_freight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
     advance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    # 💳 PAYMENT
+    # 💳 BANK
     account_name = models.CharField(max_length=100, blank=True, null=True)
     account_number = models.CharField(max_length=30, blank=True, null=True)
     ifsc = models.CharField(max_length=20, blank=True, null=True)
-    ac_type = models.CharField(max_length=20, blank = True, null=True)
+    ac_type = models.CharField(max_length=20, blank=True, null=True)
+
     bank_verified = models.BooleanField(default=False)
     bank_verified_at = models.DateTimeField(null=True, blank=True)
+
     beneficiary_name = models.CharField(max_length=100, blank=True, null=True)
 
+    # 📱 UPI
     UPI_CHOICES = [
-    ('phonepe', 'PhonePe'),
-    ('gpay', 'Google Pay'),
-    ('paytm', 'Paytm'),
-    ('other', 'Other'),
+        ('phonepe', 'PhonePe'),
+        ('gpay', 'Google Pay'),
+        ('paytm', 'Paytm'),
+        ('other', 'Other'),
     ]
 
     upi_app = models.CharField(max_length=10, choices=UPI_CHOICES, default='phonepe')
-    upi_id = models.CharField(max_length=200,blank=True,null=True)
-    upi_number = models.CharField(max_length=200, blank=True,null=True)
-    vehicle_reassign_date = models.DateTimeField(blank=True,null=True)
+    upi_id = models.CharField(max_length=200, blank=True, null=True)
+    upi_number = models.CharField(max_length=200, blank=True, null=True)
+
+    vehicle_reassign_date = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # 🚀 AUTO CALC + FTL GENERATOR
     def save(self, *args, **kwargs):
+
+        # Balance
         self.balance = Decimal(self.freight_amount or 0) - Decimal(self.advance or 0)
+
+        # Total freight
         self.total_freight = (
             Decimal(self.freight_amount or 0)
             + Decimal(self.brokerage or 0)
             + Decimal(self.loading_unloading or 0)
         )
+
+        # FTL NUMBER GENERATION
         if not self.ftl_no:
             with transaction.atomic():
+
                 last_vehicle = (
                     Vehicle.objects
                     .select_for_update()
                     .order_by('-id')
                     .first()
                 )
+
                 if last_vehicle and last_vehicle.ftl_no:
                     last_num = int(last_vehicle.ftl_no.split('_')[1])
                     new_num = last_num + 1
@@ -81,10 +100,12 @@ class Vehicle(models.Model):
                     new_num = 1
 
                 self.ftl_no = f"FTL_{new_num:03d}"
-        super().save(*args, **kwargs)
-        def __str__(self):
-            return f"{self.vehicle_number} ({self.order.order_no})"
 
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.vehicle_number} ({self.order.order_no})"
+    
 class Tracking(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="tracking")
 

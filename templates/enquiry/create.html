@@ -110,14 +110,11 @@
                         <div class="col-md-4">
                             <label class="form-label">Vehicle Type</label>
 
-                            <select name="vehicle_type" class="form-select vehicle-select" required>
-
+                            <select name="vehicle_type" class="form-select vehicle-select">
                                 <option value="">Select Vehicle</option>
-
-                                {% for value,label in vehicle_types %}
+                                {% for value, label in vehicle_types %}
                                 <option value="{{ value }}">{{ label }}</option>
                                 {% endfor %}
-
                             </select>
                         </div>
 

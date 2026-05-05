@@ -30,7 +30,9 @@ USE_TZ = True
 ALLOWED_HOSTS = [
     '168.144.71.218',
     'parcelexops.in',
-    'www.parcelexops.in'
+    'www.parcelexops.in',
+    "localhost",
+    "127.0.0.1"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
