@@ -1,6 +1,6 @@
 ROLE_MENUS = {
 
-    'superadmin': ['dashboard', 'enquiry', 'orders', 'vehicles', 'accounts'],
+    'superadmin': ['dashboard', 'enquiry', 'orders', 'vehicles', 'accounts','vehicle_accounts','accounts_customer','bank_accounts'],
 
     'admin': ['dashboard', 'enquiry', 'orders', 'vehicles'],
 
