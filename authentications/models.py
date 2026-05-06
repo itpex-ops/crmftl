@@ -9,7 +9,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15)
     ROLE_CHOICES = (
         ('admin', 'Admin'),
-         ('it', 'IT'),
+         ('superadmin', 'Superadmin'),
         ('sales', 'Sales'),
         ('fleet', 'Fleet'),
         ('support', 'Support'),

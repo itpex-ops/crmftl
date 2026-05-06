@@ -41,7 +41,7 @@
 
                     <div class="col-md-3">
                         <div class="mini-box">
-                            <small>Currently Assigned Vehicle Date</small>
+                            <small>Vehicle Assigned Date</small>
                             <h6>
                                 {{ vehicle.order.vehicle_place_date|date:"d M Y h:i A" }}
                             </h6>
@@ -50,7 +50,7 @@
 
                     <div class="col-md-3">
                         <div class="mini-box">
-                            <small>Vehicle Reassign Date</small>
+                            <small>Reassign Vehicle Date</small>
 
                             <input type="text" id="vehicle_reassign_date" name="vehicle_reassign_date"
                                 class="form-control mt-2" value="" placeholder="Select Date & Time">
@@ -166,8 +166,8 @@
 
                     <div class="col-md-4">
                         <label class="form-label">Account Name</label>
-                        <input type="text" name="account_name" class="form-control input-style"
-                            value="{{ vehicle.account_name }}">
+                        <input type="text" name="Beneficiary_name" class="form-control input-style"
+                            value="{{ vehicle.Beneficiary_name }}">
                     </div>
 
                     <div class="col-md-4">

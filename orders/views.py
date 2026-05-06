@@ -226,17 +226,19 @@ def convert_to_order1(request, enquiry_id):
 @login_required
 def order_list(request):
 
-    orders = Order.objects.prefetch_related(
-        'vehicles'
-    ).select_related(
-        'tracking'
-    ).order_by('-created_at')
+    orders = Order.objects.select_related('tracking').order_by('-id')
+
+    for o in orders:
+        try:
+            o.vehicle_obj = o.vehicles
+        except:
+            o.vehicle_obj = None
 
     total_orders = orders.count()
 
     assigned_count = orders.filter(
         vehicles__isnull=False
-    ).distinct().count()
+    ).count()
 
     not_assigned_count = orders.filter(
         vehicles__isnull=True
@@ -260,7 +262,7 @@ def order_list(request):
         for order in orders
     )
 
-    context = {
+    return render(request, "orders/orders.html", {
         "orders": orders,
         "total_orders": total_orders,
         "assigned_count": assigned_count,
@@ -269,10 +271,7 @@ def order_list(request):
         "delivered_count": delivered_count,
         "transit_count": transit_count,
         "total_revenue": int(total_revenue),
-    }
-
-    return render(request, "orders/orders.html", context)
-
+    })
 
 def to_float(value):
     try:

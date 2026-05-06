@@ -116,7 +116,7 @@ def public_tracking(request):
 
     return render(request, "vehicle/public_tracking.html", context)
 
-@login_required
+@login_required 
 def assign_vehicle(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
@@ -129,13 +129,6 @@ def assign_vehicle(request, order_id):
 
         if source == "others" and source_other:
             source = source_other
-
-        # OTP VERIFY CHECK
-        driver_verified = request.POST.get("driver_verified")
-
-        if driver_verified != "1":
-            messages.error(request, "Driver number not OTP verified.")
-            return redirect("assign_vehicle", order_id=order.id)
 
         Vehicle.objects.create(
             order=order,
@@ -151,19 +144,23 @@ def assign_vehicle(request, order_id):
             halting=Decimal(request.POST.get("halting") or 0),
             loading_unloading=Decimal(request.POST.get("loading_unloading") or 0),
             brokerage=Decimal(request.POST.get("brokerage") or 0),
-            total_freight=Decimal(request.POST.get("total_freight") or 0),
+
+            # ❗ OPTIONAL: no need to send these, model auto calculates
             advance=Decimal(request.POST.get("advance") or 0),
-            balance=Decimal(request.POST.get("balance") or 0),
+
             # PAYMENT
             upi_app=request.POST.get("upi_app"),
             upi_id=request.POST.get("upi_id"),
             upi_number=request.POST.get("upi_number"),
 
-            account_name=request.POST.get("account_name"),
+            #account_name=request.POST.get("account_name"),
             account_number=request.POST.get("account_number"),
             ifsc=request.POST.get("ifsc"),
             ac_type=request.POST.get("ac_type"),
-            beneficiary_name = request.POST.get('beneficiary_name')
+            beneficiary_name=request.POST.get('account_beneficiary_name'),
+
+            # ❗ TEMP: just accept flags (no strict validation)
+            bank_verified = request.POST.get("bank_verified") == "1",
         )
 
         # AUTO CREATE TRACKING
@@ -175,10 +172,58 @@ def assign_vehicle(request, order_id):
     return render(
         request,
         "vehicle/assign_vehicle.html",
-        {
-            "order": order
-        }
+        {"order": order}
     )
+
+# views.py
+from django.http import JsonResponse
+from orders.models import Order
+
+def order_status_api(request):
+
+    orders = Order.objects.select_related('tracking', 'vehicles')
+
+    data = []
+
+    for o in orders:
+        status = "Pending"
+
+        if hasattr(o, 'tracking') and o.tracking:
+
+            if o.tracking.settled:
+                status = "Settled"
+            elif o.tracking.transporter_paid:
+                status = "Transporter Paid"
+            elif o.tracking.customer_paid:
+                status = "Customer Paid"
+            elif o.tracking.delivered:
+                status = "Delivered"
+            elif o.tracking.fleet_departed:
+                status = "In Transit"
+            elif o.tracking.invoice_eway:
+                status = "Invoice / Eway"
+            elif o.tracking.lr_no_b:
+                status = "LR Created"
+            elif o.tracking.advance_to_fleet:
+                status = "Fleet Advance"
+            elif o.tracking.vehicle_document:
+                status = "Documents Collected"
+            elif o.tracking.vehicle_placed:
+                status = "Vehicle Placed"
+            else:
+                status = "Pending Dispatch"
+
+        vehicle = None
+        if hasattr(o, 'vehicles'):
+            vehicle = o.vehicles.vehicle_number
+
+        data.append({
+            "id": o.id,
+            "status": status,
+            "vehicle": vehicle
+        })
+
+    return JsonResponse({"orders": data})
 
 def assigned_vehicles(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -204,44 +249,44 @@ def assign_vehicle12(request, order_id):
         'order': order,
     })
 
+@login_required
 def edit_vehicle(request, vehicle_id):
+
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
-    order = vehicle.order
 
     if request.method == "POST":
 
-        # Vehicle Details
+        # BASIC
         vehicle.vehicle_number = request.POST.get("vehicle_number")
         vehicle.driver_number = request.POST.get("driver_number")
         vehicle.owner_number = request.POST.get("owner_number")
         vehicle.source = request.POST.get("source")
 
-        # Amount Details
-        vehicle.freight_amount = request.POST.get("freight_amount") or 0
-        vehicle.advance = request.POST.get("advance") or 0
-        vehicle.brokerage = request.POST.get("brokerage") or 0
-        vehicle.loading_unloading = request.POST.get("loading_unloading") or 0
+        # MONEY
+        from decimal import Decimal
+        vehicle.freight_amount = Decimal(request.POST.get("freight_amount") or 0)
+        vehicle.advance = Decimal(request.POST.get("advance") or 0)
+        vehicle.brokerage = Decimal(request.POST.get("brokerage") or 0)
+        vehicle.loading_unloading = Decimal(request.POST.get("loading_unloading") or 0)
 
-        # Payment Details
+        # PAYMENT
         vehicle.upi_number = request.POST.get("upi_number")
         vehicle.upi_app = request.POST.get("upi_app")
-        vehicle.account_name = request.POST.get("account_name")
+        vehicle.beneficiary_name = request.POST.get("beneficiary_name")
         vehicle.account_number = request.POST.get("account_number")
         vehicle.ifsc = request.POST.get("ifsc")
         vehicle.ac_type = request.POST.get("ac_type")
 
-       
-        # Reassign Date Update in Order
+        # DATE FIX
+        from django.utils.dateparse import parse_datetime
         vehicle_date = request.POST.get("vehicle_reassign_date")
 
         if vehicle_date:
-            vehicle_date.vehicle_reassign_date = parse_datetime(vehicle_date)
+            vehicle.vehicle_reassign_date = parse_datetime(vehicle_date)
         else:
-            vehicle_date.vehicle_reassign_date = None
+            vehicle.vehicle_reassign_date = None
 
-         # Save Vehicle
         vehicle.save()
-
 
         messages.success(request, "Vehicle updated successfully.")
         return redirect('all_assigned_vehicles')
