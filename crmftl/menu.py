@@ -2,7 +2,7 @@ ROLE_MENUS = {
 
     'superadmin': ['dashboard', 'enquiry', 'orders', 'vehicles', 'accounts','vehicle_accounts','accounts_customer','accounts_bank'],
 
-    'admin': ['dashboard', 'enquiry', 'orders', 'vehicles'],
+    'admin': ['dashboard', 'enquiry', 'orders', 'vehicles','orders_manual'],
 
     'fleet': ['dashboard', 'vehicles','accounts', 'vehicle_accounts'],
 
@@ -10,5 +10,5 @@ ROLE_MENUS = {
 
     'sales': ['dashboard', 'enquiry', 'orders', 'orders_manual'],
 
-    'accounts': ['dashboard', 'orders', 'accounts','vehicle_accounts','accounts_customer','accounts_bank'],
+    'accounts': ['dashboard', 'orders', 'accounts','vehicle_accounts','accounts_customer','accounts_bank','orders_manual'],
 }

@@ -206,8 +206,9 @@
         <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
             {% if 'orders_manual' in role_perms %}
             <a href="{% url 'manual_order_create' %}">Manual</a>
-            {% endif %}
             <a href="{% url 'order_list' %}">List</a>
+            {% endif %}
+
         </div>
 
         {% endif %}
