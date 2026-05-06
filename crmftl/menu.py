@@ -10,5 +10,5 @@ ROLE_MENUS = {
 
     'sales': ['dashboard', 'enquiry', 'orders'],
 
-    'accounts': ['dashboard', 'orders', 'accounts'],
+    'accounts': ['dashboard', 'orders', 'accounts','vehicle_accounts','accounts_customer','accounts_bank'],
 }
