@@ -8,7 +8,7 @@ ROLE_MENUS = {
 
     'support': ['dashboard', 'enquiry', 'orders'],
 
-    'sales': ['dashboard', 'enquiry', 'orders'],
+    'sales': ['dashboard', 'enquiry', 'orders', 'orders_manual'],
 
     'accounts': ['dashboard', 'orders', 'accounts','vehicle_accounts','accounts_customer','accounts_bank'],
 }
