@@ -6,7 +6,7 @@ ROLE_MENUS = {
 
     'fleet': ['dashboard', 'vehicles','accounts', 'vehicle_accounts'],
 
-    'support': ['dashboard', 'enquiry', 'orders'],
+    'support': ['dashboard', 'enquiry', 'orders','orders_manual'],
 
     'sales': ['dashboard', 'enquiry', 'orders', 'orders_manual'],
 
