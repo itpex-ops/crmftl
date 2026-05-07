@@ -44,6 +44,65 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from .models import Tracking, TrackingDocument
 
+# vehicles/views.py
+
+from django.shortcuts import render
+from django.db.models import Count, Sum
+
+from .models import Vehicle, Tracking
+
+
+def vehicles_dashboard(request):
+
+    total_vehicles = Vehicle.objects.count()
+
+    direct_vehicles = Vehicle.objects.filter(
+        source='direct'
+    ).count()
+
+    broker_vehicles = Vehicle.objects.filter(
+        source='brokers'
+    ).count()
+
+    transporter_vehicles = Vehicle.objects.filter(
+        source='transporters'
+    ).count()
+
+    settled_vehicles = Tracking.objects.filter(
+        settled=True
+    ).count()
+
+    pending_vehicles = Tracking.objects.filter(
+        settled=False
+    ).count()
+
+    total_freight = Vehicle.objects.aggregate(
+        total=Sum('total_freight')
+    )['total'] or 0
+
+    recent_vehicles = Vehicle.objects.order_by('-created_at')[:10]
+
+    source_stats = (
+        Vehicle.objects
+        .values('source')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+
+    context = {
+        'total_vehicles': total_vehicles,
+        'direct_vehicles': direct_vehicles,
+        'broker_vehicles': broker_vehicles,
+        'transporter_vehicles': transporter_vehicles,
+        'settled_vehicles': settled_vehicles,
+        'pending_vehicles': pending_vehicles,
+        'total_freight': total_freight,
+        'recent_vehicles': recent_vehicles,
+        'source_stats': source_stats,
+    }
+
+    return render(request, 'dashboards/vehicles_dashboard.html', context)
+
 @require_POST
 def upload_tracking_docs(request, id):
     tracking = get_object_or_404(Tracking, id=id)

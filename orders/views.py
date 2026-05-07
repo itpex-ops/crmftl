@@ -33,60 +33,163 @@ from django.shortcuts import get_object_or_404, redirect, render
 from enquiries.models import Enquiry
 from .models import Order
 
+# orders/views.py
+
+from django.shortcuts import render
+from django.db.models import Count, Sum
+from django.utils import timezone
+from datetime import timedelta
+
+from .models import Order
+from vehicles.models import Tracking
+from datetime import datetime
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+
+from enquiries.models import Enquiry
+from .models import Order
+
+
+# =====================================================
+# HELPERS
+# =====================================================
+
+def to_float(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def parse_datetime(value):
+    try:
+        return datetime.strptime(value.strip(), "%Y-%m-%d %H:%M")
+    except:
+        return None
+
+
+def parse_date(value):
+    try:
+        return datetime.strptime(value.strip(), "%Y-%m-%d").date()
+    except:
+        return None
+
+
+# =====================================================
+# COMMON SAVE FUNCTION
+# =====================================================
+
+def save_order_data(order, request):
+
+    # =================================================
+    # DATES
+    # =================================================
+
+    order.vehicle_place_date = parse_datetime(
+        request.POST.get("vehicle_place_date", "")
+    )
+
+    order.credit_date = parse_date(
+        request.POST.get("credit_date", "")
+    )
+
+    order.due_date = parse_date(
+        request.POST.get("due_date", "")
+    )
+
+    # =================================================
+    # PRICING
+    # =================================================
+
+    order.finalized_rate = to_float(
+        request.POST.get("finalized_rate")
+    )
+
+    order.loading_charges = to_float(
+        request.POST.get("loading_charges")
+    )
+
+    order.halting_charges = to_float(
+        request.POST.get("halting_charges")
+    )
+
+    order.gst_percent = to_float(
+        request.POST.get("gst_percent")
+    )
+
+    order.total_rate = to_float(
+        request.POST.get("total_rate")
+    )
+
+    # =================================================
+    # PAYMENT
+    # =================================================
+
+    order.payment_terms = request.POST.get(
+        "payment_terms", ""
+    )
+
+    order.advance = to_float(
+        request.POST.get("advance")
+    )
+
+    order.balance = to_float(
+        request.POST.get("balance")
+    )
+
+    order.topay = to_float(
+        request.POST.get("topay")
+    )
+
+    order.credit = to_float(
+        request.POST.get("credit")
+    )
+
+    order.credit_days = int(
+        request.POST.get("credit_days") or 0
+    )
+
+    # =================================================
+    # SAVE
+    # =================================================
+
+    order.save()
+
+    return order
+
+
+# =====================================================
+# CREATE / UPDATE ORDER
+# =====================================================
 
 @login_required
 def pricing_page(request, enquiry_id):
-    """
-    SINGLE CLEAN PAGE
 
-    If order exists  -> update order
-    If not exists    -> create order
+    enquiry = get_object_or_404(
+        Enquiry,
+        id=enquiry_id
+    )
 
-    Same template for create/update.
-    After save -> enquiry_list
-    """
-
-    enquiry = get_object_or_404(Enquiry, id=enquiry_id)
-
-    # Existing order or None
-    order = Order.objects.filter(enquiry=enquiry).first()
+    order = Order.objects.filter(
+        enquiry=enquiry
+    ).first()
 
     approval_rate = enquiry.approval_rate or 0
 
+    # =================================================
+    # SAVE
+    # =================================================
+
     if request.method == "POST":
 
-        # ---------------------------------
-        # VEHICLE DATE
-        # ---------------------------------
-        raw_date = request.POST.get("vehicle_place_date", "").strip()
-
-        vehicle_date = None
-        if raw_date:
-            try:
-                vehicle_date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M")
-            except:
-                vehicle_date = None
-        
-        credit_date = request.POST.get("credit_date", "").strip()
-        c_date = None
-        if credit_date:
-            try:
-                c_date = datetime.strptime(credit_date, "%Y-%m-%d %H:%M")
-            except:
-                c_date = None
-        
-        due_date = request.POST.get("due_date", "").strip()
-        d_date = None
-        if due_date:
-            try:
-                d_date = datetime.strptime(due_date, "%Y-%m-%d %H:%M")
-            except:
-                d_date = None
-
-        # ---------------------------------
+        # =============================================
         # CREATE ORDER FIRST TIME
-        # ---------------------------------
+        # =============================================
+
         if not order:
+
             order = Order(
                 enquiry=enquiry,
                 customer_name=enquiry.customer_name,
@@ -96,85 +199,84 @@ def pricing_page(request, enquiry_id):
                 created_by=request.user
             )
 
-        # ---------------------------------
-        # COMMON SAVE DATA
-        # ---------------------------------
-        order.vehicle_place_date = vehicle_date
-        order.credit_date = c_date
-        order.due_date = d_date
+        # =============================================
+        # SAVE COMMON DATA
+        # =============================================
 
-        # Pricing
-        order.finalized_rate = request.POST.get("finalized_rate") or 0
-        order.loading_charges = request.POST.get("loading_charges") or 0
-        order.halting_charges = request.POST.get("halting_charges") or 0
-        order.gst_percent = request.POST.get("gst_percent") or 0
-        order.total_rate = request.POST.get("total_rate") or 0
+        save_order_data(order, request)
 
-        # Payment
-        order.payment_terms = request.POST.get("payment_terms") or ""
-        order.advance = request.POST.get("advance") or 0
-        order.balance = request.POST.get("balance") or 0
-        order.topay = request.POST.get("topay") or 0
-        order.credit = request.POST.get("credit") or 0
-        order.credit_days = request.POST.get("credit_days") or 0
-        
-        
-        order.save()
+        # =============================================
+        # MARK ENQUIRY CONVERTED
+        # =============================================
 
-        # mark converted
         enquiry.is_converted_to_order = True
         enquiry.save()
 
-        if order:
-            messages.success(request, f"Order {order.order_no} saved successfully!")
+        messages.success(
+            request,
+            f"Order {order.order_no} saved successfully!"
+        )
 
         return redirect("enquiry_list")
 
-    # ----------------------------
-    # OPEN PAGE
-    # ----------------------------
+    # =================================================
+    # PAGE LOAD
+    # =================================================
+
     context = {
         "order": order,
         "enquiry": enquiry,
         "approval_rate": approval_rate,
     }
 
-    return render(request, "orders/order_detail.html", context)
+    return render(
+        request,
+        "orders/order_detail.html",
+        context
+    )
 
+
+# =====================================================
+# ORDER DETAIL / UPDATE
+# =====================================================
 
 @login_required
 def order_detail(request, id):
 
-    order = get_object_or_404(Order, id=id)
+    order = get_object_or_404(
+        Order,
+        id=id
+    )
+
     enquiry = getattr(order, "enquiry", None)
 
-    approval_rate = enquiry.approval_rate if enquiry and enquiry.approval_rate else 0
+    approval_rate = (
+        enquiry.approval_rate
+        if enquiry and enquiry.approval_rate
+        else 0
+    )
+
+    # =================================================
+    # UPDATE
+    # =================================================
 
     if request.method == "POST":
 
-        vehicle_date = request.POST.get("vehicle_place_date")
+        save_order_data(order, request)
 
-        # DATE
-        order.vehicle_place_date = vehicle_date if vehicle_date else None
+        messages.success(
+            request,
+            "Order updated successfully!"
+        )
 
-        # PRICING
-        order.finalized_rate = request.POST.get("finalized_rate") or 0
-        order.loading_charges = request.POST.get("loading_charges") or 0
-        order.halting_charges = request.POST.get("halting_charges") or 0
-        order.gst_percent = request.POST.get("gst_percent") or 0
-        order.total_rate = request.POST.get("total_rate") or 0
+        return redirect(
+            "order_detail",
+            id=order.id
+        )
 
-        # PAYMENT
-        order.payment_terms = request.POST.get("payment_terms")
-        order.advance = request.POST.get("advance") or 0
-        order.balance = request.POST.get("balance") or 0
-        order.topay = request.POST.get("topay") or 0
-        order.credit = request.POST.get("credit") or 0
-
-        order.save()
-
-        messages.success(request, "Order updated successfully!")
-        return redirect("order_detail", id=order.id)
+    # =================================================
+    # PAGE LOAD
+    # =================================================
 
     context = {
         "order": order,
@@ -182,8 +284,11 @@ def order_detail(request, id):
         "approval_rate": approval_rate,
     }
 
-    return render(request, "orders/order_detail.html", context)
-
+    return render(
+        request,
+        "orders/order_detail.html",
+        context
+    )
 #@user_passes_test(is_sales)
 @login_required
 def convert_to_order1(request, enquiry_id):
@@ -273,11 +378,6 @@ def order_list(request):
         "total_revenue": int(total_revenue),
     })
 
-def to_float(value):
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return 0.0
 
 @login_required
 def assign_vehicle(request, order_id):

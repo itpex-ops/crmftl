@@ -11,6 +11,52 @@ from vehicles.models import Vehicle
 from enquiries.models import Enquiry
 from datetime import timedelta
 from django.contrib import messages
+from .models import (
+    CustomerTransaction,
+    VehicleTransaction,
+    BankTransaction,
+    LedgerEntry
+)
+
+def accounts_dashboard(request):
+
+    customer_total = CustomerTransaction.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    vehicle_expense = VehicleTransaction.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    bank_credit = BankTransaction.objects.filter(
+        txn_type='credit'
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    bank_debit = BankTransaction.objects.filter(
+        txn_type='debit'
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    ledger_credit = LedgerEntry.objects.aggregate(
+        total=Sum('credit')
+    )['total'] or 0
+
+    ledger_debit = LedgerEntry.objects.aggregate(
+        total=Sum('debit')
+    )['total'] or 0
+
+    recent_bank_txns = BankTransaction.objects.order_by('-date')[:10]
+
+    context = {
+        'customer_total': customer_total,
+        'vehicle_expense': vehicle_expense,
+        'bank_credit': bank_credit,
+        'bank_debit': bank_debit,
+        'ledger_credit': ledger_credit,
+        'ledger_debit': ledger_debit,
+        'recent_bank_txns': recent_bank_txns,
+    }
+
+    return render(request, 'dashboards/accounts_dashboard.html', context)
 
 def pay_vehicle_balance(request, vehicle_id):
 

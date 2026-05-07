@@ -7,6 +7,50 @@ from .models import (
     ManualOrder, Customer, Pricing, Payment
 )
 
+# manual_order/views.py
+
+from django.shortcuts import render
+from django.db.models import Count, Sum
+from django.utils import timezone
+
+from .models import ManualOrder, Payment
+
+
+def manual_orders_dashboard(request):
+
+    total_orders = ManualOrder.objects.count()
+
+    total_amount = ManualOrder.objects.aggregate(
+        total=Sum('expected_rate')
+    )['total'] or 0
+
+    payment_pending = Payment.objects.filter(
+        payment_status='pending'
+    ).count()
+
+    payment_paid = Payment.objects.filter(
+        payment_status='paid'
+    ).count()
+
+    vehicle_stats = (
+        ManualOrder.objects
+        .values('vehicle_type')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+
+    recent_orders = ManualOrder.objects.order_by('-created_at')[:10]
+
+    context = {
+        'total_orders': total_orders,
+        'total_amount': total_amount,
+        'payment_pending': payment_pending,
+        'payment_paid': payment_paid,
+        'vehicle_stats': vehicle_stats,
+        'recent_orders': recent_orders,
+    }
+
+    return render(request, 'dashboards/manual_dashboard.html', context)
 # 🔢 CUSTOMER CODE GENERATOR
 def generate_customer_code():
     last = Customer.objects.order_by("-id").first()

@@ -6,7 +6,8 @@ urlpatterns = [
     path('create/', create_enquiry, name='create_enquiry'),
     path('list/', enquiry_list, name='enquiry_list'),
     path('update-pitch/<int:id>/', update_pitch, name='update_pitch'),
-    path("update-status/<int:id>/<str:action>/", views.update_enquiry_status, name="update_enquiry_status"),
+    path("update-status/<int:id>/<str:action>/", views.update_enquiry_status, name="update_enquiry_status"), 
+    #path('dashboard/',views.enquiry_dashboard,name='enquiry_dashboard'),
 ]
 
 websocket_urlpatterns = [

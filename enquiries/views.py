@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import Enquiry,Notification ,VEHICLE_TYPES
 from orders.models import Order
 from django.http import JsonResponse, HttpResponseForbidden
+from django.utils import timezone
 import json
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -96,7 +97,6 @@ def create_enquiry(request):
     return render(request, "enquiry/create.html", 
         { "vehicle_types": vehicle_types}
     )
-    
 
 @login_required
 def enquiry_list(request):
