@@ -114,7 +114,7 @@
 
                                     <td class="text-end">
 
-                                        {% if e.status != 'confirmed' and is_admin %}
+                                        {% if e.status != 'confirmed' %}
                                         <div class="d-flex gap-2 justify-content-end">
                                             <button type="button" class="icon-btn text-info open-pitch-modal"
                                                 data-id="{{ e.id }}" data-p1="{{ e.pitch1|default:'' }}"
@@ -129,7 +129,7 @@
                                         </div>
                                         {% endif %}
 
-                                        {% if e.status != 'confirmed' and is_sales %}
+                                        {% if e.status != 'confirmed' %}
                                         <div class="d-flex gap-2 justify-content-end">
                                             <button type="button" class="icon-btn text-success action-btn"
                                                 data-id="{{ e.id }}" data-action="confirm">✔️</button>
