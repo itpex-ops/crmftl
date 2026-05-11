@@ -106,7 +106,7 @@
                                     <td>
                                         <span class="status-pill 
                                 {% if e.status == 'confirmed' %}success
-                                {% elif 'pending' in e.status %}warning
+                                {% elif 'waiting for rate approval' in e.status %}warning
                                 {% else %}danger{% endif %}">
                                             <span class="dot"></span>{{ e.status|capfirst }}
                                         </span>
@@ -114,7 +114,7 @@
 
                                     <td class="text-end">
 
-                                        {% if is_admin %}
+                                        {% if e.status != 'confirmed' and is_admin %}
                                         <div class="d-flex gap-2 justify-content-end">
                                             <button type="button" class="icon-btn text-info open-pitch-modal"
                                                 data-id="{{ e.id }}" data-p1="{{ e.pitch1|default:'' }}"
@@ -131,7 +131,6 @@
 
                                         {% if e.status != 'confirmed' and is_sales %}
                                         <div class="d-flex gap-2 justify-content-end">
-
                                             <button type="button" class="icon-btn text-success action-btn"
                                                 data-id="{{ e.id }}" data-action="confirm">✔️</button>
 
@@ -177,6 +176,7 @@
                                             </div>
 
                                         </div>
+
                                         {% endif %}
 
                                     </td>
@@ -212,15 +212,17 @@
 
                                 <div class="d-flex gap-2">
                                     {% if is_admin %}
-                                    <button type="submit" name="is_approved" value="true"
-                                        class="btn btn-success btn-sm">
-                                        Approve & Confirm
-                                    </button>
-                                    {% endif %}
-
                                     <button type="submit" name="is_approved" value="false"
+                                        class="btn btn-success btn-sm">
+                                        Continue
+                                    </button>
+
+                                    OR
+
+                                    {% endif %}
+                                    <button type="submit" name="is_approved" value="true"
                                         class="btn btn-primary btn-sm">
-                                        Save & Continue
+                                        Approve
                                     </button>
                                 </div>
 
@@ -229,10 +231,7 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
-
             <!-- 🔷 JS -->
             <script>
                 document.querySelectorAll(".open-pitch-modal").forEach(btn => {
@@ -269,9 +268,9 @@
             `;
                         }
 
-                        html += row("Pitch 1", p1, p1r, status === "pending_pitch2");
-                        html += row("Pitch 2", p2, p2r, status === "pending_pitch3");
-                        html += row("Pitch 3", p3, p3r, false);
+                        html += row("Pitch 1", p1, p1r, status === "pending_pitch1");
+                        html += row("Pitch 2", p2, p2r, status === "pending_pitch2");
+                        html += row("Pitch 3", p3, p3r, status === "confirmed");
 
                         if (!html) {
                             html = "<small class='text-muted'>No previous pitches</small>";

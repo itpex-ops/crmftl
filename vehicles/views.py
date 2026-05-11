@@ -51,7 +51,6 @@ from django.db.models import Count, Sum
 
 from .models import Vehicle, Tracking
 
-
 def vehicles_dashboard(request):
 
     total_vehicles = Vehicle.objects.count()
@@ -338,10 +337,11 @@ def edit_vehicle(request, vehicle_id):
 
         # DATE FIX
         from django.utils.dateparse import parse_datetime
-        vehicle_date = request.POST.get("vehicle_reassign_date")
+        vehicle_reassign_date = request.POST.get("vehicle_reassign_date")
 
-        if vehicle_date:
-            vehicle.vehicle_reassign_date = parse_datetime(vehicle_date)
+        if vehicle_reassign_date:
+            vehicle.vehicle_reassign_date = parse_datetime(vehicle_reassign_date)
+            print("vehicle_reassign_date",vehicle_reassign_date)
         else:
             vehicle.vehicle_reassign_date = None
 

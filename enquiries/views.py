@@ -8,6 +8,8 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 import json
 from django.contrib.auth import get_user_model
+from decimal import Decimal
+
 User = get_user_model()
 
 @login_required
@@ -74,9 +76,7 @@ def create_enquiry(request):
             breadth=float(breadth) if breadth else None,
             height=float(height) if height else None,
             expected_rate=float(expected_rate) if expected_rate else None,
-
-            status='pending',  # ✅ FIXED
-
+            status='waiting for rate approval',
             routes=routes,
             created_by=request.user
         )
@@ -102,7 +102,7 @@ def create_enquiry(request):
 def enquiry_list(request):
     user = request.user
 
-    is_admin = user.role == 'admin'
+    is_admin = user.role == 'superadmin'
     is_sales = user.role == 'sales'
 
     # ✅ Admin sees all
@@ -183,65 +183,78 @@ def update_enquiry_status(request, id, action):
 
 @login_required
 def update_pitch(request, id):
-
     if request.method != "POST":
-        return JsonResponse({"success": False, "msg": "Invalid request method"})
-
+        return JsonResponse({
+            "success": False,
+            "msg": "Invalid request method"
+        })
     enquiry = get_object_or_404(Enquiry, id=id)
-
-    # 🚫 BLOCK if already confirmed
     if enquiry.status == "confirmed":
-        return HttpResponseForbidden("Already confirmed. Cannot modify.")
+        return HttpResponseForbidden(
+            "Already confirmed. Cannot modify."
+        )
 
-    remarks = request.POST.get("remarks") or ""
+    remarks = request.POST.get("remarks", "").strip()
     pitch_rate = request.POST.get("pitch_rate")
     is_approved = request.POST.get("is_approved") == "true"
 
-    # ✅ Admin / Manager check
+    if not pitch_rate:
+        return JsonResponse({
+            "success": False,
+            "msg": "Pitch rate required"
+        })
+
+    try:
+        pitch_rate = Decimal(pitch_rate)
+    except:
+        return JsonResponse({
+            "success": False,
+            "msg": "Invalid rate"
+        })
+
+    # Admin / Manager permission
     can_approve = (
-        request.user.role == "admin" or
         request.user.is_superuser or
+        getattr(request.user, "role", "") == "admin" or
         request.user.groups.filter(name="Managers").exists()
     )
 
-    status = (enquiry.status or "").lower()
+    current_status = (enquiry.status or "").lower()
 
-    # ================= ADMIN CONFIRM (ANY STAGE) =================
+    # ---------------- APPROVE ----------------
     if is_approved:
         if not can_approve:
             return HttpResponseForbidden("Only admin/manager can approve")
-
         enquiry.status = "confirmed"
         enquiry.approval_rate = pitch_rate
-
         enquiry.save()
-
-        # 👉 DO NOT create order here (pricing page will handle)
         return redirect("enquiry_list")
 
-    # ================= SALES PITCH FLOW =================
-    if status in ["pending_pitch1", "waiting for rate approval", ""]:
+    if current_status in ["", "waiting for rate approval"]:
         enquiry.pitch1 = pitch_rate
-        enquiry.approval_rate = pitch_rate
         enquiry.pitch1_remarks = remarks
+        enquiry.approval_rate = pitch_rate
+        enquiry.status = "pending_pitch1"
+
+    elif current_status == "pending_pitch1":
+
+        enquiry.pitch2 = pitch_rate
+        enquiry.pitch2_remarks = remarks
+        enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch2"
 
-    elif status == "pending_pitch2":
-        enquiry.pitch2 = pitch_rate
+    elif current_status == "pending_pitch2":
+
+        enquiry.pitch3 = pitch_rate
+        enquiry.pitch3_remarks = remarks
         enquiry.approval_rate = pitch_rate
-        enquiry.pitch2_remarks = remarks
         enquiry.status = "pending_pitch3"
 
-    elif status == "pending_pitch3":
-        enquiry.pitch3 = pitch_rate
-        enquiry.approval_rate = pitch_rate
-        enquiry.pitch3_remarks = remarks
-
-        # ✅ No auto confirm
-        enquiry.status = "pending_pitch3"  # stay here until admin acts
-
     else:
-        enquiry.status = "pending_pitch1"
+        return JsonResponse({
+            "success": False,
+            "msg": "Maximum pitch attempts completed"
+        })
 
     enquiry.save()
 

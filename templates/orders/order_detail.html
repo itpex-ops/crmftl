@@ -18,12 +18,8 @@
                     🚚 Vehicle Date
                 </label>
 
-                <input type="text"
-                       id="vehicle_date"
-                       name="vehicle_place_date"
-                       class="form-control"
-                       style="width:220px;"
-                       value="{{ order.vehicle_place_date|date:'Y-m-d H:i'|default_if_none:'' }}">
+                <input type="text" id="vehicle_date" name="vehicle_place_date" class="form-control" style="width:220px;"
+                    value="{{ order.vehicle_place_date|date:'Y-m-d H:i'|default_if_none:'' }}">
             </div>
 
         </div>
@@ -46,56 +42,40 @@
                         <!-- Final Rate -->
                         <label class="form-label">Final Rate</label>
 
-                        <input type="text"
-                               name="finalized_rate"
-                               id="final_rate"
-                               class="form-control mb-2"
-                               value="{{ order.finalized_rate|default_if_none:approval_rate|default:approval_rate }}">
+                        <input type="text" name="finalized_rate" id="final_rate" class="form-control mb-2"
+                            value="{{ order.finalized_rate|default_if_none:approval_rate|default:approval_rate }}">
 
                         <!-- Loading -->
                         <label class="form-label">
-                            Loading Charges
+                            Loading / Unloading Charges
                         </label>
 
-                        <input type="text"
-                               name="loading_charges"
-                               id="loading_unloading"
-                               class="form-control mb-2"
-                               value="{{ order.loading_charges|default_if_none:'' }}">
+                        <input type="text" name="loading_charges" id="loading_unloading" class="form-control mb-2"
+                            value="{{ order.loading_charges|default_if_none:'' }}">
 
                         <!-- Halting -->
                         <label class="form-label">
                             Halting Charges
                         </label>
 
-                        <input type="text"
-                               name="halting_charges"
-                               id="halting_charges"
-                               class="form-control mb-2"
-                               value="{{ order.halting_charges|default_if_none:'' }}">
+                        <input type="text" name="halting_charges" id="halting_charges" class="form-control mb-2"
+                            value="{{ order.halting_charges|default_if_none:'' }}">
 
                         <!-- GST -->
                         <label class="form-label">
                             GST %
                         </label>
 
-                        <input type="text"
-                               name="gst_percent"
-                               id="gst_percent"
-                               class="form-control mb-2"
-                               value="{{ order.gst_percent|default_if_none:'' }}">
+                        <input type="text" name="gst_percent" id="gst_percent" class="form-control mb-2"
+                            value="{{ order.gst_percent|default_if_none:'' }}">
 
                         <!-- Total -->
                         <label class="form-label">
                             Total Amount
                         </label>
 
-                        <input type="text"
-                               name="total_rate"
-                               id="total_rate"
-                               readonly
-                               class="form-control bg-light"
-                               value="{{ order.total_rate|default_if_none:'' }}">
+                        <input type="text" name="total_rate" id="total_rate" readonly class="form-control bg-light"
+                            value="{{ order.total_rate|default_if_none:'' }}">
 
                     </div>
 
@@ -123,37 +103,24 @@
                             Payment Type
                         </label>
 
-                        <select name="payment_terms"
-                                id="payment_terms"
-                                class="form-select mb-3">
+                        <select name="payment_terms" id="payment_terms" class="form-select mb-3">
 
                             <option value="">Select</option>
 
-                            <option value="advance_balance"
-                                {% if order.payment_terms == "advance_balance" %}
-                                    selected
-                                {% endif %}>
+                            <option value="advance_balance" {% if order.payment_terms=="advance_balance" %} selected {%
+                                endif %}>
                                 Advance + Balance
                             </option>
 
-                            <option value="topay"
-                                {% if order.payment_terms == "topay" %}
-                                    selected
-                                {% endif %}>
+                            <option value="topay" {% if order.payment_terms=="topay" %} selected {% endif %}>
                                 To Pay
                             </option>
 
-                            <option value="full"
-                                {% if order.payment_terms == "full" %}
-                                    selected
-                                {% endif %}>
+                            <option value="full" {% if order.payment_terms=="full" %} selected {% endif %}>
                                 Full Payment
                             </option>
 
-                            <option value="credit"
-                                {% if order.payment_terms == "credit" %}
-                                    selected
-                                {% endif %}>
+                            <option value="credit" {% if order.payment_terms=="credit" %} selected {% endif %}>
                                 Credit
                             </option>
 
@@ -166,11 +133,8 @@
                                 Advance
                             </label>
 
-                            <input type="text"
-                                   id="advance"
-                                   name="advance"
-                                   class="form-control mb-2"
-                                   value="{{ order.advance|default_if_none:'' }}">
+                            <input type="text" id="advance" name="advance" class="form-control mb-2"
+                                value="{{ order.advance|default_if_none:'' }}">
 
                         </div>
 
@@ -181,11 +145,8 @@
                                 Balance
                             </label>
 
-                            <input type="text"
-                                   id="balance"
-                                   name="balance"
-                                   class="form-control mb-2"
-                                   value="{{ order.balance|default_if_none:'' }}">
+                            <input type="text" id="balance" name="balance" class="form-control mb-2"
+                                value="{{ order.balance|default_if_none:'' }}">
 
                         </div>
 
@@ -196,11 +157,8 @@
                                 Topay Amount
                             </label>
 
-                            <input type="text"
-                                   id="topay"
-                                   name="topay"
-                                   class="form-control mb-2"
-                                   value="{{ order.topay|default_if_none:'' }}">
+                            <input type="text" id="topay" name="topay" class="form-control mb-2"
+                                value="{{ order.topay|default_if_none:'' }}">
 
                         </div>
 
@@ -211,47 +169,34 @@
                                 Credit Amount
                             </label>
 
-                            <input type="text"
-                                   id="credit"
-                                   name="credit"
-                                   class="form-control mb-2"
-                                   value="{{ order.credit|default_if_none:'' }}">
+                            <input type="text" id="credit" name="credit" class="form-control mb-2"
+                                value="{{ order.credit|default_if_none:'' }}">
 
                             <label class="form-label">
                                 Credit Start Date
                             </label>
 
-                            <input type="text"
-                                   id="credit_date"
-                                   name="credit_date"
-                                   class="form-control mb-2"
-                                   value="{{ order.credit_date|date:'Y-m-d'|default_if_none:'' }}">
+                            <input type="text" id="credit_date" name="credit_date" class="form-control mb-2"
+                                value="{{ order.credit_date|date:'Y-m-d'|default_if_none:'' }}">
 
                             <label class="form-label">
                                 No. of Days
                             </label>
 
-                            <input type="text"
-                                   id="credit_days"
-                                   name="credit_days"
-                                   class="form-control mb-2"
-                                   value="{{ order.credit_days|default_if_none:'' }}">
+                            <input type="text" id="credit_days" name="credit_days" class="form-control mb-2"
+                                value="{{ order.credit_days|default_if_none:'' }}">
 
                             <label class="form-label">
                                 Due Date
                             </label>
 
-                            <input type="text"
-                                   id="due_date"
-                                   name="due_date"
-                                   class="form-control mb-2"
-                                   value="{{ order.due_date|date:'Y-m-d'|default_if_none:'' }}">
+                            <input type="text" id="due_date" name="due_date" class="form-control mb-2"
+                                value="{{ order.due_date|date:'Y-m-d'|default_if_none:'' }}">
 
                         </div>
 
                         <!-- Message -->
-                        <div id="payment_message"
-                             class="alert alert-info mt-2 mb-0 py-2 small">
+                        <div id="payment_message" class="alert alert-info mt-2 mb-0 py-2 small">
 
                             Select payment type
 
@@ -271,13 +216,12 @@
                 <div class="card section-card p-3 text-center">
 
                     {% if order %}
-                        <span class="status-chip success mb-2">
-                            ✅ Converted
-                        </span>
+                    <span class="status-chip success mb-2">
+                        ✅ Converted
+                    </span>
                     {% endif %}
 
-                    <button type="submit"
-                            class="btn btn-success">
+                    <button type="submit" class="btn btn-success">
 
                         💾 Save Order
 
@@ -294,264 +238,261 @@
 </div>
 
 <style>
+    .header-bar {
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
+    }
 
-.header-bar{
-    border-radius:14px;
-    background:#fff;
-    box-shadow:0 4px 12px rgba(0,0,0,.05);
-}
+    .section-card {
+        border-radius: 14px;
+        border: 1px solid #eee;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .04);
+    }
 
-.section-card{
-    border-radius:14px;
-    border:1px solid #eee;
-    box-shadow:0 5px 15px rgba(0,0,0,.04);
-}
+    .section-title {
+        padding: 12px;
+        font-weight: 600;
+        border-bottom: 1px solid #eee;
+    }
 
-.section-title{
-    padding:12px;
-    font-weight:600;
-    border-bottom:1px solid #eee;
-}
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+    }
 
-.form-control,
-.form-select{
-    border-radius:10px;
-}
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
 
-.form-label{
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:6px;
-}
+    .status-chip {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
 
-.status-chip{
-    display:inline-block;
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:12px;
-}
-
-.status-chip.success{
-    background:#d4edda;
-    color:#155724;
-}
-
+    .status-chip.success {
+        background: #d4edda;
+        color: #155724;
+    }
 </style>
 
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function(){
+    document.addEventListener("DOMContentLoaded", function () {
 
-    flatpickr("#vehicle_date", {
-        enableTime:true,
-        dateFormat:"Y-m-d H:i"
-    });
+        flatpickr("#vehicle_date", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i"
+        });
 
-    flatpickr("#credit_date", {
-        dateFormat:"Y-m-d"
-    });
+        flatpickr("#credit_date", {
+            dateFormat: "Y-m-d"
+        });
 
-    flatpickr("#due_date", {
-        dateFormat:"Y-m-d"
-    });
+        flatpickr("#due_date", {
+            dateFormat: "Y-m-d"
+        });
 
-    const finalRate = document.getElementById("final_rate");
-    const gst = document.getElementById("gst_percent");
-    const load = document.getElementById("loading_unloading");
-    const halt = document.getElementById("halting_charges");
-    const total = document.getElementById("total_rate");
+        const finalRate = document.getElementById("final_rate");
+        const gst = document.getElementById("gst_percent");
+        const load = document.getElementById("loading_unloading");
+        const halt = document.getElementById("halting_charges");
+        const total = document.getElementById("total_rate");
 
-    const paymentType = document.getElementById("payment_terms");
+        const paymentType = document.getElementById("payment_terms");
 
-    const adv = document.getElementById("advance");
-    const bal = document.getElementById("balance");
-    const topay = document.getElementById("topay");
-    const credit = document.getElementById("credit");
+        const adv = document.getElementById("advance");
+        const bal = document.getElementById("balance");
+        const topay = document.getElementById("topay");
+        const credit = document.getElementById("credit");
 
-    const creditDate = document.getElementById("credit_date");
-    const creditDays = document.getElementById("credit_days");
-    const dueDate = document.getElementById("due_date");
+        const creditDate = document.getElementById("credit_date");
+        const creditDays = document.getElementById("credit_days");
+        const dueDate = document.getElementById("due_date");
 
-    const msg = document.getElementById("payment_message");
+        const msg = document.getElementById("payment_message");
 
-    const advBox = document.getElementById("advance_box");
-    const balBox = document.getElementById("balance_box");
-    const topayBox = document.getElementById("topay_box");
-    const creditBox = document.getElementById("credit_box");
+        const advBox = document.getElementById("advance_box");
+        const balBox = document.getElementById("balance_box");
+        const topayBox = document.getElementById("topay_box");
+        const creditBox = document.getElementById("credit_box");
 
-    function num(v){
-        return parseFloat(v) || 0;
-    }
-
-    function calcTotal(){
-
-        let b = num(finalRate.value);
-        let g = num(gst.value);
-        let l = num(load.value);
-        let h = num(halt.value);
-
-        total.value = (
-            b + (b * g / 100) + l + h
-        ).toFixed(2);
-
-        calcPayment();
-    }
-
-    function hideAll(){
-
-        advBox.style.display = "none";
-        balBox.style.display = "none";
-        topayBox.style.display = "none";
-        creditBox.style.display = "none";
-    }
-
-    function calcPayment(){
-
-        let t = num(total.value);
-        let a = num(adv.value);
-
-        let type = paymentType.value;
-
-        hideAll();
-
-        if(type === "advance_balance"){
-
-            advBox.style.display = "block";
-            balBox.style.display = "block";
-
-            bal.value = (t - a).toFixed(2);
-
-            msg.innerHTML =
-                "Advance ₹" + a.toFixed(2) +
-                " received. Balance ₹" +
-                bal.value + " pending.";
+        function num(v) {
+            return parseFloat(v) || 0;
         }
 
-        else if(type === "full"){
+        function calcTotal() {
 
-            advBox.style.display = "block";
+            let b = num(finalRate.value);
+            let g = num(gst.value);
+            let l = num(load.value);
+            let h = num(halt.value);
 
-            adv.value = t.toFixed(2);
-            bal.value = "0";
+            total.value = (
+                b + (b * g / 100) + l + h
+            ).toFixed(2);
 
-            msg.innerHTML =
-                "Full payment ₹" +
-                t.toFixed(2) +
-                " received.";
+            calcPayment();
         }
 
-        else if(type === "topay"){
+        function hideAll() {
 
-            topayBox.style.display = "block";
-
-            topay.value = t.toFixed(2);
-
-            msg.innerHTML =
-                "Receiver will pay ₹" +
-                t.toFixed(2) +
-                " at delivery.";
+            advBox.style.display = "none";
+            balBox.style.display = "none";
+            topayBox.style.display = "none";
+            creditBox.style.display = "none";
         }
 
-        else if(type === "credit"){
+        function calcPayment() {
 
-            creditBox.style.display = "block";
+            let t = num(total.value);
+            let a = num(adv.value);
 
-            credit.value = t.toFixed(2);
+            let type = paymentType.value;
 
-            msg.innerHTML =
-                "Credit amount ₹" +
-                t.toFixed(2) +
-                " pending.";
+            hideAll();
+
+            if (type === "advance_balance") {
+
+                advBox.style.display = "block";
+                balBox.style.display = "block";
+
+                bal.value = (t - a).toFixed(2);
+
+                msg.innerHTML =
+                    "Advance ₹" + a.toFixed(2) +
+                    " received. Balance ₹" +
+                    bal.value + " pending.";
+            }
+
+            else if (type === "full") {
+
+                advBox.style.display = "block";
+
+                adv.value = t.toFixed(2);
+                bal.value = "0";
+
+                msg.innerHTML =
+                    "Full payment ₹" +
+                    t.toFixed(2) +
+                    " received.";
+            }
+
+            else if (type === "topay") {
+
+                topayBox.style.display = "block";
+
+                topay.value = t.toFixed(2);
+
+                msg.innerHTML =
+                    "Receiver will pay ₹" +
+                    t.toFixed(2) +
+                    " at delivery.";
+            }
+
+            else if (type === "credit") {
+
+                creditBox.style.display = "block";
+
+                credit.value = t.toFixed(2);
+
+                msg.innerHTML =
+                    "Credit amount ₹" +
+                    t.toFixed(2) +
+                    " pending.";
+            }
+
+            else {
+
+                msg.innerHTML =
+                    "Select payment type";
+            }
         }
 
-        else{
+        function calcCredit() {
 
-            msg.innerHTML =
-                "Select payment type";
+            let start = creditDate.value;
+            let days = parseInt(creditDays.value) || 0;
+
+            if (start && days) {
+
+                let d = new Date(start);
+
+                d.setDate(
+                    d.getDate() + days
+                );
+
+                let yyyy = d.getFullYear();
+                let mm = String(
+                    d.getMonth() + 1
+                ).padStart(2, '0');
+
+                let dd = String(
+                    d.getDate()
+                ).padStart(2, '0');
+
+                dueDate.value =
+                    yyyy + "-" + mm + "-" + dd;
+
+                msg.innerHTML =
+                    "Credit ₹" +
+                    credit.value +
+                    " due on " +
+                    dueDate.value +
+                    " (" + days + " days).";
+            }
         }
-    }
 
-    function calcCredit(){
+        [finalRate, gst, load, halt].forEach(el => {
 
-        let start = creditDate.value;
-        let days = parseInt(creditDays.value) || 0;
+            if (el) {
+                el.addEventListener(
+                    "input",
+                    calcTotal
+                );
+            }
 
-        if(start && days){
+        });
 
-            let d = new Date(start);
-
-            d.setDate(
-                d.getDate() + days
+        if (paymentType) {
+            paymentType.addEventListener(
+                "change",
+                calcPayment
             );
-
-            let yyyy = d.getFullYear();
-            let mm = String(
-                d.getMonth() + 1
-            ).padStart(2,'0');
-
-            let dd = String(
-                d.getDate()
-            ).padStart(2,'0');
-
-            dueDate.value =
-                yyyy + "-" + mm + "-" + dd;
-
-            msg.innerHTML =
-                "Credit ₹" +
-                credit.value +
-                " due on " +
-                dueDate.value +
-                " (" + days + " days).";
         }
-    }
 
-    [finalRate, gst, load, halt].forEach(el => {
-
-        if(el){
-            el.addEventListener(
+        if (adv) {
+            adv.addEventListener(
                 "input",
-                calcTotal
+                calcPayment
             );
         }
 
+        if (creditDate) {
+            creditDate.addEventListener(
+                "change",
+                calcCredit
+            );
+        }
+
+        if (creditDays) {
+            creditDays.addEventListener(
+                "input",
+                calcCredit
+            );
+        }
+
+        calcTotal();
+
     });
-
-    if(paymentType){
-        paymentType.addEventListener(
-            "change",
-            calcPayment
-        );
-    }
-
-    if(adv){
-        adv.addEventListener(
-            "input",
-            calcPayment
-        );
-    }
-
-    if(creditDate){
-        creditDate.addEventListener(
-            "change",
-            calcCredit
-        );
-    }
-
-    if(creditDays){
-        creditDays.addEventListener(
-            "input",
-            calcCredit
-        );
-    }
-
-    calcTotal();
-
-});
 
 </script>
 

@@ -11,5 +11,5 @@ urlpatterns = [
     path('tracking/update-ajax/', views.update_tracking_ajax, name='update_tracking_ajax'),
     path('public_tracking/',views.public_tracking,name='public_tracking'),
     path('tracking/<int:id>/upload-docs/', views.upload_tracking_docs, name='upload_tracking_docs'),
-    path('order/api/order-status/<int:id>', views.order_status_api, name='order_status_api')
+    path('api/order-status/<int:id>', views.order_status_api, name='order_status_api')
 ]
