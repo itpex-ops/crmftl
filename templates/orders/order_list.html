@@ -86,7 +86,7 @@
              data-order="{{ order.order_no }}"
              data-status="{% if order.vehicles.count %}assigned{% else %}not_assigned{% endif %}">
 
-            <div class="card premium-card order-card 
+            <div class="card premium-card order-card 7
                 {% if order.vehicles.count %}success{% else %}danger{% endif %}">
 
                 <!-- HEADER -->
@@ -233,5 +233,6 @@ document.getElementById("filterStatus").addEventListener("change", function() {
     });
 });
 </script>
+
 
 {% endblock %}

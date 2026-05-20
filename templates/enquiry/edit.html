@@ -1,167 +1,1036 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<form method="POST" id="mainForm">
-    {% csrf_token %}
-    <div class="container-fluid mt-3">
-        <div class="card header-bar mb-3 p-3">
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-                    <h5 class="fw-bold mb-0">✏ Enquiry {{ e.enquiry_no }}</h5>
-                    <small class="text-muted">{{ e.customer_name }}</small>
-                </div>
-
-                </div>
-
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-4">
-                <!-- ✅ PRICING (after pitch approved) -->
-                {% if e.status == "confirmed" or e.approval_rate %}
-                <div id="pricing_section" class="card section-card mb-3">
-                    <div class="section-title">💰 Pricing</div>
-
-                    <div class="p-3">
-                        <input name="finalized_rate" id="final_rate" class="form-control mb-2"
-                            placeholder="Final Rate"
-                            value="{{ request.POST.finalized_rate|default:e.approval_rate|default:e.expected_rate|default:'' }}">
-
-                        <input name="loading_charges" id="loading_unloading" class="form-control mb-2"
-                            placeholder="Loading/Unloading"
-                            value="{{ request.POST.loading_charges|default:'' }}">
-
-                        <input name="halting_charges" id="halting_charges" class="form-control mb-2"
-                            placeholder="Halting Charges"
-                            value="{{ request.POST.halting_charges|default:'' }}">
-
-                        <input name="gst_percent" id="gst_percent" class="form-control mb-2"
-                            placeholder="GST %"
-                            value="{{ request.POST.gst_percent|default:'' }}">
-
-                        <input name="total_rate" id="total_rate" class="form-control bg-light"
-                            readonly placeholder="Total"
-                            value="{{ request.POST.total_rate|default:'' }}">
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- ✅ PAYMENT (only after confirmed) -->
-                {% if e.status == "confirmed" %}
-                <div class="card section-card mb-3">
-                    <div class="section-title">💳 Payment</div>
-
-                    <div class="p-3">
-                        <select name="payment_terms" id="payment_terms" class="form-select mb-2">
-                            <option value="">Select</option>
-                            <option value="advance_balance" {% if request.POST.payment_terms == "advance_balance" %}selected{% endif %}>Advance</option>
-                            <option value="topay" {% if request.POST.payment_terms == "topay" %}selected{% endif %}>Topay</option>
-                            <option value="full" {% if request.POST.payment_terms == "full" %}selected{% endif %}>Full</option>
-                        </select>
-
-                        <input id="advance" name="advance" class="form-control mb-2"
-                            placeholder="Advance"
-                            value="{{ request.POST.advance|default:'' }}">
-
-                        <input id="balance" name="balance" class="form-control mb-2"
-                            placeholder="Balance"
-                            value="{{ request.POST.balance|default:'' }}">
-
-                        <input id="topay" name="topay" class="form-control mb-2"
-                            placeholder="To Pay"
-                            value="{{ request.POST.topay|default:'' }}">
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- ✅ CONVERT (only after confirmed) -->
-                {% if e.status == "confirmed" %}
-                <div class="card section-card text-center p-3">
-                    {% if e.is_converted_to_order %}
-                        <span class="text-success">✅ Converted</span>
-                    {% else %}
-                        <button formaction="{% url 'convert_to_order' e.id %}" class="btn btn-success w-100">
-                            🚀 Convert to Order
-                        </button>
-                    {% endif %}
-                </div>
-                {% endif %}
-
-            </div>
-
-        </div>
-    </div>
-</form>
-
-<!-- 🔥 SaaS CSS -->
 <style>
-.header-bar {
-    border-radius: 14px;
-    background: #fff;
-}
-.section-card {
-    border-radius: 14px;
-    border: 1px solid #eee;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.04);
-}
-.section-title {
-    font-weight: 600;
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-.status-chip {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-.status-chip.success { background:#d4edda; color:#155724; }
-.status-chip.warning { background:#fff3cd; color:#856404; }
-.status-chip.danger { background:#f8d7da; color:#721c24; }
-.form-control, .form-select { border-radius: 10px; }
+    body {
+        background: #f5f7fb;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        border-radius: 18px;
+        padding: 22px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        color: #0f172a;
+        border-left: 4px solid #2563eb;
+        padding-left: 10px;
+    }
+
+    label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #334155;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        min-height: 44px;
+        border: 1px solid #dbe2ea;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #2563eb;
+    }
+
+    textarea.form-control {
+        min-height: 90px;
+    }
+
+    .btn-save {
+        background: #2563eb;
+        border: none;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .btn-save:hover {
+        background: #1e40af;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .route-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 12px;
+    }
 </style>
 
+<div class="container-fluid mt-3">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h4>
+                ✏ Edit Enquiry
+            </h4>
+            <div class="small">
+                {{ enquiry.enquiry_no }}
+            </div>
+        </div>
+        <div>
+            <span class="status-badge">
+                {{ enquiry.status|default:"Pending" }}
+            </span>
+        </div>
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <div class="row">
+
+            <!-- LEFT -->
+
+            <div class="col-lg-8">
+
+                <!-- CUSTOMER -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Customer Information
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Customer Name
+                            </label>
+
+                            <input type="text" name="customer_name" class="form-control"
+                                value="{{ enquiry.customer_name }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Customer Contact
+                            </label>
+
+                            <input type="text" name="customer_contact" class="form-control"
+                                value="{{ enquiry.customer_contact }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Email
+                            </label>
+
+                            <input type="email" name="email" class="form-control" value="{{ enquiry.email }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Lead Source
+                            </label>
+
+                            <input type="text" name="lead_source" class="form-control"
+                                value="{{ enquiry.lead_source }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Reference Name
+                            </label>
+
+                            <input type="text" name="reference_name" class="form-control"
+                                value="{{ enquiry.reference_name }}">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- VEHICLE -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Vehicle Information
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>
+                                Vehicle Type
+                            </label>
+
+                            <select name="vehicle_type" class="form-select vehicle-select">
+                                <option value="">Select Vehicle</option>
+                                {% for value, label in vehicle_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <link rel="stylesheet"
+                            href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+
+                        <!-- Tom Select JS -->
+                        <script
+                            src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+
+                                new TomSelect(".vehicle-select", {
+                                    create: false,
+                                    sortField: {
+                                        field: "text",
+                                        direction: "asc"
+                                    },
+                                    placeholder: "Search Vehicle Type..."
+                                });
+
+                            });
+                        </script>
+
+                        <div class="col-md-6 mb-1">
+
+                            <label>
+                                Vehicle Description
+                            </label>
+
+                            <textarea name="vehicle_description"
+                                class="form-control">{{ enquiry.vehicle_description }}</textarea>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Pickups
+                            </label>
+
+                            <input type="number" name="pickups" class="form-control" value="{{ enquiry.pickups }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Deliveries
+                            </label>
+
+                            <input type="number" name="deliveries" class="form-control"
+                                value="{{ enquiry.deliveries }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                KMS
+                            </label>
+
+                            <input type="text" name="kms" class="form-control" value="{{ enquiry.kms }}">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- MATERIAL -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Material Details
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Material
+                            </label>
+
+                            <input type="text" name="material" class="form-control" value="{{ enquiry.material }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Pieces
+                            </label>
+
+                            <input type="number" name="pieces" class="form-control" value="{{ enquiry.pieces }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Tonnage
+                            </label>
+
+                            <input type="number" step="0.01" name="tonnage" class="form-control"
+                                value="{{ enquiry.tonnage }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                KG
+                            </label>
+
+                            <input type="number" step="0.01" name="kg" class="form-control" value="{{ enquiry.kg }}">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- DIMENSION -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Dimension Details
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                Length
+                            </label>
+
+                            <input type="number" step="0.01" name="length" class="form-control"
+                                value="{{ enquiry.length }}">
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                Breadth
+                            </label>
+
+                            <input type="number" step="0.01" name="breadth" class="form-control"
+                                value="{{ enquiry.breadth }}">
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                Height
+                            </label>
+
+                            <input type="number" step="0.01" name="height" class="form-control"
+                                value="{{ enquiry.height }}">
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                Unit
+                            </label>
+
+                            <input type="text" name="dimension_unit" class="form-control"
+                                value="{{ enquiry.dimension_unit }}">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ROUTES -->
+
+                <div class="card-box">
+
+                    <div class="section-title d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Routes
+                        </span>
+
+                        <button type="button" class="btn btn-primary btn-sm" id="addRoute">
+
+                            + Add Route
+
+                        </button>
+
+                    </div>
+
+                    <div id="routeContainer">
+
+                        {% for route in enquiry.routes %}
+
+                        <div class="route-box route-row">
+
+                            <div class="row">
+
+                                <div class="col-md-5 mb-2">
+
+                                    <label>From</label>
+
+                                    <input type="text" name="origin[]" class="form-control" value="{{ route.origin }}">
+
+                                </div>
+
+                                <div class="col-md-5 mb-2">
+
+                                    <label>To</label>
+
+                                    <input type="text" name="destination[]" class="form-control"
+                                        value="{{ route.destination }}">
+
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+
+                                    <button type="button" class="btn btn-danger w-100 removeRoute">
+
+                                        Remove
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+
+                        <div class="route-box route-row">
+
+                            <div class="row">
+
+                                <div class="col-md-5 mb-2">
+
+                                    <label>From</label>
+
+                                    <input type="text" name="origin[]" class="form-control">
+
+                                </div>
+
+                                <div class="col-md-5 mb-2">
+
+                                    <label>To</label>
+
+                                    <input type="text" name="destination[]" class="form-control">
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <!-- RATE -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Pricing Details
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Expected Rate
+                            </label>
+
+                            <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                value="{{ enquiry.expected_rate }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Approval Rate
+                            </label>
+
+                            <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                value="{{ enquiry.approval_rate }}">
+
+                        </div>
+
+                        <!-- <div class="col-md-4 mb-3">
+
+                            <label>
+                                GST Bill %
+                            </label>
+
+                            <input type="number" name="gstbill" class="form-control" value="{{ enquiry.gstbill }}">
+
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <!-- RIGHT -->
+            <div class="col-lg-4">
+
+                <!-- STATUS -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Status
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+                            Status
+                        </label>
+
+                        <input type="text" name="status" class="form-control"
+                            value="{{ enquiry.status|default_if_none:'' }}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+                            Cancel Reason
+                        </label>
+
+                        <textarea name="cancel_reason"
+                            class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+
+                    </div>
+
+                </div>
+
+                <!-- PITCH -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Pitch Information
+                    </div>
+
+                    {% if is_admin %}
+
+                    <!-- ADMIN VIEW -->
+
+                    <!-- PITCH 1 -->
+
+                    <div class="mb-3">
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+
+                            <label class="mb-0">
+                                Pitch 1
+                            </label>
+
+                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
+                                data-target="pitch1">
+
+                                <i class="bi bi-pencil-square"></i>
+
+                            </button>
+
+                        </div>
+
+                        <input type="text" name="pitch1" id="pitch1" class="form-control"
+                            value="{{ enquiry.pitch1|default_if_none:'' }}" disabled>
+
+                    </div>
+
+                    <!-- PITCH 2 -->
+
+                    <div class="mb-3">
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+
+                            <label class="mb-0">
+                                Pitch 2
+                            </label>
+
+                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
+                                data-target="pitch2">
+
+                                <i class="bi bi-pencil-square"></i>
+
+                            </button>
+
+                        </div>
+
+                        <input type="text" name="pitch2" id="pitch2" class="form-control"
+                            value="{{ enquiry.pitch2|default_if_none:'' }}" disabled>
+
+                    </div>
+
+                    <!-- PITCH 3 -->
+
+                    <div class="mb-0">
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+
+                            <label class="mb-0">
+                                Pitch 3
+                            </label>
+
+                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
+                                data-target="pitch3">
+
+                                <i class="bi bi-pencil-square"></i>
+
+                            </button>
+
+                        </div>
+
+                        <input type="text" name="pitch3" id="pitch3" class="form-control"
+                            value="{{ enquiry.pitch3|default_if_none:'' }}" disabled>
+
+                    </div>
+
+                    {% else %}
+
+                    <!-- USER FLOW VIEW -->
+
+                    <div class="timeline-box">
+
+                        <!-- PITCH 1 -->
+
+                        {% if enquiry.pitch1 %}
+
+                        <div class="border rounded p-3 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong>
+                                    Pitch 1
+                                </strong>
+
+                                {% if enquiry.status == 'pending_pitch1' %}
+
+                                <span class="badge bg-warning">
+                                    Active
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="mt-2">
+                                ₹ {{ enquiry.pitch1 }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- PITCH 2 -->
+
+                        {% if enquiry.pitch2 %}
+
+                        <div class="border rounded p-3 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong>
+                                    Pitch 2
+                                </strong>
+
+                                {% if enquiry.status == 'pending_pitch2' %}
+
+                                <span class="badge bg-warning">
+                                    Active
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="mt-2">
+                                ₹ {{ enquiry.pitch2 }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- PITCH 3 -->
+
+                        {% if enquiry.pitch3 %}
+
+                        <div class="border rounded p-3 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong>
+                                    Pitch 3
+                                </strong>
+
+                                {% if enquiry.status == 'pending_pitch3' %}
+
+                                <span class="badge bg-warning">
+                                    Active
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="mt-2">
+                                ₹ {{ enquiry.pitch3 }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- APPROVAL RATE -->
+
+                        {% if enquiry.approval_rate %}
+
+                        <div class="border rounded p-3 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong>
+                                    Confirmed Rate
+                                </strong>
+
+                                {% if enquiry.status == 'confirmed' %}
+
+                                <span class="badge bg-success">
+                                    Confirmed
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-secondary">
+                                    Pending
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="mt-2">
+                                ₹ {{ enquiry.approval_rate }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- EMPTY -->
+
+                        {% if not enquiry.pitch1 and not enquiry.pitch2 and not enquiry.pitch3 and not enquiry.approval_rate %}
+
+                        <div class="text-muted small">
+                            No pitching activity available
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- INFORMATION -->
+
+                <div class="card-box">
+
+                    <div class="section-title">
+                        Information
+                    </div>
+
+                    <table class="table table-borderless align-middle mb-0">
+
+                        <tbody>
+
+                            <tr>
+
+                                <td class="fw-semibold text-muted" width="45%">
+                                    Created By
+                                </td>
+
+                                <td>
+                                    {{ enquiry.created_by|default_if_none:'' }}
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td class="fw-semibold text-muted">
+                                    Created At
+                                </td>
+
+                                <td>
+                                    {{ enquiry.created_at|date:"d M Y h:i A" }}
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td class="fw-semibold text-muted">
+                                    Converted
+                                </td>
+
+                                <td>
+
+                                    {% if enquiry.is_converted_to_order %}
+
+                                    <span class="badge bg-success">
+                                        Yes
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        No
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- BUTTONS -->
+
+                <div class="card-box">
+
+                    <div class="d-grid gap-2">
+
+                        <button type="submit" class="btn btn-primary btn-save">
+
+                            💾 Update Enquiry
+
+                        </button>
+
+                        <a href="{% url 'enquiry_list' %}" class="btn btn-light">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+
+    document
+        .getElementById('addRoute')
+        .addEventListener('click', function () {
+
+            let html = `
+
+    <div class="route-box route-row">
+
+        <div class="row">
+
+            <div class="col-md-5 mb-2">
+
+                <label>
+                    From
+                </label>
+
+                <input type="text"
+                       name="origin[]"
+                       class="form-control">
+
+            </div>
+
+            <div class="col-md-5 mb-2">
+
+                <label>
+                    To
+                </label>
+
+                <input type="text"
+                       name="destination[]"
+                       class="form-control">
+
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+
+                <button type="button"
+                        class="btn btn-danger w-100 removeRoute">
+
+                    Remove
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `
+
+            document
+                .getElementById('routeContainer')
+                .insertAdjacentHTML('beforeend', html)
+
+        })
+
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target.classList.contains('removeRoute')) {
+
+            e.target
+                .closest('.route-row')
+                .remove()
+
+        }
+
+    })
+
+</script>
+<script>
 
     document.querySelectorAll("input, textarea").forEach(el => {
-        if (el.value === "None") el.value = "";
+
+        if (el.value === "None") {
+
+            el.value = "";
+
+        }
+
     });
 
-    document.getElementById("final_rate")?.addEventListener("input", calcTotal);
-    document.getElementById("loading_unloading")?.addEventListener("input", calcTotal);
-    document.getElementById("gst_percent")?.addEventListener("input", calcTotal);
-
-    document.getElementById("payment_terms")?.addEventListener("change", calcPayment);
-    document.getElementById("advance")?.addEventListener("input", calcPayment);
-
-    calcTotal();
-});
-
-function calcTotal() {
-    let base = parseFloat(document.getElementById("final_rate")?.value) || 0;
-    let gst = parseFloat(document.getElementById("gst_percent")?.value) || 0;
-    let load = parseFloat(document.getElementById("loading_unloading")?.value) || 0;
-
-    let total = base + (base * gst / 100) + load;
-
-    document.getElementById("total_rate").value = total.toFixed(2);
-}
-
-function calcPayment() {
-    let total = parseFloat(document.getElementById("total_rate")?.value) || 0;
-    let adv = parseFloat(document.getElementById("advance")?.value) || 0;
-    let type = document.getElementById("payment_terms")?.value;
-
-    if (type === "advance_balance") {
-        document.getElementById("balance").value = (total - adv).toFixed(2);
-    } else if (type === "full") {
-        document.getElementById("advance").value = total.toFixed(2);
-        document.getElementById("balance").value = "0.00";
-    }
-}
 </script>
+<script>
 
+    document.querySelectorAll('.toggle-edit-btn').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+            const input =
+                document.getElementById(
+                    this.dataset.target
+                );
+
+            if (input.disabled) {
+
+                input.disabled = false;
+
+                input.focus();
+
+                this.innerHTML =
+                    '<i class="bi bi-lock me-1"></i> ';
+
+                this.classList.remove(
+                    'btn-outline-primary'
+                );
+
+                this.classList.add(
+                    'btn-outline-danger'
+                );
+
+            }
+            else {
+
+                input.disabled = true;
+
+                this.innerHTML =
+                    '<i class="bi bi-pencil-square me-1"></i>';
+
+                this.classList.remove(
+                    'btn-outline-danger'
+                );
+
+                this.classList.add(
+                    'btn-outline-primary'
+                );
+
+            }
+
+        });
+
+    });
+
+</script>
 {% endblock %}

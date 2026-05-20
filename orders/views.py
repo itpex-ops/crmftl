@@ -76,20 +76,13 @@ def parse_date(value):
     except:
         return None
 
-
-# =====================================================
-# COMMON SAVE FUNCTION
-# =====================================================
-
 def save_order_data(order, request):
 
     # =================================================
     # DATES
     # =================================================
 
-    order.vehicle_place_date = parse_datetime(
-        request.POST.get("vehicle_place_date", "")
-    )
+    order.vehicle_place_date = parse_datetime(request.POST.get("vehicle_place_date", ""))
 
     order.credit_date = parse_date(
         request.POST.get("credit_date", "")
@@ -159,11 +152,6 @@ def save_order_data(order, request):
 
     return order
 
-
-# =====================================================
-# CREATE / UPDATE ORDER
-# =====================================================
-
 @login_required
 def pricing_page(request, enquiry_id):
 
@@ -196,6 +184,7 @@ def pricing_page(request, enquiry_id):
                 customer_contact=enquiry.customer_contact,
                 routes=enquiry.routes,
                 vehicle_type=enquiry.vehicle_type,
+                kms = enquiry.kms,
                 created_by=request.user
             )
 
@@ -364,8 +353,9 @@ def order_list(request):
 
     total_revenue = sum(
         float(order.total_rate or 0)
-        for order in orders
-    )
+
+        for order in orders)
+    
 
     return render(request, "orders/orders.html", {
         "orders": orders,
@@ -376,6 +366,7 @@ def order_list(request):
         "delivered_count": delivered_count,
         "transit_count": transit_count,
         "total_revenue": int(total_revenue),
+        
     })
 
 
@@ -460,10 +451,7 @@ def view_order(request, order_id):
             'tracking'
         ).prefetch_related(
             'vehicles'
-        ),
-        id=order_id
-    )
-
+        ),id=order_id)
     return render(request, 'orders/view_order.html', {
         'order': order
     })

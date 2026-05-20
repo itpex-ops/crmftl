@@ -4,9 +4,94 @@
 <div class="container mt-4">
 
     <!-- HEADER -->
-    <div class="card p-3 mb-4 shadow-sm border-0 d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold mb-0">🚚 Assign Vehicle</h5>
-        <span class="order-badge">{{ order.order_no }}</span>
+    <!-- ========================= -->
+    <!-- MARGIN SUMMARY TOP BOX -->
+    <!-- ========================= -->
+
+    <div class="card shadow-sm border-0 mb-4 top-margin-card">
+
+        <div class="card-body">
+
+            <div class="row text-center align-items-center">
+
+                <!-- ASSIGN VEHICLE -->
+                <div class="col-md-2 border-end">
+                    <div class="top-title"> Assign Vehicle</div>
+
+                    <div class="top-value text-primary">
+                        Pending
+                    </div>
+                </div>
+
+                <!-- SELLING RATE -->
+                <div class="col-md-2 border-end">
+                    <div class="top-title">Selling Rate</div>
+
+                    <div class="top-value">
+                        ₹ {{ order.total_rate }}
+                    </div>
+                </div>
+
+                <!-- EXPECTED FREIGHT -->
+                <div class="col-md-2 border-end">
+
+                    <div class="top-title">
+                        Expected Freight
+                    </div>
+
+                    <div class="top-value text-warning" id="expectedFreight">
+                        ₹ 0
+                    </div>
+
+                    <small class="text-muted">
+                        Expected Margin:
+                        <span id="expectedMargin">0%</span>
+                    </small>
+
+                </div>
+
+                <!-- FINAL FREIGHT -->
+                <div class="col-md-2 border-end">
+
+                    <div class="top-title">
+                        Final Freight
+                    </div>
+
+                    <div class="top-value text-danger" id="finalFreightView">
+                        ₹ 0
+                    </div>
+
+                </div>
+
+                <!-- MARGIN -->
+                <div class="col-md-4">
+
+                    <div class="top-title">
+                        Margin Percentage
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+
+                        <span class="badge bg-danger fs-6" id="minMargin">
+                            13%
+                        </span>
+
+                        <span class="badge bg-success fs-6" id="currentMargin">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div id="marginText" class="mt-2 small fw-semibold text-muted">
+                        Waiting for freight calculation...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
     <form method="POST" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
@@ -399,161 +484,301 @@
         const balance = document.getElementById("balance");
 
         function calcFreight() {
+
             let f = parseFloat(freight.value) || 0;
             let h = parseFloat(halting.value) || 0;
             let l = parseFloat(loading.value) || 0;
             let b = parseFloat(brokerage.value) || 0;
             let a = parseFloat(advance.value) || 0;
 
+            // SELLING RATE
+            let sellingRate = parseFloat("{{ order.total_rate|default:0 }}") || 0;
+
+            // EXPECTED FREIGHT
+            let expectedFreight = sellingRate - ((sellingRate * 25) / 100);
+
+            // TOTAL FREIGHT
             let t = f + h + l + b;
+
+            // BALANCE
             let bal = t - a;
 
             total.value = t.toFixed(2);
             balance.value = bal.toFixed(2);
-        }
 
-        [freight, halting, loading, brokerage, advance].forEach(el => {
-            el.addEventListener("input", calcFreight);
-        });
+            // FINAL MARGIN
+            let marginPercent = 0;
 
-        calcFreight();
+            if (sellingRate > 0) {
 
-        /* OTP */
-        let generatedOtp = "";
-        let timer;
+                marginPercent =
+                    ((sellingRate - t) / sellingRate) * 100;
 
-        const sendBtn = document.getElementById("sendOtpBtn");
-        const verifyBtn = document.getElementById("verifyOtpBtn");
-        const otpBox = document.getElementById("otpBox");
-        const otpInput = document.getElementById("otp_input");
-        const driver = document.getElementById("driver_number");
-        const driverMsg = document.getElementById("driverMsg");
-        const verified = document.getElementById("driver_verified");
-
-        sendBtn.addEventListener("click", function () {
-
-            driver.value = driver.value.replace(/\D/g, '');
-
-            if (driver.value.length !== 10) {
-                driverMsg.innerHTML = "❌ Enter valid mobile number";
-                driverMsg.style.color = "red";
-                return;
             }
 
-            generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            // =========================
+            // TOP BOX VALUES
+            // =========================
 
-            otpBox.style.display = "block";
-            otpInput.value = "";
-            verified.value = "0";
+            document.getElementById("expectedFreight").innerHTML =
+                "₹ " + expectedFreight.toFixed(2);
 
-            let seconds = 60;
+            document.getElementById("finalFreightView").innerHTML =
+                "₹ " + t.toFixed(2);
 
-            clearInterval(timer);
+            document.getElementById("expectedMargin").innerHTML =
+                "25%";
 
-            timer = setInterval(function () {
+            document.getElementById("currentMargin").innerHTML =
+                marginPercent.toFixed(2) + "%";
 
-                seconds--;
+            const marginText =
+                document.getElementById("marginText");
 
-                driverMsg.innerHTML = "OTP sent. Expires in " + seconds + " sec";
-                driverMsg.style.color = "#0d6efd";
+            const currentMargin =
+                document.getElementById("currentMargin");
 
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    otpBox.style.display = "none";
-                    driverMsg.innerHTML = "⌛ OTP expired";
+            // =========================
+            // RULES
+            // =========================
+
+            if (marginPercent < 13) {
+
+                currentMargin.className =
+                    "badge bg-danger fs-6";
+
+                marginText.innerHTML = `
+    
+        <div class="alert alert-danger mt-2 mb-0 p-2">
+
+            <div class="fw-bold mb-1">
+                ❌ YOUR VEHICLE SOURCE RATE IS BELOW MINIMUM MARGIN
+            </div>
+
+            <div>
+                Approval authority required.
+            </div>
+
+            <div class="mt-2 small">
+                Approved By :
+                <span class="text-dark fw-bold">
+                    ____________________
+                </span>
+            </div>
+
+        </div>
+    
+    `;
+
+            }
+            else if (marginPercent >= 13 && marginPercent < 15) {
+
+                currentMargin.className =
+                    "badge bg-warning text-dark fs-6";
+
+                marginText.innerHTML = `
+    
+        <div class="alert alert-warning mt-2 mb-0 p-2">
+
+            ⚠ Margin is between 13% and 15%.
+            Please review before approval.
+
+        </div>
+    
+    `;
+
+            }
+            else {
+
+                currentMargin.className =
+                    "badge bg-success fs-6";
+
+                marginText.innerHTML = `
+    
+        <div class="alert alert-success mt-2 mb-0 p-2">
+
+            ✅ Margin is healthy.
+
+        </div>
+    
+    `;
+
+            }
+        }
+            [freight, halting, loading, brokerage, advance].forEach(el => {
+                el.addEventListener("input", calcFreight);
+            });
+
+            calcFreight();
+
+            /* OTP */
+            let generatedOtp = "";
+            let timer;
+
+            const sendBtn = document.getElementById("sendOtpBtn");
+            const verifyBtn = document.getElementById("verifyOtpBtn");
+            const otpBox = document.getElementById("otpBox");
+            const otpInput = document.getElementById("otp_input");
+            const driver = document.getElementById("driver_number");
+            const driverMsg = document.getElementById("driverMsg");
+            const verified = document.getElementById("driver_verified");
+
+            sendBtn.addEventListener("click", function () {
+
+                driver.value = driver.value.replace(/\D/g, '');
+
+                if (driver.value.length !== 10) {
+                    driverMsg.innerHTML = "❌ Enter valid mobile number";
                     driverMsg.style.color = "red";
+                    return;
                 }
 
-            }, 1000);
+                generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        });
+                otpBox.style.display = "block";
+                otpInput.value = "";
+                verified.value = "0";
 
-        verifyBtn.addEventListener("click", function () {
-
-            if (otpInput.value === generatedOtp) {
+                let seconds = 60;
 
                 clearInterval(timer);
 
-                driverMsg.innerHTML = "✅ Verified";
-                driverMsg.style.color = "green";
+                timer = setInterval(function () {
 
-                otpBox.style.display = "none";
-                sendBtn.style.display = "none";
-                driver.readOnly = true;
-                verified.value = "1";
+                    seconds--;
 
-            } else {
-                driverMsg.innerHTML = "❌ Invalid OTP";
-                driverMsg.style.color = "red";
-            }
+                    driverMsg.innerHTML = "OTP sent. Expires in " + seconds + " sec";
+                    driverMsg.style.color = "#0d6efd";
 
-        });
-
-        /* UPI */
-        const upiId = document.getElementById("upi_id");
-        const upiNo = document.getElementById("upi_number");
-
-        upiId.addEventListener("input", function () {
-            document.getElementById("upiMsg").innerHTML =
-                this.value.includes("@") ? "✅ Valid" : "❌ Invalid";
-        });
-
-        upiNo.addEventListener("input", function () {
-            this.value = this.value.replace(/\D/g, '');
-            document.getElementById("numMsg").innerHTML =
-                this.value.length === 10 ? "✅ Valid" : "❌ Enter 10 digits";
-        });
-
-        /* BANK VERIFY DEMO */
-        const verifyBankBtn = document.getElementById("verifyBankBtn");
-        const bankMsg = document.getElementById("bankMsg");
-        const bankVerified = document.getElementById("bank_verified");
-
-        verifyBankBtn.addEventListener("click", function () {
-
-            const acc = acc1.value.trim();
-            const ifsc = document.getElementById("ifsc").value.trim();
-
-            if (acc === "" || ifsc === "") {
-                bankMsg.innerHTML = "❌ Enter Account Number + IFSC";
-                bankMsg.style.color = "red";
-                return;
-            }
-
-            verifyBankBtn.disabled = true;
-            verifyBankBtn.innerHTML = "Checking...";
-
-            setTimeout(function () {
-
-                if (acc.length >= 8 && ifsc.length >= 8) {
-
-                    bankVerified.value = "1";
-
-                    if (document.getElementById("account_beneficiary_name").value === "") {
-                        document.getElementById("account_beneficiary_name").value = "Verified Beneficiary";
+                    if (seconds <= 0) {
+                        clearInterval(timer);
+                        otpBox.style.display = "none";
+                        driverMsg.innerHTML = "⌛ OTP expired";
+                        driverMsg.style.color = "red";
                     }
 
-                    bankMsg.innerHTML = "✅ Beneficiary Verified";
-                    bankMsg.style.color = "green";
+                }, 1000);
+
+            });
+
+            verifyBtn.addEventListener("click", function () {
+
+                if (otpInput.value === generatedOtp) {
+
+                    clearInterval(timer);
+
+                    driverMsg.innerHTML = "✅ Verified";
+                    driverMsg.style.color = "green";
+
+                    otpBox.style.display = "none";
+                    sendBtn.style.display = "none";
+                    driver.readOnly = true;
+                    verified.value = "1";
 
                 } else {
-
-                    bankVerified.value = "0";
-                    bankMsg.innerHTML = "❌ Invalid Bank Details";
-                    bankMsg.style.color = "red";
+                    driverMsg.innerHTML = "❌ Invalid OTP";
+                    driverMsg.style.color = "red";
                 }
 
-                verifyBankBtn.disabled = false;
-                verifyBankBtn.innerHTML = "Verify Beneficiary";
+            });
 
-            }, 1500);
+            /* UPI */
+            const upiId = document.getElementById("upi_id");
+            const upiNo = document.getElementById("upi_number");
+
+            upiId.addEventListener("input", function () {
+                document.getElementById("upiMsg").innerHTML =
+                    this.value.includes("@") ? "✅ Valid" : "❌ Invalid";
+            });
+
+            upiNo.addEventListener("input", function () {
+                this.value = this.value.replace(/\D/g, '');
+                document.getElementById("numMsg").innerHTML =
+                    this.value.length === 10 ? "✅ Valid" : "❌ Enter 10 digits";
+            });
+
+            /* BANK VERIFY DEMO */
+            const verifyBankBtn = document.getElementById("verifyBankBtn");
+            const bankMsg = document.getElementById("bankMsg");
+            const bankVerified = document.getElementById("bank_verified");
+
+            verifyBankBtn.addEventListener("click", function () {
+
+                const acc = acc1.value.trim();
+                const ifsc = document.getElementById("ifsc").value.trim();
+
+                if (acc === "" || ifsc === "") {
+                    bankMsg.innerHTML = "❌ Enter Account Number + IFSC";
+                    bankMsg.style.color = "red";
+                    return;
+                }
+
+                verifyBankBtn.disabled = true;
+                verifyBankBtn.innerHTML = "Checking...";
+
+                setTimeout(function () {
+
+                    if (acc.length >= 8 && ifsc.length >= 8) {
+
+                        bankVerified.value = "1";
+
+                        if (document.getElementById("account_beneficiary_name").value === "") {
+                            document.getElementById("account_beneficiary_name").value = "Verified Beneficiary";
+                        }
+
+                        bankMsg.innerHTML = "✅ Beneficiary Verified";
+                        bankMsg.style.color = "green";
+
+                    } else {
+
+                        bankVerified.value = "0";
+                        bankMsg.innerHTML = "❌ Invalid Bank Details";
+                        bankMsg.style.color = "red";
+                    }
+
+                    verifyBankBtn.disabled = false;
+                    verifyBankBtn.innerHTML = "Verify Beneficiary";
+
+                }, 1500);
+
+            });
 
         });
-
-    });
 </script>
 
 <style>
+    .top-margin-card {
+        border-radius: 16px;
+        background: linear-gradient(135deg, #ffffff, #f8fafc);
+    }
+
+    .top-title {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .top-value {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .border-end {
+        border-right: 1px solid #eef2f7 !important;
+    }
+
+    @media(max-width:768px) {
+
+        .border-end {
+            border-right: none !important;
+            border-bottom: 1px solid #eef2f7;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+    }
+
     .order-badge {
         background: #eef2ff;
         color: #4338ca;

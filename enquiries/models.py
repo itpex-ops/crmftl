@@ -2,9 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-
 VEHICLE_TYPES = [
-
     # OPEN BODY
     ('Open Body 9 Ft', 'Open Body 9 Ft'),
     ('Open Body 10 Ft', 'Open Body 10 Ft'),
@@ -27,17 +25,22 @@ VEHICLE_TYPES = [
     ('Container 32 Ft', 'Container 32 Ft'),
 
     # TRAILER
-    ('Flat Low Bed 20 Ft', 'Flat Low Bed 20 Ft'),
-    ('Flat Low Bed 32 Ft', 'Flat Low Bed 32 Ft'),
-    ('Flat Low Bed 40 Ft', 'Flat Low Bed 40 Ft'),
+    ('Trailer Flat Low Bed 20 Ft','Trailer Flat Low Bed 20 Ft'),
+    ('Trailer Flat Low Bed 32 Ft','Trailer Flat Low Bed 32 Ft'),
+    ('Trailer Flat Low Bed 40 Ft','Trailer Flat Low Bed 40 Ft'),
 
-    ('Flat High Bed 20 Ft', 'Flat High Bed 20 Ft'),
-    ('Flat High Bed 32 Ft', 'Flat High Bed 32 Ft'),
-    ('Flat High Bed 40 Ft', 'Flat High Bed 40 Ft'),
+    ('Trailer Flat High Bed 20 Ft', 'Trailer Flat High Bed 20 Ft'),
+    ('Trailer Flat High Bed 32 Ft', 'Trailer Flat High Bed 32 Ft'),
+    ('Trailer Flat High Bed 40 Ft', 'Trailer Flat High Bed 40 Ft'),
 
     # SPECIAL
     ('JCB', 'JCB'),
     ('ODC', 'ODC'),
+    ('TATA ACE','Tata Ace 7 Ft'),
+    ('TATA 407','Tata 407 10 to 12 Ft'),
+    ('Bolero PickUP','Bolero Pickup 8 to 10 Ft'),
+    ('Dost 8 to 9 Ft','Dost 8 to 9 Ft'),
+    ('BadaDost 10 Ft','BadaDost 10 Ft'),
 
     # TORRES
     ('Torres 6 Wheels', 'Torres 6 Wheels'),
@@ -78,6 +81,7 @@ class Enquiry(models.Model):
     material = models.CharField(max_length=200, blank=True, null=True)
     pieces = models.IntegerField(blank=True, null=True)
     tonnage = models.FloatField(blank=True, null=True)
+    kg = models.FloatField(blank=True,null=True)
 
     dimension_unit = models.CharField(max_length=20, blank=True, null=True)
 
@@ -143,9 +147,7 @@ class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
     enquiry = models.ForeignKey(Enquiry, on_delete=models.CASCADE, null=True, blank=True)
-
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return self.message

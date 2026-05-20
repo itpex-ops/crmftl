@@ -88,7 +88,7 @@ def manual_order_create(request):
             # 👤 CUSTOMER
             name = request.POST.get("customer_name")
             phone = request.POST.get("customer_contact")
-            email = request.POST.get("email")
+            email = request.POST.get("email") or None,
 
             customer, created = Customer.objects.get_or_create(
                 phone=phone,

@@ -12,10 +12,177 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from decimal import Decimal
 from django.utils.dateparse import parse_datetime
-
 from django.shortcuts import render
 from vehicles.models import Vehicle, Tracking
 from django.db.models import Q
+
+from decimal import Decimal
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def assign_vehicle(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+
+        # =========================
+        # SOURCE
+        # =========================
+        source = request.POST.get("source")
+        source_other = request.POST.get("source_other")
+
+        if source == "others" and source_other:
+            source = source_other
+
+        # =========================
+        # AMOUNTS
+        # =========================
+        freight_amount = Decimal(
+            request.POST.get("freight_amount") or 0
+        )
+
+        halting = Decimal(
+            request.POST.get("halting") or 0
+        )
+
+        loading_unloading = Decimal(
+            request.POST.get("loading_unloading") or 0
+        )
+
+        brokerage = Decimal(
+            request.POST.get("brokerage") or 0
+        )
+
+        # =========================
+        # FINAL FREIGHT
+        # =========================
+        final_freight = (
+            freight_amount
+            + halting
+            + loading_unloading
+            + brokerage
+        )
+
+        # =========================
+        # SELLING RATE
+        # =========================
+        selling_price = Decimal(order.total_rate or 0)
+
+        # =========================
+        # MARGIN %
+        # =========================
+        margin_percentage = Decimal(0)
+
+        if selling_price > 0:
+
+            margin_percentage = (
+                (
+                    selling_price - final_freight
+                )
+                / selling_price
+            ) * 100
+
+        # =========================
+        # APPROVAL MESSAGE
+        # =========================
+        approval_message = ""
+
+        if margin_percentage < 13:
+
+            approval_message = (
+                f"Your vehicle source rate margin "
+                f"is below 13%. "
+                f"Please update the approving authority name."
+            )
+
+        elif margin_percentage >= 15:
+
+            approval_message = (
+                f"Margin is healthy at "
+                f"{margin_percentage:.2f}%."
+            )
+
+        else:
+
+            approval_message = (
+                f"Margin is "
+                f"{margin_percentage:.2f}%."
+            )
+
+        # =========================
+        # CREATE VEHICLE
+        # =========================
+        vehicle = Vehicle.objects.create(
+
+            order=order,
+
+            # BASIC
+            vehicle_number=request.POST.get("vehicle_number"),
+            driver_number=request.POST.get("driver_number"),
+            owner_number=request.POST.get("owner_number"),
+            source=source,
+
+            # MONEY
+            freight_amount=freight_amount,
+            halting=halting,
+            loading_unloading=loading_unloading,
+            brokerage=brokerage,
+
+            # SAVE CALCULATED VALUES
+            total_freight=final_freight,
+            margin_percentage=margin_percentage,
+
+            advance=Decimal(
+                request.POST.get("advance") or 0
+            ),
+
+            # PAYMENT
+            upi_app=request.POST.get("upi_app"),
+            upi_id=request.POST.get("upi_id"),
+            upi_number=request.POST.get("upi_number"),
+
+            account_number=request.POST.get("account_number"),
+            ifsc=request.POST.get("ifsc"),
+            ac_type=request.POST.get("ac_type"),
+
+            beneficiary_name=request.POST.get(
+                'account_beneficiary_name'
+            ),
+
+            bank_verified=request.POST.get(
+                "bank_verified"
+            ) == "1",
+        )
+
+        # =========================
+        # TRACKING
+        # =========================
+        Tracking.objects.get_or_create(order=order)
+
+        # =========================
+        # MESSAGE
+        # =========================
+        messages.success(
+            request,
+            f"Vehicle assigned successfully. "
+            f"Final Freight: ₹{final_freight} | "
+            f"Margin: {margin_percentage:.2f}% | "
+            f"{approval_message}"
+        )
+
+        return redirect("order_list")
+
+    return render(
+        request,
+        "vehicle/assign_vehicle.html",
+        {
+            "order": order
+        }
+    )
+
 
 def tracking_view(request):
     query = request.GET.get("q")
@@ -140,6 +307,7 @@ def upload_tracking_docs(request, id):
 
     messages.success(request, "Documents uploaded successfully.")
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
 def public_tracking(request):
     """
     Search by FTL No or LR No
@@ -175,7 +343,7 @@ def public_tracking(request):
     return render(request, "vehicle/public_tracking.html", context)
 
 @login_required 
-def assign_vehicle(request, order_id):
+def assign_vehicle12(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
 
@@ -232,10 +400,6 @@ def assign_vehicle(request, order_id):
         "vehicle/assign_vehicle.html",
         {"order": order}
     )
-
-# views.py
-from django.http import JsonResponse
-from orders.models import Order
 
 def order_status_api(request):
 
@@ -309,9 +473,7 @@ def assign_vehicle12(request, order_id):
 
 @login_required
 def edit_vehicle(request, vehicle_id):
-
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
-
     if request.method == "POST":
 
         # BASIC
@@ -331,6 +493,7 @@ def edit_vehicle(request, vehicle_id):
         vehicle.upi_number = request.POST.get("upi_number")
         vehicle.upi_app = request.POST.get("upi_app")
         vehicle.beneficiary_name = request.POST.get("beneficiary_name")
+        print("benificary name",vehicle.beneficiary_name)
         vehicle.account_number = request.POST.get("account_number")
         vehicle.ifsc = request.POST.get("ifsc")
         vehicle.ac_type = request.POST.get("ac_type")
@@ -357,8 +520,6 @@ def edit_vehicle(request, vehicle_id):
 # All vehicles
 def all_assigned_vehicles(request):
     vehicles = Vehicle.objects.select_related('order').order_by('-created_at')
-    for vehicle in vehicles:
-        print("placed number",vehicle.order.vehicle_place_date)
     return render(request, 'vehicle/assigned.html', {
         'vehicles': vehicles
     })
@@ -369,44 +530,50 @@ def delete_vehicle(request, vehicle_id):
     vehicle.delete()
     return redirect(reverse('assigned_vehicles', args=[order_id]))
 
-from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-
 @login_required
 def tracking_page(request, vehicle_id):
 
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
-    tracking, created = Tracking.objects.get_or_create(order=vehicle.order)
+    tracking, created = Tracking.objects.get_or_create(
+        order=vehicle.order
+    )
 
     if request.method == "POST":
 
         # 🚫 BLOCK EDIT IF SETTLED
         if tracking.settled:
-            messages.warning(request, "Tracking already settled. Editing is locked.")
+            messages.warning(
+                request,
+                "Tracking already settled. Editing is locked."
+            )
             return redirect("all_assigned_vehicles")
 
         # -----------------------
         # CHECKBOX VALUES
         # -----------------------
-        tracking.vehicle_placed    = 'vehicle_placed' in request.POST
-        tracking.vehicle_document  = 'vehicle_document' in request.POST
-        tracking.invoice_eway     = 'invoice_eway' in request.POST
+        tracking.vehicle_placed = 'vehicle_placed' in request.POST
+        tracking.vehicle_document = 'vehicle_document' in request.POST
+        tracking.invoice_eway = 'invoice_eway' in request.POST
         tracking.advance_to_fleet = 'advance_to_fleet' in request.POST
-        tracking.fleet_departed   = 'fleet_departed' in request.POST
+        tracking.fleet_departed = 'fleet_departed' in request.POST
         tracking.advance_received = 'advance_received' in request.POST
-        tracking.arrived          = 'arrived' in request.POST
-        tracking.delivered        = 'delivered' in request.POST
-        tracking.pod_received     = 'pod_received' in request.POST
-
-        # 🔥 FIXED KEY (was wrong earlier: lrno_received)
-        tracking.lr_no_b         = 'lr_no_b' in request.POST
-
-        tracking.lr_no = request.POST.get('lr_no', '').strip()
-
-        # SETTLED
+        tracking.arrived = 'arrived' in request.POST
+        tracking.delivered = 'delivered' in request.POST
+        tracking.pod_received = 'pod_received' in request.POST
         tracking.settled = 'settled' in request.POST
+
+        # LR NO
+        tracking.lr_no = request.POST.get(
+            'lr_no',
+            ''
+        ).strip()
+
+        # REMARKS
+        tracking.remarks = request.POST.get(
+            "remarks",
+            ""
+        ).strip()
 
         now = timezone.now()
 
@@ -425,20 +592,35 @@ def tracking_page(request, vehicle_id):
         if tracking.delivered and not tracking.delivered_at:
             tracking.delivered_at = now
 
-        # -----------------------
-        # REMARKS
-        # -----------------------
-        tracking.remarks = request.POST.get("remarks", "").strip()
-
         tracking.save()
 
-        messages.success(request, "Tracking updated successfully.")
+        # =========================
+        # DOCUMENT UPLOAD
+        # =========================
+        files = request.FILES.getlist('documents')
+
+        for file in files:
+
+            TrackingDocument.objects.create(
+                tracking=tracking,
+                file=file
+            )
+
+        messages.success(
+            request,
+            "Tracking updated successfully."
+        )
+
         return redirect("all_assigned_vehicles")
 
-    return render(request, "vehicle/tracking_page.html", {
-        "vehicle": vehicle,
-        "tracking": tracking
-    })
+    return render(
+        request,
+        "vehicle/tracking_page.html",
+        {
+            "vehicle": vehicle,
+            "tracking": tracking
+        }
+    )
 
 @csrf_exempt
 def update_tracking_ajax(request):

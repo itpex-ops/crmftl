@@ -173,7 +173,11 @@
 
                         <div class="col-md-3">
                             <label class="form-label">Tonnage</label>
-                            <input type="number" name="tonnage" class="form-control">
+                            <input type="float" name="tonnage" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">KG</label>
+                            <input type="float" name="kg" class="form-control">
                         </div>
 
                         <div class="col-md-3">
@@ -254,35 +258,35 @@
         text-overflow: ellipsis;
     }
 
-input[type="text"],
-textarea {
-text-transform: uppercase;
-}
+    input[type="text"],
+    textarea {
+        text-transform: uppercase;
+    }
 
-.section-card {
-border-radius: 12px;
-border: 1px solid #eee;
-box-shadow: 0 3px 12px rgba(0, 0, 0, .05);
-}
+    .section-card {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, .05);
+    }
 
-.section-title {
-font-weight: 600;
-padding: 12px;
-border-bottom: 1px solid #eee;
-background: #f9f9f9;
-}
+    .section-title {
+        font-weight: 600;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        background: #f9f9f9;
+    }
 
-.form-control,
-.form-select {
-border-radius: 8px;
-text-transform: uppercase;
-}
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        text-transform: uppercase;
+    }
 
-.form-label {
-font-size: 13px;
-font-weight: 600;
-margin-bottom: 6px;
-}
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
 </style>
 <script>
     document.addEventListener("DOMContentLoaded", function () {

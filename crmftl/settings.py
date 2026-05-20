@@ -24,10 +24,9 @@ SECRET_KEY = 'django-insecure-z5)r#58f*hg4+5=kv2p!568b4=pg-&(f4!ce7h390b-7d6w=2(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-TIME_ZONE = 'Asia/Kolkata'
-USE_TZ = True
 
 ALLOWED_HOSTS = [
+    '192.168.1.23',
     '168.144.71.218',
     'parcelexops.in',
     'www.parcelexops.in',
@@ -94,7 +93,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                 'crmftl.context_processors.role_permissions'
+                'crmftl.context_processors.role_permissions',
+                'crmftl.context_processors.notification_data',
 
             ],
         },
@@ -163,7 +163,12 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = True

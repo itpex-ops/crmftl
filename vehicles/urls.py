@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('',views.all_assigned_vehicles,name ='all_assigned_vehicles'),
     # path('order/<int:order_id>/vehicles/', views.assigned_vehicles, name='assigned_vehicles'),
@@ -11,5 +13,11 @@ urlpatterns = [
     path('tracking/update-ajax/', views.update_tracking_ajax, name='update_tracking_ajax'),
     path('public_tracking/',views.public_tracking,name='public_tracking'),
     path('tracking/<int:id>/upload-docs/', views.upload_tracking_docs, name='upload_tracking_docs'),
-    path('api/order-status/<int:id>', views.order_status_api, name='order_status_api')
+    #path('api/order-status/<int:id>', views.order_status_api, name='order_status_api')
 ]
+
+
+urlpatterns += static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT
+)

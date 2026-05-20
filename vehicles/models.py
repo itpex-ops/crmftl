@@ -41,6 +41,7 @@ class Vehicle(models.Model):
     total_freight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     advance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    margin_percentage = models.DecimalField(max_digits=5,decimal_places=2,default=0)
 
     # 💳 BANK
     account_name = models.CharField(max_length=100, blank=True, null=True)
@@ -99,7 +100,7 @@ class Vehicle(models.Model):
                 else:
                     new_num = 1
 
-                self.ftl_no = f"FTL_{new_num:03d}"
+                self.ftl_no = f"FTL{new_num:03d}"
 
         super().save(*args, **kwargs)
 

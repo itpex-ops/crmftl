@@ -13,6 +13,7 @@ class Order(models.Model):
 
     routes = models.JSONField(null=True, blank=True)
     vehicle_type = models.CharField(max_length=100)
+    kms = models.FloatField(blank=True , null = True)
     vehicle_place_date = models.DateTimeField(blank=True,null=True)
 
     # 💰 Pricing

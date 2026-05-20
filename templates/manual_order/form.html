@@ -11,10 +11,6 @@
             <h4 class="fw-bold">Create Shipment Order</h4>
             <small class="text-muted">Capture freight details and generate dispatch request</small>
         </div>
-
-        <button type="submit" form="orderForm" class="btn btn-primary">
-            💾 Save Order
-        </button>
     </div>
 
     <form method="POST" id="orderForm">
@@ -159,14 +155,12 @@
                 </div>
 
                 <!-- USER -->
-                <div class="card saas-card mt-3">
-                    <div class="card-header saas-title">👤 Created By</div>
-                    <div class="card-body">
-                        <div class="form-control bg-light">
-                            {{ request.user.username }}
-                        </div>
-                    </div>
-                </div>
+                 <div class="card saas-card mt-3">
+                <button type="submit" form="orderForm" class="btn btn-primary">
+                    💾 Save Order
+                </button>
+                 </div>
+
 
             </div>
 

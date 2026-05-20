@@ -104,34 +104,62 @@
                             {% if vehicle.order.vehicle_place_date %}
                             {{ vehicle.order.vehicle_place_date|date:"d M Y h:i A" }}
                             {% else %}
-                            --
+                            {{ vehicle.order.vehicle_reassign_date|date:"d M Y h:i A" }}
                             {% endif %}
                         </td>
 
-                        <!-- Actions -->
-                        <td class="text-center">
+                     <!-- Actions -->
+<td class="text-center">
 
-                            {% now "Y-m-d H:i:s" as current_time %}
+    {% if vehicle.order.tracking.settled %}
 
-                            {% if vehicle.order.vehicle_place_date %}
+        <button class="btn btn-light btn-sm" disabled>
+            🔒 Trip Closed
+        </button>
 
-                            {% if vehicle.order.vehicle_place_date|date:"Y-m-d H:i:s" <= current_time %} <a
-                                href="{% url 'tracking_page' vehicle.id %}" class="btn btn-success btn-sm">
-                                🚚 Open Tracking
-                                </a>
-                                {% else %}
-                                <button class="btn btn-warning btn-sm" disabled>
-                                    ⏰ Waiting Time
-                                </button>
-                                {% endif %}
+    {% else %}
 
-                                {% else %}
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    📅 No Vehicle Date
-                                </button>
-                                {% endif %}
+        {% now "Y-m-d H:i:s" as current_time %}
 
-                        </td>
+        {% if vehicle.order.vehicle_place_date %}
+
+            {% if vehicle.order.vehicle_place_date|date:"Y-m-d H:i:s" <= current_time %}
+
+                <a href="{% url 'tracking_page' vehicle.id %}"
+                   class="btn btn-success btn-sm">
+
+                    🚚 Open Tracking
+
+                </a>
+
+            {% elif vehicle.order.vehicle_reassign_date %}
+
+                <a href="{% url 'tracking_page' vehicle.id %}"
+                   class="btn btn-success btn-sm">
+
+                    🚚 Open Tracking
+
+                </a>
+
+            {% else %}
+
+                <button class="btn btn-warning btn-sm" disabled>
+                    ⏰ Waiting Time
+                </button>
+
+            {% endif %}
+
+        {% else %}
+
+            <button class="btn btn-secondary btn-sm" disabled>
+                📅 No Vehicle Date
+            </button>
+
+        {% endif %}
+
+    {% endif %}
+
+</td>
 
                     </tr>
 
@@ -201,7 +229,6 @@
 
     });
 </script>
-
 
 <style>
     .table-container {
