@@ -4,7 +4,7 @@ ROLE_MENUS = {
 
     'admin': ['dashboard','enquiry', 'orders_list', 'vehicles'],
 
-    'fleet': ['dashboard', 'vehicles', 'orders_list','vehicle_accounts'],
+    'fleet': ['dashboard', 'vehicles', 'orders_list','vehicle_tracking'],
 
     'support': ['dashboard','enquiry','enquiry_list', 'orders', 'vehicles', 'accounts','vehicle_accounts','accounts_customer','accounts_bank','orders_manual'],
 
