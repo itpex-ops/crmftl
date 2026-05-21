@@ -1,16 +1,16 @@
 ROLE_MENUS = {
 
-    'superadmin': ['dashboard','enquiry_create','enquiry_list', 'orders', 'vehicles','accounts_vehicle','accounts_customer','accounts_bank','orders_manual'],
+    'superadmin': ['dashboard','enquiry_create','enquiry_list','orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
 
-    'admin': ['dashboard','enquiry_create', 'orders_list', 'vehicles'],
+    'admin': ['dashboard','enquiry_list', 'orders_list','vehicles_placement','vehicle_tracking'],
 
     'fleet': ['dashboard', 'vehicles_placement','vehicle_tracking', 'orders_list','accounts_vehicle'],
 
-    'support': ['dashboard','enquiry_create','enquiry_list', 'orders', 'vehicles', 'accounts','accounts_vehicle','accounts_customer','accounts_bank','orders_manual'],
+    'support': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
 
-    'sales': ['dashboard','enquiry_create','enquiry_list', 'orders_manual','orders_list', 'vehicle_tracking'],
+    'sales': ['dashboard','enquiry_create','enquiry_list','orders_manual','orders_list', 'vehicle_tracking'],
 
-    'accounts': ['dashboard', 'orders','accounts_vehicle','accounts_customer','accounts_bank','orders_manual'],
+    'accounts': ['dashboard','accounts_vehicle','accounts_customer','accounts_bank','orders_manual'],
 
     'vigilance' :['vehicle_tracking'],
 } 
