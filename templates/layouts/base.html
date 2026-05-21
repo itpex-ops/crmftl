@@ -219,7 +219,7 @@
             <a href="{% url 'manual_order_create' %}">
                 <i class="bi bi-plus-square me-2"></i> Manual
             </a>
-            {%if 'orders_list' in roles_perms %}
+            {% if 'orders_list' in roles_perms %}
             <a href="{% url 'order_list' %}">
                 <i class="bi bi-receipt me-2"></i> List
             </a>
