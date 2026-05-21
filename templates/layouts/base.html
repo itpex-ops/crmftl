@@ -209,7 +209,7 @@
 
 
 <!-- ORDERS -->
-{% if 'orders' in role_perms or 'orders_manual' in role_perms or 'orders_list' in role_perms %}
+{% if 'orders' in role_perms or 'orders_manual' in role_perms %}
 <a data-bs-toggle="collapse" href="#orderMenu">
     <i class="bi bi-box-seam me-2"></i> Orders
     <i class="bi bi-chevron-down float-end"></i>
@@ -223,11 +223,11 @@
     </a>
     {% endif %}
 
-    {% if 'orders' in role_perms or 'orders_list' in role_perms %}
+  
     <a href="{% url 'order_list' %}">
         <i class="bi bi-receipt me-2"></i> List
     </a>
-    {% endif %}
+   
 
 </div>
 {% endif %}
