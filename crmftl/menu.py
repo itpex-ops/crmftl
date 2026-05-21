@@ -10,7 +10,7 @@ ROLE_MENUS = {
 
     'sales': ['dashboard','enquiry_create','enquiry_list','orders_manual','orders_list', 'vehicle_tracking'],
 
-    'accounts': ['dashboard','accounts_vehicle','accounts_customer','accounts_bank','orders_manual'],
+    'accounts': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
 
     'vigilance' :['dashboard','vehicle_tracking'],
 } 
