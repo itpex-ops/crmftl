@@ -183,8 +183,8 @@
         {% endif %}
 
         <!-- ENQUIRIES -->
-        <!-- ENQUIRIES -->
-{% if 'enquiry' in role_perms or 'enquiry_list' in role_perms %}
+      
+{% if 'enquiry' in role_perms  role_perms %}
 <a data-bs-toggle="collapse" href="#enquiryMenu">
     <i class="bi bi-headset me-2"></i> Enquiries
     <i class="bi bi-chevron-down float-end"></i>
@@ -193,11 +193,11 @@
 <div class="collapse submenu {% if 'enquiry' in request.path %}show{% endif %}"
     id="enquiryMenu">
 
-    {% if 'enquiry' in role_perms %}
+   
     <a href="{% url 'create_enquiry' %}">
         <i class="bi bi-plus-circle me-2"></i> Create
     </a>
-    {% endif %}
+   
 
     {% if 'enquiry_list' in role_perms %}
     <a href="{% url 'enquiry_list' %}">
