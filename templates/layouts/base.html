@@ -233,7 +233,7 @@
 
 
         <!-- VEHICLES -->
-        {% if 'vehicles' in role_perms or 'vehicle_tracking' in role_perms %}
+        {% if 'vehicles_placement' in role_perms or 'vehicle_tracking' in role_perms %}
         <a data-bs-toggle="collapse" href="#vehicleMenu">
             <i class="bi bi-truck me-2"></i> Vehicles
             <i class="bi bi-chevron-down float-end"></i>
@@ -241,7 +241,7 @@
 
         <div class="collapse submenu {% if 'vehicles' in request.path %}show{% endif %}" id="vehicleMenu">
 
-            {% if 'vehicles' in role_perms %}
+            {% if 'vehicles_placement' in role_perms %}
             <a href="{% url 'all_assigned_vehicles' %}">
                 <i class="bi bi-geo-alt me-2"></i> Placements
             </a>
