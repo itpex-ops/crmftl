@@ -21,6 +21,14 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
+from decimal import Decimal
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+
+from .models import Order, Vehicle, Tracking
+
+
 @login_required
 def assign_vehicle(request, order_id):
 
@@ -28,152 +36,240 @@ def assign_vehicle(request, order_id):
 
     if request.method == "POST":
 
-        # =========================
-        # SOURCE
-        # =========================
-        source = request.POST.get("source")
-        source_other = request.POST.get("source_other")
+        try:
 
-        if source == "others" and source_other:
-            source = source_other
+            # =========================
+            # SOURCE
+            # =========================
 
-        # =========================
-        # AMOUNTS
-        # =========================
-        freight_amount = Decimal(
-            request.POST.get("freight_amount") or 0
-        )
+            source = request.POST.get("source", "")
+            source_other = request.POST.get("source_other", "")
 
-        halting = Decimal(
-            request.POST.get("halting") or 0
-        )
+            if source == "others" and source_other:
+                source = source_other
 
-        loading_unloading = Decimal(
-            request.POST.get("loading_unloading") or 0
-        )
+            # =========================
+            # AMOUNTS
+            # =========================
 
-        brokerage = Decimal(
-            request.POST.get("brokerage") or 0
-        )
-
-        # =========================
-        # FINAL FREIGHT
-        # =========================
-        final_freight = (
-            freight_amount
-            + halting
-            + loading_unloading
-            + brokerage
-        )
-
-        # =========================
-        # SELLING RATE
-        # =========================
-        selling_price = Decimal(order.total_rate or 0)
-
-        # =========================
-        # MARGIN %
-        # =========================
-        margin_percentage = Decimal(0)
-
-        if selling_price > 0:
-
-            margin_percentage = (
-                (
-                    selling_price - final_freight
-                )
-                / selling_price
-            ) * 100
-
-        # =========================
-        # APPROVAL MESSAGE
-        # =========================
-        approval_message = ""
-
-        if margin_percentage < 13:
-
-            approval_message = (
-                f"Your vehicle source rate margin "
-                f"is below 13%. "
-                f"Please update the approving authority name."
+            freight_amount = Decimal(
+                request.POST.get("freight_amount") or 0
             )
 
-        elif margin_percentage >= 15:
-
-            approval_message = (
-                f"Margin is healthy at "
-                f"{margin_percentage:.2f}%."
+            halting = Decimal(
+                request.POST.get("halting") or 0
             )
 
-        else:
-
-            approval_message = (
-                f"Margin is "
-                f"{margin_percentage:.2f}%."
+            loading_unloading = Decimal(
+                request.POST.get("loading_unloading") or 0
             )
 
-        # =========================
-        # CREATE VEHICLE
-        # =========================
-        vehicle = Vehicle.objects.create(
+            brokerage = Decimal(
+                request.POST.get("brokerage") or 0
+            )
 
-            order=order,
-
-            # BASIC
-            vehicle_number=request.POST.get("vehicle_number"),
-            driver_number=request.POST.get("driver_number"),
-            owner_number=request.POST.get("owner_number"),
-            source=source,
-
-            # MONEY
-            freight_amount=freight_amount,
-            halting=halting,
-            loading_unloading=loading_unloading,
-            brokerage=brokerage,
-
-            # SAVE CALCULATED VALUES
-            total_freight=final_freight,
-            margin_percentage=margin_percentage,
-
-            advance=Decimal(
+            advance = Decimal(
                 request.POST.get("advance") or 0
-            ),
+            )
 
-            # PAYMENT
-            upi_app=request.POST.get("upi_app"),
-            upi_id=request.POST.get("upi_id"),
-            upi_number=request.POST.get("upi_number"),
+            # =========================
+            # FINAL FREIGHT
+            # =========================
 
-            account_number=request.POST.get("account_number"),
-            ifsc=request.POST.get("ifsc"),
-            ac_type=request.POST.get("ac_type"),
+            final_freight = (
+                freight_amount
+                + halting
+                + loading_unloading
+                + brokerage
+            )
 
-            beneficiary_name=request.POST.get(
-                'account_beneficiary_name'
-            ),
+            # =========================
+            # SELLING PRICE
+            # =========================
 
-            bank_verified=request.POST.get(
-                "bank_verified"
-            ) == "1",
-        )
+            selling_price = Decimal(
+                order.total_rate or 0
+            )
 
-        # =========================
-        # TRACKING
-        # =========================
-        Tracking.objects.get_or_create(order=order)
+            # =========================
+            # MARGIN %
+            # =========================
 
-        # =========================
-        # MESSAGE
-        # =========================
-        messages.success(
-            request,
-            f"Vehicle assigned successfully. "
-            f"Final Freight: ₹{final_freight} | "
-            f"Margin: {margin_percentage:.2f}% | "
-            f"{approval_message}"
-        )
+            margin_percentage = Decimal("0")
 
-        return redirect("order_list")
+            if selling_price > 0:
+
+                margin_percentage = (
+                    (
+                        selling_price - final_freight
+                    ) / selling_price
+                ) * 100
+
+            # =========================
+            # PROFIT
+            # =========================
+
+            profit_amount = (
+                selling_price - final_freight
+            )
+
+            # =========================
+            # APPROVAL
+            # =========================
+
+            # APPROVAL
+            approval_name = request.POST.get(
+                "approval_name", ""
+            ).strip()
+
+            approval_reason = request.POST.get(
+                "approval_reason", ""
+            ).strip()
+
+            # BLOCK SAVE
+            if margin_percentage < 13 and not approval_name:
+
+                messages.error(
+                    request,
+                    "Approval authority name required for low margin."
+                )
+
+                return redirect(
+                    "assign_vehicle",
+                    order_id=order.id
+                )
+
+            # =========================
+            # APPROVAL MESSAGE
+            # =========================
+
+            if margin_percentage < 13:
+
+                approval_message = (
+                    f"Low margin approved by "
+                    f"{approval_name}"
+                )
+
+            elif margin_percentage >= 15:
+
+                approval_message = (
+                    f"Healthy margin "
+                    f"{margin_percentage:.2f}%"
+                )
+
+            else:
+
+                approval_message = (
+                    f"Margin is "
+                    f"{margin_percentage:.2f}%"
+                )
+
+            # =========================
+            # CREATE VEHICLE
+            # =========================
+
+            vehicle = Vehicle.objects.create(
+
+                order=order,
+
+                # BASIC
+                vehicle_number=request.POST.get(
+                    "vehicle_number"
+                ),
+
+                driver_number=request.POST.get(
+                    "driver_number"
+                ),
+
+                owner_number=request.POST.get(
+                    "owner_number"
+                ),
+
+                source=source,
+
+                # FREIGHT
+                freight_amount=freight_amount,
+                halting=halting,
+                loading_unloading=loading_unloading,
+                brokerage=brokerage,
+
+                total_freight=final_freight,
+
+                # MARGIN
+                margin_percentage=margin_percentage,
+
+                # PROFIT
+                profit_amount=profit_amount,
+
+                # APPROVAL
+                approval_name=approval_name,
+                approval_reason=approval_reason,
+
+                # PAYMENT
+                advance=advance,
+
+                upi_app=request.POST.get(
+                    "upi_app"
+                ),
+
+                upi_id=request.POST.get(
+                    "upi_id"
+                ),
+
+                upi_number=request.POST.get(
+                    "upi_number"
+                ),
+
+                account_number=request.POST.get(
+                    "account_number"
+                ),
+
+                ifsc=request.POST.get(
+                    "ifsc"
+                ),
+
+                ac_type=request.POST.get(
+                    "ac_type"
+                ),
+
+                beneficiary_name=request.POST.get(
+                    "account_beneficiary_name"
+                ),
+
+                bank_verified=request.POST.get(
+                    "bank_verified"
+                ) == "1",
+            )
+
+            # =========================
+            # TRACKING
+            # =========================
+
+            Tracking.objects.get_or_create(
+                order=order
+            )
+
+            # =========================
+            # SUCCESS MESSAGE
+            # =========================
+
+            messages.success(
+                request,
+                f"Vehicle assigned successfully | "
+                f"Freight ₹{final_freight} | "
+                f"Profit ₹{profit_amount} | "
+                f"Margin {margin_percentage:.2f}% | "
+                f"{approval_message}"
+            )
+
+            return redirect("order_list")
+
+        except Exception as e:
+
+            messages.error(
+                request,
+                f"Error : {str(e)}"
+            )
 
     return render(
         request,
@@ -182,7 +278,6 @@ def assign_vehicle(request, order_id):
             "order": order
         }
     )
-
 
 def tracking_view(request):
     query = request.GET.get("q")

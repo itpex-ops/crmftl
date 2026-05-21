@@ -183,91 +183,111 @@
         {% endif %}
 
         <!-- ENQUIRIES -->
-        <a data-bs-toggle="collapse" href="#enquiryMenu">
-            <i class="bi bi-headset me-2"></i> Enquiries
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
+        <!-- ENQUIRIES -->
+{% if 'enquiry' in role_perms or 'enquiry_list' in role_perms %}
+<a data-bs-toggle="collapse" href="#enquiryMenu">
+    <i class="bi bi-headset me-2"></i> Enquiries
+    <i class="bi bi-chevron-down float-end"></i>
+</a>
 
-        <div class="collapse submenu {% if 'enquiry' in request.resolver_match.url_name %}show{% endif %}"
-            id="enquiryMenu">
+<div class="collapse submenu {% if 'enquiry' in request.path %}show{% endif %}"
+    id="enquiryMenu">
 
-            <a href="{% url 'create_enquiry' %}">
-                <i class="bi bi-plus-circle me-2"></i> Create
-            </a>
+    {% if 'enquiry' in role_perms %}
+    <a href="{% url 'create_enquiry' %}">
+        <i class="bi bi-plus-circle me-2"></i> Create
+    </a>
+    {% endif %}
 
-            <a href="{% url 'enquiry_list' %}">
-                <i class="bi bi-card-list me-2"></i> List
-            </a>
+    {% if 'enquiry_list' in role_perms %}
+    <a href="{% url 'enquiry_list' %}">
+        <i class="bi bi-card-list me-2"></i> List
+    </a>
+    {% endif %}
 
-        </div>
+</div>
+{% endif %}
 
-        <!-- ORDERS -->
-        <a data-bs-toggle="collapse" href="#orderMenu">
-            <i class="bi bi-box-seam me-2"></i> Orders
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
 
-        <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
+<!-- ORDERS -->
+{% if 'orders' in role_perms or 'orders_manual' in role_perms or 'orders_list' in role_perms %}
+<a data-bs-toggle="collapse" href="#orderMenu">
+    <i class="bi bi-box-seam me-2"></i> Orders
+    <i class="bi bi-chevron-down float-end"></i>
+</a>
 
-            <a href="{% url 'manual_order_create' %}">
-                <i class="bi bi-plus-square me-2"></i> Manual
-            </a>
+<div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
 
-            <a href="{% url 'order_list' %}">
-                <i class="bi bi-receipt me-2"></i> List
-            </a>
+    {% if 'orders_manual' in role_perms %}
+    <a href="{% url 'manual_order_create' %}">
+        <i class="bi bi-plus-square me-2"></i> Manual
+    </a>
+    {% endif %}
 
-        </div>
+    {% if 'orders' in role_perms or 'orders_list' in role_perms %}
+    <a href="{% url 'order_list' %}">
+        <i class="bi bi-receipt me-2"></i> List
+    </a>
+    {% endif %}
 
-        <!-- VEHICLES -->
-        {% if 'vehicles' in role_perms %}
-        <a data-bs-toggle="collapse" href="#vehicleMenu">
-            <i class="bi bi-truck me-2"></i> Vehicles
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
+</div>
+{% endif %}
 
-        <div class="collapse submenu {% if 'vehicles' in request.path %}show{% endif %}" id="vehicleMenu">
 
-            <a href="{% url 'all_assigned_vehicles' %}">
-                <i class="bi bi-geo-alt me-2"></i> Placements
-            </a>
+<!-- VEHICLES -->
+{% if 'vehicles' in role_perms or 'vehicle_tracking' in role_perms %}
+<a data-bs-toggle="collapse" href="#vehicleMenu">
+    <i class="bi bi-truck me-2"></i> Vehicles
+    <i class="bi bi-chevron-down float-end"></i>
+</a>
 
-            <a href="{% url 'public_tracking' %}">
-                <i class="bi bi-map me-2"></i> Tracking
-            </a>
+<div class="collapse submenu {% if 'vehicles' in request.path %}show{% endif %}" id="vehicleMenu">
 
-        </div>
-        {% endif %}
+    {% if 'vehicles' in role_perms %}
+    <a href="{% url 'all_assigned_vehicles' %}">
+        <i class="bi bi-geo-alt me-2"></i> Placements
+    </a>
+    {% endif %}
 
-        <!-- ACCOUNTS -->
-        {% if 'accounts' in role_perms %}
-        <a data-bs-toggle="collapse" href="#accountsMenu">
-            <i class="bi bi-wallet2 me-2"></i> Accounts
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
+    {% if 'vehicle_tracking' in role_perms %}
+    <a href="{% url 'public_tracking' %}">
+        <i class="bi bi-map me-2"></i> Tracking
+    </a>
+    {% endif %}
 
-        <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
+</div>
+{% endif %}
 
-            {% if 'accounts_customer' in role_perms %}
-            <a href="{% url 'customer_accounts' %}">
-                <i class="bi bi-people-fill me-2"></i> Customer
-            </a>
-            {% endif %}
 
-            {% if 'vehicle_accounts' in role_perms %}
-            <a href="{% url 'vehicle_accounts' %}">
-                <i class="bi bi-truck-flatbed me-2"></i> Vehicle
-            </a>
-            {% endif %}
+<!-- ACCOUNTS -->
+{% if 'accounts' in role_perms %}
+<a data-bs-toggle="collapse" href="#accountsMenu">
+    <i class="bi bi-wallet2 me-2"></i> Accounts
+    <i class="bi bi-chevron-down float-end"></i>
+</a>
 
-            <!-- {% if 'accounts_bank' in role_perms %}
-            <a href="{% url 'bank_accounts' %}">
-                <i class="bi bi-bank me-2"></i> Bank
-            </a>
-            {% endif %} -->
+<div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
 
-        </div>
-        {% endif %}
+    {% if 'accounts_customer' in role_perms %}
+    <a href="{% url 'customer_accounts' %}">
+        <i class="bi bi-people-fill me-2"></i> Customer
+    </a>
+    {% endif %}
+
+    {% if 'vehicle_accounts' in role_perms %}
+    <a href="{% url 'vehicle_accounts' %}">
+        <i class="bi bi-truck-flatbed me-2"></i> Vehicle
+    </a>
+    {% endif %}
+
+    {% if 'accounts_bank' in role_perms %}
+    <a href="{% url 'bank_accounts' %}">
+        <i class="bi bi-bank me-2"></i> Bank
+    </a>
+    {% endif %}
+
+</div>
+{% endif %}
 
         <!-- LOGOUT -->
         <a href="{% url 'logout' %}">

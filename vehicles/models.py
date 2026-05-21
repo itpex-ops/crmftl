@@ -68,6 +68,12 @@ class Vehicle(models.Model):
 
     vehicle_reassign_date = models.DateTimeField(blank=True, null=True)
 
+    profit_amount = models.DecimalField(max_digits=12,decimal_places=2,default=0)
+    approval_required = models.BooleanField(default=False)
+
+    approval_name = models.CharField(max_length=120,blank=True,null=True)
+    approval_reason = models.TextField(blank=True,null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     # 🚀 AUTO CALC + FTL GENERATOR
