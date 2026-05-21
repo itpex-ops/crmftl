@@ -14,6 +14,7 @@ class User(AbstractUser):
         ('fleet', 'Fleet'),
         ('support', 'Support'),
         ('accounts', 'Accounts'),
+        ('vigilance','Vigilance')
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     is_approved = models.BooleanField(default=False)
