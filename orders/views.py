@@ -13,9 +13,8 @@ from django.db.models import Count
 from datetime import datetime
 # def is_fleet(user):
 #     return user.is_authenticated and (user.role in ['fleet','admin'])
-
-# def is_sales(user):
-#      return user.is_authenticated and (user.role in ['sales','admin'])
+def is_sales(user):
+      return user.is_authenticated and (user.role in ['sales'])
 
 from datetime import datetime
 
@@ -278,7 +277,6 @@ def order_detail(request, id):
         "orders/order_detail.html",
         context
     )
-#@user_passes_test(is_sales)
 @login_required
 def convert_to_order1(request, enquiry_id):
 
@@ -366,6 +364,7 @@ def order_list(request):
         "delivered_count": delivered_count,
         "transit_count": transit_count,
         "total_revenue": int(total_revenue),
+        "is_sales" : is_sales ,
         
     })
 

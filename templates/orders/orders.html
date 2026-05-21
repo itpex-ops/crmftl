@@ -84,14 +84,23 @@
                         </td>
 
                         <!-- ORDER -->
-                         <td>
-                                <a href="{% url 'view_order' order.id %}" class="fw-semibold text-decoration-none">
+                        <td>
+
+                            {% if request.user.role == 'sales' %}
+
+                            <span class="fw-semibold">
+                                {{ order.order_no }}
+                            </span>
+
+                            {% else %}
+
+                            <a href="{% url 'view_order' order.id %}" class="fw-semibold text-decoration-none">
 
                                 {{ order.order_no }}
 
                             </a>
-                         
-                            <br>
+
+                            {% endif %}
 
                             <small class="text-muted">
                                 {{ order.vehicle_place_date|date:"d M Y h:i a" }}
