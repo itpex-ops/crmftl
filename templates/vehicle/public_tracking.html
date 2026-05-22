@@ -1,569 +1,1009 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<style>
-    #collapseButton {
-        transition: transform 0.3s ease;
-    }
-
-    [aria-expanded="true"] #collapseButton {
-        transform: rotate(180deg);
-    }
-</style>
-
-<cr-icon-button id="collapseButton" iron-icon="cr:expand-more" title="Expand list">
-</cr-icon-button>
-<div class="page-wrap">
+<div class="tracking-wrapper">
 
     <!-- HERO -->
-    <section class="hero-card">
+    <div class="hero-banner">
+
         <div class="hero-left">
-            <div class="hero-icon">🚚</div>
-            <div>
-                <h1>Track Shipment</h1>
-                <p>Live transport progress using FTL No / LR No</p>
+
+            <div class="hero-icon">
+                🚚
             </div>
+
+            <div>
+
+                <div class="hero-title">
+                    Shipment Tracking
+                </div>
+
+                <div class="hero-sub">
+                    Track vehicle movement, delivery & payment updates
+                </div>
+
+            </div>
+
         </div>
 
-        <form method="GET" class="hero-search">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by e.g. FTL_001 / LR1234">
-            <button type="submit">Track</button>
+        <form method="GET" class="search-box">
+
+            <input type="text"
+                   name="q"
+                   value="{{ request.GET.q }}"
+                   placeholder="Search FTL No / LR No">
+
+            <button type="submit">
+                Track
+            </button>
+
         </form>
-    </section>
+
+    </div>
 
     {% if tracking %}
 
-    <!-- TOP GRID -->
-    <section class="top-grid">
+    <!-- TOP INFO -->
+    <div class="top-cards">
 
-        <div class="glass-card">
-            <span class="label">Shipment ID</span>
-            <h2>{{ vehicle.ftl_no }}</h2>
+        <!-- LEFT -->
+        <div class="info-card main-info">
 
-            <div class="chip-row">
-                <span class="chip">📄 LR : {{ tracking.lr_no|default:"Pending" }}</span>
-                <span class="chip">🚛 {{ vehicle.vehicle_number }}</span>
+            <div class="card-top">
+
+                <div>
+
+                    <div class="small-label">
+                        Shipment Number
+                    </div>
+
+                    <h2 class="shipment-id">
+                        {{ vehicle.ftl_no }}
+                    </h2>
+
+                </div>
+
+                {% if tracking.settled %}
+
+                <div class="live-status success">
+                    💰 Settled
+                </div>
+
+                {% elif tracking.customer_paid %}
+
+                <div class="live-status blue">
+                    💳 Customer Paid
+                </div>
+
+                {% elif tracking.delivered %}
+
+                <div class="live-status purple">
+                    📦 Delivered
+                </div>
+
+                {% elif tracking.arrived %}
+
+                <div class="live-status orange">
+                    📍 Arrived
+                </div>
+
+                {% elif tracking.fleet_departed %}
+
+                <div class="live-status yellow">
+                    🚛 In Transit
+                </div>
+
+                {% else %}
+
+                <div class="live-status gray">
+                    ⏳ Processing
+                </div>
+
+                {% endif %}
+
             </div>
+
+            <div class="info-grid">
+
+                <div class="mini-box">
+                    <span>🚛 Vehicle</span>
+                    <strong>{{ vehicle.vehicle_number }}</strong>
+                </div>
+
+                <div class="mini-box">
+                    <span>📄 LR Number</span>
+                    <strong>{{ tracking.lr_no|default:"Pending" }}</strong>
+                </div>
+
+                <div class="mini-box">
+                    <span>📦 Order No</span>
+                    <strong>{{ vehicle.order.order_no }}</strong>
+                </div>
+
+                <div class="mini-box">
+                    <span>📍 Current Stage</span>
+
+                    <strong>
+
+                        {% if tracking.settled %}
+                            Settlement Completed
+
+                        {% elif tracking.customer_paid %}
+                            Customer Payment Received
+
+                        {% elif tracking.transporter_paid %}
+                            Transporter Paid
+
+                        {% elif tracking.delivered %}
+                            Delivered
+
+                        {% elif tracking.arrived %}
+                            Arrived Destination
+
+                        {% elif tracking.fleet_departed %}
+                            Vehicle Departed
+
+                        {% elif tracking.vehicle_placed %}
+                            Vehicle Assigned
+
+                        {% else %}
+                            Processing
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="glass-card status-card">
-            <span class="label">Current Status</span>
+    </div>
 
-            {% if tracking.settled %}
-            <div class="status green">💰 Settled</div>
+    <!-- TIMELINE -->
+    <div class="timeline-card">
 
-            {% elif tracking.customer_paid %}
-            <div class="status blue">💳 Customer Paid</div>
+        <div class="timeline-header">
 
-            {% elif tracking.transporter_paid %}
-            <div class="status teal">🏦 Transporter Paid</div>
-
-            {% elif tracking.delivered %}
-            <div class="status violet">📦 Delivered</div>
-
-            {% elif tracking.arrived %}
-            <div class="status orange">📍 Arrived</div>
-
-            {% elif tracking.fleet_departed %}
-            <div class="status yellow">🚛 In Transit</div>
-
-            {% elif tracking.vehicle_placed %}
-            <div class="status purple">🚚 Vehicle Assigned</div>
-
-            {% else %}
-            <div class="status gray">⏳ Processing</div>
-            {% endif %}
-        </div>
-
-    </section>
-
-    <!-- TRACK CARD -->
-    <section class="glass-card track-card">
-
-        <div class="track-head">
             <div>
-                <h3>Live Shipment Timeline</h3>
-                <small>Current stage auto highlighted</small>
+
+                <h3>
+                    Shipment Timeline
+                </h3>
+
+                <small>
+                    Live tracking updates
+                </small>
+
             </div>
 
             <div class="live-pill">
                 <span class="pulse"></span>
-                Live
+                LIVE
             </div>
+
         </div>
 
         <div class="timeline">
 
             <!-- 1 -->
-            <div class="step
-                {% if tracking.vehicle_placed %}done{% endif %}
-                {% if tracking.vehicle_placed and not tracking.vehicle_document %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.vehicle_placed %}completed{% endif %}
             ">
-                <div class="node">🚚</div>
-                <div class="step-body">
-                    <h4>Vehicle Assigned</h4>
-                    <p>
-                        {% if tracking.vehicle_placed_at %}
-                        {{ tracking.vehicle_placed_at|date:"d M Y h:i A" }}
-                        {% else %}
-                        Waiting for vehicle
-                        {% endif %}
-                    </p>
+
+                <div class="timeline-icon">
+                    🚚
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Vehicle Assigned
+                    </h4>
+
+                    <p>
+
+                        {% if tracking.vehicle_placed_at %}
+
+                        {{ tracking.vehicle_placed_at|date:"d M Y h:i A" }}
+
+                        {% else %}
+
+                        Waiting for vehicle assignment
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 2 -->
-            <div class="step
-                {% if tracking.vehicle_document %}done{% endif %}
-                {% if tracking.vehicle_document and not tracking.invoice_eway %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.vehicle_document %}completed{% endif %}
             ">
-                <div class="node">📄</div>
-                <div class="step-body">
-                    <h4>Documents Received</h4>
-                    <p>RC / Insurance / DL</p>
+
+                <div class="timeline-icon">
+                    📄
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Vehicle Documents
+                    </h4>
+
+                    <p>
+                        RC / Insurance / DL verified
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 3 -->
-            <div class="step
-                {% if tracking.invoice_eway %}done{% endif %}
-                {% if tracking.invoice_eway and not tracking.advance_to_fleet %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.invoice_eway %}completed{% endif %}
             ">
-                <div class="node">🧾</div>
-                <div class="step-body">
-                    <h4>Invoice & E-way Ready</h4>
-                    <p>Dispatch documents ready</p>
+
+                <div class="timeline-icon">
+                    🧾
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Invoice & E-way
+                    </h4>
+
+                    <p>
+                        Dispatch documents ready
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 4 -->
-            <div class="step
-                {% if tracking.advance_to_fleet %}done{% endif %}
-                {% if tracking.advance_to_fleet and not tracking.fleet_departed %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.advance_to_fleet %}completed{% endif %}
             ">
-                <div class="node">💸</div>
-                <div class="step-body">
-                    <h4>Advance Sent</h4>
-                    <p>Advance paid to fleet owner</p>
+
+                <div class="timeline-icon">
+                    💸
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Advance Sent
+                    </h4>
+
+                    <p>
+                        Advance transferred to transporter
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 5 -->
-            <div class="step
-                {% if tracking.fleet_departed %}done{% endif %}
-                {% if tracking.fleet_departed and not tracking.arrived %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.fleet_departed %}completed current{% endif %}
             ">
-                <div class="node">🚛</div>
-                <div class="step-body">
-                    <h4>Vehicle Departed</h4>
-                    <p>
-                        {% if tracking.fleet_departed_at %}
-                        {{ tracking.fleet_departed_at|date:"d M Y h:i A" }}
-                        {% else %}
-                        Shipment started
-                        {% endif %}
-                    </p>
+
+                <div class="timeline-icon">
+                    🚛
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Vehicle Departed
+                    </h4>
+
+                    <p>
+
+                        {% if tracking.fleet_departed_at %}
+
+                        {{ tracking.fleet_departed_at|date:"d M Y h:i A" }}
+
+                        {% else %}
+
+                        Shipment in transit
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 6 -->
-            <div class="step
-                {% if tracking.arrived %}done{% endif %}
-                {% if tracking.arrived and not tracking.delivered %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.arrived %}completed{% endif %}
             ">
-                <div class="node">📍</div>
-                <div class="step-body">
-                    <h4>Arrived Destination</h4>
-                    <p>
-                        {% if tracking.arrived_at %}
-                        {{ tracking.arrived_at|date:"d M Y h:i A" }}
-                        {% else %}
-                        On route
-                        {% endif %}
-                    </p>
+
+                <div class="timeline-icon">
+                    📍
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Arrived Destination
+                    </h4>
+
+                    <p>
+
+                        {% if tracking.arrived_at %}
+
+                        {{ tracking.arrived_at|date:"d M Y h:i A" }}
+
+                        {% else %}
+
+                        Vehicle on route
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 7 -->
-            <div class="step
-                {% if tracking.delivered %}done{% endif %}
-                {% if tracking.delivered and not tracking.pod_received %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.delivered %}completed{% endif %}
             ">
-                <div class="node">📦</div>
-                <div class="step-body">
-                    <h4>Delivered</h4>
-                    <p>
-                        {% if tracking.delivered_at %}
-                        {{ tracking.delivered_at|date:"d M Y h:i A" }}
-                        {% else %}
-                        Pending delivery
-                        {% endif %}
-                    </p>
+
+                <div class="timeline-icon">
+                    📦
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Delivered
+                    </h4>
+
+                    <p>
+
+                        {% if tracking.delivered_at %}
+
+                        {{ tracking.delivered_at|date:"d M Y h:i A" }}
+
+                        {% else %}
+
+                        Pending delivery
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 8 -->
-            <div class="step
-                {% if tracking.pod_received %}done{% endif %}
-                {% if tracking.pod_received and not tracking.transporter_paid %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.pod_received %}completed{% endif %}
             ">
-                <div class="node">✅</div>
-                <div class="step-body">
-                    <h4>POD Received</h4>
-                    <p>Proof of delivery updated</p>
+
+                <div class="timeline-icon">
+                    ✅
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        POD Received
+                    </h4>
+
+                    <p>
+                        Proof of delivery uploaded
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 9 -->
-            <div class="step
-                {% if tracking.transporter_paid %}done{% endif %}
-                {% if tracking.transporter_paid and not tracking.customer_paid %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.transporter_paid %}completed{% endif %}
             ">
-                <div class="node">🏦</div>
-                <div class="step-body">
-                    <h4>Transporter Paid</h4>
-                    <p>Vendor payment completed</p>
+
+                <div class="timeline-icon">
+                    🏦
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Transporter Paid
+                    </h4>
+
+                    <p>
+                        Vendor settlement completed
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 10 -->
-            <div class="step
-                {% if tracking.customer_paid %}done{% endif %}
-                {% if tracking.customer_paid and not tracking.settled %}active{% endif %}
+            <div class="timeline-item
+                {% if tracking.customer_paid %}completed{% endif %}
             ">
-                <div class="node">💳</div>
-                <div class="step-body">
-                    <h4>Customer Paid</h4>
-                    <p>Customer payment received</p>
+
+                <div class="timeline-icon">
+                    💳
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Customer Payment Received
+                    </h4>
+
+                    <p>
+                        Customer payment collected
+                    </p>
+
+                </div>
+
             </div>
 
             <!-- 11 -->
-            <div class="step
-                {% if tracking.settled %}done active success{% endif %}
+            <div class="timeline-item final-step
+                {% if tracking.settled %}completed{% endif %}
             ">
-                <div class="node">💰</div>
-                <div class="step-body">
-                    <h4>Settlement Completed</h4>
-                    <p>Shipment closed</p>
+
+                <div class="timeline-icon">
+                    💰
                 </div>
+
+                <div class="timeline-content">
+
+                    <h4>
+                        Settlement Completed
+                    </h4>
+
+                    <p>
+                        Shipment successfully closed
+                    </p>
+
+                </div>
+
             </div>
 
         </div>
 
         {% if tracking.remarks %}
-        <div class="remarks-box">
-            <strong>Remarks</strong><br>
-            {{ tracking.remarks }}
+
+        <div class="remarks-section">
+
+            <div class="remarks-title">
+                📝 Remarks
+            </div>
+
+            <div class="remarks-content">
+                {{ tracking.remarks }}
+            </div>
+
         </div>
+
         {% endif %}
 
-    </section>
+    </div>
 
     {% endif %}
 
 </div>
-<script>
-    const heading = document.getElementById("cardHeading");
-    const button = document.getElementById("collapseButton");
-    const collapseArea = document.getElementById("collapse");
 
-    button.addEventListener("click", () => {
-        const expanded = heading.getAttribute("aria-expanded") === "true";
-
-        heading.setAttribute("aria-expanded", !expanded);
-
-        if (expanded) {
-            collapseArea.style.display = "none";
-            button.setAttribute("iron-icon", "cr:expand-more");
-            button.setAttribute("title", "Expand list");
-        } else {
-            collapseArea.style.display = "block";
-            button.setAttribute("iron-icon", "cr:expand-less");
-            button.setAttribute("title", "Collapse list");
-        }
-    });
-</script>
 <style>
-    body {
-        background: #f6f8fc;
-        font-family: Inter, sans-serif;
+
+body{
+    background:#f4f7fb;
+    font-family:Inter,sans-serif;
+}
+
+.tracking-wrapper{
+    max-width:1200px;
+    margin:auto;
+    padding:24px;
+}
+
+/* HERO */
+
+.hero-banner{
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    border-radius:28px;
+    padding:32px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:25px;
+    color:#fff;
+    margin-bottom:28px;
+    box-shadow:0 15px 35px rgba(37,99,235,.25);
+}
+
+.hero-left{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.hero-icon{
+    width:78px;
+    height:78px;
+    border-radius:22px;
+    background:rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    backdrop-filter:blur(10px);
+}
+
+.hero-title{
+    font-size:32px;
+    font-weight:800;
+}
+
+.hero-sub{
+    opacity:.9;
+    margin-top:6px;
+}
+
+.search-box{
+    display:flex;
+    gap:12px;
+    width:420px;
+}
+
+.search-box input{
+    flex:1;
+    border:none;
+    border-radius:18px;
+    padding:15px;
+    outline:none;
+}
+
+.search-box button{
+    border:none;
+    background:#fff;
+    color:#2563eb;
+    padding:0 22px;
+    border-radius:18px;
+    font-weight:700;
+}
+
+/* TOP */
+
+.top-cards{
+    margin-bottom:28px;
+}
+
+.info-card{
+    background:#fff;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.small-label{
+    color:#64748b;
+    font-size:13px;
+}
+
+.shipment-id{
+    margin-top:6px;
+    font-weight:800;
+}
+
+.live-status{
+    padding:12px 18px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:14px;
+}
+
+.success{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.blue{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.purple{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+.orange{
+    background:#ffedd5;
+    color:#ea580c;
+}
+
+.yellow{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.gray{
+    background:#e5e7eb;
+    color:#111827;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.mini-box{
+    background:#f8fafc;
+    border-radius:18px;
+    padding:18px;
+    border:1px solid #edf2f7;
+}
+
+.mini-box span{
+    display:block;
+    color:#64748b;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.mini-box strong{
+    font-size:16px;
+}
+
+/* =========================
+TIMELINE MODERN UI
+========================= */
+
+.timeline{
+    position:relative;
+    margin-top:40px;
+    padding-left:20px;
+}
+
+/* MAIN LINE */
+.timeline::before{
+    content:"";
+    position:absolute;
+    left:34px;
+    top:0;
+    bottom:0;
+    width:4px;
+    border-radius:20px;
+    background:linear-gradient(
+        to bottom,
+        #3b82f6,
+        #8b5cf6,
+        #22c55e
+    );
+    opacity:.18;
+}
+
+/* EACH STEP */
+.timeline-item{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    gap:22px;
+    margin-bottom:34px;
+    transition:.3s ease;
+}
+
+/* CONNECTOR LINE BETWEEN ITEMS */
+.timeline-item::after{
+    content:"";
+    position:absolute;
+    left:32px;
+    top:68px;
+    width:4px;
+    height:calc(100% + 8px);
+    background:#dbeafe;
+    border-radius:20px;
+    z-index:0;
+}
+
+/* REMOVE LAST LINE */
+.timeline-item:last-child::after{
+    display:none;
+}
+
+/* ICON BOX */
+.timeline-icon{
+    position:relative;
+    width:68px;
+    height:68px;
+    min-width:68px;
+    border-radius:24px;
+    background:#fff;
+    border:2px solid #e2e8f0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    z-index:2;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    transition:.3s ease;
+}
+
+/* CONTENT CARD */
+.timeline-content{
+    flex:1;
+    background:#fff;
+    border-radius:24px;
+    padding:22px;
+    border:1px solid #eef2f7;
+    box-shadow:0 8px 30px rgba(0,0,0,.04);
+    transition:.3s ease;
+}
+
+/* TITLE */
+.timeline-content h4{
+    margin:0 0 8px;
+    font-size:18px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+/* SUBTEXT */
+.timeline-content p{
+    margin:0;
+    color:#64748b;
+    font-size:14px;
+    line-height:1.6;
+}
+
+/* COMPLETED STEP */
+.timeline-item.completed .timeline-icon{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:#fff;
+    border:none;
+}
+
+.timeline-item.completed::after{
+    background:linear-gradient(
+        to bottom,
+        #22c55e,
+        #4ade80
+    );
+}
+
+/* CURRENT STEP */
+.timeline-item.current .timeline-icon{
+    background:linear-gradient(135deg,#3b82f6,#6366f1);
+    color:#fff;
+    border:none;
+    animation:pulseGlow 1.5s infinite;
+}
+
+.timeline-item.current .timeline-content{
+    border:2px solid #bfdbfe;
+    background:linear-gradient(
+        135deg,
+        #ffffff,
+        #f8fbff
+    );
+}
+
+/* FINAL STEP */
+.timeline-item.final-step .timeline-icon{
+    background:linear-gradient(
+        135deg,
+        #f59e0b,
+        #f97316
+    );
+    color:#fff;
+    border:none;
+}
+
+.timeline-item.final-step .timeline-content{
+    background:linear-gradient(
+        135deg,
+        #fff7ed,
+        #ffffff
+    );
+    border:2px solid #fed7aa;
+}
+
+/* HOVER */
+.timeline-item:hover{
+    transform:translateY(-2px);
+}
+
+.timeline-item:hover .timeline-content{
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+/* GLOW */
+@keyframes pulseGlow{
+
+    0%{
+        box-shadow:0 0 0 rgba(59,130,246,.4);
     }
 
-    .page-wrap {
-        max-width: 1180px;
-        margin: auto;
-        padding: 28px;
+    50%{
+        box-shadow:0 0 25px rgba(59,130,246,.45);
     }
 
-    .hero-card,
-    .glass-card {
-        background: #fff;
-        border-radius: 26px;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, .05);
+    100%{
+        box-shadow:0 0 0 rgba(59,130,246,.4);
     }
 
-    .hero-card {
-        padding: 28px;
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        align-items: center;
-        margin-bottom: 24px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .timeline::before{
+        left:20px;
     }
 
-    .hero-left {
-        display: flex;
-        gap: 15px;
-        align-items: center;
+    .timeline-item::after{
+        left:18px;
     }
 
-    .hero-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
+    .timeline-icon{
+        width:42px;
+        height:42px;
+        min-width:42px;
+        border-radius:14px;
+        font-size:18px;
     }
 
-    .hero-search {
-        display: flex;
-        gap: 12px;
-        min-width: 420px;
+    .timeline-content{
+        padding:16px;
+        border-radius:18px;
     }
 
-    .hero-search input {
-        flex: 1;
-        border: none;
-        background: #f1f5f9;
-        padding: 15px;
-        border-radius: 16px;
+    .timeline-content h4{
+        font-size:15px;
     }
 
-    .hero-search button {
-        border: none;
-        background: #2563eb;
-        color: #fff;
-        padding: 0 22px;
-        border-radius: 16px;
+}
+/* LIVE */
+
+.live-pill{
+    background:#ecfdf5;
+    color:#15803d;
+    border-radius:999px;
+    padding:10px 18px;
+    font-weight:700;
+}
+
+.pulse{
+    width:9px;
+    height:9px;
+    background:#22c55e;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:8px;
+    animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+    0%{
+        transform:scale(1);
+        opacity:1;
+    }
+    50%{
+        transform:scale(1.4);
+        opacity:.4;
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+/* REMARKS */
+
+.remarks-section{
+    margin-top:30px;
+    background:#eff6ff;
+    border-radius:20px;
+    padding:20px;
+}
+
+.remarks-title{
+    font-weight:700;
+    margin-bottom:10px;
+    color:#1d4ed8;
+}
+
+.remarks-content{
+    color:#334155;
+    line-height:1.6;
+}
+
+/* MOBILE */
+
+@media(max-width:992px){
+
+    .hero-banner{
+        flex-direction:column;
+        align-items:flex-start;
     }
 
-    .top-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 22px;
-        margin-bottom: 24px;
+    .search-box{
+        width:100%;
     }
 
-    .glass-card {
-        padding: 26px;
+    .info-grid{
+        grid-template-columns:1fr 1fr;
     }
 
-    .label {
-        color: #64748b;
-        font-size: 13px;
+}
+
+@media(max-width:768px){
+
+    .tracking-wrapper{
+        padding:14px;
     }
 
-    .chip-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+    .hero-title{
+        font-size:24px;
     }
 
-    .chip {
-        background: #eef2ff;
-        color: #4338ca;
-        padding: 10px 14px;
-        border-radius: 14px;
-        font-size: 14px;
+    .search-box{
+        flex-direction:column;
     }
 
-    .status {
-        margin-top: 15px;
-        padding: 14px;
-        border-radius: 18px;
-        font-weight: 800;
+    .info-grid{
+        grid-template-columns:1fr;
     }
 
-    .green {
-        background: #dcfce7;
-        color: #15803d;
+    .timeline{
+        padding-left:10px;
     }
 
-    .blue {
-        background: #dbeafe;
-        color: #1d4ed8;
+    .timeline:before{
+        left:18px;
     }
 
-    .teal {
-        background: #ccfbf1;
-        color: #0f766e;
+    .timeline-item{
+        gap:14px;
     }
 
-    .violet {
-        background: #ede9fe;
-        color: #6d28d9;
+    .timeline-icon{
+        width:44px;
+        height:44px;
+        min-width:44px;
+        border-radius:14px;
+        font-size:20px;
     }
 
-    .orange {
-        background: #ffedd5;
-        color: #ea580c;
+    .timeline-content{
+        padding:14px;
     }
 
-    .yellow {
-        background: #fef3c7;
-        color: #92400e;
+    .timeline-content h4{
+        font-size:15px;
     }
 
-    .purple {
-        background: #ede9fe;
-        color: #6d28d9;
-    }
+}
 
-    .gray {
-        background: #e5e7eb;
-        color: #111827;
-    }
-
-    .track-head {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 26px;
-    }
-
-    .timeline {
-        position: relative;
-        padding-left: 42px;
-    }
-
-    .timeline:before {
-        content: "";
-        position: absolute;
-        left: 18px;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: #e5e7eb;
-    }
-
-    .step {
-        display: flex;
-        gap: 18px;
-        margin-bottom: 24px;
-        opacity: .35;
-    }
-
-    .step.done,
-    .step.active {
-        opacity: 1;
-    }
-
-    .node {
-        width: 56px;
-        height: 56px;
-        min-width: 56px;
-        border-radius: 18px;
-        background: #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .done .node {
-        background: #dcfce7;
-    }
-
-    .active .node {
-        background: #ffedd5;
-    }
-
-    .success .node {
-        background: #dcfce7;
-    }
-
-    .active {
-        background: #fff7ed;
-        border-radius: 20px;
-        padding: 12px;
-    }
-
-    .step-body h4 {
-        margin: 0 0 6px;
-        font-size: 18px;
-    }
-
-    .step-body p {
-        margin: 0;
-        color: #64748b;
-    }
-
-    .success h4 {
-        color: #16a34a;
-    }
-
-    .live-pill {
-        background: #ecfdf5;
-        color: #15803d;
-        padding: 10px 15px;
-        border-radius: 999px;
-    }
-
-    .pulse {
-        width: 8px;
-        height: 8px;
-        background: #22c55e;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 7px;
-    }
-
-    .remarks-box {
-        margin-top: 20px;
-        padding: 18px;
-        border-radius: 18px;
-        background: #eff6ff;
-        color: #1d4ed8;
-    }
-
-    @media(max-width:992px) {
-        .hero-card {
-            flex-direction: column;
-        }
-
-        .hero-search {
-            width: 100%;
-            min-width: auto;
-        }
-
-        .top-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media(max-width:768px) {
-        .page-wrap {
-            padding: 16px;
-        }
-
-        .hero-search {
-            flex-direction: column;
-        }
-
-        .node {
-            width: 48px;
-            height: 48px;
-            min-width: 48px;
-        }
-
-        .step-body h4 {
-            font-size: 16px;
-        }
-    }
 </style>
 
 {% endblock %}

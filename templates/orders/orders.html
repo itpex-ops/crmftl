@@ -63,7 +63,9 @@
                         <th width="180">Vehicle</th>
                         <th width="130">Selling Rate ₹</th>
                         <th width="180">Status</th>
+                        {% if request.user.role != 'sales' %}
                         <th width="100" class="text-center">Action</th>
+                        {% endif %}
                     </tr>
                 </thead>
 
@@ -234,6 +236,7 @@
                             {% endif %}
 
                         </td>
+                        {% if request.user.role != 'sales' %}
 
                         <!-- ACTION -->
                         <td class="text-center">
@@ -263,7 +266,7 @@
                             {% endif %}
 
                         </td>
-
+                        {% endif %}
                     </tr>
 
                     {% empty %}

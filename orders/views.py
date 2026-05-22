@@ -13,11 +13,9 @@ from django.db.models import Count
 from datetime import datetime
 # def is_fleet(user):
 #     return user.is_authenticated and (user.role in ['fleet','admin'])
+
 def is_sales(user):
       return user.is_authenticated and (user.role in ['sales'])
-
-from datetime import datetime
-
 from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -75,13 +73,33 @@ def parse_date(value):
     except:
         return None
 
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime, parse_date
+
 def save_order_data(order, request):
 
     # =================================================
-    # DATES
+    # VEHICLE DATE
     # =================================================
 
-    order.vehicle_place_date = parse_datetime(request.POST.get("vehicle_place_date", ""))
+    vehicle_date = parse_datetime(
+        request.POST.get("vehicle_place_date", "")
+    )
+
+    if vehicle_date:
+
+        if timezone.is_naive(vehicle_date):
+
+            vehicle_date = timezone.make_aware(
+                vehicle_date,
+                timezone.get_current_timezone()
+            )
+
+    order.vehicle_place_date = vehicle_date
+
+    # =================================================
+    # CREDIT DATES
+    # =================================================
 
     order.credit_date = parse_date(
         request.POST.get("credit_date", "")
@@ -150,7 +168,6 @@ def save_order_data(order, request):
     order.save()
 
     return order
-
 @login_required
 def pricing_page(request, enquiry_id):
 
@@ -322,18 +339,18 @@ def order_list(request):
 
     for o in orders:
         try:
-            o.vehicle_obj = o.vehicles
+            o.vehicle_obj = o.vehicle
         except:
             o.vehicle_obj = None
 
     total_orders = orders.count()
 
     assigned_count = orders.filter(
-        vehicles__isnull=False
+        vehicle__isnull=False
     ).count()
 
     not_assigned_count = orders.filter(
-        vehicles__isnull=True
+        vehicle__isnull=True
     ).count()
 
     pending_count = orders.filter(
@@ -449,7 +466,7 @@ def view_order(request, order_id):
             'created_by',
             'tracking'
         ).prefetch_related(
-            'vehicles'
+            'vehicle'
         ),id=order_id)
     return render(request, 'orders/view_order.html', {
         'order': order

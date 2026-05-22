@@ -1,385 +1,832 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<div class="container mt-4">
+<div class="container-fluid py-4 tracking-page">
 
+    <!-- ========================= -->
     <!-- HEADER -->
-    <div class="card shadow-sm border-0 p-3 mb-4 header-card">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
+    <!-- ========================= -->
+
+    <div class="tracking-header mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
             <div>
-                <h4 class="mb-1 fw-bold text-dark">📍 Vehicle Tracking</h4>
-                <small class="text-muted">
-                    {{ vehicle.vehicle_number }} | Order : {{ vehicle.order.order_no }}
-                </small>
-            </div>
 
-            <a href="{% url 'all_assigned_vehicles' %}" class="btn btn-light border">
-                ← Back
-            </a>
-
-        </div>
-    </div>
-
-    <!-- FORM -->
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="card shadow-sm border-0 p-4">
-
-            <div class="row g-4">
-
-                <!-- LEFT -->
-                <div class="col-md-6">
-                    <div class="step-box">
-
-                        <label class="track-item">
-                            <input type="checkbox" name="vehicle_placed"
-                                {% if tracking.vehicle_placed %}checked{% endif %}>
-                            🚚 Vehicle Placed
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="vehicle_document"
-                                {% if tracking.vehicle_document %}checked{% endif %}>
-                            📄 Vehicle Document
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="invoice_eway"
-                                {% if tracking.invoice_eway %}checked{% endif %}>
-                            🧾 Invoice / E-way
-                        </label>
-
-                        <!-- ✅ LR NO ADDED HERE -->
-                        <label class="track-item">
-                            📄 LR No:
-                            <input type="text" class="form-control"
-                                name="lr_no"
-                                value="{{ tracking.lr_no|default:'' }}"
-                                placeholder="Enter LR No">
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="advance_to_fleet"
-                                {% if tracking.advance_to_fleet %}checked{% endif %}>
-                            💰 Advance To Fleet
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="fleet_departed"
-                                {% if tracking.fleet_departed %}checked{% endif %}>
-                            🚛 Fleet Departed
-                        </label>
-
-                    </div>
+                <div class="small text-muted fw-semibold mb-1">
+                    LIVE TRIP TRACKING
                 </div>
 
-                <!-- RIGHT -->
-                <div class="col-md-6">
-                    <div class="step-box">
+                <h3 class="fw-bold mb-1">
+                    🚚 {{ vehicle.vehicle_number }}
+                </h3>
 
-                        <label class="track-item">
-                            <input type="checkbox" name="advance_received"
-                                {% if tracking.advance_received %}checked{% endif %}>
-                            💵 Advance Received
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="arrived"
-                                {% if tracking.arrived %}checked{% endif %}>
-                            📍 Arrived
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="delivered"
-                                {% if tracking.delivered %}checked{% endif %}>
-                            ✅ Delivered
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" id="podBox" name="pod_received"
-                                {% if tracking.pod_received %}checked{% endif %}>
-                            📦 POD Received
-                        </label>
-
-                        <label class="track-item">
-                            <input type="checkbox" name="settled"
-                                {% if tracking.settled %}checked{% endif %}>
-                            🧮 Settled
-                        </label>
-
-                    </div>
+                <div class="text-muted">
+                    Order :
+                    <span class="fw-semibold text-dark">
+                        {{ vehicle.order.order_no }}
+                    </span>
                 </div>
 
             </div>
 
-            <!-- ✅ POD DOCUMENT UPLOAD (AFTER POD RECEIVED ONLY) -->
-            <div id="uploadBox" class="mt-4"
-                 style="{% if not tracking.pod_received %}display:none;{% endif %}">
+            <div class="d-flex gap-2">
 
-                <div class="step-box">
+                <div class="status-pill
+                    {% if tracking.settled %}
+                        settled
+                    {% elif tracking.delivered %}
+                        delivered
+                    {% elif tracking.fleet_departed %}
+                        running
+                    {% else %}
+                        pending
+                    {% endif %}
+                ">
 
-                    <h6 class="mb-3">📎 Upload POD Documents</h6>
-
-                    <input type="file"
-                           name="documents"
-                           multiple
-                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                           class="form-control">
-
-                    <small class="text-muted d-block mt-2">
-                        Upload POD, invoice copy, delivery proof, etc.
-                    </small>
-
-                    {% if tracking.documents.all %}
-                    <div class="mt-3">
-                        <strong>Uploaded Files:</strong>
-                        <ul>
-                            {% for doc in tracking.documents.all %}
-                            <li>
-                                <a href="{{ doc.file.url }}" target="_blank">
-                                    📎 {{ doc.file.name }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    {% if tracking.settled %}
+                        ✅ Settled
+                    {% elif tracking.delivered %}
+                        📦 Delivered
+                    {% elif tracking.fleet_departed %}
+                        🚛 In Transit
+                    {% else %}
+                        ⏳ Pending
                     {% endif %}
 
                 </div>
-            </div>
 
-            <!-- REMARKS -->
-            <div class="mt-4">
-                <label class="fw-semibold mb-2">Remarks</label>
-                <textarea name="remarks" rows="4" class="form-control remarks-box">{{ tracking.remarks }}</textarea>
-            </div>
+                <a href="{% url 'all_assigned_vehicles' %}"
+                   class="btn btn-light border back-btn">
 
-            <!-- BUTTONS -->
-            <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-success px-4">💾 Save</button>
-                <a href="{% url 'all_assigned_vehicles' %}" class="btn btn-light border px-4">Cancel</a>
+                    ← Back
+
+                </a>
+
             </div>
 
         </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- FORM -->
+    <!-- ========================= -->
+
+    <form method="POST"
+          enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <!-- ========================= -->
+            <!-- LEFT SIDE -->
+            <!-- ========================= -->
+
+            <div class="col-lg-8">
+
+                <!-- TIMELINE -->
+                <div class="card tracking-card border-0 mb-4">
+
+                    <div class="card-header tracking-title">
+
+                        📍 Trip Progress Timeline
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="timeline-grid">
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="vehicle_placed"
+                                       {% if tracking.vehicle_placed %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        🚚
+                                    </div>
+
+                                    <div>
+                                        <div class="timeline-head">
+                                            Vehicle Placed
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Vehicle assigned for trip
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="vehicle_document"
+                                       {% if tracking.vehicle_document %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        📄
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Vehicle Document
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            RC / DL / Insurance
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="invoice_eway"
+                                       {% if tracking.invoice_eway %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        🧾
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Invoice / E-way
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Documents received
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="advance_to_fleet"
+                                       {% if tracking.advance_to_fleet %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        💰
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Advance To Fleet
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Driver payment released
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="fleet_departed"
+                                       {% if tracking.fleet_departed %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        🚛
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Fleet Departed
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Vehicle started trip
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="advance_received"
+                                       {% if tracking.advance_received %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        💵
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Advance Received
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Customer payment received
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="arrived"
+                                       {% if tracking.arrived %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        📍
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Arrived
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Vehicle reached destination
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       name="delivered"
+                                       {% if tracking.delivered %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        📦
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Delivered
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Material delivered
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item">
+
+                                <input type="checkbox"
+                                       id="podBox"
+                                       name="pod_received"
+                                       {% if tracking.pod_received %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        🧾
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            POD Received
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Delivery proof uploaded
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                            <!-- STEP -->
+
+                            <label class="timeline-item settled-card">
+
+                                <input type="checkbox"
+                                       id="settledBox"
+                                       name="settled"
+                                       {% if tracking.settled %}checked{% endif %}>
+
+                                <div class="timeline-content">
+
+                                    <div class="timeline-icon">
+                                        ✅
+                                    </div>
+
+                                    <div>
+
+                                        <div class="timeline-head">
+                                            Trip Settled
+                                        </div>
+
+                                        <div class="timeline-sub">
+                                            Trip completed & closed
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- POD -->
+                <div id="uploadBox"
+                     class="card tracking-card border-0 mb-4 {% if tracking.pod_received %}show-box{% endif %}">
+
+                    <div class="card-header tracking-title">
+                        📎 POD Documents
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="upload-zone">
+
+                            <input type="file"
+                                   name="documents"
+                                   multiple
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                   class="form-control upload-input">
+
+                            <div class="upload-text">
+
+                                Upload POD / Invoice / Delivery Copy
+
+                            </div>
+
+                        </div>
+
+                        {% if tracking.documents.all %}
+
+                        <div class="row mt-4 g-3">
+
+                            {% for doc in tracking.documents.all %}
+
+                            <div class="col-md-6">
+
+                                <a href="{{ doc.file.url }}"
+                                   target="_blank"
+                                   class="doc-card">
+
+                                    <div class="doc-icon">
+                                        📄
+                                    </div>
+
+                                    <div class="doc-name">
+
+                                        {{ doc.file.name }}
+
+                                    </div>
+
+                                </a>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================= -->
+            <!-- RIGHT SIDE -->
+            <!-- ========================= -->
+
+            <div class="col-lg-4">
+
+                <!-- LR -->
+                <div class="card tracking-card border-0 mb-4">
+
+                    <div class="card-header tracking-title">
+                        📄 LR Information
+                    </div>
+
+                    <div class="card-body">
+
+                        <label class="form-label fw-semibold">
+                            LR Number
+                        </label>
+
+                        <input type="text"
+                               name="lr_no"
+                               class="form-control modern-input"
+                               value="{{ tracking.lr_no|default:'' }}"
+                               placeholder="Enter LR No">
+
+                    </div>
+
+                </div>
+
+                <!-- REMARKS -->
+                <div class="card tracking-card border-0 mb-4">
+
+                    <div class="card-header tracking-title">
+                        📝 Remarks
+                    </div>
+
+                    <div class="card-body">
+
+                        <textarea name="remarks"
+                                  rows="8"
+                                  class="form-control remarks-area"
+                                  placeholder="Enter trip updates...">{{ tracking.remarks }}</textarea>
+
+                    </div>
+
+                </div>
+
+                <!-- SAVE -->
+                <div class="card tracking-card border-0">
+
+                    <div class="card-body">
+
+                        <button type="submit"
+                                class="btn btn-success save-btn w-100 mb-3">
+
+                            💾 Save Tracking
+
+                        </button>
+
+                        <a href="{% url 'all_assigned_vehicles' %}"
+                           class="btn btn-light border w-100">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </form>
 
 </div>
 
+<!-- ========================= -->
 <!-- JS -->
+<!-- ========================= -->
+
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    const podBox = document.getElementById("podBox");
-    const uploadBox = document.getElementById("uploadBox");
+    const podBox =
+        document.getElementById("podBox");
 
-    function toggleUpload() {
-        uploadBox.style.display = podBox.checked ? "block" : "none";
-    }
+    const uploadBox =
+        document.getElementById("uploadBox");
 
-    podBox.addEventListener("change", toggleUpload);
-    toggleUpload();
+    function togglePodBox() {
 
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+        if (podBox.checked) {
 
-    const items = document.querySelectorAll(".track-item input");
-    const settledBox = document.getElementById("settledBox");
-    const podBox = document.getElementById("podBox");
-    const uploadBox = document.getElementById("uploadBox");
-    const lrInput = document.querySelector("input[name='lr_no']");
+            uploadBox.style.display = "block";
 
-    // =========================
-    // POD TOGGLE
-    // =========================
-    function toggleUpload() {
-        if (!uploadBox) return;
-        uploadBox.style.display = podBox.checked ? "block" : "none";
-    }
+        } else {
 
-    if (podBox) {
-        podBox.addEventListener("change", toggleUpload);
-        toggleUpload();
-    }
+            uploadBox.style.display = "none";
 
-    // =========================
-    // DISABLE ALL
-    // =========================
-    function disableAll(except = null, lock = false) {
-
-        items.forEach(el => {
-
-            const parent = el.closest(".track-item");
-
-            if (except && el !== except) {
-                el.checked = false;
-            }
-
-            if (lock) {
-                el.disabled = true;
-            } else {
-                el.disabled = el !== except;
-            }
-
-            if (parent) {
-                parent.classList.add("disabled-row");
-            }
-
-        });
-
-        // LR input also must follow same rule
-        if (lrInput) {
-            lrInput.disabled = lock || (except !== lrInput);
-        }
-    }
-
-    // =========================
-    // ENABLE ALL
-    // =========================
-    function enableAll() {
-
-        items.forEach(el => {
-            el.disabled = false;
-            const parent = el.closest(".track-item");
-            if (parent) parent.classList.remove("disabled-row", "selected-row");
-        });
-
-        if (lrInput) lrInput.disabled = false;
-    }
-
-    // =========================
-    // NORMAL RULE
-    // =========================
-    items.forEach(el => {
-
-        if (el === settledBox) return;
-
-        el.addEventListener("change", function () {
-
-            if (this.checked) {
-                disableAll(this, false);
-
-                if (settledBox) {
-                    settledBox.checked = false;
-                    settledBox.disabled = true;
-                }
-
-            } else {
-                enableAll();
-            }
-
-        });
-
-    });
-
-    // =========================
-    // SETTLED RULE (FULL LOCK)
-    // =========================
-    if (settledBox) {
-
-        settledBox.addEventListener("change", function () {
-
-            if (this.checked) {
-
-                items.forEach(el => {
-                    el.checked = false;
-                    el.disabled = true;
-                });
-
-                if (lrInput) lrInput.disabled = true;
-
-            } else {
-                enableAll();
-            }
-
-        });
-
-        // page load state
-        if (settledBox.checked) {
-            items.forEach(el => el.disabled = true);
-            if (lrInput) lrInput.disabled = true;
         }
 
     }
 
+    podBox.addEventListener(
+        "change",
+        togglePodBox
+    );
+
+    togglePodBox();
+
 });
+
 </script>
 
+<!-- ========================= -->
 <!-- STYLE -->
+<!-- ========================= -->
+
 <style>
-.upload-box {
-    border-radius: 14px;
-    padding: 16px;
-    border: 2px solid #e5e7eb;
-    transition: 0.3s;
+
+body{
+    background:#f4f7fb;
 }
 
-/* ❌ NOT ACTIVE (RED LINE) */
-.upload-box.inactive {
-    border-left: 6px solid #ef4444;  /* RED */
-    opacity: 0.6;
+.tracking-page{
+    max-width:1500px;
 }
 
-/* ⚠️ READY BUT NOT USED (YELLOW LINE) */
-.upload-box.warning {
-    border-left: 6px solid #f59e0b;  /* YELLOW */
-    opacity: 0.8;
+/* ========================= */
+/* HEADER */
+/* ========================= */
+
+.tracking-header{
+    background:#fff;
+    border-radius:22px;
+    padding:25px 30px;
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
 }
 
-/* ✅ ACTIVE (GREEN LINE) */
-.upload-box.active {
-    border-left: 6px solid #22c55e;  /* GREEN */
-    opacity: 1;
+.status-pill{
+    padding:10px 18px;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:700;
 }
 
-body {
-    background: #f5f7fb;
+.status-pill.pending{
+    background:#fff7ed;
+    color:#ea580c;
 }
 
-.header-card {
-    border-radius: 16px;
+.status-pill.running{
+    background:#eff6ff;
+    color:#2563eb;
 }
 
-.step-box {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px;
-    border: 1px solid #edf0f5;
+.status-pill.delivered{
+    background:#ecfdf5;
+    color:#059669;
 }
 
-.track-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px;
-    border: 1px solid #eef1f4;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    background: #fafbfc;
-    font-weight: 500;
+.status-pill.settled{
+    background:#dcfce7;
+    color:#15803d;
 }
 
-.track-item input {
-    transform: scale(1.05);
+.back-btn{
+    border-radius:12px;
+    padding:10px 18px;
 }
 
-.remarks-box {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 12px;
+/* ========================= */
+/* CARD */
+/* ========================= */
+
+.tracking-card{
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
 }
 
-.btn-success {
-    background: #16a34a;
-    border-radius: 10px;
+.tracking-title{
+    background:#fff;
+    border-bottom:1px solid #edf2f7;
+    padding:18px 22px;
+    font-weight:700;
+    font-size:16px;
 }
 
-.btn-light {
-    border-radius: 10px;
+/* ========================= */
+/* TIMELINE */
+/* ========================= */
+
+.timeline-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
 }
+
+.timeline-item{
+    position:relative;
+    cursor:pointer;
+}
+
+.timeline-item input{
+    position:absolute;
+    opacity:0;
+}
+
+.timeline-content{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:#f8fafc;
+    border:2px solid transparent;
+    border-radius:18px;
+    padding:18px;
+    transition:.25s;
+}
+
+.timeline-item:hover .timeline-content{
+    transform:translateY(-2px);
+}
+
+.timeline-item input:checked + .timeline-content{
+    background:#ecfdf5;
+    border-color:#22c55e;
+}
+
+.timeline-icon{
+    width:58px;
+    height:58px;
+    border-radius:16px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+}
+
+.timeline-head{
+    font-weight:700;
+    color:#0f172a;
+}
+
+.timeline-sub{
+    font-size:13px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.settled-card input:checked + .timeline-content{
+    background:#dcfce7;
+    border-color:#16a34a;
+}
+
+/* ========================= */
+/* INPUT */
+/* ========================= */
+
+.modern-input,
+.remarks-area{
+    border-radius:14px;
+    border:1px solid #dbe2ea;
+    padding:14px;
+}
+
+.remarks-area{
+    resize:none;
+}
+
+/* ========================= */
+/* UPLOAD */
+/* ========================= */
+
+#uploadBox{
+    display:none;
+}
+
+.upload-zone{
+    border:2px dashed #cbd5e1;
+    border-radius:18px;
+    padding:35px;
+    text-align:center;
+    background:#f8fafc;
+}
+
+.upload-input{
+    margin-bottom:15px;
+}
+
+.upload-text{
+    color:#64748b;
+    font-size:14px;
+}
+
+.doc-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:15px;
+    border-radius:14px;
+    background:#f8fafc;
+    text-decoration:none;
+    color:#111827;
+    border:1px solid #e5e7eb;
+    transition:.2s;
+}
+
+.doc-card:hover{
+    background:#eff6ff;
+}
+
+.doc-icon{
+    font-size:22px;
+}
+
+.doc-name{
+    word-break:break-all;
+    font-size:14px;
+}
+
+/* ========================= */
+/* BUTTON */
+/* ========================= */
+
+.save-btn{
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    font-weight:700;
+    background:linear-gradient(
+        135deg,
+        #16a34a,
+        #22c55e
+    );
+}
+
+/* ========================= */
+/* MOBILE */
+/* ========================= */
+
+@media(max-width:768px){
+
+    .timeline-grid{
+        grid-template-columns:1fr;
+    }
+
+    .tracking-header{
+        padding:20px;
+    }
+
+}
+
 </style>
 
 {% endblock %}

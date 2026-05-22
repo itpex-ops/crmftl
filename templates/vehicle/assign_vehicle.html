@@ -108,6 +108,37 @@
         <input type="text" name="fake_user" autocomplete="username" style="position:absolute;left:-9999px;opacity:0;">
         <input type="password" name="fake_pass" autocomplete="current-password"
             style="position:absolute;left:-9999px;opacity:0;">
+              <!-- APPROVAL SECTION -->
+        <div class="card border-danger mb-4" id="approvalSection" style="display:none;">
+
+            <div class="card-header bg-danger text-white">
+                🔒 Manager Approval Required
+            </div>
+
+            <div class="card-body row g-3">
+
+                <div class="col-md-6">
+                    <label>Manager Name</label>
+
+                    <input type="text" name="approval_name" id="approvalName" class="form-control input-style"
+                        placeholder="Enter Manager Name">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Reason</label>
+
+                    <input type="text" name="approval_reason" class="form-control input-style"
+                        placeholder="Reason for negative margin">
+                </div>
+
+                <div class="col-12">
+                    <small id="approvalError"></small>
+                </div>
+
+            </div>
+
+        </div>
+
 
         <!-- VEHICLE -->
         <div class="card saas-card mb-4">
@@ -328,6 +359,7 @@
             </div>
         </div>
 
+      
         <!-- ACTION -->
         <div class="action-bar">
             <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
@@ -346,641 +378,667 @@
 
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    // =========================================
-    // SOURCE SELECT
-    // =========================================
+        // =========================================
+        // SOURCE SELECT
+        // =========================================
 
-    new TomSelect("#source_select", {
-        create: false,
-        placeholder: "Search Source..."
-    });
+        new TomSelect("#source_select", {
+            create: false,
+            placeholder: "Search Source..."
+        });
 
-    const source = document.getElementById("source_select");
-    const otherBox = document.getElementById("source_other");
+        const source = document.getElementById("source_select");
+        const otherBox = document.getElementById("source_other");
 
-    source.addEventListener("change", function () {
+        source.addEventListener("change", function () {
 
-        if (this.value === "others") {
-            otherBox.style.display = "block";
-        } else {
-            otherBox.style.display = "none";
-            otherBox.value = "";
-        }
+            if (this.value === "others") {
+                otherBox.style.display = "block";
+            } else {
+                otherBox.style.display = "none";
+                otherBox.value = "";
+            }
 
-    });
+        });
 
-    // =========================================
-    // ACCOUNT MATCH
-    // =========================================
+        // =========================================
+        // ACCOUNT MATCH
+        // =========================================
 
-    const acc1 = document.getElementById("account_number");
-    const acc2 = document.getElementById("re_account_number");
-    const accMsg = document.getElementById("accMsg");
+        const acc1 = document.getElementById("account_number");
+        const acc2 = document.getElementById("re_account_number");
+        const accMsg = document.getElementById("accMsg");
 
-    function checkAccount() {
+        function checkAccount() {
 
-        if (acc2.value === "") {
-            accMsg.innerHTML = "";
-            return;
-        }
+            if (acc2.value === "") {
+                accMsg.innerHTML = "";
+                return;
+            }
 
-        if (acc1.value === acc2.value) {
+            if (acc1.value === acc2.value) {
 
-            accMsg.innerHTML = "✅ Account Number Matched";
-            accMsg.style.color = "green";
-
-        } else {
-
-            accMsg.innerHTML = "❌ Account Number Not Matched";
-            accMsg.style.color = "red";
-
-        }
-
-    }
-
-    acc1.addEventListener("input", checkAccount);
-    acc2.addEventListener("input", checkAccount);
-
-    // =========================================
-    // UPI VALIDATION
-    // =========================================
-
-    const upiId = document.getElementById("upi_id");
-    const upiNo = document.getElementById("upi_number");
-
-    const verifyUpiBtn = document.getElementById("verifyUpiBtn");
-
-    const upiMsg = document.getElementById("upiMsg");
-    const numMsg = document.getElementById("numMsg");
-
-    const upiVerifyMsg =
-        document.getElementById("upiVerifyMsg");
-
-    const upiName =
-        document.getElementById("upi_beneficiary_name");
-
-    const upiVerified =
-        document.getElementById("upi_verified");
-
-    upiId.addEventListener("input", function () {
-
-        if (this.value.includes("@")) {
-
-            upiMsg.innerHTML = "✅ Valid Format";
-            upiMsg.style.color = "green";
-
-        } else {
-
-            upiMsg.innerHTML = "❌ Invalid UPI ID";
-            upiMsg.style.color = "red";
-
-        }
-
-    });
-
-    upiNo.addEventListener("input", function () {
-
-        this.value = this.value.replace(/\D/g, '');
-
-        if (this.value.length === 10) {
-
-            numMsg.innerHTML = "✅ Valid Number";
-            numMsg.style.color = "green";
-
-        } else {
-
-            numMsg.innerHTML = "❌ Enter 10 digits";
-            numMsg.style.color = "red";
-
-        }
-
-    });
-
-    // =========================================
-    // VERIFY UPI
-    // =========================================
-
-    verifyUpiBtn.addEventListener("click", function () {
-
-        let upi = upiId.value.trim();
-        let num = upiNo.value.trim();
-
-        if (upi === "" && num === "") {
-
-            upiVerifyMsg.innerHTML =
-                "❌ Enter UPI ID or Number";
-
-            upiVerifyMsg.style.color = "red";
-            return;
-
-        }
-
-        verifyUpiBtn.disabled = true;
-        verifyUpiBtn.innerHTML = "Checking...";
-
-        setTimeout(function () {
-
-            if (
-                (upi.includes("@") && upi.length >= 6) ||
-                num.length === 10
-            ) {
-
-                upiVerified.value = "1";
-
-                upiName.value =
-                    "Verified UPI Holder";
-
-                upiVerifyMsg.innerHTML =
-                    "✅ UPI Verified Successfully";
-
-                upiVerifyMsg.style.color = "green";
+                accMsg.innerHTML = "✅ Account Number Matched";
+                accMsg.style.color = "green";
 
             } else {
 
-                upiVerified.value = "0";
+                accMsg.innerHTML = "❌ Account Number Not Matched";
+                accMsg.style.color = "red";
 
-                upiName.value = "";
+            }
+
+        }
+
+        acc1.addEventListener("input", checkAccount);
+        acc2.addEventListener("input", checkAccount);
+
+        // =========================================
+        // UPI VALIDATION
+        // =========================================
+
+        const upiId = document.getElementById("upi_id");
+        const upiNo = document.getElementById("upi_number");
+
+        const verifyUpiBtn = document.getElementById("verifyUpiBtn");
+
+        const upiMsg = document.getElementById("upiMsg");
+        const numMsg = document.getElementById("numMsg");
+
+        const upiVerifyMsg =
+            document.getElementById("upiVerifyMsg");
+
+        const upiName =
+            document.getElementById("upi_beneficiary_name");
+
+        const upiVerified =
+            document.getElementById("upi_verified");
+
+        upiId.addEventListener("input", function () {
+
+            if (this.value.includes("@")) {
+
+                upiMsg.innerHTML = "✅ Valid Format";
+                upiMsg.style.color = "green";
+
+            } else {
+
+                upiMsg.innerHTML = "❌ Invalid UPI ID";
+                upiMsg.style.color = "red";
+
+            }
+
+        });
+
+        upiNo.addEventListener("input", function () {
+
+            this.value = this.value.replace(/\D/g, '');
+
+            if (this.value.length === 10) {
+
+                numMsg.innerHTML = "✅ Valid Number";
+                numMsg.style.color = "green";
+
+            } else {
+
+                numMsg.innerHTML = "❌ Enter 10 digits";
+                numMsg.style.color = "red";
+
+            }
+
+        });
+
+        // =========================================
+        // VERIFY UPI
+        // =========================================
+
+        verifyUpiBtn.addEventListener("click", function () {
+
+            let upi = upiId.value.trim();
+            let num = upiNo.value.trim();
+
+            if (upi === "" && num === "") {
 
                 upiVerifyMsg.innerHTML =
-                    "❌ UPI Verification Failed";
+                    "❌ Enter UPI ID or Number";
 
                 upiVerifyMsg.style.color = "red";
+                return;
 
             }
 
-            verifyUpiBtn.disabled = false;
-            verifyUpiBtn.innerHTML = "Verify UPI";
+            verifyUpiBtn.disabled = true;
+            verifyUpiBtn.innerHTML = "Checking...";
 
-        }, 1500);
+            setTimeout(function () {
 
-    });
+                if (
+                    (upi.includes("@") && upi.length >= 6) ||
+                    num.length === 10
+                ) {
 
-    // =========================================
-    // FREIGHT + MARGIN
-    // =========================================
+                    upiVerified.value = "1";
 
-    const freight =
-        document.getElementById("freight_amount");
+                    upiName.value =
+                        "Verified UPI Holder";
 
-    const halting =
-        document.getElementById("halting");
+                    upiVerifyMsg.innerHTML =
+                        "✅ UPI Verified Successfully";
 
-    const loading =
-        document.getElementById("loading_unloading");
+                    upiVerifyMsg.style.color = "green";
 
-    const brokerage =
-        document.getElementById("brokerage");
+                } else {
 
-    const total =
-        document.getElementById("total_freight");
+                    upiVerified.value = "0";
 
-    const advance =
-        document.getElementById("advance");
+                    upiName.value = "";
 
-    const balance =
-        document.getElementById("balance");
+                    upiVerifyMsg.innerHTML =
+                        "❌ UPI Verification Failed";
 
-    const saveBtn =
-        document.getElementById("saveBtn");
-
-    const approvalSection =
-        document.getElementById("approvalSection");
-
-    const approvalName =
-        document.getElementById("approvalName");
-
-    const approvalError =
-        document.getElementById("approvalError");
-
-    const topCard =
-        document.querySelector(".top-margin-card");
-
-    function calcFreight() {
-
-        let f = parseFloat(freight.value) || 0;
-        let h = parseFloat(halting.value) || 0;
-        let l = parseFloat(loading.value) || 0;
-        let b = parseFloat(brokerage.value) || 0;
-        let a = parseFloat(advance.value) || 0;
-
-        // SELLING RATE
-        let sellingRate =
-            parseFloat("{{ order.total_rate|default:0 }}") || 0;
-
-        // EXPECTED FREIGHT
-        let expectedFreight =
-            sellingRate - ((sellingRate * 25) / 100);
-
-        // TOTAL FREIGHT
-        let totalFreight = f + h + l + b;
-
-        // BALANCE
-        let balanceAmount = totalFreight - a;
-
-        total.value = totalFreight.toFixed(2);
-        balance.value = balanceAmount.toFixed(2);
-
-        // MARGIN %
-        let marginPercent = 0;
-
-        if (sellingRate > 0) {
-
-            marginPercent =
-                ((sellingRate - totalFreight)
-                    / sellingRate) * 100;
-
-        }
-
-        // PROFIT
-        let profit = sellingRate - totalFreight;
-
-        // =========================================
-        // TOP VALUES
-        // =========================================
-
-        document.getElementById("expectedFreight").innerHTML =
-            "₹ " + expectedFreight.toFixed(2);
-
-        document.getElementById("finalFreightView").innerHTML =
-            "₹ " + totalFreight.toFixed(2);
-
-        document.getElementById("expectedMargin").innerHTML =
-            "25%";
-
-        document.getElementById("currentMargin").innerHTML =
-            marginPercent.toFixed(2) + "%";
-
-        // PROFIT DISPLAY
-        const profitAmount =
-            document.getElementById("profitAmount");
-
-        if (profitAmount) {
-
-            profitAmount.innerHTML =
-                "Profit ₹ " + profit.toFixed(2);
-
-        }
-
-        const marginText =
-            document.getElementById("marginText");
-
-        const currentMargin =
-            document.getElementById("currentMargin");
-
-        // RESET
-        topCard.classList.remove(
-            "margin-danger",
-            "margin-warning",
-            "margin-success"
-        );
-
-        // =========================================
-        // BELOW 13%
-        // =========================================
-
-        if (marginPercent < 13) {
-
-            currentMargin.className =
-                "badge bg-danger fs-6";
-
-            topCard.classList.add("margin-danger");
-
-            if (approvalSection) {
-                approvalSection.style.display = "block";
-            }
-
-            marginText.innerHTML = `
-                <div class="alert alert-danger mt-2 mb-0">
-                    ❌ Vehicle source rate is below minimum margin.
-                    Manager approval required.
-                </div>
-            `;
-
-            if (
-                approvalName &&
-                approvalName.value.trim() === ""
-            ) {
-
-                saveBtn.disabled = true;
-
-                saveBtn.innerHTML =
-                    "🔒 Approval Required";
-
-                if (approvalError) {
-
-                    approvalError.innerHTML =
-                        "Approval name required";
-
-                    approvalError.style.color = "red";
+                    upiVerifyMsg.style.color = "red";
 
                 }
 
-            } else {
+                verifyUpiBtn.disabled = false;
+                verifyUpiBtn.innerHTML = "Verify UPI";
+
+            }, 1500);
+
+        });
+
+        // =========================================
+        // FREIGHT + MARGIN
+        // =========================================
+
+        const freight =
+            document.getElementById("freight_amount");
+
+        const halting =
+            document.getElementById("halting");
+
+        const loading =
+            document.getElementById("loading_unloading");
+
+        const brokerage =
+            document.getElementById("brokerage");
+
+        const total =
+            document.getElementById("total_freight");
+
+        const advance =
+            document.getElementById("advance");
+
+        const balance =
+            document.getElementById("balance");
+
+        const saveBtn =
+            document.getElementById("saveBtn");
+
+        const approvalSection =
+            document.getElementById("approvalSection");
+
+        const approvalName =
+            document.getElementById("approvalName");
+
+        const approvalError =
+            document.getElementById("approvalError");
+
+        const topCard =
+            document.querySelector(".top-margin-card");
+
+        function calcFreight() {
+
+            let f = parseFloat(freight.value) || 0;
+            let h = parseFloat(halting.value) || 0;
+            let l = parseFloat(loading.value) || 0;
+            let b = parseFloat(brokerage.value) || 0;
+            let a = parseFloat(advance.value) || 0;
+
+            // SELLING RATE
+            let sellingRate =
+                parseFloat("{{ order.total_rate|default:0 }}") || 0;
+
+            // EXPECTED FREIGHT
+            let expectedFreight =
+                sellingRate - ((sellingRate * 25) / 100);
+
+            // TOTAL FREIGHT
+            let totalFreight = f + h + l + b;
+
+            // BALANCE
+            let balanceAmount = totalFreight - a;
+
+            total.value = totalFreight.toFixed(2);
+            balance.value = balanceAmount.toFixed(2);
+
+            // MARGIN %
+            let marginPercent = 0;
+
+            if (sellingRate > 0) {
+
+                marginPercent =
+                    ((sellingRate - totalFreight)
+                        / sellingRate) * 100;
+
+            }
+
+            // PROFIT
+            let profit = sellingRate - totalFreight;
+
+            // =========================================
+            // TOP VALUES
+            // =========================================
+
+            document.getElementById("expectedFreight").innerHTML =
+                "₹ " + expectedFreight.toFixed(2);
+
+            document.getElementById("finalFreightView").innerHTML =
+                "₹ " + totalFreight.toFixed(2);
+
+            document.getElementById("expectedMargin").innerHTML =
+                "25%";
+
+            document.getElementById("currentMargin").innerHTML =
+                marginPercent.toFixed(2) + "%";
+
+            // PROFIT DISPLAY
+            const profitAmount =
+                document.getElementById("profitAmount");
+
+            if (profitAmount) {
+
+                if (profit >= 0) {
+
+                    profitAmount.innerHTML =
+                        "Profit ₹ " + profit.toFixed(2);
+
+                    profitAmount.className =
+                        "mt-2 fw-bold text-success";
+
+                } else {
+
+                    profitAmount.innerHTML =
+                        "Loss ₹ " + Math.abs(profit).toFixed(2);
+
+                    profitAmount.className =
+                        "mt-2 fw-bold text-danger";
+                }
+
+            }
+
+            const marginText =
+                document.getElementById("marginText");
+
+            const currentMargin =
+                document.getElementById("currentMargin");
+
+            // RESET
+            topCard.classList.remove(
+                "margin-danger",
+                "margin-warning",
+                "margin-success"
+            );
+
+            // =========================================
+            // BELOW 13%
+            // =========================================
+
+            if (marginPercent < 13 || profit < 0) {
+
+                currentMargin.className =
+                    "badge bg-danger fs-6";
+
+                topCard.classList.add("margin-danger");
+
+                if (approvalSection) {
+                    approvalSection.style.display = "block";
+                }
+
+                if (profit < 0) {
+
+                    marginText.innerHTML = `
+                    <div class="alert alert-danger mt-2 mb-0">
+                        ❌ Trip is in LOSS.
+                        Manager approval mandatory.
+                    </div>
+                `;
+
+                } else {
+
+                    marginText.innerHTML = `
+                    <div class="alert alert-danger mt-2 mb-0">
+                        ❌ Vehicle source rate is below minimum margin.
+                        Manager approval required.
+                    </div>
+                `;
+                };
+
+                if (
+                    approvalName &&
+                    approvalName.value.trim() === ""
+                ) {
+
+                    saveBtn.disabled = true;
+
+                    saveBtn.innerHTML =
+                        "🔒 Approval Required";
+
+                    if (approvalError) {
+
+                        approvalError.innerHTML =
+                            "Approval name required";
+
+                        approvalError.style.color = "red";
+
+                    }
+
+                } else {
+
+                    saveBtn.disabled = false;
+
+                    saveBtn.innerHTML =
+                        "💾 Save Vehicle";
+
+                    if (approvalError) {
+
+                        approvalError.innerHTML = "";
+
+                    }
+
+                }
+
+            }
+
+            // =========================================
+            // WARNING
+            // =========================================
+
+            else if (
+                marginPercent >= 13 &&
+                marginPercent < 15
+            ) {
+
+                currentMargin.className =
+                    "badge bg-warning text-dark fs-6";
+
+                topCard.classList.add("margin-warning");
+
+                if (approvalSection) {
+                    approvalSection.style.display = "none";
+                }
 
                 saveBtn.disabled = false;
 
                 saveBtn.innerHTML =
                     "💾 Save Vehicle";
 
-                if (approvalError) {
-
-                    approvalError.innerHTML = "";
-
-                }
-
-            }
-
-        }
-
-        // =========================================
-        // WARNING
-        // =========================================
-
-        else if (
-            marginPercent >= 13 &&
-            marginPercent < 15
-        ) {
-
-            currentMargin.className =
-                "badge bg-warning text-dark fs-6";
-
-            topCard.classList.add("margin-warning");
-
-            if (approvalSection) {
-                approvalSection.style.display = "none";
-            }
-
-            saveBtn.disabled = false;
-
-            saveBtn.innerHTML =
-                "💾 Save Vehicle";
-
-            marginText.innerHTML = `
+                marginText.innerHTML = `
                 <div class="alert alert-warning mt-2 mb-0">
                     ⚠ Margin between 13% and 15%.
                     Review recommended.
                 </div>
             `;
 
-        }
-
-        // =========================================
-        // HEALTHY
-        // =========================================
-
-        else {
-
-            currentMargin.className =
-                "badge bg-success fs-6";
-
-            topCard.classList.add("margin-success");
-
-            if (approvalSection) {
-                approvalSection.style.display = "none";
             }
 
-            saveBtn.disabled = false;
+            // =========================================
+            // HEALTHY
+            // =========================================
 
-            saveBtn.innerHTML =
-                "💾 Save Vehicle";
+            else {
 
-            marginText.innerHTML = `
+                currentMargin.className =
+                    "badge bg-success fs-6";
+
+                topCard.classList.add("margin-success");
+
+                if (approvalSection) {
+                    approvalSection.style.display = "none";
+                }
+
+                saveBtn.disabled = false;
+
+                saveBtn.innerHTML =
+                    "💾 Save Vehicle";
+
+                marginText.innerHTML = `
                 <div class="alert alert-success mt-2 mb-0">
                     ✅ Margin is healthy.
                 </div>
             `;
 
-        }
-
-    }
-
-    // LIVE CALC
-    [
-        freight,
-        halting,
-        loading,
-        brokerage,
-        advance
-    ].forEach(el => {
-
-        if (el) {
-            el.addEventListener("input", calcFreight);
-        }
-
-    });
-
-    if (approvalName) {
-
-        approvalName.addEventListener(
-            "input",
-            calcFreight
-        );
-
-    }
-
-    calcFreight();
-
-    // =========================================
-    // OTP SECTION
-    // =========================================
-
-    let generatedOtp = "";
-    let timer;
-
-    const sendBtn =
-        document.getElementById("sendOtpBtn");
-
-    const verifyBtn =
-        document.getElementById("verifyOtpBtn");
-
-    const otpBox =
-        document.getElementById("otpBox");
-
-    const otpInput =
-        document.getElementById("otp_input");
-
-    const driver =
-        document.getElementById("driver_number");
-
-    const driverMsg =
-        document.getElementById("driverMsg");
-
-    const verified =
-        document.getElementById("driver_verified");
-
-    sendBtn.addEventListener("click", function () {
-
-        driver.value =
-            driver.value.replace(/\D/g, '');
-
-        if (driver.value.length !== 10) {
-
-            driverMsg.innerHTML =
-                "❌ Enter valid mobile number";
-
-            driverMsg.style.color = "red";
-
-            return;
+            }
 
         }
 
-        generatedOtp =
-            Math.floor(
-                100000 + Math.random() * 900000
-            ).toString();
+        // LIVE CALC
+        [
+            freight,
+            halting,
+            loading,
+            brokerage,
+            advance
+        ].forEach(el => {
 
-        otpBox.style.display = "block";
+            if (el) {
+                el.addEventListener("input", calcFreight);
+            }
 
-        otpInput.value = "";
+        });
 
-        verified.value = "0";
+        if (approvalName) {
 
-        let seconds = 60;
+            approvalName.addEventListener(
+                "input",
+                calcFreight
+            );
 
-        clearInterval(timer);
+        }
 
-        timer = setInterval(function () {
+        calcFreight();
 
-            seconds--;
+        // =========================================
+        // OTP SECTION
+        // =========================================
 
-            driverMsg.innerHTML =
-                "OTP sent. Expires in "
-                + seconds + " sec";
+        let generatedOtp = "";
+        let timer;
 
-            driverMsg.style.color = "#0d6efd";
+        const sendBtn =
+            document.getElementById("sendOtpBtn");
 
-            if (seconds <= 0) {
+        const verifyBtn =
+            document.getElementById("verifyOtpBtn");
+
+        const otpBox =
+            document.getElementById("otpBox");
+
+        const otpInput =
+            document.getElementById("otp_input");
+
+        const driver =
+            document.getElementById("driver_number");
+
+        const driverMsg =
+            document.getElementById("driverMsg");
+
+        const verified =
+            document.getElementById("driver_verified");
+
+        sendBtn.addEventListener("click", function () {
+
+            driver.value =
+                driver.value.replace(/\D/g, '');
+
+            if (driver.value.length !== 10) {
+
+                driverMsg.innerHTML =
+                    "❌ Enter valid mobile number";
+
+                driverMsg.style.color = "red";
+
+                return;
+
+            }
+
+            generatedOtp =
+                Math.floor(
+                    100000 + Math.random() * 900000
+                ).toString();
+
+            otpBox.style.display = "block";
+
+            otpInput.value = "";
+
+            verified.value = "0";
+
+            let seconds = 60;
+
+            clearInterval(timer);
+
+            timer = setInterval(function () {
+
+                seconds--;
+
+                driverMsg.innerHTML =
+                    "OTP sent. Expires in "
+                    + seconds + " sec";
+
+                driverMsg.style.color = "#0d6efd";
+
+                if (seconds <= 0) {
+
+                    clearInterval(timer);
+
+                    otpBox.style.display = "none";
+
+                    driverMsg.innerHTML =
+                        "⌛ OTP expired";
+
+                    driverMsg.style.color = "red";
+
+                }
+
+            }, 1000);
+
+        });
+
+        verifyBtn.addEventListener("click", function () {
+
+            if (otpInput.value === generatedOtp) {
 
                 clearInterval(timer);
 
+                driverMsg.innerHTML =
+                    "✅ Verified";
+
+                driverMsg.style.color = "green";
+
                 otpBox.style.display = "none";
 
+                sendBtn.style.display = "none";
+
+                driver.readOnly = true;
+
+                verified.value = "1";
+
+            } else {
+
                 driverMsg.innerHTML =
-                    "⌛ OTP expired";
+                    "❌ Invalid OTP";
 
                 driverMsg.style.color = "red";
 
             }
 
-        }, 1000);
+        });
 
-    });
+        // =========================================
+        // BANK VERIFY
+        // =========================================
 
-    verifyBtn.addEventListener("click", function () {
+        const verifyBankBtn =
+            document.getElementById("verifyBankBtn");
 
-        if (otpInput.value === generatedOtp) {
+        const bankMsg =
+            document.getElementById("bankMsg");
 
-            clearInterval(timer);
+        const bankVerified =
+            document.getElementById("bank_verified");
 
-            driverMsg.innerHTML =
-                "✅ Verified";
+        verifyBankBtn.addEventListener("click", function () {
 
-            driverMsg.style.color = "green";
+            const acc = acc1.value.trim();
 
-            otpBox.style.display = "none";
+            const ifsc =
+                document.getElementById("ifsc")
+                    .value.trim();
 
-            sendBtn.style.display = "none";
-
-            driver.readOnly = true;
-
-            verified.value = "1";
-
-        } else {
-
-            driverMsg.innerHTML =
-                "❌ Invalid OTP";
-
-            driverMsg.style.color = "red";
-
-        }
-
-    });
-
-    // =========================================
-    // BANK VERIFY
-    // =========================================
-
-    const verifyBankBtn =
-        document.getElementById("verifyBankBtn");
-
-    const bankMsg =
-        document.getElementById("bankMsg");
-
-    const bankVerified =
-        document.getElementById("bank_verified");
-
-    verifyBankBtn.addEventListener("click", function () {
-
-        const acc = acc1.value.trim();
-
-        const ifsc =
-            document.getElementById("ifsc")
-                .value.trim();
-
-        if (acc === "" || ifsc === "") {
-
-            bankMsg.innerHTML =
-                "❌ Enter Account Number + IFSC";
-
-            bankMsg.style.color = "red";
-
-            return;
-
-        }
-
-        verifyBankBtn.disabled = true;
-
-        verifyBankBtn.innerHTML = "Checking...";
-
-        setTimeout(function () {
-
-            if (
-                acc.length >= 8 &&
-                ifsc.length >= 8
-            ) {
-
-                bankVerified.value = "1";
-
-                const beneficiary =
-                    document.getElementById(
-                        "account_beneficiary_name"
-                    );
-
-                if (beneficiary.value === "") {
-
-                    beneficiary.value =
-                        "Verified Beneficiary";
-
-                }
+            if (acc === "" || ifsc === "") {
 
                 bankMsg.innerHTML =
-                    "✅ Beneficiary Verified";
-
-                bankMsg.style.color = "green";
-
-            } else {
-
-                bankVerified.value = "0";
-
-                bankMsg.innerHTML =
-                    "❌ Invalid Bank Details";
+                    "❌ Enter Account Number + IFSC";
 
                 bankMsg.style.color = "red";
 
+                return;
+
             }
 
-            verifyBankBtn.disabled = false;
+            verifyBankBtn.disabled = true;
 
-            verifyBankBtn.innerHTML =
-                "Verify Beneficiary";
+            verifyBankBtn.innerHTML = "Checking...";
 
-        }, 1500);
+            setTimeout(function () {
+
+                if (
+                    acc.length >= 8 &&
+                    ifsc.length >= 8
+                ) {
+
+                    bankVerified.value = "1";
+
+                    const beneficiary =
+                        document.getElementById(
+                            "account_beneficiary_name"
+                        );
+
+                    if (beneficiary.value === "") {
+
+                        beneficiary.value =
+                            "Verified Beneficiary";
+
+                    }
+
+                    bankMsg.innerHTML =
+                        "✅ Beneficiary Verified";
+
+                    bankMsg.style.color = "green";
+
+                } else {
+
+                    bankVerified.value = "0";
+
+                    bankMsg.innerHTML =
+                        "❌ Invalid Bank Details";
+
+                    bankMsg.style.color = "red";
+
+                }
+
+                verifyBankBtn.disabled = false;
+
+                verifyBankBtn.innerHTML =
+                    "Verify Beneficiary";
+
+            }, 1500);
+
+        });
 
     });
-
-});
 </script>
 <style>
     .margin-danger {

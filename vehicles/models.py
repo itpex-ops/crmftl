@@ -9,9 +9,8 @@ class Vehicle(models.Model):
     order = models.OneToOneField(
     'orders.Order',   # ✅ CORRECT
     on_delete=models.CASCADE,
-    related_name='vehicles'   # ✅ singular for OneToOne
+    related_name='vehicle'   # ✅ singular for OneToOne
 )
-
     ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
 
     vehicle_number = models.CharField(max_length=50)
@@ -85,12 +84,14 @@ class Vehicle(models.Model):
         # Total freight
         self.total_freight = (
             Decimal(self.freight_amount or 0)
+            + Decimal(self.halting or 0)
             + Decimal(self.brokerage or 0)
             + Decimal(self.loading_unloading or 0)
         )
 
         # FTL NUMBER GENERATION
         if not self.ftl_no:
+
             with transaction.atomic():
 
                 last_vehicle = (
@@ -101,18 +102,19 @@ class Vehicle(models.Model):
                 )
 
                 if last_vehicle and last_vehicle.ftl_no:
-                    last_num = int(last_vehicle.ftl_no.split('_')[1])
+
+                    last_num = int(
+                        last_vehicle.ftl_no.replace("FTL", "")
+                    )
+
                     new_num = last_num + 1
+
                 else:
                     new_num = 1
 
                 self.ftl_no = f"FTL{new_num:03d}"
 
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.vehicle_number} ({self.order.order_no})"
-    
 class Tracking(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="tracking")
 

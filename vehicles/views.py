@@ -28,11 +28,35 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Order, Vehicle, Tracking
 
-
 @login_required
 def assign_vehicle(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
+
+    # =========================
+    # ONE TO ONE CHECK
+    # =========================
+
+    existing_vehicle = Vehicle.objects.filter(
+        order=order
+    ).first()
+
+    existing_vehicle = Vehicle.objects.filter(
+    order=order
+    ).first()
+
+    if existing_vehicle:
+
+        messages.warning(
+            request,
+            "Vehicle already assigned."
+        )
+
+        return redirect("order_list")
+
+    # =========================
+    # POST
+    # =========================
 
     if request.method == "POST":
 
@@ -42,8 +66,15 @@ def assign_vehicle(request, order_id):
             # SOURCE
             # =========================
 
-            source = request.POST.get("source", "")
-            source_other = request.POST.get("source_other", "")
+            source = request.POST.get(
+                "source",
+                ""
+            )
+
+            source_other = request.POST.get(
+                "source_other",
+                ""
+            )
 
             if source == "others" and source_other:
                 source = source_other
@@ -53,23 +84,33 @@ def assign_vehicle(request, order_id):
             # =========================
 
             freight_amount = Decimal(
-                request.POST.get("freight_amount") or 0
+                request.POST.get(
+                    "freight_amount"
+                ) or 0
             )
 
             halting = Decimal(
-                request.POST.get("halting") or 0
+                request.POST.get(
+                    "halting"
+                ) or 0
             )
 
             loading_unloading = Decimal(
-                request.POST.get("loading_unloading") or 0
+                request.POST.get(
+                    "loading_unloading"
+                ) or 0
             )
 
             brokerage = Decimal(
-                request.POST.get("brokerage") or 0
+                request.POST.get(
+                    "brokerage"
+                ) or 0
             )
 
             advance = Decimal(
-                request.POST.get("advance") or 0
+                request.POST.get(
+                    "advance"
+                ) or 0
             )
 
             # =========================
@@ -101,7 +142,8 @@ def assign_vehicle(request, order_id):
 
                 margin_percentage = (
                     (
-                        selling_price - final_freight
+                        selling_price
+                        - final_freight
                     ) / selling_price
                 ) * 100
 
@@ -110,58 +152,41 @@ def assign_vehicle(request, order_id):
             # =========================
 
             profit_amount = (
-                selling_price - final_freight
+                selling_price
+                - final_freight
             )
 
             # =========================
             # APPROVAL
             # =========================
 
-            # APPROVAL
             approval_name = request.POST.get(
-                "approval_name", ""
+                "approval_name",
+                ""
             ).strip()
 
             approval_reason = request.POST.get(
-                "approval_reason", ""
+                "approval_reason",
+                ""
             ).strip()
 
-            # BLOCK SAVE
-            if margin_percentage < 13 and not approval_name:
+            # =========================
+            # LOW MARGIN CHECK
+            # =========================
+
+            if (
+                margin_percentage < 13
+                or profit_amount < 0
+            ) and not approval_name:
 
                 messages.error(
                     request,
-                    "Approval authority name required for low margin."
+                    "Manager approval required."
                 )
 
                 return redirect(
                     "assign_vehicle",
                     order_id=order.id
-                )
-
-            # =========================
-            # APPROVAL MESSAGE
-            # =========================
-
-            if margin_percentage < 13:
-
-                approval_message = (
-                    f"Low margin approved by "
-                    f"{approval_name}"
-                )
-
-            elif margin_percentage >= 15:
-
-                approval_message = (
-                    f"Healthy margin "
-                    f"{margin_percentage:.2f}%"
-                )
-
-            else:
-
-                approval_message = (
-                    f"Margin is "
-                    f"{margin_percentage:.2f}%"
                 )
 
             # =========================
@@ -195,6 +220,9 @@ def assign_vehicle(request, order_id):
 
                 total_freight=final_freight,
 
+                # PAYMENT
+                advance=advance,
+
                 # MARGIN
                 margin_percentage=margin_percentage,
 
@@ -202,12 +230,15 @@ def assign_vehicle(request, order_id):
                 profit_amount=profit_amount,
 
                 # APPROVAL
+                approval_required=(
+                    margin_percentage < 13
+                    or profit_amount < 0
+                ),
+
                 approval_name=approval_name,
                 approval_reason=approval_reason,
 
-                # PAYMENT
-                advance=advance,
-
+                # UPI
                 upi_app=request.POST.get(
                     "upi_app"
                 ),
@@ -220,6 +251,7 @@ def assign_vehicle(request, order_id):
                     "upi_number"
                 ),
 
+                # BANK
                 account_number=request.POST.get(
                     "account_number"
                 ),
@@ -236,9 +268,11 @@ def assign_vehicle(request, order_id):
                     "account_beneficiary_name"
                 ),
 
-                bank_verified=request.POST.get(
-                    "bank_verified"
-                ) == "1",
+                bank_verified=(
+                    request.POST.get(
+                        "bank_verified"
+                    ) == "1"
+                ),
             )
 
             # =========================
@@ -256,15 +290,20 @@ def assign_vehicle(request, order_id):
             messages.success(
                 request,
                 f"Vehicle assigned successfully | "
+                f"FTL : {vehicle.ftl_no} | "
                 f"Freight ₹{final_freight} | "
                 f"Profit ₹{profit_amount} | "
-                f"Margin {margin_percentage:.2f}% | "
-                f"{approval_message}"
+                f"Margin {margin_percentage:.2f}%"
             )
 
             return redirect("order_list")
 
         except Exception as e:
+
+            print(
+                "ASSIGN VEHICLE ERROR:",
+                str(e)
+            )
 
             messages.error(
                 request,
@@ -301,6 +340,7 @@ def tracking_view(request):
         "tracking": tracking,
         "vehicle": vehicle
     })
+
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
@@ -438,7 +478,7 @@ def public_tracking(request):
     return render(request, "vehicle/public_tracking.html", context)
 
 @login_required 
-def assign_vehicle12(request, order_id):
+def assign_vehicle32(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
 
