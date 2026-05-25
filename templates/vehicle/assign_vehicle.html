@@ -108,7 +108,7 @@
         <input type="text" name="fake_user" autocomplete="username" style="position:absolute;left:-9999px;opacity:0;">
         <input type="password" name="fake_pass" autocomplete="current-password"
             style="position:absolute;left:-9999px;opacity:0;">
-              <!-- APPROVAL SECTION -->
+        <!-- APPROVAL SECTION -->
         <div class="card border-danger mb-4" id="approvalSection" style="display:none;">
 
             <div class="card-header bg-danger text-white">
@@ -359,7 +359,7 @@
             </div>
         </div>
 
-      
+
         <!-- ACTION -->
         <div class="action-bar">
             <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
@@ -1041,104 +1041,121 @@
     });
 </script>
 <style>
-    .margin-danger {
-        border: 2px solid #dc3545 !important;
-        box-shadow: 0 0 15px rgba(220, 53, 69, .2);
+    /* =========================
+   SAP ERP GRID LAYOUT (SAFE)
+========================= */
+
+    .erp-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 18px;
+        align-items: start;
     }
 
-    .margin-warning {
-        border: 2px solid #ffc107 !important;
-        box-shadow: 0 0 15px rgba(255, 193, 7, .2);
+    /* LEFT SIDE */
+    .erp-left {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
 
-    .margin-success {
-        border: 2px solid #198754 !important;
-        box-shadow: 0 0 15px rgba(25, 135, 84, .2);
+    /* RIGHT SIDE */
+    .erp-right {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        border-left: 3px solid #1b90ff;
+        padding-left: 16px;
     }
 
-    .top-margin-card {
-        border-radius: 16px;
-        background: linear-gradient(135deg, #ffffff, #f8fafc);
-    }
-
-    .top-title {
-        font-size: 13px;
-        color: #64748b;
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-
-    .top-value {
-        font-size: 24px;
-        font-weight: 700;
-    }
-
-    .border-end {
-        border-right: 1px solid #eef2f7 !important;
-    }
-
-    @media(max-width:768px) {
-
-        .border-end {
-            border-right: none !important;
-            border-bottom: 1px solid #eef2f7;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-    }
-
-    .order-badge {
-        background: #eef2ff;
-        color: #4338ca;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-    }
+    /* =========================
+   CARD (FIORI STYLE CLEAN)
+========================= */
 
     .saas-card {
-        border: 1px solid #eef0f2;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
-    }
-
-    .saas-card .card-header {
-        background: transparent;
-        border-bottom: 1px solid #f1f3f5;
-        font-weight: 600;
-    }
-
-    .input-style {
+        border: 1px solid #e3e8ef;
         border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
     }
 
-    label {
+    .saas-card:hover {
+        box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+    }
+
+    /* HEADER */
+    .saas-card .card-header {
+        background: linear-gradient(90deg, #0a6ed1, #1b90ff);
+        color: white;
+        font-weight: 600;
         font-size: 13px;
-        font-weight: 500;
+        padding: 10px 14px;
+        border-radius: 10px 10px 0 0;
     }
 
+    /* BODY */
+    .saas-card .card-body {
+        padding: 16px;
+    }
+
+    /* INPUT */
+    .input-style {
+        border-radius: 6px;
+        border: 1px solid #cfd7e3;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .input-style:focus {
+        border-color: #1b90ff;
+        box-shadow: 0 0 0 3px rgba(27, 144, 255, 0.15);
+    }
+
+    /* LABEL */
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    /* ACTION BAR */
     .action-bar {
+        grid-column: 1 / -1;
         position: sticky;
         bottom: 0;
         background: #fff;
-        padding: 15px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid #e5e7eb;
+        padding: 12px 16px;
         display: flex;
         justify-content: space-between;
+        z-index: 10;
     }
 
+    /* BUTTONS */
     .btn-success {
-        background: #10b981;
+        background: #1b90ff;
         border: none;
+        border-radius: 6px;
+        font-weight: 600;
     }
 
-    /* Autofill remove */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus {
-        -webkit-box-shadow: 0 0 0px 1000px white inset !important;
-        -webkit-text-fill-color: #000 !important;
+    .btn-success:hover {
+        background: #0a6ed1;
+    }
+
+    /* =========================
+   MOBILE STACK
+========================= */
+
+    @media (max-width: 991px) {
+        .erp-grid {
+            display: block;
+        }
+
+        .erp-right {
+            border-left: none;
+            padding-left: 0;
+        }
     }
 </style>
-
 {% endblock %}

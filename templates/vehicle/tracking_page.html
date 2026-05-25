@@ -48,7 +48,7 @@
                         <input type="checkbox"
                                name="vehicle_document"
                                {% if tracking.vehicle_document %}checked{% endif %}>
-                        📄 Vehicle Document
+                        📄 Vehicle Document Collected
                     </label>
                 </div>
 
@@ -139,24 +139,7 @@
                         📦 POD Received
                     </label>
                 </div>
-
-                <div class="track-item">
-                    <label>
-                        <input type="checkbox"
-                               name="settled"
-                               id="settledBox"
-                               {% if tracking.settled %}checked{% endif %}>
-                        🧮 Settled
-                    </label>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- POD UPLOAD -->
+                  <!-- POD UPLOAD -->
     <div id="uploadBox"
          class="mt-4"
          style="{% if not tracking.pod_received %}display:none;{% endif %}">
@@ -209,6 +192,24 @@
         </div>
 
     </div>
+
+                <div class="track-item">
+                    <label>
+                        <input type="checkbox"
+                               name="settled"
+                               id="settledBox"
+                               {% if tracking.settled %}checked{% endif %}>
+                        🧮 Settled
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+  
 
     <!-- REMARKS -->
     <div class="mt-4">

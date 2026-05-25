@@ -13,29 +13,16 @@
                 ✏ Enquiry {{ enquiry.enquiry_no }}
             </h5>
 
-            <div class="ms-auto text-end">
-                <label class="small text-muted d-block mb-1">
-                    🚚 Vehicle Date
-                </label>
-
-                <input type="text"
-                       id="vehicle_date"
-                       name="vehicle_place_date"
-                       class="form-control"
-                       style="width:220px;"
-                       value="{{ order.vehicle_place_date|date:'Y-m-d H:i'|default_if_none:'' }}">
-            </div>
-
         </div>
 
-        <div class="row g-3">
+        <div class="row g-3 align-items-stretch">
 
             <!-- LEFT -->
-            <div class="col-lg-6">
+            {% if enquiry.status == "confirmed" or enquiry.approval_rate %}
 
-                {% if enquiry.status == "confirmed" or enquiry.approval_rate %}
+            <div class="col-lg-6 d-flex">
 
-                <div class="card section-card mb-3">
+                <div class="card section-card w-100">
 
                     <div class="section-title">
                         💰 Pricing Details
@@ -44,12 +31,14 @@
                     <div class="p-3">
 
                         <!-- Final Rate -->
-                        <label class="form-label">Final Rate</label>
+                        <label class="form-label">
+                            Final Rate
+                        </label>
 
                         <input type="text"
                                name="finalized_rate"
                                id="final_rate"
-                               class="form-control mb-2"
+                               class="form-control mb-3"
                                value="{{ order.finalized_rate|default_if_none:approval_rate|default:approval_rate }}">
 
                         <!-- Loading -->
@@ -60,7 +49,7 @@
                         <input type="text"
                                name="loading_charges"
                                id="loading_unloading"
-                               class="form-control mb-2"
+                               class="form-control mb-3"
                                value="{{ order.loading_charges|default_if_none:'' }}">
 
                         <!-- Halting -->
@@ -71,7 +60,7 @@
                         <input type="text"
                                name="halting_charges"
                                id="halting_charges"
-                               class="form-control mb-2"
+                               class="form-control mb-3"
                                value="{{ order.halting_charges|default_if_none:'' }}">
 
                         <!-- GST -->
@@ -82,7 +71,7 @@
                         <input type="text"
                                name="gst_percent"
                                id="gst_percent"
-                               class="form-control mb-2"
+                               class="form-control mb-3"
                                value="{{ order.gst_percent|default_if_none:'' }}">
 
                         <!-- Total -->
@@ -101,16 +90,16 @@
 
                 </div>
 
-                {% endif %}
-
             </div>
 
+            {% endif %}
+
             <!-- RIGHT -->
-            <div class="col-lg-6">
+            {% if enquiry.status == "confirmed" %}
 
-                {% if enquiry.status == "confirmed" %}
+            <div class="col-lg-6 d-flex">
 
-                <div class="card section-card mb-3">
+                <div class="card section-card w-100">
 
                     <div class="section-title">
                         💳 Payment Terms
@@ -151,7 +140,7 @@
 
                         </select>
 
-                        <!-- Advance -->
+                        <!-- ADVANCE -->
                         <div id="advance_box">
 
                             <label class="form-label">
@@ -161,12 +150,12 @@
                             <input type="text"
                                    id="advance"
                                    name="advance"
-                                   class="form-control mb-2"
+                                   class="form-control mb-3"
                                    value="{{ order.advance|default_if_none:'' }}">
 
                         </div>
 
-                        <!-- Balance -->
+                        <!-- BALANCE -->
                         <div id="balance_box">
 
                             <label class="form-label">
@@ -176,12 +165,12 @@
                             <input type="text"
                                    id="balance"
                                    name="balance"
-                                   class="form-control mb-2"
+                                   class="form-control mb-3"
                                    value="{{ order.balance|default_if_none:'' }}">
 
                         </div>
 
-                        <!-- Topay -->
+                        <!-- TOPAY -->
                         <div id="topay_box">
 
                             <label class="form-label">
@@ -191,10 +180,12 @@
                             <input type="text"
                                    id="topay"
                                    name="topay"
-                                   class="form-control mb-2"
+                                   class="form-control mb-3"
                                    value="{{ order.topay|default_if_none:'' }}">
+
                         </div>
-                        <!-- Credit -->
+
+                        <!-- CREDIT -->
                         <div id="credit_box">
 
                             <label class="form-label">
@@ -204,76 +195,124 @@
                             <input type="text"
                                    id="credit"
                                    name="credit"
-                                   class="form-control mb-2"
+                                   class="form-control mb-3"
                                    value="{{ order.credit|default_if_none:'' }}">
 
-                            <label class="form-label">
-                                Credit Start Date
-                            </label>
+                            <div class="row g-2">
 
-                            <input type="text"
-                                   id="credit_date"
-                                   name="credit_date"
-                                   class="form-control mb-2"
-                                   value="{{ order.credit_date|date:'Y-m-d'|default_if_none:'' }}">
+                                <!-- CREDIT DATE -->
+                                <div class="col-md-6">
 
-                            <label class="form-label">
-                                No. of Days
-                            </label>
+                                    <label class="form-label">
+                                        Start Date
+                                    </label>
 
-                            <input type="text"
-                                   id="credit_days"
-                                   name="credit_days"
-                                   class="form-control mb-2"
-                                   value="{{ order.credit_days|default_if_none:'' }}">
+                                    <input type="text"
+                                           id="credit_date"
+                                           name="credit_date"
+                                           class="form-control"
+                                           value="{{ order.credit_date|date:'Y-m-d'|default_if_none:'' }}">
 
-                            <label class="form-label">
-                                Due Date
-                            </label>
+                                </div>
+                                 <!-- DUE DATE -->
+                                <div class="col-md-6">
 
-                            <input type="text"
-                                   id="due_date"
-                                   name="due_date"
-                                   class="form-control mb-2"
-                                   value="{{ order.due_date|date:'Y-m-d'|default_if_none:'' }}">
+                                    <label class="form-label mt-2">
+                                        Due Date
+                                    </label>
+
+                                    <input type="text"
+                                           id="due_date"
+                                           name="due_date"
+                                           class="form-control"
+                                           value="{{ order.due_date|date:'Y-m-d'|default_if_none:'' }}">
+
+                                </div>
+
+                               
+
+                                    <label class="form-label">
+                                        No. of Days
+                                    </label>
+
+                                    <input type="text"
+                                           id="credit_days"
+                                           name="credit_days"
+                                           class="form-control"
+                                           value="{{ order.credit_days|default_if_none:'' }}">
+
+                                </div>
+
+                               
+
+                            </div>
 
                         </div>
 
-                        <!-- Message -->
+                        <!-- MESSAGE -->
                         <div id="payment_message"
-                             class="alert alert-info mt-2 mb-0 py-2 small">
+                             class="alert alert-info mt-3 mb-0 py-2 small">
 
                             Select payment type
 
                         </div>
 
-                        <!-- Remarks -->
-                         <div id ="remarks" class = "alert alert-info mt-2 mb-0 py-2 small">
-
-                         </div>
-
                     </div>
 
                 </div>
 
-                {% endif %}
-
             </div>
 
-            <!-- BUTTON -->
-            <div class="col-md-3 ms-auto">
+            {% endif %}
 
-                <div class="card section-card p-3 text-center">
+            <!-- FOOTER -->
+            <div class="col-12">
 
-                    {% if order %}
-                    <span class="status-chip success mb-2">
-                        ✅ Converted
-                    </span>
-                    {% endif %}
+                <div class="card section-card p-3">
 
-                    <button type="submit" class="btn btn-success">
-                        💾 Save Order
-                    </button>
+                    <div class="row align-items-end g-3">
+
+                        <!-- VEHICLE DATE -->
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="small text-muted d-block mb-1">
+                                🚚 Vehicle Date
+                            </label>
+
+                            <input type="text"
+                                   id="vehicle_date"
+                                   name="vehicle_place_date"
+                                   class="form-control"
+                                   value="{{ order.vehicle_place_date|date:'Y-m-d H:i'|default_if_none:'' }}">
+
+                        </div>
+
+                        <!-- STATUS -->
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+
+                            {% if order %}
+
+                            <span class="status-chip success">
+                                ✅ Converted
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="col-lg-4 text-lg-end text-start">
+
+                            <button type="submit"
+                                    class="btn btn-success px-4">
+
+                                💾 Save Order
+
+                            </button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -339,18 +378,34 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // =========================
+    // DATE PICKERS
+    // =========================
+
     flatpickr("#vehicle_date", {
+
         enableTime: true,
         dateFormat: "Y-m-d H:i"
+
     });
 
     flatpickr("#credit_date", {
-        dateFormat: "Y-m-d"
+
+        dateFormat: "Y-m-d",
+        maxDate: "today"
+
     });
 
     flatpickr("#due_date", {
-        dateFormat: "Y-m-d"
+
+        dateFormat: "Y-m-d",
+        minDate: "today"
+
     });
+
+    // =========================
+    // INPUTS
+    // =========================
 
     const finalRate = document.getElementById("final_rate");
     const gst = document.getElementById("gst_percent");
@@ -376,9 +431,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const topayBox = document.getElementById("topay_box");
     const creditBox = document.getElementById("credit_box");
 
+    // =========================
+    // COMMON
+    // =========================
+
     function num(v){
+
         return parseFloat(v) || 0;
+
     }
+
+    function formatDate(d){
+
+        let yyyy = d.getFullYear();
+
+        let mm = String(
+            d.getMonth() + 1
+        ).padStart(2, '0');
+
+        let dd = String(
+            d.getDate()
+        ).padStart(2, '0');
+
+        return yyyy + "-" + mm + "-" + dd;
+
+    }
+
+    // =========================
+    // TOTAL
+    // =========================
 
     function calcTotal(){
 
@@ -394,24 +475,31 @@ document.addEventListener("DOMContentLoaded", function () {
         calcPayment();
     }
 
+    // =========================
+    // HIDE
+    // =========================
+
     function hideAll(){
 
         advBox.style.display = "none";
         balBox.style.display = "none";
         topayBox.style.display = "none";
         creditBox.style.display = "none";
+
     }
+
+    // =========================
+    // PAYMENT
+    // =========================
 
     function calcPayment(){
 
         let t = num(total.value);
         let a = num(adv.value);
 
-        let type = paymentType.value;
-
         hideAll();
 
-        if(type === "advance_balance"){
+        if(paymentType.value === "advance_balance"){
 
             advBox.style.display = "block";
             balBox.style.display = "block";
@@ -422,22 +510,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Advance ₹" + a.toFixed(2) +
                 " received. Balance ₹" +
                 bal.value + " pending.";
+
         }
 
-        else if(type === "full"){
+        else if(paymentType.value === "full"){
 
             advBox.style.display = "block";
 
             adv.value = t.toFixed(2);
-            bal.value = "0";
 
             msg.innerHTML =
                 "Full payment ₹" +
                 t.toFixed(2) +
                 " received.";
+
         }
 
-        else if(type === "topay"){
+        else if(paymentType.value === "topay"){
 
             topayBox.style.display = "block";
 
@@ -447,9 +536,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Receiver will pay ₹" +
                 t.toFixed(2) +
                 " at delivery.";
+
         }
 
-        else if(type === "credit"){
+        else if(paymentType.value === "credit"){
 
             creditBox.style.display = "block";
 
@@ -459,20 +549,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Credit amount ₹" +
                 t.toFixed(2) +
                 " pending.";
+
         }
 
         else{
 
             msg.innerHTML = "Select payment type";
+
         }
+
     }
 
-    function calcCredit(){
+    // =========================
+    // CREDIT CALC
+    // =========================
+
+    function calcDueDate(){
 
         let start = creditDate.value;
         let days = parseInt(creditDays.value) || 0;
 
-        if(start && days){
+        if(start){
 
             let d = new Date(start);
 
@@ -480,68 +577,117 @@ document.addEventListener("DOMContentLoaded", function () {
                 d.getDate() + days
             );
 
-            let yyyy = d.getFullYear();
+            dueDate.value = formatDate(d);
 
-            let mm = String(
-                d.getMonth() + 1
-            ).padStart(2, '0');
-
-            let dd = String(
-                d.getDate()
-            ).padStart(2, '0');
-
-            dueDate.value =
-                yyyy + "-" + mm + "-" + dd;
-
-            msg.innerHTML =
-                "Credit ₹" +
-                credit.value +
-                " due on " +
-                dueDate.value +
-                " (" + days + " days).";
         }
+
     }
+
+    function calcDays(){
+
+        let start = creditDate.value;
+        let due = dueDate.value;
+
+        if(start && due){
+
+            let startDate = new Date(start);
+            let dueDateObj = new Date(due);
+
+            let diffTime =
+                dueDateObj - startDate;
+
+            let diffDays =
+                Math.ceil(
+                    diffTime / (1000 * 60 * 60 * 24)
+                );
+
+            if(diffDays >= 0){
+
+                creditDays.value = diffDays;
+
+                msg.innerHTML =
+                    "Credit period : " +
+                    diffDays +
+                    " days.";
+
+            }
+
+        }
+
+    }
+
+    // =========================
+    // EVENTS
+    // =========================
 
     [finalRate, gst, load, halt].forEach(el => {
 
         if(el){
+
             el.addEventListener(
                 "input",
                 calcTotal
             );
+
         }
 
     });
 
     if(paymentType){
+
         paymentType.addEventListener(
             "change",
             calcPayment
         );
+
     }
 
     if(adv){
+
         adv.addEventListener(
             "input",
             calcPayment
         );
+
     }
 
     if(creditDate){
+
         creditDate.addEventListener(
             "change",
-            calcCredit
+            function(){
+
+                calcDueDate();
+                calcDays();
+
+            }
         );
+
     }
 
     if(creditDays){
+
         creditDays.addEventListener(
             "input",
-            calcCredit
+            calcDueDate
         );
+
     }
 
+    if(dueDate){
+
+        dueDate.addEventListener(
+            "change",
+            calcDays
+        );
+
+    }
+
+    // INITIAL
+
     calcTotal();
+    calcDueDate();
+    calcDays();
 
 });
 
