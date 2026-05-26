@@ -139,239 +139,250 @@
 
         </div>
 
+        <div class="erp-grid">
+            <!-- VEHICLE -->
+            <div class="erp-left">
+                <div class="card saas-card">
+                    <div class="card-header">🚚 Vehicle Details</div>
 
-        <!-- VEHICLE -->
-        <div class="card saas-card mb-4">
-            <div class="card-header">🚚 Vehicle Details</div>
+                    <div class="card-body row g-4">
 
-            <div class="card-body row g-4">
+                        <div class="col-md-4">
+                            <label>Vehicle Number</label>
+                            <input type="text" name="vehicle_number" class="form-control input-style" autocomplete="off"
+                                required>
+                        </div>
 
-                <div class="col-md-4">
-                    <label>Vehicle Number</label>
-                    <input type="text" name="vehicle_number" class="form-control input-style" autocomplete="off"
-                        required>
-                </div>
+                        <!-- DRIVER OTP -->
+                        <div class="col-md-4">
+                            <label>Driver Number</label>
 
-                <!-- DRIVER OTP -->
-                <div class="col-md-4">
-                    <label>Driver Number</label>
+                            <div class="input-group">
+                                <input type="text" name="driver_number" id="driver_number" maxlength="10"
+                                    class="form-control input-style" autocomplete="off" required>
 
-                    <div class="input-group">
-                        <input type="text" name="driver_number" id="driver_number" maxlength="10"
-                            class="form-control input-style" autocomplete="off" required>
+                                <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
+                                    Send OTP
+                                </button>
+                            </div>
 
-                        <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
-                            Send OTP
-                        </button>
+                            <small id="driverMsg"></small>
+
+                            <div class="mt-2" id="otpBox" style="display:none;">
+                                <input type="text" id="otp_input" maxlength="6" class="form-control input-style"
+                                    placeholder="Enter OTP">
+
+                                <button type="button" class="btn btn-success btn-sm mt-2" id="verifyOtpBtn">
+                                    Verify OTP
+                                </button>
+                            </div>
+
+                            <input type="hidden" name="driver_verified" id="driver_verified" value="0">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Owner Number</label>
+                            <input type="text" name="owner_number" maxlength="10" class="form-control input-style"
+                                autocomplete="off">
+                        </div>
+
+                        <!-- SOURCE -->
+                        <div class="col-md-4">
+                            <label>Source</label>
+
+                            <select name="source" id="source_select" class="form-control input-style">
+                                <option value="">Select Source</option>
+                                <option value="direct">Direct</option>
+                                <option value="transporters">Transporters</option>
+                                <option value="brokers">Brokers</option>
+                                <option value="drivers">Drivers</option>
+                                <option value="others">Others</option>
+                            </select>
+
+                            <input type="text" name="source_other" id="source_other"
+                                class="form-control input-style mt-2" placeholder="Enter Source Name"
+                                style="display:none;">
+                        </div>
+
                     </div>
+                </div>
 
-                    <small id="driverMsg"></small>
+                <!-- FREIGHT -->
+                <div class="card saas-card mb-4">
+                    <div class="card-header text-success">💰 Freight Details</div>
 
-                    <div class="mt-2" id="otpBox" style="display:none;">
-                        <input type="text" id="otp_input" maxlength="6" class="form-control input-style"
-                            placeholder="Enter OTP">
+                    <div class="card-body row g-4">
 
-                        <button type="button" class="btn btn-success btn-sm mt-2" id="verifyOtpBtn">
-                            Verify OTP
-                        </button>
+                        <div class="col-md-3">
+                            <label>Freight</label>
+                            <input type="number" step="0.01" name="freight_amount" id="freight_amount"
+                                class="form-control input-style">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Halting</label>
+                            <input type="number" step="0.01" name="halting" id="halting"
+                                class="form-control input-style">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Loading / Unloading</label>
+                            <input type="number" step="0.01" name="loading_unloading" id="loading_unloading"
+                                class="form-control input-style">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Brokerage</label>
+                            <input type="number" step="0.01" name="brokerage" id="brokerage"
+                                class="form-control input-style">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Total Freight</label>
+                            <input type="number" step="0.01" name="total_freight" id="total_freight" readonly
+                                class="form-control input-style bg-light">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Advance</label>
+                            <input type="number" step="0.01" name="advance" id="advance"
+                                class="form-control input-style">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Balance</label>
+                            <input type="number" step="0.01" name="balance" id="balance" readonly
+                                class="form-control input-style bg-light">
+                        </div>
+
                     </div>
-
-                    <input type="hidden" name="driver_verified" id="driver_verified" value="0">
                 </div>
-
-                <div class="col-md-4">
-                    <label>Owner Number</label>
-                    <input type="text" name="owner_number" maxlength="10" class="form-control input-style"
-                        autocomplete="off">
-                </div>
-
-                <!-- SOURCE -->
-                <div class="col-md-4">
-                    <label>Source</label>
-
-                    <select name="source" id="source_select" class="form-control input-style">
-                        <option value="">Select Source</option>
-                        <option value="direct">Direct</option>
-                        <option value="transporters">Transporters</option>
-                        <option value="brokers">Brokers</option>
-                        <option value="drivers">Drivers</option>
-                        <option value="others">Others</option>
-                    </select>
-
-                    <input type="text" name="source_other" id="source_other" class="form-control input-style mt-2"
-                        placeholder="Enter Source Name" style="display:none;">
-                </div>
-
             </div>
-        </div>
+            <!-- UPI -->
+            <div class="erp-right">
+                <div class="card saas-card mb-4">
+                    <div class="card-header text-info">💳 UPI Payment</div>
 
-        <!-- FREIGHT -->
-        <div class="card saas-card mb-4">
-            <div class="card-header text-success">💰 Freight Details</div>
+                    <div class="card-body row g-4">
 
-            <div class="card-body row g-4">
+                        <div class="col-md-4">
+                            <label>UPI App</label>
+                            <select name="upi_app" class="form-control input-style">
+                                <option value="">Select</option>
+                                <option value="phonepe">PhonePe</option>
+                                <option value="gpay">Google Pay</option>
+                                <option value="paytm">Paytm</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
 
-                <div class="col-md-3">
-                    <label>Freight</label>
-                    <input type="number" step="0.01" name="freight_amount" id="freight_amount"
-                        class="form-control input-style">
+                        <div class="col-md-4">
+                            <label>UPI ID</label>
+                            <input type="text" name="upi_id" id="upi_id" class="form-control input-style"
+                                placeholder="example@upi" autocomplete="off">
+
+                            <small id="upiMsg"></small>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>UPI Number</label>
+                            <input type="text" name="upi_number" id="upi_number" maxlength="10"
+                                class="form-control input-style" autocomplete="off">
+
+                            <small id="numMsg"></small>
+                        </div>
+
+                        <div class="col-md-4 d-grid">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-primary" id="verifyUpiBtn">
+                                Verify UPI
+                            </button>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label>UPI Beneficiary Name</label>
+                            <input type="text" name="upi_beneficiary_name" id="upi_beneficiary_name"
+                                class="form-control input-style bg-light" readonly
+                                placeholder="Auto Fetch After Verify">
+                        </div>
+
+                        <div class="col-md-12">
+                            <small id="upiVerifyMsg"></small>
+                            <input type="hidden" name="upi_verified" id="upi_verified" value="0">
+                        </div>
+
+                    </div>
+                </div>
+                <!-- BANK -->
+                <div class="card saas-card mb-5">
+                    <div class="card-header text-warning">🏦 Bank Details</div>
+
+                    <div class="card-body row g-4">
+
+                        <div class="col-md-3">
+                            <label>Account Number</label>
+                            <input name="account_number" id="account_number" class="form-control input-style"
+                                autocomplete="new-password">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Retype Account Number</label>
+                            <input type="password" id="re_account_number" class="form-control input-style"
+                                placeholder="Retype Account Number" autocomplete="new-password">
+                            <small id="accMsg"></small>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>IFSC</label>
+                            <input type="text" name="ifsc" id="ifsc" class="form-control input-style"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Type</label>
+                            <select name="ac_type" class="form-control input-style">
+                                <option value="saving">Saving</option>
+                                <option value="current">Current</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Beneficiary Name</label>
+                            <input type="text" name="account_beneficiary_name" id="account_beneficiary_name"
+                                class="form-control input-style" placeholder="Optional" autocomplete="off">
+                        </div>
+
+                        <div class="col-md-3 d-grid">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-primary" id="verifyBankBtn">
+                                Verify Beneficiary
+                            </button>
+                        </div>
+
+                        <div class="col-md-12">
+                            <small id="bankMsg"></small>
+                            <input type="hidden" name="bank_verified" id="bank_verified" value="0">
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <label>Halting</label>
-                    <input type="number" step="0.01" name="halting" id="halting" class="form-control input-style">
-                </div>
 
-                <div class="col-md-3">
-                    <label>Loading / Unloading</label>
-                    <input type="number" step="0.01" name="loading_unloading" id="loading_unloading"
-                        class="form-control input-style">
-                </div>
+                <!-- ACTION -->
+                <div class="action-bar">
+                    <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
+                        ⬅ Back
+                    </a>
 
-                <div class="col-md-3">
-                    <label>Brokerage</label>
-                    <input type="number" step="0.01" name="brokerage" id="brokerage" class="form-control input-style">
-                </div>
-
-                <div class="col-md-3">
-                    <label>Total Freight</label>
-                    <input type="number" step="0.01" name="total_freight" id="total_freight" readonly
-                        class="form-control input-style bg-light">
-                </div>
-
-                <div class="col-md-3">
-                    <label>Advance</label>
-                    <input type="number" step="0.01" name="advance" id="advance" class="form-control input-style">
-                </div>
-
-                <div class="col-md-3">
-                    <label>Balance</label>
-                    <input type="number" step="0.01" name="balance" id="balance" readonly
-                        class="form-control input-style bg-light">
-                </div>
-
-            </div>
-        </div>
-
-        <!-- UPI -->
-        <div class="card saas-card mb-4">
-            <div class="card-header text-info">💳 UPI Payment</div>
-
-            <div class="card-body row g-4">
-
-                <div class="col-md-4">
-                    <label>UPI App</label>
-                    <select name="upi_app" class="form-control input-style">
-                        <option value="">Select</option>
-                        <option value="phonepe">PhonePe</option>
-                        <option value="gpay">Google Pay</option>
-                        <option value="paytm">Paytm</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label>UPI ID</label>
-                    <input type="text" name="upi_id" id="upi_id" class="form-control input-style"
-                        placeholder="example@upi" autocomplete="off">
-
-                    <small id="upiMsg"></small>
-                </div>
-
-                <div class="col-md-4">
-                    <label>UPI Number</label>
-                    <input type="text" name="upi_number" id="upi_number" maxlength="10" class="form-control input-style"
-                        autocomplete="off">
-
-                    <small id="numMsg"></small>
-                </div>
-
-                <div class="col-md-4 d-grid">
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn btn-primary" id="verifyUpiBtn">
-                        Verify UPI
+                    <button class="btn btn-success px-4" id="saveBtn">
+                        💾 Save Vehicle
                     </button>
                 </div>
-
-                <div class="col-md-8">
-                    <label>UPI Beneficiary Name</label>
-                    <input type="text" name="upi_beneficiary_name" id="upi_beneficiary_name"
-                        class="form-control input-style bg-light" readonly placeholder="Auto Fetch After Verify">
-                </div>
-
-                <div class="col-md-12">
-                    <small id="upiVerifyMsg"></small>
-                    <input type="hidden" name="upi_verified" id="upi_verified" value="0">
-                </div>
-
             </div>
-        </div>
-        <!-- BANK -->
-        <div class="card saas-card mb-5">
-            <div class="card-header text-warning">🏦 Bank Details</div>
-
-            <div class="card-body row g-4">
-
-                <div class="col-md-3">
-                    <label>Account Number</label>
-                    <input name="account_number" id="account_number" class="form-control input-style"
-                        autocomplete="new-password">
-                </div>
-
-                <div class="col-md-3">
-                    <label>Retype Account Number</label>
-                    <input type="password" id="re_account_number" class="form-control input-style"
-                        placeholder="Retype Account Number" autocomplete="new-password">
-                    <small id="accMsg"></small>
-                </div>
-
-                <div class="col-md-3">
-                    <label>IFSC</label>
-                    <input type="text" name="ifsc" id="ifsc" class="form-control input-style" autocomplete="off">
-                </div>
-
-                <div class="col-md-3">
-                    <label>Type</label>
-                    <select name="ac_type" class="form-control input-style">
-                        <option value="saving">Saving</option>
-                        <option value="current">Current</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label>Beneficiary Name</label>
-                    <input type="text" name="account_beneficiary_name" id="account_beneficiary_name"
-                        class="form-control input-style" placeholder="Optional" autocomplete="off">
-                </div>
-
-                <div class="col-md-3 d-grid">
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn btn-primary" id="verifyBankBtn">
-                        Verify Beneficiary
-                    </button>
-                </div>
-
-                <div class="col-md-12">
-                    <small id="bankMsg"></small>
-                    <input type="hidden" name="bank_verified" id="bank_verified" value="0">
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- ACTION -->
-        <div class="action-bar">
-            <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
-                ⬅ Back
-            </a>
-
-            <button class="btn btn-success px-4" id="saveBtn">
-                💾 Save Vehicle
-            </button>
         </div>
     </form>
 </div>
+
 
 <!-- SEARCH SELECT -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
@@ -1042,119 +1053,203 @@
 </script>
 <style>
     /* =========================
-   SAP ERP GRID LAYOUT (SAFE)
-========================= */
+       ERP MAIN GRID
+    ========================= */
 
     .erp-grid {
         display: grid;
         grid-template-columns: 1.3fr 0.7fr;
-        gap: 18px;
+        gap: 20px;
         align-items: start;
     }
 
-    /* LEFT SIDE */
-    .erp-left {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+    /* LEFT & RIGHT SIDE */
 
-    /* RIGHT SIDE */
+    .erp-left,
     .erp-right {
         display: flex;
         flex-direction: column;
-        gap: 16px;
-        border-left: 3px solid #1b90ff;
-        padding-left: 16px;
+        gap: 20px;
+    }
+
+    .erp-right {
+        border-left: 2px solid #e5e7eb;
+        padding-left: 20px;
     }
 
     /* =========================
-   CARD (FIORI STYLE CLEAN)
-========================= */
+       CARD DESIGN
+    ========================= */
 
     .saas-card {
         border: 1px solid #e3e8ef;
-        border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        border-radius: 14px;
+        background: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        transition: all 0.25s ease;
     }
 
     .saas-card:hover {
-        box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
-    /* HEADER */
+    /* =========================
+       CARD HEADER
+    ========================= */
+
     .saas-card .card-header {
         background: linear-gradient(90deg, #0a6ed1, #1b90ff);
-        color: white;
-        font-weight: 600;
-        font-size: 13px;
-        padding: 10px 14px;
-        border-radius: 10px 10px 0 0;
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 14px 18px;
+        border: none;
+        letter-spacing: 0.3px;
     }
 
-    /* BODY */
+    /* =========================
+       CARD BODY
+    ========================= */
+
     .saas-card .card-body {
-        padding: 16px;
+        padding: 20px;
     }
 
-    /* INPUT */
+    /* =========================
+       FORM LABEL
+    ========================= */
+
+    label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    /* =========================
+       INPUT STYLE
+    ========================= */
+
     .input-style {
-        border-radius: 6px;
+        width: 100%;
+        height: 42px;
+        border-radius: 8px;
         border: 1px solid #cfd7e3;
-        padding: 8px 10px;
+        background: #fff;
+        padding: 8px 12px;
         font-size: 13px;
+        transition: all 0.2s ease;
+    }
+
+    textarea.input-style {
+        height: auto;
+        min-height: 90px;
     }
 
     .input-style:focus {
         border-color: #1b90ff;
         box-shadow: 0 0 0 3px rgba(27, 144, 255, 0.15);
+        outline: none;
     }
 
-    /* LABEL */
-    label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #334155;
+    .input-style.bg-light {
+        background: #f8fafc !important;
     }
 
-    /* ACTION BAR */
-    .action-bar {
-        grid-column: 1 / -1;
-        position: sticky;
-        bottom: 0;
-        background: #fff;
-        border-top: 1px solid #e5e7eb;
-        padding: 12px 16px;
-        display: flex;
-        justify-content: space-between;
-        z-index: 10;
+    /* =========================
+       SMALL TEXT
+    ========================= */
+
+    small {
+        font-size: 11px;
     }
 
-    /* BUTTONS */
+    /* =========================
+       BUTTONS
+    ========================= */
+
     .btn-success {
         background: #1b90ff;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         font-weight: 600;
+        height: 42px;
     }
 
     .btn-success:hover {
         background: #0a6ed1;
     }
 
+    .btn-primary {
+        border-radius: 8px;
+        height: 42px;
+        font-weight: 600;
+    }
+
     /* =========================
-   MOBILE STACK
-========================= */
+       ACTION BAR
+    ========================= */
+
+    .action-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        z-index: 100;
+    }
+
+    /* =========================
+       TOP SUMMARY CARD
+    ========================= */
+
+    .top-margin-card {
+        border-radius: 18px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .top-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .top-value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
 
     @media (max-width: 991px) {
+
         .erp-grid {
-            display: block;
+            grid-template-columns: 1fr;
         }
 
         .erp-right {
             border-left: none;
             padding-left: 0;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-bar .btn {
+            width: 100%;
         }
     }
 </style>

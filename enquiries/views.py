@@ -41,7 +41,7 @@ def edit_enquiry(request, id):
 
         enquiry.pickups = request.POST.get(
             'pickups'
-        ) or 1
+        ) or 1                      
 
         enquiry.deliveries = request.POST.get(
             'deliveries'
@@ -265,8 +265,8 @@ def create_enquiry(request):
         lead_source = request.POST.get("lead_source") or None
         reference_name = request.POST.get("reference_name") or None
 
-        pickups = int(request.POST.get("pickup") or 1)
-        deliveries = int(request.POST.get("delivery") or 1)
+        pickups = request.POST.get("pickups") or 1
+        deliveries = request.POST.get("deliveries") or 1
 
         vehicle_type = request.POST.get("vehicle_type") or None
         vehicle_description = request.POST.get("vehicle_desc") or None

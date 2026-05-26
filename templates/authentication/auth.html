@@ -7,141 +7,388 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Parcelex</title>
 
-    <!-- Bootstrap -->
+    <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
-        /* BODY */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            height: 100vh;
             margin: 0;
+            min-height: 100vh;
             font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
+            background: #f3f6fb;
+            overflow-x: hidden;
         }
 
-        .container-fluid {
-            height: 100%;
+        .main-wrapper {
+            min-height: 100vh;
         }
 
-        /* LEFT PANEL */
+        /* =========================
+           LEFT PANEL
+        ========================= */
+
         .left-panel {
-            background: linear-gradient(135deg, #1fa2ff, #6a5acd);
-            color: white;
+            background:
+                linear-gradient(rgba(15, 23, 42, 0.75),
+                    rgba(30, 41, 59, 0.8)),
+                url("{% static 'assets/images/login_page.jpg' %}");
+
+            background-size: cover;
+            background-position: center;
+
+            color: #fff;
+
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+
             text-align: center;
-            padding: 30px 15px;
+
+            padding: 60px 40px;
+
+            position: relative;
         }
 
-        .left-panel img {
-            width: 70%;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.2);
+        .brand-logo {
+            width: 95px;
+            height: 95px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 24px;
+
+            font-size: 42px;
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .left-panel h2 {
+        .left-panel h1 {
+            font-size: 42px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 14px;
         }
 
         .left-panel p {
-            font-size: 16px;
-            color: #e0e0ff;
+            max-width: 480px;
+            font-size: 17px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        /* RIGHT PANEL */
+        .feature-list {
+            margin-top: 35px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+
+            border-radius: 18px;
+
+            padding: 16px 18px;
+            margin-bottom: 14px;
+
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            text-align: left;
+        }
+
+        .feature-item i {
+            font-size: 20px;
+        }
+
+        /* =========================
+           RIGHT PANEL
+        ========================= */
+
         .right-panel {
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: #f8f9fa;
-            padding: 30px 15px;
+            justify-content: center;
+
+            padding: 40px 20px;
+
+            background: #f8fafc;
         }
 
         .auth-card {
-            width: 380px;
-            padding: 30px;
-            border-radius: 16px;
-            background: #ffffff;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            width: 100%;
+            max-width: 430px;
+
+            background: #fff;
+
+            border-radius: 28px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 10px 40px rgba(15, 23, 42, 0.08);
+
+            border: 1px solid #edf2f7;
         }
 
-        .auth-card:hover {
-            transform: translateY(-4px);
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #0f172a;
         }
 
-        /* TABS */
+        .welcome-sub {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 26px;
+        }
+
+        /* =========================
+           TABS
+        ========================= */
+
+        .nav-tabs {
+            border: none;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
         .nav-tabs .nav-link {
             border: none;
-            color: #555;
-            font-weight: 500;
-            padding: 10px 15px;
-            transition: all 0.2s;
-        }
+            border-radius: 12px;
 
-        .nav-tabs .nav-link:hover {
-            color: #0d6efd;
+            padding: 10px 18px;
+
+            background: #f1f5f9;
+
+            color: #475569;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+            transition: 0.3s ease;
         }
 
         .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
         }
 
-        /* FORMS */
-        .form-control {
-            border-radius: 12px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
+        /* =========================
+           FORM
+        ========================= */
 
-        .form-control:focus {
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        }
-
-        .btn {
-            border-radius: 12px;
-            padding: 10px 0;
+        .form-label {
+            font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s;
+            color: #334155;
+            margin-bottom: 6px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
+        .form-control,
+        .form-select,
+        textarea {
+            border-radius: 14px !important;
+            min-height: 50px;
+
+            border: 1px solid #dbe2ea;
+
+            padding: 12px 14px;
+
+            font-size: 14px;
+
+            transition: 0.2s ease;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: none;
+        }
+
+        .form-control:focus,
+        .form-select:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
         .input-group-text {
+            border-radius: 0 14px 14px 0 !important;
             cursor: pointer;
-            background: #f1f3f5;
-            border-radius: 0 12px 12px 0;
+            background: #f8fafc;
+            border-left: 0;
         }
 
-        /* ALERTS */
+        .password-input {
+            border-right: 0;
+        }
+
+        .btn-custom {
+            height: 52px;
+            border-radius: 14px;
+
+            font-weight: 600;
+
+            border: none;
+
+            transition: 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+        }
+
+        .btn-forgot {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        /* =========================
+           ALERTS
+        ========================= */
+
         .alert {
-            border-radius: 12px;
+            border: none;
+            border-radius: 14px;
             font-size: 14px;
         }
 
-        /* RESPONSIVE */
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 991px) {
+
+            .left-panel {
+                min-height: 380px;
+                padding: 50px 25px;
+            }
+
+            .left-panel h1 {
+                font-size: 34px;
+            }
+
+            .feature-list {
+                max-width: 100%;
+            }
+        }
+
         @media (max-width: 767px) {
 
-            .left-panel,
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                min-height: auto;
+                padding: 40px 20px;
+            }
+
             .right-panel {
-                height: auto;
-                text-align: center;
-                padding: 20px;
+                padding: 25px 15px;
             }
 
             .auth-card {
-                width: 100%;
+                padding: 25px 20px;
+                border-radius: 22px;
+            }
+
+            .left-panel h1 {
+                font-size: 28px;
+            }
+
+            .left-panel p {
+                font-size: 15px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .brand-logo {
+                width: 78px;
+                height: 78px;
+                font-size: 34px;
+            }
+
+            .left-panel h1 {
+                font-size: 24px;
+            }
+
+            .auth-card {
+                padding: 20px 16px;
+            }
+
+            .form-control,
+            .form-select,
+            textarea {
+                min-height: 46px;
+                font-size: 13px;
+            }
+
+            .btn-custom {
+                height: 48px;
+                font-size: 14px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+
+            .left-panel {
+                padding: 80px;
+            }
+
+            .auth-card {
+                max-width: 470px;
+            }
+
+            .left-panel h1 {
+                font-size: 52px;
             }
         }
     </style>
@@ -150,34 +397,84 @@
 <body>
 
     <div class="container-fluid">
-        <div class="row h-100">
+        <div class="row main-wrapper">
 
-            <!-- LEFT PANEL -->
-            <div class="col-md-6 left-panel">
-                <img src="{% static 'assets/images/login_page.jpg' %}" alt="Login Image">
-                <h2>Parcelex CRM</h2>
-                <p>Integrated Logistics, Optimized Results</p>
+            <!-- LEFT -->
+            <div class="col-lg-7 left-panel">
+
+                <div class="brand-logo">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <h1>Parcelex CRM</h1>
+
+                <p>
+                    Integrated logistics management platform for vehicle tracking,
+                    shipment coordination, operations, finance and customer management.
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+                        <i class="bi bi-truck"></i>
+                        <div>
+                            Real-time shipment & vehicle monitoring
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <div>
+                            Smart logistics analytics & operations dashboard
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            Secure centralized employee access system
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- RIGHT PANEL -->
-            <div class="col-md-6 right-panel">
+            <!-- RIGHT -->
+            <div class="col-lg-5 right-panel">
 
                 <div class="auth-card">
 
+                    <div class="welcome-title">
+                        Welcome Back
+                    </div>
+
+                    <div class="welcome-sub">
+                        Login to continue managing your logistics operations
+                    </div>
+
                     <!-- TABS -->
-                    <ul class="nav nav-tabs mb-3">
+                    <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">
+                            <button class="nav-link active"
+                                data-bs-toggle="tab"
+                                data-bs-target="#login">
                                 Login
                             </button>
                         </li>
+
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">
+                            <button class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#register">
                                 Register
                             </button>
                         </li>
+
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#forgot">
+                            <button class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#forgot">
                                 Forgot
                             </button>
                         </li>
@@ -187,77 +484,192 @@
 
                         <!-- LOGIN -->
                         <div class="tab-pane fade show active" id="login">
+
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="login">
 
-                                <h4 class="mb-3">Login</h4>
+                                <input type="hidden"
+                                    name="action"
+                                    value="login">
 
                                 {% if login_error %}
-                                <div class="alert alert-danger">{{ login_error }}</div>
+                                <div class="alert alert-danger">
+                                    {{ login_error }}
+                                </div>
                                 {% endif %}
 
-                                <input class="form-control mb-3" name="username" placeholder="Username" required>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Username
+                                    </label>
 
-                                <div class="input-group mb-3">
-                                    <input type="password" class="form-control" name="password" id="loginPassword"
-                                        placeholder="Password" required>
-                                    <span class="input-group-text" onclick="togglePassword('loginPassword')">
-                                        <i class="fa fa-eye"></i>
-                                    </span>
+                                    <input type="text"
+                                        name="username"
+                                        class="form-control"
+                                        placeholder="Enter username"
+                                        required>
                                 </div>
 
-                                <button class="btn btn-primary w-100">Login</button>
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Password
+                                    </label>
+
+                                    <div class="input-group">
+
+                                        <input type="password"
+                                            class="form-control password-input"
+                                            name="password"
+                                            id="loginPassword"
+                                            placeholder="Enter password"
+                                            required>
+
+                                        <span class="input-group-text"
+                                            onclick="togglePassword('loginPassword')">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <button class="btn btn-custom btn-login w-100">
+                                    Login
+                                </button>
+
                             </form>
+
                         </div>
 
                         <!-- REGISTER -->
                         <div class="tab-pane fade" id="register">
+
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="register">
-                                <h4 class="mb-3">Register</h4>
-                                {% if register_error %}
-                                <div class="alert alert-danger">{{ register_error }}</div>
-                                {% endif %}
-                                {% if register_success %}
-                                <div class="alert alert-success">{{ register_success }}</div>
-                                {% endif %}
-                                <input type="text" name="emp_code" class="form-control mb-2" placeholder="Employee Code"
-                                    required>
-                                <input type="text" name="phone" class="form-control mb-2" placeholder="Phone" required>
-                                <input type="text" name="username" class="form-control mb-2" placeholder="Username"
-                                    required>
-                                <input type="text" name="role" class="form-control mb-2" placeholder="Role" required>
-                                <input type="password" name="password" id="regPassword" class="form-control mb-2"
-                                    placeholder="Password" required>
 
-                                <button class="btn btn-success w-100">Register</button>
+                                <input type="hidden"
+                                    name="action"
+                                    value="register">
+
+                                {% if register_error %}
+                                <div class="alert alert-danger">
+                                    {{ register_error }}
+                                </div>
+                                {% endif %}
+
+                                {% if register_success %}
+                                <div class="alert alert-success">
+                                    {{ register_success }}
+                                </div>
+                                {% endif %}
+
+                                <div class="mb-2">
+                                    <input type="text"
+                                        name="emp_code"
+                                        class="form-control"
+                                        placeholder="Employee Code"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text"
+                                        name="phone"
+                                        class="form-control"
+                                        placeholder="Phone Number"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text"
+                                        name="username"
+                                        class="form-control"
+                                        placeholder="Username"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text"
+                                        name="role"
+                                        class="form-control"
+                                        placeholder="Role"
+                                        required>
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <div class="input-group">
+
+                                        <input type="password"
+                                            name="password"
+                                            id="regPassword"
+                                            class="form-control password-input"
+                                            placeholder="Password"
+                                            required>
+
+                                        <span class="input-group-text"
+                                            onclick="togglePassword('regPassword')">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <button class="btn btn-custom btn-register w-100">
+                                    Register
+                                </button>
+
                             </form>
+
                         </div>
 
                         <!-- FORGOT -->
                         <div class="tab-pane fade" id="forgot">
+
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="forgot">
 
-                                <h4 class="mb-3">Forgot Password</h4>
+                                <input type="hidden"
+                                    name="action"
+                                    value="forgot">
 
                                 {% if forgot_error %}
-                                <div class="alert alert-danger">{{ forgot_error }}</div>
+                                <div class="alert alert-danger">
+                                    {{ forgot_error }}
+                                </div>
                                 {% endif %}
 
                                 {% if forgot_success %}
-                                <div class="alert alert-success">{{ forgot_success }}</div>
+                                <div class="alert alert-success">
+                                    {{ forgot_success }}
+                                </div>
                                 {% endif %}
 
-                                <input type="text" name="username" class="form-control mb-2" placeholder="Username"
-                                    required>
-                                <textarea name="reason" class="form-control mb-2" placeholder="Reason"></textarea>
+                                <div class="mb-3">
+                                    <input type="text"
+                                        name="username"
+                                        class="form-control"
+                                        placeholder="Username"
+                                        required>
+                                </div>
 
-                                <button class="btn btn-danger w-100">Request Reset</button>
+                                <div class="mb-4">
+                                    <textarea name="reason"
+                                        class="form-control"
+                                        placeholder="Reason for password reset"></textarea>
+                                </div>
+
+                                <button class="btn btn-custom btn-forgot w-100">
+                                    Request Reset
+                                </button>
+
                             </form>
+
                         </div>
 
                     </div>
@@ -271,21 +683,39 @@
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+
         function togglePassword(id) {
-            var input = document.getElementById(id);
-            input.type = input.type === "password" ? "text" : "password";
+
+            const input = document.getElementById(id);
+
+            input.type =
+                input.type === "password"
+                    ? "text"
+                    : "password";
         }
+
         document.addEventListener("DOMContentLoaded", function () {
+
             var activeTab = "{{ active_tab }}";
+
             if (activeTab) {
-                var triggerEl = document.querySelector('[data-bs-target="#' + activeTab + '"]');
+
+                var triggerEl =
+                    document.querySelector(
+                        '[data-bs-target="#' + activeTab + '"]'
+                    );
+
                 if (triggerEl) {
                     new bootstrap.Tab(triggerEl).show();
                 }
             }
+
         });
+
     </script>
+
 </body>
 
 </html>
