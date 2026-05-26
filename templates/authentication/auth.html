@@ -14,8 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -35,14 +34,13 @@
         }
 
         /* =========================
-           LEFT PANEL
-        ========================= */
+       LEFT PANEL
+    ========================= */
 
         .left-panel {
-            background:
-                linear-gradient(rgba(15, 23, 42, 0.75),
-                    rgba(30, 41, 59, 0.8)),
-                url("{% static 'assets/images/login_page.jpg' %}");
+            background: linear-gradient(rgba(15, 23, 42, 0.78),
+                rgba(30, 41, 59, 0.82)),
+            url("{% static 'assets/images/login_page.jpg' %}");
 
             background-size: cover;
             background-position: center;
@@ -62,116 +60,152 @@
         }
 
         .brand-logo {
-            width: 95px;
-            height: 95px;
-            border-radius: 24px;
+            width: 85px;
+            height: 85px;
+
+            border-radius: 22px;
+
             background: rgba(255, 255, 255, 0.15);
+
             backdrop-filter: blur(10px);
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            margin-bottom: 24px;
+            margin-bottom: 18px;
 
-            font-size: 42px;
+            font-size: 38px;
 
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .left-panel h1 {
-            font-size: 42px;
+            font-size: 40px;
             font-weight: 700;
-            margin-bottom: 14px;
+            margin-bottom: 6px;
+        }
+
+        /* TAGLINE */
+        .left-panel .tagline {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 18px;
         }
 
         .left-panel p {
-            max-width: 480px;
-            font-size: 17px;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
+            max-width: 460px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.88);
+            margin-bottom: 0;
         }
 
+        /* FEATURES */
+
         .feature-list {
-            margin-top: 35px;
+            margin-top: 28px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
         }
 
         .feature-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.10);
+
             backdrop-filter: blur(10px);
 
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.14);
 
-            border-radius: 18px;
+            border-radius: 16px;
 
-            padding: 16px 18px;
-            margin-bottom: 14px;
+            padding: 14px 16px;
+
+            margin-bottom: 12px;
 
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
 
             text-align: left;
+
+            transition: 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
         }
 
         .feature-item i {
-            font-size: 20px;
+            font-size: 18px;
+        }
+
+        .feature-item div {
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         /* =========================
-           RIGHT PANEL
-        ========================= */
+       RIGHT PANEL
+    ========================= */
 
         .right-panel {
             display: flex;
             align-items: center;
             justify-content: center;
 
-            padding: 40px 20px;
+            padding: 35px 18px;
 
             background: #f8fafc;
         }
 
+        /* AUTH CARD */
+
         .auth-card {
             width: 100%;
-            max-width: 430px;
+            max-width: 385px;
 
             background: #fff;
 
-            border-radius: 28px;
+            border-radius: 24px;
 
-            padding: 35px;
+            padding: 24px;
 
             box-shadow:
-                0 10px 40px rgba(15, 23, 42, 0.08);
+                0 10px 35px rgba(15, 23, 42, 0.08);
 
             border: 1px solid #edf2f7;
         }
 
+        /* HEADINGS */
+
         .welcome-title {
-            font-size: 28px;
+            font-size: 23px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             color: #0f172a;
         }
 
         .welcome-sub {
             color: #64748b;
-            font-size: 14px;
-            margin-bottom: 26px;
+            font-size: 13px;
+            margin-bottom: 18px;
         }
 
         /* =========================
-           TABS
-        ========================= */
+       TABS
+    ========================= */
 
         .nav-tabs {
             border: none;
-            gap: 10px;
-            margin-bottom: 24px;
+
+            gap: 8px;
+
+            margin-bottom: 20px;
+
             flex-wrap: nowrap;
+
             overflow-x: auto;
         }
 
@@ -181,13 +215,16 @@
 
         .nav-tabs .nav-link {
             border: none;
-            border-radius: 12px;
 
-            padding: 10px 18px;
+            border-radius: 10px;
+
+            padding: 8px 14px;
 
             background: #f1f5f9;
 
             color: #475569;
+
+            font-size: 13px;
 
             font-weight: 600;
 
@@ -202,33 +239,34 @@
         }
 
         /* =========================
-           FORM
-        ========================= */
+       FORM ELEMENTS
+    ========================= */
 
         .form-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #334155;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .form-control,
         .form-select,
         textarea {
-            border-radius: 14px !important;
-            min-height: 50px;
+            border-radius: 12px !important;
+
+            min-height: 40px;
 
             border: 1px solid #dbe2ea;
 
-            padding: 12px 14px;
+            padding: 8px 12px;
 
-            font-size: 14px;
+            font-size: 13px;
 
             transition: 0.2s ease;
         }
 
         textarea {
-            min-height: 90px;
+            min-height: 80px;
             resize: none;
         }
 
@@ -236,23 +274,35 @@
         .form-select:focus,
         textarea:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
         }
 
-        .input-group-text {
-            border-radius: 0 14px 14px 0 !important;
-            cursor: pointer;
-            background: #f8fafc;
-            border-left: 0;
-        }
+        /* PASSWORD */
 
         .password-input {
             border-right: 0;
         }
 
+        .input-group-text {
+            border-radius: 0 12px 12px 0 !important;
+
+            cursor: pointer;
+
+            background: #f8fafc;
+
+            border-left: 0;
+
+            padding: 0 14px;
+        }
+
+        /* BUTTONS */
+
         .btn-custom {
-            height: 52px;
-            border-radius: 14px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            font-size: 13px;
 
             font-weight: 600;
 
@@ -265,9 +315,44 @@
             transform: translateY(-2px);
         }
 
+        /* LOGIN BUTTON SMALL + GRADIENT */
+
+        /* REMOVE GLASS EFFECT */
+
         .btn-login {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-            color: white;
+            background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
+
+            color: #fff !important;
+
+            border: none !important;
+
+            height: 38px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            border-radius: 10px;
+
+            letter-spacing: 0.3px;
+
+            backdrop-filter: none !important;
+
+            -webkit-backdrop-filter: none !important;
+
+            box-shadow: none !important;
+
+            opacity: 1 !important;
+
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #1d4ed8, #4338ca) !important;
+
+            transform: translateY(-1px);
+
+            box-shadow: none !important;
         }
 
         .btn-register {
@@ -280,29 +365,28 @@
             color: white;
         }
 
-        /* =========================
-           ALERTS
-        ========================= */
+        /* ALERTS */
 
         .alert {
             border: none;
-            border-radius: 14px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            padding: 10px 12px;
         }
 
         /* =========================
-           RESPONSIVE
-        ========================= */
+       RESPONSIVE
+    ========================= */
 
         @media (max-width: 991px) {
 
             .left-panel {
-                min-height: 380px;
-                padding: 50px 25px;
+                min-height: 360px;
+                padding: 45px 24px;
             }
 
             .left-panel h1 {
-                font-size: 34px;
+                font-size: 32px;
             }
 
             .feature-list {
@@ -318,16 +402,16 @@
 
             .left-panel {
                 min-height: auto;
-                padding: 40px 20px;
+                padding: 38px 20px;
             }
 
             .right-panel {
-                padding: 25px 15px;
+                padding: 22px 14px;
             }
 
             .auth-card {
-                padding: 25px 20px;
-                border-radius: 22px;
+                padding: 22px 18px;
+                border-radius: 20px;
             }
 
             .left-panel h1 {
@@ -335,45 +419,49 @@
             }
 
             .left-panel p {
-                font-size: 15px;
-            }
-
-            .welcome-title {
-                font-size: 24px;
-            }
-
-            .nav-tabs .nav-link {
-                padding: 10px 14px;
                 font-size: 14px;
+            }
+
+            .feature-item {
+                padding: 12px 14px;
             }
         }
 
         @media (max-width: 480px) {
 
             .brand-logo {
-                width: 78px;
-                height: 78px;
-                font-size: 34px;
+                width: 72px;
+                height: 72px;
+                font-size: 30px;
             }
 
             .left-panel h1 {
                 font-size: 24px;
             }
 
+            .left-panel .tagline {
+                font-size: 13px;
+            }
+
             .auth-card {
-                padding: 20px 16px;
+                padding: 18px 15px;
             }
 
             .form-control,
             .form-select,
             textarea {
-                min-height: 46px;
-                font-size: 13px;
+                min-height: 38px;
+                font-size: 12px;
             }
 
             .btn-custom {
-                height: 48px;
-                font-size: 14px;
+                height: 40px;
+                font-size: 12px;
+            }
+
+            .nav-tabs .nav-link {
+                font-size: 12px;
+                padding: 7px 12px;
             }
         }
 
@@ -383,12 +471,12 @@
                 padding: 80px;
             }
 
-            .auth-card {
-                max-width: 470px;
+            .left-panel h1 {
+                font-size: 50px;
             }
 
-            .left-panel h1 {
-                font-size: 52px;
+            .auth-card {
+                max-width: 420px;
             }
         }
     </style>
@@ -406,11 +494,10 @@
                     <i class="bi bi-box-seam"></i>
                 </div>
 
-                <h1>Parcelex CRM</h1>
+                <h1>Parcelex</h1>
 
                 <p>
-                    Integrated logistics management platform for vehicle tracking,
-                    shipment coordination, operations, finance and customer management.
+                    Integrated Logistics, Optimized Results
                 </p>
 
                 <div class="feature-list">
@@ -456,25 +543,19 @@
                     <!-- TABS -->
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <button class="nav-link active"
-                                data-bs-toggle="tab"
-                                data-bs-target="#login">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">
                                 Login
                             </button>
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link"
-                                data-bs-toggle="tab"
-                                data-bs-target="#register">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">
                                 Register
                             </button>
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link"
-                                data-bs-toggle="tab"
-                                data-bs-target="#forgot">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#forgot">
                                 Forgot
                             </button>
                         </li>
@@ -488,9 +569,7 @@
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
 
-                                <input type="hidden"
-                                    name="action"
-                                    value="login">
+                                <input type="hidden" name="action" value="login">
 
                                 {% if login_error %}
                                 <div class="alert alert-danger">
@@ -503,10 +582,7 @@
                                         Username
                                     </label>
 
-                                    <input type="text"
-                                        name="username"
-                                        class="form-control"
-                                        placeholder="Enter username"
+                                    <input type="text" name="username" class="form-control" placeholder="Enter username"
                                         required>
                                 </div>
 
@@ -518,15 +594,10 @@
 
                                     <div class="input-group">
 
-                                        <input type="password"
-                                            class="form-control password-input"
-                                            name="password"
-                                            id="loginPassword"
-                                            placeholder="Enter password"
-                                            required>
+                                        <input type="password" class="form-control password-input" name="password"
+                                            id="loginPassword" placeholder="Enter password" required>
 
-                                        <span class="input-group-text"
-                                            onclick="togglePassword('loginPassword')">
+                                        <span class="input-group-text" onclick="togglePassword('loginPassword')">
 
                                             <i class="bi bi-eye"></i>
 
@@ -550,9 +621,7 @@
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
 
-                                <input type="hidden"
-                                    name="action"
-                                    value="register">
+                                <input type="hidden" name="action" value="register">
 
                                 {% if register_error %}
                                 <div class="alert alert-danger">
@@ -567,50 +636,32 @@
                                 {% endif %}
 
                                 <div class="mb-2">
-                                    <input type="text"
-                                        name="emp_code"
-                                        class="form-control"
-                                        placeholder="Employee Code"
+                                    <input type="text" name="emp_code" class="form-control" placeholder="Employee Code"
                                         required>
                                 </div>
 
                                 <div class="mb-2">
-                                    <input type="text"
-                                        name="phone"
-                                        class="form-control"
-                                        placeholder="Phone Number"
+                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number"
                                         required>
                                 </div>
 
                                 <div class="mb-2">
-                                    <input type="text"
-                                        name="username"
-                                        class="form-control"
-                                        placeholder="Username"
+                                    <input type="text" name="username" class="form-control" placeholder="Username"
                                         required>
                                 </div>
 
                                 <div class="mb-2">
-                                    <input type="text"
-                                        name="role"
-                                        class="form-control"
-                                        placeholder="Role"
-                                        required>
+                                    <input type="text" name="role" class="form-control" placeholder="Role" required>
                                 </div>
 
                                 <div class="mb-4">
 
                                     <div class="input-group">
 
-                                        <input type="password"
-                                            name="password"
-                                            id="regPassword"
-                                            class="form-control password-input"
-                                            placeholder="Password"
-                                            required>
+                                        <input type="password" name="password" id="regPassword"
+                                            class="form-control password-input" placeholder="Password" required>
 
-                                        <span class="input-group-text"
-                                            onclick="togglePassword('regPassword')">
+                                        <span class="input-group-text" onclick="togglePassword('regPassword')">
 
                                             <i class="bi bi-eye"></i>
 
@@ -634,9 +685,7 @@
                             <form method="POST" action="{% url 'auth' %}">
                                 {% csrf_token %}
 
-                                <input type="hidden"
-                                    name="action"
-                                    value="forgot">
+                                <input type="hidden" name="action" value="forgot">
 
                                 {% if forgot_error %}
                                 <div class="alert alert-danger">
@@ -651,16 +700,12 @@
                                 {% endif %}
 
                                 <div class="mb-3">
-                                    <input type="text"
-                                        name="username"
-                                        class="form-control"
-                                        placeholder="Username"
+                                    <input type="text" name="username" class="form-control" placeholder="Username"
                                         required>
                                 </div>
 
                                 <div class="mb-4">
-                                    <textarea name="reason"
-                                        class="form-control"
+                                    <textarea name="reason" class="form-control"
                                         placeholder="Reason for password reset"></textarea>
                                 </div>
 
