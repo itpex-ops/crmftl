@@ -1,105 +1,151 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
+<!-- =========================
+PAGE STYLES
+========================= -->
+
 <style>
-    body {
-        background: #f5f7fb;
-    }
 
-    .page-header {
-        background: linear-gradient(135deg, #2563eb, #1e40af);
-        border-radius: 18px;
-        padding: 22px;
-        color: white;
-        margin-bottom: 20px;
-    }
+body{
+    background:#f5f7fb;
+}
 
-    .card-box {
-        background: #fff;
-        border-radius: 18px;
-        padding: 24px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-        margin-bottom: 20px;
-    }
+.page-header{
+    background:linear-gradient(135deg,#2563eb,#1e40af);
+    border-radius:18px;
+    padding:22px;
+    color:#fff;
+    margin-bottom:20px;
+}
 
-    .section-title {
-        font-size: 15px;
-        font-weight: 700;
-        margin-bottom: 18px;
-        color: #0f172a;
-        border-left: 4px solid #2563eb;
-        padding-left: 10px;
-    }
+.card-box{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+    margin-bottom:20px;
+}
 
-    label {
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #334155;
-    }
+.section-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:18px;
+    color:#0f172a;
+    border-left:4px solid #2563eb;
+    padding-left:10px;
+}
 
-    .form-control,
-    .form-select {
-        border-radius: 10px;
-        min-height: 44px;
-        border: 1px solid #dbe2ea;
-    }
+label{
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:6px;
+    color:#334155;
+}
 
-    .form-control:focus,
-    .form-select:focus {
-        box-shadow: none;
-        border-color: #2563eb;
-    }
+.form-control,
+.form-select{
+    border-radius:10px;
+    min-height:44px;
+    border:1px solid #dbe2ea;
+}
 
-    textarea.form-control {
-        min-height: 90px;
-    }
+.form-control:focus,
+.form-select:focus{
+    box-shadow:none;
+    border-color:#2563eb;
+}
 
-    .btn-save {
-        background: #2563eb;
-        border: none;
-        padding: 11px 22px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
+textarea.form-control{
+    min-height:90px;
+}
 
-    .btn-save:hover {
-        background: #1e40af;
-    }
+.btn-save{
+    background:#2563eb;
+    border:none;
+    padding:11px 22px;
+    border-radius:10px;
+    font-weight:600;
+}
 
-    .status-badge {
-        padding: 6px 14px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 600;
-        background: #fef3c7;
-        color: #92400e;
-    }
+.btn-save:hover{
+    background:#1e40af;
+}
 
-    .route-box {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 12px;
-    }
+.status-badge{
+    padding:6px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.route-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.dimension-result-box{
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    background:#f8fafc;
+    padding:18px;
+}
+
+.result-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:14px;
+    color:#0f172a;
+}
+
+.result-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+.result-row strong{
+    color:#1e293b;
+    font-weight:700;
+}
+
 </style>
 
 <div class="container-fluid mt-3">
+
+    <!-- =========================
+    HEADER
+    ========================= -->
+
     <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+
         <div>
+
             <h4>
                 ✏ Edit Enquiry
             </h4>
+
             <div class="small">
                 {{ enquiry.enquiry_no }}
             </div>
+
         </div>
+
         <div>
+
             <span class="status-badge">
                 {{ enquiry.status|default:"Pending" }}
             </span>
+
         </div>
+
     </div>
 
     <form method="POST">
@@ -108,11 +154,15 @@
 
         <div class="row">
 
-            <!-- LEFT -->
+            <!-- =========================
+            LEFT SIDE
+            ========================= -->
 
             <div class="col-lg-8">
 
-                <!-- CUSTOMER -->
+                <!-- =========================
+                CUSTOMER DETAILS
+                ========================= -->
 
                 <div class="card-box">
 
@@ -120,59 +170,70 @@
                         Customer Information
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Customer Name
                             </label>
 
-                            <input type="text" name="customer_name" class="form-control"
-                                value="{{ enquiry.customer_name }}">
+                            <input type="text"
+                                   name="customer_name"
+                                   class="form-control"
+                                   value="{{ enquiry.customer_name|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Customer Contact
                             </label>
 
-                            <input type="text" name="customer_contact" class="form-control"
-                                value="{{ enquiry.customer_contact }}">
+                            <input type="text"
+                                   name="customer_contact"
+                                   class="form-control"
+                                   value="{{ enquiry.customer_contact|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Email
                             </label>
 
-                            <input type="email" name="email" class="form-control" value="{{ enquiry.email }}">
+                            <input type="email"
+                                   name="email"
+                                   class="form-control"
+                                   value="{{ enquiry.email|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Lead Source
                             </label>
 
-                            <input type="text" name="lead_source" class="form-control"
-                                value="{{ enquiry.lead_source }}">
+                            <input type="text"
+                                   name="lead_source"
+                                   class="form-control"
+                                   value="{{ enquiry.lead_source|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Reference Name
                             </label>
 
-                            <input type="text" name="reference_name" class="form-control"
-                                value="{{ enquiry.reference_name }}">
+                            <input type="text"
+                                   name="reference_name"
+                                   class="form-control"
+                                   value="{{ enquiry.reference_name|default_if_none:'' }}">
 
                         </div>
 
@@ -180,7 +241,9 @@
 
                 </div>
 
-                <!-- VEHICLE -->
+                <!-- =========================
+                VEHICLE DETAILS
+                ========================= -->
 
                 <div class="card-box">
 
@@ -188,82 +251,83 @@
                         Vehicle Information
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
 
                             <label>
                                 Vehicle Type
                             </label>
 
-                            <select name="vehicle_type" class="form-select vehicle-select">
-                                <option value="">Select Vehicle</option>
+                            <select name="vehicle_type"
+                                    class="form-select">
+
+                                <option value="">
+                                    Select Vehicle
+                                </option>
+
                                 {% for value, label in vehicle_types %}
-                                <option value="{{ value }}">{{ label }}</option>
+
+                                <option value="{{ value }}"
+                                    {% if enquiry.vehicle_type == value %}selected{% endif %}>
+
+                                    {{ label }}
+
+                                </option>
+
                                 {% endfor %}
+
                             </select>
+
                         </div>
-                        <link rel="stylesheet"
-                            href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
 
-                        <!-- Tom Select JS -->
-                        <script
-                            src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
-
-                                new TomSelect(".vehicle-select", {
-                                    create: false,
-                                    sortField: {
-                                        field: "text",
-                                        direction: "asc"
-                                    },
-                                    placeholder: "Search Vehicle Type..."
-                                });
-
-                            });
-                        </script>
-
-                        <div class="col-md-6 mb-1">
+                        <div class="col-md-6">
 
                             <label>
                                 Vehicle Description
                             </label>
 
                             <textarea name="vehicle_description"
-                                class="form-control">{{ enquiry.vehicle_description }}</textarea>
+                                      class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }}</textarea>
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Pickups
                             </label>
 
-                            <input type="number" name="pickups" class="form-control" value="{{ enquiry.pickups }}">
+                            <input type="number"
+                                   name="pickups"
+                                   class="form-control"
+                                   value="{{ enquiry.pickups|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Deliveries
                             </label>
 
-                            <input type="number" name="deliveries" class="form-control"
-                                value="{{ enquiry.deliveries }}">
+                            <input type="number"
+                                   name="deliveries"
+                                   class="form-control"
+                                   value="{{ enquiry.deliveries|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 KMS
                             </label>
 
-                            <input type="text" name="kms" class="form-control" value="{{ enquiry.kms }}">
+                            <input type="text"
+                                   name="kms"
+                                   class="form-control"
+                                   value="{{ enquiry.kms|default_if_none:'' }}">
 
                         </div>
 
@@ -271,7 +335,9 @@
 
                 </div>
 
-                <!-- MATERIAL -->
+                <!-- =========================
+                MATERIAL DETAILS
+                ========================= -->
 
                 <div class="card-box">
 
@@ -279,46 +345,59 @@
                         Material Details
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Material
                             </label>
 
-                            <input type="text" name="material" class="form-control" value="{{ enquiry.material }}">
+                            <input type="text"
+                                   name="material"
+                                   class="form-control"
+                                   value="{{ enquiry.material|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Pieces
                             </label>
 
-                            <input type="number" name="pieces" class="form-control" value="{{ enquiry.pieces }}">
+                            <input type="number"
+                                   name="pieces"
+                                   class="form-control"
+                                   value="{{ enquiry.pieces|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Tonnage
                             </label>
 
-                            <input type="number" step="0.01" name="tonnage" class="form-control"
-                                value="{{ enquiry.tonnage }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="tonnage"
+                                   class="form-control"
+                                   value="{{ enquiry.tonnage|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 KG
                             </label>
 
-                            <input type="number" step="0.01" name="kg" class="form-control" value="{{ enquiry.kg }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="kg"
+                                   class="form-control"
+                                   value="{{ enquiry.kg|default_if_none:'' }}">
 
                         </div>
 
@@ -326,7 +405,9 @@
 
                 </div>
 
-                <!-- DIMENSION -->
+                <!-- =========================
+                DIMENSION DETAILS
+                ========================= -->
 
                 <div class="card-box">
 
@@ -334,57 +415,165 @@
                         Dimension Details
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
 
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
+
+                            <label>
+                                Dimension Unit
+                            </label>
+
+                            <select name="dimension_unit"
+                                    class="form-select"
+                                    id="dimensionUnit">
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option value="cm"
+                                    {% if enquiry.dimension_unit == 'cm' %}selected{% endif %}>
+                                    CM
+                                </option>
+
+                                <option value="inch"
+                                    {% if enquiry.dimension_unit == 'inch' %}selected{% endif %}>
+                                    INCH
+                                </option>
+
+                                <option value="feet"
+                                    {% if enquiry.dimension_unit == 'feet' %}selected{% endif %}>
+                                    FEET
+                                </option>
+
+                                <option value="meter"
+                                    {% if enquiry.dimension_unit == 'meter' %}selected{% endif %}>
+                                    METER
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
 
                             <label>
                                 Length
                             </label>
 
-                            <input type="number" step="0.01" name="length" class="form-control"
-                                value="{{ enquiry.length }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="length"
+                                   id="lengthInput"
+                                   class="form-control"
+                                   value="{{ enquiry.length|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
 
                             <label>
                                 Breadth
                             </label>
 
-                            <input type="number" step="0.01" name="breadth" class="form-control"
-                                value="{{ enquiry.breadth }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="breadth"
+                                   id="breadthInput"
+                                   class="form-control"
+                                   value="{{ enquiry.breadth|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
 
                             <label>
                                 Height
                             </label>
 
-                            <input type="number" step="0.01" name="height" class="form-control"
-                                value="{{ enquiry.height }}">
-
-                        </div>
-
-                        <div class="col-md-3 mb-3">
-
-                            <label>
-                                Unit
-                            </label>
-
-                            <input type="text" name="dimension_unit" class="form-control"
-                                value="{{ enquiry.dimension_unit }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="height"
+                                   id="heightInput"
+                                   class="form-control"
+                                   value="{{ enquiry.height|default_if_none:'' }}">
 
                         </div>
 
                     </div>
 
+                    <!-- RESULT BOX -->
+
+                    <div class="row mt-4">
+
+                        <div class="col-md-6 d-none"
+                             id="dimensionBox">
+
+                            <div class="dimension-result-box">
+
+                                <div class="result-title">
+                                    📐 Dimension Calculation
+                                </div>
+
+                                <div class="result-row">
+
+                                    <span>
+                                        Converted Size
+                                    </span>
+
+                                    <strong id="convertedDimension">
+                                        0 × 0 × 0 CM
+                                    </strong>
+
+                                </div>
+
+                                <div class="result-row">
+
+                                    <span>
+                                        Volume
+                                    </span>
+
+                                    <strong id="volumeResult">
+                                        0
+                                    </strong>
+
+                                </div>
+
+                                <div class="result-row">
+
+                                    <span>
+                                        Volumetric Weight
+                                    </span>
+
+                                    <strong id="volumetricWeight">
+                                        0 KG
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- HIDDEN SAVE FIELDS -->
+
+                    <input type="hidden"
+                           name="volume"
+                           id="volumeInput"
+                           value="{{ enquiry.volume|default_if_none:'' }}">
+
+                    <input type="hidden"
+                           name="volumetric_weight"
+                           id="volumetricWeightInput"
+                           value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
+
                 </div>
 
-                <!-- ROUTES -->
+                <!-- =========================
+                ROUTES
+                ========================= -->
 
                 <div class="card-box">
 
@@ -394,7 +583,9 @@
                             Routes
                         </span>
 
-                        <button type="button" class="btn btn-primary btn-sm" id="addRoute">
+                        <button type="button"
+                                class="btn btn-primary btn-sm"
+                                id="addRoute">
 
                             + Add Route
 
@@ -412,54 +603,38 @@
 
                                 <div class="col-md-5 mb-2">
 
-                                    <label>From</label>
+                                    <label>
+                                        From
+                                    </label>
 
-                                    <input type="text" name="origin[]" class="form-control" value="{{ route.origin }}">
+                                    <input type="text"
+                                           name="origin[]"
+                                           class="form-control"
+                                           value="{{ route.origin }}">
 
                                 </div>
 
                                 <div class="col-md-5 mb-2">
 
-                                    <label>To</label>
+                                    <label>
+                                        To
+                                    </label>
 
-                                    <input type="text" name="destination[]" class="form-control"
-                                        value="{{ route.destination }}">
+                                    <input type="text"
+                                           name="destination[]"
+                                           class="form-control"
+                                           value="{{ route.destination }}">
 
                                 </div>
 
                                 <div class="col-md-2 d-flex align-items-end">
 
-                                    <button type="button" class="btn btn-danger w-100 removeRoute">
+                                    <button type="button"
+                                            class="btn btn-danger w-100 removeRoute">
 
                                         Remove
 
                                     </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% empty %}
-
-                        <div class="route-box route-row">
-
-                            <div class="row">
-
-                                <div class="col-md-5 mb-2">
-
-                                    <label>From</label>
-
-                                    <input type="text" name="origin[]" class="form-control">
-
-                                </div>
-
-                                <div class="col-md-5 mb-2">
-
-                                    <label>To</label>
-
-                                    <input type="text" name="destination[]" class="form-control">
 
                                 </div>
 
@@ -473,7 +648,9 @@
 
                 </div>
 
-                <!-- RATE -->
+                <!-- =========================
+                RATE DETAILS
+                ========================= -->
 
                 <div class="card-box">
 
@@ -481,46 +658,47 @@
                         Pricing Details
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Expected Rate
                             </label>
 
-                            <input type="number" step="0.01" name="expected_rate" class="form-control"
-                                value="{{ enquiry.expected_rate }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="expected_rate"
+                                   class="form-control"
+                                   value="{{ enquiry.expected_rate|default_if_none:'' }}">
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
 
                             <label>
                                 Approval Rate
                             </label>
 
-                            <input type="number" step="0.01" name="approval_rate" class="form-control"
-                                value="{{ enquiry.approval_rate }}">
+                            <input type="number"
+                                   step="0.01"
+                                   name="approval_rate"
+                                   class="form-control"
+                                   value="{{ enquiry.approval_rate|default_if_none:'' }}">
 
                         </div>
 
-                        <!-- <div class="col-md-4 mb-3">
-
-                            <label>
-                                GST Bill %
-                            </label>
-
-                            <input type="number" name="gstbill" class="form-control" value="{{ enquiry.gstbill }}">
-
-                        </div> -->
                     </div>
-                </div>
-            </div>
-            <!-- RIGHT -->
-            <div class="col-lg-4">
 
-                <!-- STATUS -->
+                </div>
+
+            </div>
+
+            <!-- =========================
+            RIGHT SIDE
+            ========================= -->
+
+            <div class="col-lg-4">
 
                 <div class="card-box">
 
@@ -534,8 +712,10 @@
                             Status
                         </label>
 
-                        <input type="text" name="status" class="form-control"
-                            value="{{ enquiry.status|default_if_none:'' }}">
+                        <input type="text"
+                               name="status"
+                               class="form-control"
+                               value="{{ enquiry.status|default_if_none:'' }}">
 
                     </div>
 
@@ -546,343 +726,25 @@
                         </label>
 
                         <textarea name="cancel_reason"
-                            class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+                                  class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
 
                     </div>
 
                 </div>
-
-                <!-- PITCH -->
-
-                <div class="card-box">
-
-                    <div class="section-title">
-                        Pitch Information
-                    </div>
-
-                    {% if is_admin %}
-
-                    <!-- ADMIN VIEW -->
-
-                    <!-- PITCH 1 -->
-
-                    <div class="mb-3">
-
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-
-                            <label class="mb-0">
-                                Pitch 1
-                            </label>
-
-                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
-                                data-target="pitch1">
-
-                                <i class="bi bi-pencil-square"></i>
-
-                            </button>
-
-                        </div>
-
-                        <input type="text" name="pitch1" id="pitch1" class="form-control"
-                            value="{{ enquiry.pitch1|default_if_none:'' }}" disabled>
-
-                    </div>
-
-                    <!-- PITCH 2 -->
-
-                    <div class="mb-3">
-
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-
-                            <label class="mb-0">
-                                Pitch 2
-                            </label>
-
-                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
-                                data-target="pitch2">
-
-                                <i class="bi bi-pencil-square"></i>
-
-                            </button>
-
-                        </div>
-
-                        <input type="text" name="pitch2" id="pitch2" class="form-control"
-                            value="{{ enquiry.pitch2|default_if_none:'' }}" disabled>
-
-                    </div>
-
-                    <!-- PITCH 3 -->
-
-                    <div class="mb-0">
-
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-
-                            <label class="mb-0">
-                                Pitch 3
-                            </label>
-
-                            <button type="button" class="btn btn-sm btn-outline-primary toggle-edit-btn"
-                                data-target="pitch3">
-
-                                <i class="bi bi-pencil-square"></i>
-
-                            </button>
-
-                        </div>
-
-                        <input type="text" name="pitch3" id="pitch3" class="form-control"
-                            value="{{ enquiry.pitch3|default_if_none:'' }}" disabled>
-
-                    </div>
-
-                    {% else %}
-
-                    <!-- USER FLOW VIEW -->
-
-                    <div class="timeline-box">
-
-                        <!-- PITCH 1 -->
-
-                        {% if enquiry.pitch1 %}
-
-                        <div class="border rounded p-3 mb-3">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <strong>
-                                    Pitch 1
-                                </strong>
-
-                                {% if enquiry.status == 'pending_pitch1' %}
-
-                                <span class="badge bg-warning">
-                                    Active
-                                </span>
-
-                                {% else %}
-
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-
-                                {% endif %}
-
-                            </div>
-
-                            <div class="mt-2">
-                                ₹ {{ enquiry.pitch1 }}
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-                        <!-- PITCH 2 -->
-
-                        {% if enquiry.pitch2 %}
-
-                        <div class="border rounded p-3 mb-3">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <strong>
-                                    Pitch 2
-                                </strong>
-
-                                {% if enquiry.status == 'pending_pitch2' %}
-
-                                <span class="badge bg-warning">
-                                    Active
-                                </span>
-
-                                {% else %}
-
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-
-                                {% endif %}
-
-                            </div>
-
-                            <div class="mt-2">
-                                ₹ {{ enquiry.pitch2 }}
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-                        <!-- PITCH 3 -->
-
-                        {% if enquiry.pitch3 %}
-
-                        <div class="border rounded p-3 mb-3">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <strong>
-                                    Pitch 3
-                                </strong>
-
-                                {% if enquiry.status == 'pending_pitch3' %}
-
-                                <span class="badge bg-warning">
-                                    Active
-                                </span>
-
-                                {% else %}
-
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-
-                                {% endif %}
-
-                            </div>
-
-                            <div class="mt-2">
-                                ₹ {{ enquiry.pitch3 }}
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-                        <!-- APPROVAL RATE -->
-
-                        {% if enquiry.approval_rate %}
-
-                        <div class="border rounded p-3 mb-3">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <strong>
-                                    Confirmed Rate
-                                </strong>
-
-                                {% if enquiry.status == 'confirmed' %}
-
-                                <span class="badge bg-success">
-                                    Confirmed
-                                </span>
-
-                                {% else %}
-
-                                <span class="badge bg-secondary">
-                                    Pending
-                                </span>
-
-                                {% endif %}
-
-                            </div>
-
-                            <div class="mt-2">
-                                ₹ {{ enquiry.approval_rate }}
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-                        <!-- EMPTY -->
-
-                        {% if not enquiry.pitch1 and not enquiry.pitch2 and not enquiry.pitch3 and not enquiry.approval_rate %}
-
-                        <div class="text-muted small">
-                            No pitching activity available
-                        </div>
-
-                        {% endif %}
-
-                    </div>
-
-                    {% endif %}
-
-                </div>
-
-                <!-- INFORMATION -->
-
-                <div class="card-box">
-
-                    <div class="section-title">
-                        Information
-                    </div>
-
-                    <table class="table table-borderless align-middle mb-0">
-
-                        <tbody>
-
-                            <tr>
-
-                                <td class="fw-semibold text-muted" width="45%">
-                                    Created By
-                                </td>
-
-                                <td>
-                                    {{ enquiry.created_by|default_if_none:'' }}
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td class="fw-semibold text-muted">
-                                    Created At
-                                </td>
-
-                                <td>
-                                    {{ enquiry.created_at|date:"d M Y h:i A" }}
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td class="fw-semibold text-muted">
-                                    Converted
-                                </td>
-
-                                <td>
-
-                                    {% if enquiry.is_converted_to_order %}
-
-                                    <span class="badge bg-success">
-                                        Yes
-                                    </span>
-
-                                    {% else %}
-
-                                    <span class="badge bg-secondary">
-                                        No
-                                    </span>
-
-                                    {% endif %}
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-                <!-- BUTTONS -->
 
                 <div class="card-box">
 
                     <div class="d-grid gap-2">
 
-                        <button type="submit" class="btn btn-primary btn-save">
+                        <button type="submit"
+                                class="btn btn-primary btn-save">
 
                             💾 Update Enquiry
 
                         </button>
 
-                        <a href="{% url 'enquiry_list' %}" class="btn btn-light">
+                        <a href="{% url 'enquiry_list' %}"
+                           class="btn btn-light">
 
                             Cancel
 
@@ -893,16 +755,24 @@
                 </div>
 
             </div>
+
         </div>
+
     </form>
+
 </div>
+
+<!-- =========================
+ROUTE JS
+========================= -->
+
 <script>
 
-    document
-        .getElementById('addRoute')
-        .addEventListener('click', function () {
+document
+.getElementById("addRoute")
+.addEventListener("click", function(){
 
-            let html = `
+    let html = `
 
     <div class="route-box route-row">
 
@@ -947,90 +817,159 @@
 
     </div>
 
-    `
+    `;
 
-            document
-                .getElementById('routeContainer')
-                .insertAdjacentHTML('beforeend', html)
+    document
+    .getElementById("routeContainer")
+    .insertAdjacentHTML("beforeend", html);
 
-        })
+});
 
+document.addEventListener("click", function(e){
 
-    document.addEventListener('click', function (e) {
+    if(e.target.classList.contains("removeRoute")){
 
-        if (e.target.classList.contains('removeRoute')) {
+        e.target.closest(".route-row").remove();
 
-            e.target
-                .closest('.route-row')
-                .remove()
+    }
 
-        }
-
-    })
+});
 
 </script>
+
+<!-- =========================
+DIMENSION JS
+========================= -->
+
 <script>
 
-    document.querySelectorAll("input, textarea").forEach(el => {
+document.addEventListener("DOMContentLoaded", function () {
 
-        if (el.value === "None") {
+    const lengthInput =
+        document.getElementById("lengthInput");
 
-            el.value = "";
+    const breadthInput =
+        document.getElementById("breadthInput");
 
+    const heightInput =
+        document.getElementById("heightInput");
+
+    const unitInput =
+        document.getElementById("dimensionUnit");
+
+    const dimensionBox =
+        document.getElementById("dimensionBox");
+
+    function calculateDimension() {
+
+        const unit = unitInput.value;
+
+        if (unit !== "") {
+
+            dimensionBox.classList.remove("d-none");
+
+        } else {
+
+            dimensionBox.classList.add("d-none");
+
+            return;
         }
 
-    });
+        let length =
+            parseFloat(lengthInput.value) || 0;
+
+        let breadth =
+            parseFloat(breadthInput.value) || 0;
+
+        let height =
+            parseFloat(heightInput.value) || 0;
+
+        // CONVERT TO CM
+
+        if (unit === "inch") {
+
+            length *= 2.54;
+            breadth *= 2.54;
+            height *= 2.54;
+        }
+
+        else if (unit === "feet") {
+
+            length *= 30.48;
+            breadth *= 30.48;
+            height *= 30.48;
+        }
+
+        else if (unit === "meter") {
+
+            length *= 100;
+            breadth *= 100;
+            height *= 100;
+        }
+
+        // CALCULATE
+
+        const volume =
+            length * breadth * height;
+
+        const volumetric =
+            volume / 4500;
+
+        // DISPLAY
+
+        document
+        .getElementById("convertedDimension")
+        .innerText =
+        `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} CM`;
+
+        document
+        .getElementById("volumeResult")
+        .innerText =
+        volume.toFixed(2);
+
+        document
+        .getElementById("volumetricWeight")
+        .innerText =
+        volumetric.toFixed(2) + " KG";
+
+        // SAVE TO HIDDEN INPUTS
+
+        document
+        .getElementById("volumeInput")
+        .value =
+        volume.toFixed(2);
+
+        document
+        .getElementById("volumetricWeightInput")
+        .value =
+        volumetric.toFixed(2);
+
+    }
+
+    unitInput.addEventListener(
+        "change",
+        calculateDimension
+    );
+
+    lengthInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    breadthInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    heightInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    calculateDimension();
+
+});
 
 </script>
-<script>
 
-    document.querySelectorAll('.toggle-edit-btn').forEach(btn => {
-
-        btn.addEventListener('click', function () {
-
-            const input =
-                document.getElementById(
-                    this.dataset.target
-                );
-
-            if (input.disabled) {
-
-                input.disabled = false;
-
-                input.focus();
-
-                this.innerHTML =
-                    '<i class="bi bi-lock me-1"></i> ';
-
-                this.classList.remove(
-                    'btn-outline-primary'
-                );
-
-                this.classList.add(
-                    'btn-outline-danger'
-                );
-
-            }
-            else {
-
-                input.disabled = true;
-
-                this.innerHTML =
-                    '<i class="bi bi-pencil-square me-1"></i>';
-
-                this.classList.remove(
-                    'btn-outline-danger'
-                );
-
-                this.classList.add(
-                    'btn-outline-primary'
-                );
-
-            }
-
-        });
-
-    });
-
-</script>
 {% endblock %}

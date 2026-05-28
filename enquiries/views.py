@@ -90,7 +90,8 @@ def edit_enquiry(request, id):
         enquiry.height = request.POST.get(
             'height'
         ) or None
-
+        enquiry.volume = request.POST.get('volume') or None
+        enquiry.volumetric_weight = request.POST.get('volumetric_weight') or None
         enquiry.expected_rate = request.POST.get(
             'expected_rate'
         ) or None
@@ -210,7 +211,6 @@ def notifications(request):
         }
     )
 
-
 # ==============================
 # ADMIN CONFIRM ENQUIRY
 # ==============================
@@ -253,39 +253,90 @@ def confirm_enquiry(request, enquiry_id):
 
 @login_required
 def create_enquiry(request):
-
     vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
-
     if request.method == "POST":
-
         customer_name = request.POST.get("customer_name") or None
         customer_contact = request.POST.get("customer_contact") or None
         email = request.POST.get("email") or None
-
         lead_source = request.POST.get("lead_source") or None
         reference_name = request.POST.get("reference_name") or None
+
+        # =========================
+        # VEHICLE
+        # =========================
 
         pickups = request.POST.get("pickups") or 1
         deliveries = request.POST.get("deliveries") or 1
 
         vehicle_type = request.POST.get("vehicle_type") or None
-        vehicle_description = request.POST.get("vehicle_desc") or None
+        vehicle_description = request.POST.get("vehicle_description") or None
+
+        # HTML name="kms"
         kms = request.POST.get("kms") or None
 
-        material = request.POST.get("material")
+        # =========================
+        # MATERIAL
+        # =========================
+
+        material = request.POST.get("material") or None
         pieces = request.POST.get("pieces") or None
-        tonnage = request.POST.get("tonnage")
+        tonnage = request.POST.get("tonnage") or None
         kg = request.POST.get("kg") or None
 
-        dimension_unit = request.POST.get("dimension_unit") or None
+        # =========================
+        # DIMENSIONS
+        # =========================
 
-        length = request.POST.get("length") or None
-        breadth = request.POST.get("breadth") or None
-        height = request.POST.get("height") or None
+        length = float(request.POST.get("length") or 0)
+        breadth = float(request.POST.get("breadth") or 0)
+        height = float(request.POST.get("height") or 0)
+
+        dimension_unit = request.POST.get("dimension_unit") or ""
+
+        # =========================
+        # VOLUMETRIC CALCULATION
+        # =========================
+
+        volume = length * breadth * height
+
+        volumetric_weight = 0
+
+        if volume > 0:
+
+            if dimension_unit == "cm":
+
+                volumetric_weight = volume / 4500
+
+            elif dimension_unit == "inch":
+
+                volumetric_weight = volume / 274.6
+
+            elif dimension_unit == "feet":
+
+                volumetric_weight = volume / 0.1589
+
+            elif dimension_unit == "meter":
+
+                volumetric_weight = volume / 0.0045
+
+        # =========================
+        # ROUND VALUES
+        # =========================
+
+        volume = round(volume, 2)
+
+        volumetric_weight = round(volumetric_weight, 2)
+
+        # =========================
+        # RATE
+        # =========================
 
         expected_rate = request.POST.get("expected_rate") or None
 
+        # =========================
         # ROUTES
+        # =========================
+
         origins = request.POST.getlist("origin[]")
         destinations = request.POST.getlist("destination[]")
 
@@ -301,42 +352,51 @@ def create_enquiry(request):
             if route["origin"] or route["destination"]:
                 routes.append(route)
 
+        # =========================
+        # CREATE ENQUIRY
+        # =========================
+
         enquiry = Enquiry.objects.create(
+
             customer_name=customer_name,
             customer_contact=customer_contact,
             email=email,
+
             lead_source=lead_source,
             reference_name=reference_name,
+
             pickups=pickups,
             deliveries=deliveries,
+
             vehicle_type=vehicle_type,
             vehicle_description=vehicle_description,
             kms=kms,
+
             material=material,
+
             pieces=int(pieces) if pieces else None,
             tonnage=float(tonnage) if tonnage else None,
             kg=float(kg) if kg else None,
+
             dimension_unit=dimension_unit,
-            length=float(length) if length else None,
-            breadth=float(breadth) if breadth else None,
-            height=float(height) if height else None,
+
+            # ORIGINAL VALUES
+            length=length,
+            breadth=breadth,
+            height=height,
+
+            # CALCULATED VALUES
+            volume=volume,
+            volumetric_weight=volumetric_weight,
 
             expected_rate=float(expected_rate) if expected_rate else None,
 
             status='waiting for rate approval',
+
             routes=routes,
+
             created_by=request.user
         )
-
-        # 🔔 NOTIFICATION
-        admins = User.objects.filter(role='admin')
-
-        for admin in admins:
-
-            Notification.objects.create(
-                user=admin,
-                message=f"New enquiry {enquiry.enquiry_no} created by {request.user.username}"
-            )
 
         messages.success(
             request,
@@ -352,7 +412,6 @@ def create_enquiry(request):
             "vehicle_types": vehicle_types
         }
     )
-
 @login_required
 def enquiry_list(request):
     user = request.user

@@ -325,7 +325,7 @@ def vehicle_ledger(request, vehicle_id):
 
     ledger.append({
         "date": v.created_at,
-        "remarks": v.order.order_no,
+        "ftlno": v.ftl_no,
         "debit": debit,
         "credit": credit,
         "balance": balance

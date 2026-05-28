@@ -206,6 +206,55 @@
                             <input type="number" step="any" name="height" class="form-control">
                         </div>
 
+                        <div class="col-md-6 d-none" id="dimensionBox">
+
+                            <div class="dimension-result-box">
+
+                                <div class="result-title">
+                                    📐 Dimension Calculation
+                                </div>
+
+                                <!-- Converted Size -->
+
+                                <div class="result-row">
+                                    <span>
+                                        Converted Size
+                                    </span>
+
+                                    <strong id="convertedDimension">
+                                        0 × 0 × 0 CM
+                                    </strong>
+                                </div>
+
+                                <!-- Volumetric Weight -->
+
+                                <div class="result-row volumetric-highlight">
+                                    <span>
+                                        Volumetric Weight
+                                    </span>
+
+                                    <strong id="volumetric_weight">
+                                        0 KG
+                                    </strong>
+                                </div>
+
+                                <!-- Volume -->
+
+                                <div class="result-row small-volume">
+                                    <span>
+                                        Volume
+                                    </span>
+
+                                    <small id="volumeResult">
+                                        0 CM³
+                                    </small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
                         <div class="col-md-3">
                             <label class="form-label">Expected Rate ₹</label>
                             <input type="number" step="any" name="expected_rate" class="form-control">
@@ -237,6 +286,31 @@
 </div>
 
 <style>
+    .dimension-result-box {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        background: #f8fafc;
+        margin-top: 10px;
+    }
+
+    .result-title {
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #111827;
+    }
+
+    .result-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .result-row strong {
+        color: #0f172a;
+    }
+
     .ts-wrapper.single .ts-control {
         min-height: 38px;
         display: flex;
@@ -283,11 +357,148 @@
     }
 
     .form-label {
-        font-size: 13px;
+        font-size: 16px;
         font-weight: 600;
         margin-bottom: 6px;
     }
 </style>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const lengthInput =
+        document.querySelector('[name="length"]');
+
+    const breadthInput =
+        document.querySelector('[name="breadth"]');
+
+    const heightInput =
+        document.querySelector('[name="height"]');
+
+    const unitInput =
+        document.querySelector('[name="dimension_unit"]');
+
+    const dimensionBox =
+        document.getElementById("dimensionBox");
+
+    function calculateDimension() {
+
+        const unit = unitInput.value;
+
+        // =========================
+        // SHOW / HIDE
+        // =========================
+
+        if (unit !== "") {
+
+            dimensionBox.classList.remove("d-none");
+
+        } else {
+
+            dimensionBox.classList.add("d-none");
+
+            return;
+        }
+
+        // =========================
+        // INPUT VALUES
+        // =========================
+
+        let length =
+            parseFloat(lengthInput.value) || 0;
+
+        let breadth =
+            parseFloat(breadthInput.value) || 0;
+
+        let height =
+            parseFloat(heightInput.value) || 0;
+
+        // =========================
+        // CALCULATIONS
+        // =========================
+
+        const volume =
+            length * breadth * height;
+
+        let volumetric = 0;
+
+        if (unit === "cm") {
+
+            volumetric = volume / 4500;
+        }
+
+        else if (unit === "inch") {
+
+            volumetric = volume / 274.6;
+        }
+
+        else if (unit === "feet") {
+
+            volumetric = volume / 0.1589;
+        }
+
+        else if (unit === "meter") {
+
+            volumetric = volume / 0.0045;
+        }
+
+        // =========================
+        // DISPLAY
+        // =========================
+
+        document
+            .getElementById("convertedDimension")
+            .innerText =
+
+            `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} ${unit.toUpperCase()}`;
+
+        document
+            .getElementById("volumeResult")
+            .innerText =
+
+            volume.toFixed(3);
+
+        document
+            .getElementById("volumetric_weight")
+            .innerText =
+
+            volumetric.toFixed(3) + " KG";
+    }
+
+    // =========================
+    // EVENTS
+    // =========================
+
+    unitInput.addEventListener(
+        "change",
+        calculateDimension
+    );
+
+    lengthInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    breadthInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    heightInput.addEventListener(
+        "input",
+        calculateDimension
+    );
+
+    // =========================
+    // LOAD EXISTING VALUES
+    // =========================
+
+    calculateDimension();
+
+});
+
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 

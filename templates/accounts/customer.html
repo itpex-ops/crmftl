@@ -143,10 +143,7 @@
 
                         <!-- FTL NO -->
                         <td>
-                            <a href="{% url 'customer_ledger' row.enquiry_id %}"
-                                class="fw-semibold text-decoration-none">
-                                {{ row.ftl_no }}
-                            </a>
+                            {{ row.ftl_no }}
                         </td>
 
                         <td>{{ row.customer|default_if_none:"" }}</td>

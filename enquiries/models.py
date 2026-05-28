@@ -89,6 +89,9 @@ class Enquiry(models.Model):
     breadth = models.FloatField(blank=True, null=True)
     height = models.FloatField(blank=True, null=True)
 
+    volume = models.FloatField(null=True, blank=True)
+    volumetric_weight = models.FloatField(null=True, blank=True)
+
     expected_rate = models.FloatField(blank=True, null=True)
     approval_rate = models.FloatField(blank=True, null=True)
 
