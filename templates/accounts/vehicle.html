@@ -141,7 +141,7 @@
                     <tr>
                         <th>FTL No</th>
                         <th>Vehicle</th>
-                        <th>Order</th>
+                        <!-- <th>Order</th> -->
                         <th>Freight</th>
                         <th>Advance</th>
                         <th>Balance</th>
@@ -165,7 +165,7 @@
                         </td>
 
                         <td>{{ v.vehicle|default_if_none:"" }}</td>
-                        <td>{{ v.order_no|default_if_none:"" }}</td>
+                        <!-- <td>{{ v.order_no|default_if_none:"" }}</td> -->
 
                         <td class="amount freight">₹{{ v.freight|default:0 }}</td>
                         <td class="amount advance text-success">₹{{ v.advance|default:0 }}</td>
