@@ -120,6 +120,7 @@ def orders_management(request):
         "not_assigned_count": not_assigned_count,
         "pending_count": not_assigned_count,
     })
+
 # =====================================================
 # HELPERS
 # =====================================================

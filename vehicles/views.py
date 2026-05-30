@@ -53,7 +53,7 @@ from vehicles.models import Vehicle
 @login_required
 def assign_vehicle(request, order_id):
 
-    order_source = request.GET.get("source", "crm")
+    order_source = request.GET.get("manual", "crm")
     print("s",order_source)
 
     # =========================
