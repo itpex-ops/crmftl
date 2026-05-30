@@ -98,7 +98,6 @@
                         <th width="150">Rate ₹</th>
 
                         <th width="180">Status</th>
-                        <th width="120">Actions</th>
 
                     </tr>
 
@@ -131,10 +130,9 @@
                             {% else %}
 
                             {% if order.order_source == "manual" %}
+                           
 
-
-                            <a href="{% url 'view_existing_order' order.id %}"
-                                class="fw-semibold text-decoration-none">
+                            <a href="{% url 'view_existing_order' order.id %}" class="fw-semibold text-decoration-none">
 
                                 {{ order.order_no }}
 
@@ -339,29 +337,6 @@
                             {% endif %}
 
                         </td>
-                        <!-- ACTIONS -->
-                        <td class="text-center">
-
-                            {% if request.user.is_superuser or request.user.role == 'superadmin' %}
-
-                            <form method="POST" action="{% url 'delete_order' order.id %}"
-                                onsubmit="return confirm('Are you sure you want to delete this order?');">
-
-                                {% csrf_token %}
-
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    Delete
-                                </button>
-
-                            </form>
-
-                            {% else %}
-
-                            <span class="text-muted">-</span>
-
-                            {% endif %}
-
-                        </td>
 
                     </tr>
 
@@ -369,7 +344,7 @@
 
                     <tr>
 
-                        <td colspan="9" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
 
                             No Orders Found
 

@@ -18,12 +18,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from orders.models import Order
 
 
-@staff_member_required
-def delete_order(request, order_id):
-    if request.method == "POST":
-        order = get_object_or_404(Order, id=order_id)
-        order.delete()
-    return redirect("orders_management")
+# @staff_member_required
+# def delete_order(request, order_id):
+#     if request.method == "POST":
+#         order = get_object_or_404(Order, id=order_id)
+#         order.delete()
+#     return redirect("orders_management")
 
 def is_sales(user):
       return user.is_authenticated and (user.role in ['sales'])
