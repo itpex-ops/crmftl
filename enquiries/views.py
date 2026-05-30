@@ -417,6 +417,7 @@ def enquiry_list(request):
     user = request.user
     is_admin = user.role == 'admin'
     is_sales = user.role == 'sales'
+    is_superadmin = user.role == 'superadmin'
     if is_admin:
         base_qs = Enquiry.objects.filter(
             is_converted_to_order=False,
@@ -456,6 +457,7 @@ def enquiry_list(request):
         'cancelled_count': cancelled_count,
         'is_admin': is_admin,
         'is_sales': is_sales,
+        'is_superadmin': is_superadmin,
     })
 
 @login_required
