@@ -28,6 +28,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Order, Vehicle, Tracking
 from manual_order.models import ManualOrder
+
 @login_required
 def assign_vehicle(request, order_id):
 
@@ -370,6 +371,8 @@ def assign_vehicle(request, order_id):
             "selling_price": selling_price
         }
     )
+
+
 def tracking_view(request):
     query = request.GET.get("q")
     tracking = None
