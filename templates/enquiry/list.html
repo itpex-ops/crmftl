@@ -101,7 +101,7 @@
         position: sticky;
         background: #fff;
         white-space: nowrap;
-        font-size:medium;
+        font-size: medium;
     }
 
     /* FIRST HEADER ROW */
@@ -714,11 +714,11 @@
                         <th rowspan="2" class="main-th">
                             Status
                         </th>
-
+                        {% if is_admin %}
                         <th rowspan="2" class="main-th">
                             Action
                         </th>
-
+                        {% endif %}
                     </tr>
 
                     <!-- SUB HEADER -->
