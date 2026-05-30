@@ -27,32 +27,76 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Order, Vehicle, Tracking
-
+from manual_order.models import ManualOrder
 @login_required
 def assign_vehicle(request, order_id):
 
-    order = get_object_or_404(Order, id=order_id)
+    # =========================
+    # GET ORDER
+    # =========================
+    source = None
+    order = None
+    manual_order = None
+    selling_price = Decimal("0")
+    if source == "manual":
+        print("source",source)
+        manual_order = get_object_or_404(
+            ManualOrder,
+            id=order_id
+        )
+        print("manual",manual_order)
+        existing_vehicle = Vehicle.objects.filter(
+            manual_order=manual_order
+        ).first()
+
+        # =========================
+        # MANUAL ORDER SELLING RATE
+        # =========================
+
+        if hasattr(manual_order, "pricing"):
+
+            selling_price = Decimal(
+                manual_order.pricing.total_amount or 0
+            )
+
+        else:
+
+            selling_price = Decimal(
+                manual_order.expected_rate or 0
+            )
+
+    else:
+
+        order = get_object_or_404(
+            Order,
+            id=order_id
+        )
+
+        existing_vehicle = Vehicle.objects.filter(
+            order=order
+        ).first()
+
+        # =========================
+        # CRM ORDER SELLING RATE
+        # =========================
+
+        selling_price = Decimal(
+            order.total_rate or 0
+        )
 
     # =========================
-    # ONE TO ONE CHECK
+    # VEHICLE EXISTS
     # =========================
-
-    existing_vehicle = Vehicle.objects.filter(
-        order=order
-    ).first()
-
-    existing_vehicle = Vehicle.objects.filter(
-    order=order
-    ).first()
 
     if existing_vehicle:
 
         messages.warning(
             request,
-            "Vehicle already assigned."
+            f"Vehicle already assigned. "
+            f"FTL No : {existing_vehicle.ftl_no}"
         )
 
-        return redirect("order_list")
+        return redirect("orders_management")
 
     # =========================
     # POST
@@ -66,7 +110,7 @@ def assign_vehicle(request, order_id):
             # SOURCE
             # =========================
 
-            source = request.POST.get(
+            vehicle_source = request.POST.get(
                 "source",
                 ""
             )
@@ -76,11 +120,14 @@ def assign_vehicle(request, order_id):
                 ""
             )
 
-            if source == "others" and source_other:
-                source = source_other
+            if (
+                vehicle_source == "others"
+                and source_other
+            ):
+                vehicle_source = source_other
 
             # =========================
-            # AMOUNTS
+            # FREIGHT VALUES
             # =========================
 
             freight_amount = Decimal(
@@ -122,14 +169,6 @@ def assign_vehicle(request, order_id):
                 + halting
                 + loading_unloading
                 + brokerage
-            )
-
-            # =========================
-            # SELLING PRICE
-            # =========================
-
-            selling_price = Decimal(
-                order.total_rate or 0
             )
 
             # =========================
@@ -186,16 +225,19 @@ def assign_vehicle(request, order_id):
 
                 return redirect(
                     "assign_vehicle",
-                    order_id=order.id
+                    order_id=order_id,
+                    source=source
                 )
 
             # =========================
             # CREATE VEHICLE
             # =========================
 
-            vehicle = Vehicle.objects.create(
+            vehicle = Vehicle(
 
+                # ORDERS
                 order=order,
+                manual_order=manual_order,
 
                 # BASIC
                 vehicle_number=request.POST.get(
@@ -210,15 +252,13 @@ def assign_vehicle(request, order_id):
                     "owner_number"
                 ),
 
-                source=source,
+                source=vehicle_source,
 
                 # FREIGHT
                 freight_amount=freight_amount,
                 halting=halting,
                 loading_unloading=loading_unloading,
                 brokerage=brokerage,
-
-                total_freight=final_freight,
 
                 # PAYMENT
                 advance=advance,
@@ -265,7 +305,7 @@ def assign_vehicle(request, order_id):
                 ),
 
                 beneficiary_name=request.POST.get(
-                    "account_beneficiary_name"
+                    "beneficiary_name"
                 ),
 
                 bank_verified=(
@@ -276,15 +316,23 @@ def assign_vehicle(request, order_id):
             )
 
             # =========================
-            # TRACKING
+            # SAVE VEHICLE
             # =========================
 
-            Tracking.objects.get_or_create(
-                order=order
-            )
+            vehicle.save()
 
             # =========================
-            # SUCCESS MESSAGE
+            # TRACKING ONLY CRM
+            # =========================
+
+            if order:
+
+                Tracking.objects.get_or_create(
+                    order=order
+                )
+
+            # =========================
+            # SUCCESS
             # =========================
 
             messages.success(
@@ -296,7 +344,9 @@ def assign_vehicle(request, order_id):
                 f"Margin {margin_percentage:.2f}%"
             )
 
-            return redirect("order_list")
+            return redirect(
+                "orders_management"
+            )
 
         except Exception as e:
 
@@ -314,10 +364,12 @@ def assign_vehicle(request, order_id):
         request,
         "vehicle/assign_vehicle.html",
         {
-            "order": order
+            "order": order,
+            "manual_order": manual_order,
+            "source": source,
+            "selling_price": selling_price
         }
     )
-
 def tracking_view(request):
     query = request.GET.get("q")
     tracking = None

@@ -1,97 +1,112 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
+{{ manual_order.pricing.total_amount }}
+<div class="container-fluid py-4">
 
-<div class="container mt-4">
-
-    <!-- HEADER -->
     <!-- ========================= -->
-    <!-- MARGIN SUMMARY TOP BOX -->
+    <!-- TOP SUMMARY -->
     <!-- ========================= -->
 
-    <div class="card shadow-sm border-0 mb-4 top-margin-card">
+    <div class="summary-card mb-4">
 
-        <div class="card-body">
+        <div class="row g-0 align-items-center">
 
-            <div class="row text-center align-items-center">
-
-                <!-- ASSIGN VEHICLE -->
-                <div class="col-md-2 border-end">
-                    <div class="top-title"> Assign Vehicle</div>
-
-                    <div class="top-value text-primary">
-                        Pending
-                    </div>
+            <div class="col-lg-2 col-md-4 summary-item border-end">
+                <div class="summary-label">
+                    Order Status
                 </div>
 
-                <!-- SELLING RATE -->
-                <div class="col-md-2 border-end">
-                    <div class="top-title">Selling Rate</div>
-
-                    <div class="top-value">
-                        ₹ {{ order.total_rate }}
-                    </div>
+                <div class="summary-value text-primary">
+                    Assign Vehicle
                 </div>
 
-                <!-- EXPECTED FREIGHT -->
-                <div class="col-md-2 border-end">
+                <div class="summary-sub">
+                    Pending
+                </div>
+            </div>
 
-                    <div class="top-title">
-                        Expected Freight
-                    </div>
+            <div class="col-lg-2 col-md-4 summary-item border-end">
 
-                    <div class="top-value text-warning" id="expectedFreight">
-                        ₹ 0
-                    </div>
-
-                    <small class="text-muted">
-                        Expected Margin:
-                        <span id="expectedMargin">0%</span>
-                    </small>
-
+                <div class="summary-label">
+                    Selling Rate
                 </div>
 
-                <!-- FINAL FREIGHT -->
-                <div class="col-md-2 border-end">
+                <div class="summary-value">
 
-                    <div class="top-title">
-                        Final Freight
-                    </div>
+                    ₹
+                    {% if order.total_rate %}
 
-                    <div class="top-value text-danger" id="finalFreightView">
-                        ₹ 0
-                    </div>
+                    {{ order.total_rate }}
+
+                    {% elif manual_order.pricing %}
+
+                    {{ manual_order.pricing.total_amount }}
+
+                    {% else %}
+
+                    0
+
+                    {% endif %}
 
                 </div>
 
-                <!-- MARGIN -->
-                <div class="col-md-4">
+            </div>
 
-                    <div class="top-title">
-                        Margin Percentage
-                    </div>
+            <div class="col-lg-2 col-md-4 summary-item border-end">
 
-                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+                <div class="summary-label">
+                    Expected Freight
+                </div>
 
-                        <span class="badge bg-danger fs-6" id="minMargin">
-                            13%
-                        </span>
+                <div class="summary-value text-warning" id="expectedFreight">
+                    ₹ 0
+                </div>
 
-                        <span class="badge bg-success fs-6" id="currentMargin">
-                            0%
-                        </span>
+                <small class="summary-small">
+                    Margin :
+                    <span id="expectedMargin">
+                        25%
+                    </span>
+                </small>
 
-                    </div>
+            </div>
 
-                    <!-- PROFIT -->
-                    <div class="mt-2 fw-bold text-primary" id="profitAmount">
-                        Profit ₹ 0
-                    </div>
+            <div class="col-lg-2 col-md-4 summary-item border-end">
 
-                    <!-- STATUS -->
-                    <div id="marginText" class="mt-2 small fw-semibold text-muted">
-                        Waiting for freight calculation...
-                    </div>
+                <div class="summary-label">
+                    Final Freight
+                </div>
 
+                <div class="summary-value text-danger" id="finalFreightView">
+                    ₹ 0
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 col-md-8 summary-item">
+
+                <div class="summary-label">
+                    Margin Percentage
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+
+                    <span class="badge rounded-pill bg-danger" id="minMargin">
+                        Min 13%
+                    </span>
+
+                    <span class="badge rounded-pill bg-success" id="currentMargin">
+                        0%
+                    </span>
+
+                </div>
+
+                <div class="profit-box" id="profitAmount">
+                    Profit ₹ 0
+                </div>
+
+                <div id="marginText" class="mt-2 small text-muted fw-semibold">
+                    Waiting for freight calculation...
                 </div>
 
             </div>
@@ -100,469 +115,483 @@
 
     </div>
 
-    <form method="POST" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+    <!-- ========================= -->
+    <!-- FORM -->
+    <!-- ========================= -->
+
+    <form method="POST" autocomplete="off">
 
         {% csrf_token %}
 
-        <!-- Hidden Anti Autofill -->
-        <input type="text" name="fake_user" autocomplete="username" style="position:absolute;left:-9999px;opacity:0;">
-        <input type="password" name="fake_pass" autocomplete="current-password"
-            style="position:absolute;left:-9999px;opacity:0;">
-        <!-- APPROVAL SECTION -->
-        <div class="card border-danger mb-4" id="approvalSection" style="display:none;">
+        <!-- HIDDEN -->
+        <input type="text" style="display:none">
+        <input type="password" style="display:none">
 
-            <div class="card-header bg-danger text-white">
+        <!-- ========================= -->
+        <!-- APPROVAL -->
+        <!-- ========================= -->
+
+        <div class="card border-0 shadow-sm mb-4 approval-card" id="approvalSection" style="display:none;">
+
+            <div class="card-header approval-header">
+
                 🔒 Manager Approval Required
+
             </div>
 
-            <div class="card-body row g-3">
+            <div class="card-body">
 
-                <div class="col-md-6">
-                    <label>Manager Name</label>
+                <div class="row g-4">
 
-                    <input type="text" name="approval_name" id="approvalName" class="form-control input-style"
-                        placeholder="Enter Manager Name">
-                </div>
+                    <div class="col-md-6">
 
-                <div class="col-md-6">
-                    <label>Reason</label>
+                        <label class="form-label">
+                            Manager Name
+                        </label>
 
-                    <input type="text" name="approval_reason" class="form-control input-style"
-                        placeholder="Reason for negative margin">
-                </div>
+                        <input type="text" name="approval_name" id="approvalName" class="form-control form-input"
+                            placeholder="Enter manager name">
 
-                <div class="col-12">
-                    <small id="approvalError"></small>
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Reason
+                        </label>
+
+                        <input type="text" name="approval_reason" class="form-control form-input"
+                            placeholder="Enter approval reason">
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <small id="approvalError" class="text-danger fw-semibold">
+                        </small>
+
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
 
+        <!-- ========================= -->
+        <!-- MAIN GRID -->
+        <!-- ========================= -->
+
         <div class="erp-grid">
-            <!-- VEHICLE -->
+
+            <!-- ========================= -->
+            <!-- LEFT -->
+            <!-- ========================= -->
+
             <div class="erp-left">
-                <div class="card saas-card">
-                    <div class="card-header">🚚 Vehicle Details</div>
 
-                    <div class="card-body row g-4">
+                <!-- VEHICLE -->
+                <div class="saas-card">
 
-                        <div class="col-md-4">
-                            <label>Vehicle Number</label>
-                            <input type="text" name="vehicle_number" class="form-control input-style" autocomplete="off"
-                                required>
-                        </div>
+                    <div class="card-title-bar">
 
-                        <!-- DRIVER OTP -->
-                        <div class="col-md-4">
-                            <label>Driver Number</label>
+                        🚚 Vehicle Details
 
-                            <div class="input-group">
-                                <input type="text" name="driver_number" id="driver_number" maxlength="10"
-                                    class="form-control input-style" autocomplete="off" required>
+                    </div>
 
-                                <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
-                                    Send OTP
-                                </button>
+                    <div class="card-body p-4">
+
+                        <div class="row g-4">
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Vehicle Number
+                                </label>
+
+                                <input type="text" name="vehicle_number" class="form-control form-input" required>
+
                             </div>
 
-                            <small id="driverMsg"></small>
+                            <div class="col-md-4">
 
-                            <div class="mt-2" id="otpBox" style="display:none;">
-                                <input type="text" id="otp_input" maxlength="6" class="form-control input-style"
-                                    placeholder="Enter OTP">
+                                <label class="form-label">
+                                    Driver Number
+                                </label>
 
-                                <button type="button" class="btn btn-success btn-sm mt-2" id="verifyOtpBtn">
-                                    Verify OTP
-                                </button>
+                                <div class="input-group">
+
+                                    <input type="text" name="driver_number" id="driver_number" maxlength="10"
+                                        class="form-control form-input" required>
+
+                                    <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
+
+                                        OTP
+
+                                    </button>
+
+                                </div>
+
+                                <small id="driverMsg"></small>
+
                             </div>
 
-                            <input type="hidden" name="driver_verified" id="driver_verified" value="0">
-                        </div>
+                            <div class="col-md-4">
 
-                        <div class="col-md-4">
-                            <label>Owner Number</label>
-                            <input type="text" name="owner_number" maxlength="10" class="form-control input-style"
-                                autocomplete="off">
-                        </div>
+                                <label class="form-label">
+                                    Owner Number
+                                </label>
 
-                        <!-- SOURCE -->
-                        <div class="col-md-4">
-                            <label>Source</label>
+                                <input type="text" name="owner_number" maxlength="10" class="form-control form-input">
 
-                            <select name="source" id="source_select" class="form-control input-style">
-                                <option value="">Select Source</option>
-                                <option value="direct">Direct</option>
-                                <option value="transporters">Transporters</option>
-                                <option value="brokers">Brokers</option>
-                                <option value="drivers">Drivers</option>
-                                <option value="others">Others</option>
-                            </select>
+                            </div>
 
-                            <input type="text" name="source_other" id="source_other"
-                                class="form-control input-style mt-2" placeholder="Enter Source Name"
-                                style="display:none;">
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Source
+                                </label>
+
+                                <select name="source" id="source_select" class="form-select form-input">
+
+                                    <option value="">
+                                        Select Source
+                                    </option>
+
+                                    <option value="direct">
+                                        Direct
+                                    </option>
+
+                                    <option value="transporters">
+                                        Transporters
+                                    </option>
+
+                                    <option value="brokers">
+                                        Brokers
+                                    </option>
+
+                                    <option value="drivers">
+                                        Drivers
+                                    </option>
+
+                                    <option value="others">
+                                        Others
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-8">
+
+                                <label class="form-label">
+                                    Other Source
+                                </label>
+
+                                <input type="text" name="source_other" id="source_other" class="form-control form-input"
+                                    placeholder="Enter source name" style="display:none;">
+
+                            </div>
+
                         </div>
 
                     </div>
+
                 </div>
 
                 <!-- FREIGHT -->
-                <div class="card saas-card mb-4">
-                    <div class="card-header text-success">💰 Freight Details</div>
+                <div class="saas-card mt-4">
 
-                    <div class="card-body row g-4">
+                    <div class="card-title-bar success-bar">
 
-                        <div class="col-md-3">
-                            <label>Freight</label>
-                            <input type="number" step="0.01" name="freight_amount" id="freight_amount"
-                                class="form-control input-style">
-                        </div>
+                        💰 Freight Details
 
-                        <div class="col-md-3">
-                            <label>Halting</label>
-                            <input type="number" step="0.01" name="halting" id="halting"
-                                class="form-control input-style">
-                        </div>
+                    </div>
 
-                        <div class="col-md-3">
-                            <label>Loading / Unloading</label>
-                            <input type="number" step="0.01" name="loading_unloading" id="loading_unloading"
-                                class="form-control input-style">
-                        </div>
+                    <div class="card-body p-4">
 
-                        <div class="col-md-3">
-                            <label>Brokerage</label>
-                            <input type="number" step="0.01" name="brokerage" id="brokerage"
-                                class="form-control input-style">
-                        </div>
+                        <div class="row g-4">
 
-                        <div class="col-md-3">
-                            <label>Total Freight</label>
-                            <input type="number" step="0.01" name="total_freight" id="total_freight" readonly
-                                class="form-control input-style bg-light">
-                        </div>
+                            <div class="col-md-3">
 
-                        <div class="col-md-3">
-                            <label>Advance</label>
-                            <input type="number" step="0.01" name="advance" id="advance"
-                                class="form-control input-style">
-                        </div>
+                                <label class="form-label">
+                                    Freight
+                                </label>
 
-                        <div class="col-md-3">
-                            <label>Balance</label>
-                            <input type="number" step="0.01" name="balance" id="balance" readonly
-                                class="form-control input-style bg-light">
+                                <input type="number" step="0.01" name="freight_amount" id="freight_amount"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <label class="form-label">
+                                    Halting
+                                </label>
+
+                                <input type="number" step="0.01" name="halting" id="halting"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <label class="form-label">
+                                    Loading
+                                </label>
+
+                                <input type="number" step="0.01" name="loading_unloading" id="loading_unloading"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <label class="form-label">
+                                    Brokerage
+                                </label>
+
+                                <input type="number" step="0.01" name="brokerage" id="brokerage"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Total Freight
+                                </label>
+
+                                <input type="number" readonly id="total_freight"
+                                    class="form-control form-input bg-light">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <label class="form-label">
+                                    Advance
+                                </label>
+
+                                <input type="number" step="0.01" name="advance" id="advance"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <label class="form-label">
+                                    Balance
+                                </label>
+
+                                <input type="number" readonly id="balance" class="form-control form-input bg-light">
+
+                            </div>
+
                         </div>
 
                     </div>
+
                 </div>
+
             </div>
-            <!-- UPI -->
+
+            <!-- ========================= -->
+            <!-- RIGHT -->
+            <!-- ========================= -->
+
             <div class="erp-right">
-                <div class="card saas-card mb-4">
-                    <div class="card-header text-info">💳 UPI Payment</div>
 
-                    <div class="card-body row g-4">
+                <!-- UPI -->
+                <div class="saas-card">
 
-                        <div class="col-md-4">
-                            <label>UPI App</label>
-                            <select name="upi_app" class="form-control input-style">
-                                <option value="">Select</option>
-                                <option value="phonepe">PhonePe</option>
-                                <option value="gpay">Google Pay</option>
-                                <option value="paytm">Paytm</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
+                    <div class="card-title-bar info-bar">
 
-                        <div class="col-md-4">
-                            <label>UPI ID</label>
-                            <input type="text" name="upi_id" id="upi_id" class="form-control input-style"
-                                placeholder="example@upi" autocomplete="off">
+                        💳 UPI Details
 
-                            <small id="upiMsg"></small>
-                        </div>
+                    </div>
 
-                        <div class="col-md-4">
-                            <label>UPI Number</label>
-                            <input type="text" name="upi_number" id="upi_number" maxlength="10"
-                                class="form-control input-style" autocomplete="off">
+                    <div class="card-body p-4">
 
-                            <small id="numMsg"></small>
-                        </div>
+                        <div class="row g-4">
 
-                        <div class="col-md-4 d-grid">
-                            <label>&nbsp;</label>
-                            <button type="button" class="btn btn-primary" id="verifyUpiBtn">
-                                Verify UPI
-                            </button>
-                        </div>
+                            <div class="col-md-6">
 
-                        <div class="col-md-8">
-                            <label>UPI Beneficiary Name</label>
-                            <input type="text" name="upi_beneficiary_name" id="upi_beneficiary_name"
-                                class="form-control input-style bg-light" readonly
-                                placeholder="Auto Fetch After Verify">
-                        </div>
+                                <label class="form-label">
+                                    UPI App
+                                </label>
 
-                        <div class="col-md-12">
-                            <small id="upiVerifyMsg"></small>
-                            <input type="hidden" name="upi_verified" id="upi_verified" value="0">
+                                <select name="upi_app" class="form-select form-input">
+
+                                    <option value="">
+                                        Select
+                                    </option>
+
+                                    <option value="phonepe">
+                                        PhonePe
+                                    </option>
+
+                                    <option value="gpay">
+                                        GPay
+                                    </option>
+
+                                    <option value="paytm">
+                                        Paytm
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    UPI ID
+                                </label>
+
+                                <input type="text" name="upi_id" class="form-control form-input">
+                                <label class="form-label">UPI Number</label>
+                                <input type="text" name="upi_number" class="form-control form-input">
+
+
+
+                            </div>
+
                         </div>
 
                     </div>
+
                 </div>
+
                 <!-- BANK -->
-                <div class="card saas-card mb-5">
-                    <div class="card-header text-warning">🏦 Bank Details</div>
+                <div class="saas-card mt-4">
 
-                    <div class="card-body row g-4">
+                    <div class="card-title-bar warning-bar">
 
-                        <div class="col-md-3">
-                            <label>Account Number</label>
-                            <input name="account_number" id="account_number" class="form-control input-style"
-                                autocomplete="new-password">
-                        </div>
+                        🏦 Bank Details
 
-                        <div class="col-md-3">
-                            <label>Retype Account Number</label>
-                            <input type="password" id="re_account_number" class="form-control input-style"
-                                placeholder="Retype Account Number" autocomplete="new-password">
-                            <small id="accMsg"></small>
-                        </div>
+                    </div>
 
-                        <div class="col-md-3">
-                            <label>IFSC</label>
-                            <input type="text" name="ifsc" id="ifsc" class="form-control input-style"
-                                autocomplete="off">
-                        </div>
+                    <div class="card-body p-4">
 
-                        <div class="col-md-3">
-                            <label>Type</label>
-                            <select name="ac_type" class="form-control input-style">
-                                <option value="saving">Saving</option>
-                                <option value="current">Current</option>
-                            </select>
-                        </div>
+                        <div class="row g-4">
 
-                        <div class="col-md-3">
-                            <label>Beneficiary Name</label>
-                            <input type="text" name="account_beneficiary_name" id="account_beneficiary_name"
-                                class="form-control input-style" placeholder="Optional" autocomplete="off">
-                        </div>
+                            <div class="col-md-6">
 
-                        <div class="col-md-3 d-grid">
-                            <label>&nbsp;</label>
-                            <button type="button" class="btn btn-primary" id="verifyBankBtn">
-                                Verify Beneficiary
-                            </button>
-                        </div>
+                                <label class="form-label">
+                                    Account Number
+                                </label>
 
-                        <div class="col-md-12">
-                            <small id="bankMsg"></small>
-                            <input type="hidden" name="bank_verified" id="bank_verified" value="0">
+                                <input type="text" name="account_number" id="account_number"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Retype Account
+                                </label>
+
+                                <input type="password" id="re_account_number" class="form-control form-input">
+
+                                <small id="accMsg"></small>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    IFSC
+                                </label>
+
+                                <input type="text" name="ifsc" id="ifsc" class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Account Type
+                                </label>
+
+                                <select name="ac_type" class="form-select form-input">
+
+                                    <option value="saving">
+                                        Saving
+                                    </option>
+
+                                    <option value="current">
+                                        Current
+                                    </option>
+
+                                </select>
+
+                            </div>
+
                         </div>
 
                     </div>
-                </div>
 
+                </div>
 
                 <!-- ACTION -->
                 <div class="action-bar">
-                    <a href="{% url 'order_detail' order.id %}" class="btn btn-light border px-4">
-                        ⬅ Back
+
+                    <a href="javascript:history.back()" class="btn btn-light border px-4">
+
+                        ← Back
+
                     </a>
 
-                    <button class="btn btn-success px-4" id="saveBtn">
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn">
+
                         💾 Save Vehicle
+
                     </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </form>
+
 </div>
 
-
-<!-- SEARCH SELECT -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
-
-<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
 
-        // =========================================
-        // SOURCE SELECT
-        // =========================================
+        // =========================
+        // SOURCE
+        // =========================
 
-        new TomSelect("#source_select", {
-            create: false,
-            placeholder: "Search Source..."
-        });
+        const sourceSelect =
+            document.getElementById("source_select");
 
-        const source = document.getElementById("source_select");
-        const otherBox = document.getElementById("source_other");
+        const sourceOther =
+            document.getElementById("source_other");
 
-        source.addEventListener("change", function () {
+        sourceSelect.addEventListener("change", function () {
 
             if (this.value === "others") {
-                otherBox.style.display = "block";
-            } else {
-                otherBox.style.display = "none";
-                otherBox.value = "";
-            }
 
-        });
-
-        // =========================================
-        // ACCOUNT MATCH
-        // =========================================
-
-        const acc1 = document.getElementById("account_number");
-        const acc2 = document.getElementById("re_account_number");
-        const accMsg = document.getElementById("accMsg");
-
-        function checkAccount() {
-
-            if (acc2.value === "") {
-                accMsg.innerHTML = "";
-                return;
-            }
-
-            if (acc1.value === acc2.value) {
-
-                accMsg.innerHTML = "✅ Account Number Matched";
-                accMsg.style.color = "green";
+                sourceOther.style.display = "block";
 
             } else {
 
-                accMsg.innerHTML = "❌ Account Number Not Matched";
-                accMsg.style.color = "red";
-
-            }
-
-        }
-
-        acc1.addEventListener("input", checkAccount);
-        acc2.addEventListener("input", checkAccount);
-
-        // =========================================
-        // UPI VALIDATION
-        // =========================================
-
-        const upiId = document.getElementById("upi_id");
-        const upiNo = document.getElementById("upi_number");
-
-        const verifyUpiBtn = document.getElementById("verifyUpiBtn");
-
-        const upiMsg = document.getElementById("upiMsg");
-        const numMsg = document.getElementById("numMsg");
-
-        const upiVerifyMsg =
-            document.getElementById("upiVerifyMsg");
-
-        const upiName =
-            document.getElementById("upi_beneficiary_name");
-
-        const upiVerified =
-            document.getElementById("upi_verified");
-
-        upiId.addEventListener("input", function () {
-
-            if (this.value.includes("@")) {
-
-                upiMsg.innerHTML = "✅ Valid Format";
-                upiMsg.style.color = "green";
-
-            } else {
-
-                upiMsg.innerHTML = "❌ Invalid UPI ID";
-                upiMsg.style.color = "red";
+                sourceOther.style.display = "none";
+                sourceOther.value = "";
 
             }
 
         });
 
-        upiNo.addEventListener("input", function () {
-
-            this.value = this.value.replace(/\D/g, '');
-
-            if (this.value.length === 10) {
-
-                numMsg.innerHTML = "✅ Valid Number";
-                numMsg.style.color = "green";
-
-            } else {
-
-                numMsg.innerHTML = "❌ Enter 10 digits";
-                numMsg.style.color = "red";
-
-            }
-
-        });
-
-        // =========================================
-        // VERIFY UPI
-        // =========================================
-
-        verifyUpiBtn.addEventListener("click", function () {
-
-            let upi = upiId.value.trim();
-            let num = upiNo.value.trim();
-
-            if (upi === "" && num === "") {
-
-                upiVerifyMsg.innerHTML =
-                    "❌ Enter UPI ID or Number";
-
-                upiVerifyMsg.style.color = "red";
-                return;
-
-            }
-
-            verifyUpiBtn.disabled = true;
-            verifyUpiBtn.innerHTML = "Checking...";
-
-            setTimeout(function () {
-
-                if (
-                    (upi.includes("@") && upi.length >= 6) ||
-                    num.length === 10
-                ) {
-
-                    upiVerified.value = "1";
-
-                    upiName.value =
-                        "Verified UPI Holder";
-
-                    upiVerifyMsg.innerHTML =
-                        "✅ UPI Verified Successfully";
-
-                    upiVerifyMsg.style.color = "green";
-
-                } else {
-
-                    upiVerified.value = "0";
-
-                    upiName.value = "";
-
-                    upiVerifyMsg.innerHTML =
-                        "❌ UPI Verification Failed";
-
-                    upiVerifyMsg.style.color = "red";
-
-                }
-
-                verifyUpiBtn.disabled = false;
-                verifyUpiBtn.innerHTML = "Verify UPI";
-
-            }, 1500);
-
-        });
-
-        // =========================================
-        // FREIGHT + MARGIN
-        // =========================================
+        // =========================
+        // FREIGHT CALCULATION
+        // =========================
 
         const freight =
             document.getElementById("freight_amount");
@@ -576,17 +605,14 @@
         const brokerage =
             document.getElementById("brokerage");
 
-        const total =
-            document.getElementById("total_freight");
-
         const advance =
             document.getElementById("advance");
 
+        const total =
+            document.getElementById("total_freight");
+
         const balance =
             document.getElementById("balance");
-
-        const saveBtn =
-            document.getElementById("saveBtn");
 
         const approvalSection =
             document.getElementById("approvalSection");
@@ -594,238 +620,149 @@
         const approvalName =
             document.getElementById("approvalName");
 
+        const saveBtn =
+            document.getElementById("saveBtn");
+
         const approvalError =
             document.getElementById("approvalError");
 
-        const topCard =
-            document.querySelector(".top-margin-card");
-
         function calcFreight() {
 
-            let f = parseFloat(freight.value) || 0;
-            let h = parseFloat(halting.value) || 0;
-            let l = parseFloat(loading.value) || 0;
-            let b = parseFloat(brokerage.value) || 0;
-            let a = parseFloat(advance.value) || 0;
+            let f =
+                parseFloat(freight.value) || 0;
 
-            // SELLING RATE
+            let h =
+                parseFloat(halting.value) || 0;
+
+            let l =
+                parseFloat(loading.value) || 0;
+
+            let b =
+                parseFloat(brokerage.value) || 0;
+
+            let a =
+                parseFloat(advance.value) || 0;
+
             let sellingRate =
-                parseFloat("{{ order.total_rate|default:0 }}") || 0;
+                parseFloat("{{ selling_price }}") || 0;
 
-            // EXPECTED FREIGHT
-            let expectedFreight =
-                sellingRate - ((sellingRate * 25) / 100);
+            let totalFreight =
+                f + h + l + b;
 
-            // TOTAL FREIGHT
-            let totalFreight = f + h + l + b;
+            let balanceAmount =
+                totalFreight - a;
 
-            // BALANCE
-            let balanceAmount = totalFreight - a;
+            let profit =
+                sellingRate - totalFreight;
 
-            total.value = totalFreight.toFixed(2);
-            balance.value = balanceAmount.toFixed(2);
+            let margin =
+                sellingRate > 0
+                    ? ((profit / sellingRate) * 100)
+                    : 0;
 
-            // MARGIN %
-            let marginPercent = 0;
+            total.value =
+                totalFreight.toFixed(2);
 
-            if (sellingRate > 0) {
+            balance.value =
+                balanceAmount.toFixed(2);
 
-                marginPercent =
-                    ((sellingRate - totalFreight)
-                        / sellingRate) * 100;
-
-            }
-
-            // PROFIT
-            let profit = sellingRate - totalFreight;
-
-            // =========================================
-            // TOP VALUES
-            // =========================================
-
-            document.getElementById("expectedFreight").innerHTML =
-                "₹ " + expectedFreight.toFixed(2);
-
-            document.getElementById("finalFreightView").innerHTML =
+            document.getElementById(
+                "finalFreightView"
+            ).innerHTML =
                 "₹ " + totalFreight.toFixed(2);
 
-            document.getElementById("expectedMargin").innerHTML =
-                "25%";
+            document.getElementById(
+                "expectedFreight"
+            ).innerHTML =
+                "₹ " +
+                (sellingRate * 0.75).toFixed(2);
 
-            document.getElementById("currentMargin").innerHTML =
-                marginPercent.toFixed(2) + "%";
+            document.getElementById(
+                "currentMargin"
+            ).innerHTML =
+                margin.toFixed(2) + "%";
 
-            // PROFIT DISPLAY
-            const profitAmount =
-                document.getElementById("profitAmount");
+            const profitBox =
+                document.getElementById(
+                    "profitAmount"
+                );
 
-            if (profitAmount) {
+            if (profit >= 0) {
 
-                if (profit >= 0) {
+                profitBox.innerHTML =
+                    "Profit ₹ " + profit.toFixed(2);
 
-                    profitAmount.innerHTML =
-                        "Profit ₹ " + profit.toFixed(2);
+                profitBox.className =
+                    "profit-box text-success";
 
-                    profitAmount.className =
-                        "mt-2 fw-bold text-success";
+            } else {
 
-                } else {
+                profitBox.innerHTML =
+                    "Loss ₹ " + Math.abs(profit).toFixed(2);
 
-                    profitAmount.innerHTML =
-                        "Loss ₹ " + Math.abs(profit).toFixed(2);
-
-                    profitAmount.className =
-                        "mt-2 fw-bold text-danger";
-                }
+                profitBox.className =
+                    "profit-box text-danger";
 
             }
 
             const marginText =
-                document.getElementById("marginText");
+                document.getElementById(
+                    "marginText"
+                );
 
-            const currentMargin =
-                document.getElementById("currentMargin");
+            // =========================
+            // APPROVAL
+            // =========================
 
-            // RESET
-            topCard.classList.remove(
-                "margin-danger",
-                "margin-warning",
-                "margin-success"
-            );
+            if (margin < 13 || profit < 0) {
 
-            // =========================================
-            // BELOW 13%
-            // =========================================
+                approvalSection.style.display =
+                    "block";
 
-            if (marginPercent < 13 || profit < 0) {
+                marginText.innerHTML =
+                    "⚠ Approval required due to low margin.";
 
-                currentMargin.className =
-                    "badge bg-danger fs-6";
-
-                topCard.classList.add("margin-danger");
-
-                if (approvalSection) {
-                    approvalSection.style.display = "block";
-                }
-
-                if (profit < 0) {
-
-                    marginText.innerHTML = `
-                    <div class="alert alert-danger mt-2 mb-0">
-                        ❌ Trip is in LOSS.
-                        Manager approval mandatory.
-                    </div>
-                `;
-
-                } else {
-
-                    marginText.innerHTML = `
-                    <div class="alert alert-danger mt-2 mb-0">
-                        ❌ Vehicle source rate is below minimum margin.
-                        Manager approval required.
-                    </div>
-                `;
-                };
+                document.getElementById(
+                    "currentMargin"
+                ).className =
+                    "badge rounded-pill bg-danger";
 
                 if (
-                    approvalName &&
                     approvalName.value.trim() === ""
                 ) {
 
                     saveBtn.disabled = true;
 
-                    saveBtn.innerHTML =
-                        "🔒 Approval Required";
-
-                    if (approvalError) {
-
-                        approvalError.innerHTML =
-                            "Approval name required";
-
-                        approvalError.style.color = "red";
-
-                    }
+                    approvalError.innerHTML =
+                        "Manager approval required.";
 
                 } else {
 
                     saveBtn.disabled = false;
 
-                    saveBtn.innerHTML =
-                        "💾 Save Vehicle";
-
-                    if (approvalError) {
-
-                        approvalError.innerHTML = "";
-
-                    }
+                    approvalError.innerHTML = "";
 
                 }
 
-            }
+            } else {
 
-            // =========================================
-            // WARNING
-            // =========================================
-
-            else if (
-                marginPercent >= 13 &&
-                marginPercent < 15
-            ) {
-
-                currentMargin.className =
-                    "badge bg-warning text-dark fs-6";
-
-                topCard.classList.add("margin-warning");
-
-                if (approvalSection) {
-                    approvalSection.style.display = "none";
-                }
+                approvalSection.style.display =
+                    "none";
 
                 saveBtn.disabled = false;
 
-                saveBtn.innerHTML =
-                    "💾 Save Vehicle";
+                marginText.innerHTML =
+                    "✅ Margin is healthy.";
 
-                marginText.innerHTML = `
-                <div class="alert alert-warning mt-2 mb-0">
-                    ⚠ Margin between 13% and 15%.
-                    Review recommended.
-                </div>
-            `;
-
-            }
-
-            // =========================================
-            // HEALTHY
-            // =========================================
-
-            else {
-
-                currentMargin.className =
-                    "badge bg-success fs-6";
-
-                topCard.classList.add("margin-success");
-
-                if (approvalSection) {
-                    approvalSection.style.display = "none";
-                }
-
-                saveBtn.disabled = false;
-
-                saveBtn.innerHTML =
-                    "💾 Save Vehicle";
-
-                marginText.innerHTML = `
-                <div class="alert alert-success mt-2 mb-0">
-                    ✅ Margin is healthy.
-                </div>
-            `;
+                document.getElementById(
+                    "currentMargin"
+                ).className =
+                    "badge rounded-pill bg-success";
 
             }
 
         }
 
-        // LIVE CALC
         [
             freight,
             halting,
@@ -834,423 +771,204 @@
             advance
         ].forEach(el => {
 
-            if (el) {
-                el.addEventListener("input", calcFreight);
-            }
-
-        });
-
-        if (approvalName) {
-
-            approvalName.addEventListener(
+            el.addEventListener(
                 "input",
                 calcFreight
             );
 
-        }
+        });
+
+        approvalName.addEventListener(
+            "input",
+            calcFreight
+        );
 
         calcFreight();
 
-        // =========================================
-        // OTP SECTION
-        // =========================================
-
-        let generatedOtp = "";
-        let timer;
-
-        const sendBtn =
-            document.getElementById("sendOtpBtn");
-
-        const verifyBtn =
-            document.getElementById("verifyOtpBtn");
-
-        const otpBox =
-            document.getElementById("otpBox");
-
-        const otpInput =
-            document.getElementById("otp_input");
-
-        const driver =
-            document.getElementById("driver_number");
-
-        const driverMsg =
-            document.getElementById("driverMsg");
-
-        const verified =
-            document.getElementById("driver_verified");
-
-        sendBtn.addEventListener("click", function () {
-
-            driver.value =
-                driver.value.replace(/\D/g, '');
-
-            if (driver.value.length !== 10) {
-
-                driverMsg.innerHTML =
-                    "❌ Enter valid mobile number";
-
-                driverMsg.style.color = "red";
-
-                return;
-
-            }
-
-            generatedOtp =
-                Math.floor(
-                    100000 + Math.random() * 900000
-                ).toString();
-
-            otpBox.style.display = "block";
-
-            otpInput.value = "";
-
-            verified.value = "0";
-
-            let seconds = 60;
-
-            clearInterval(timer);
-
-            timer = setInterval(function () {
-
-                seconds--;
-
-                driverMsg.innerHTML =
-                    "OTP sent. Expires in "
-                    + seconds + " sec";
-
-                driverMsg.style.color = "#0d6efd";
-
-                if (seconds <= 0) {
-
-                    clearInterval(timer);
-
-                    otpBox.style.display = "none";
-
-                    driverMsg.innerHTML =
-                        "⌛ OTP expired";
-
-                    driverMsg.style.color = "red";
-
-                }
-
-            }, 1000);
-
-        });
-
-        verifyBtn.addEventListener("click", function () {
-
-            if (otpInput.value === generatedOtp) {
-
-                clearInterval(timer);
-
-                driverMsg.innerHTML =
-                    "✅ Verified";
-
-                driverMsg.style.color = "green";
-
-                otpBox.style.display = "none";
-
-                sendBtn.style.display = "none";
-
-                driver.readOnly = true;
-
-                verified.value = "1";
-
-            } else {
-
-                driverMsg.innerHTML =
-                    "❌ Invalid OTP";
-
-                driverMsg.style.color = "red";
-
-            }
-
-        });
-
-        // =========================================
-        // BANK VERIFY
-        // =========================================
-
-        const verifyBankBtn =
-            document.getElementById("verifyBankBtn");
-
-        const bankMsg =
-            document.getElementById("bankMsg");
-
-        const bankVerified =
-            document.getElementById("bank_verified");
-
-        verifyBankBtn.addEventListener("click", function () {
-
-            const acc = acc1.value.trim();
-
-            const ifsc =
-                document.getElementById("ifsc")
-                    .value.trim();
-
-            if (acc === "" || ifsc === "") {
-
-                bankMsg.innerHTML =
-                    "❌ Enter Account Number + IFSC";
-
-                bankMsg.style.color = "red";
-
-                return;
-
-            }
-
-            verifyBankBtn.disabled = true;
-
-            verifyBankBtn.innerHTML = "Checking...";
-
-            setTimeout(function () {
-
-                if (
-                    acc.length >= 8 &&
-                    ifsc.length >= 8
-                ) {
-
-                    bankVerified.value = "1";
-
-                    const beneficiary =
-                        document.getElementById(
-                            "account_beneficiary_name"
-                        );
-
-                    if (beneficiary.value === "") {
-
-                        beneficiary.value =
-                            "Verified Beneficiary";
-
-                    }
-
-                    bankMsg.innerHTML =
-                        "✅ Beneficiary Verified";
-
-                    bankMsg.style.color = "green";
-
-                } else {
-
-                    bankVerified.value = "0";
-
-                    bankMsg.innerHTML =
-                        "❌ Invalid Bank Details";
-
-                    bankMsg.style.color = "red";
-
-                }
-
-                verifyBankBtn.disabled = false;
-
-                verifyBankBtn.innerHTML =
-                    "Verify Beneficiary";
-
-            }, 1500);
-
-        });
-
     });
+
 </script>
+
 <style>
+    body {
+        background: #f4f7fb;
+    }
+
     /* =========================
-       ERP MAIN GRID
+       SUMMARY
+    ========================= */
+
+    .summary-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, .06);
+    }
+
+    .summary-item {
+        padding: 24px;
+        text-align: center;
+    }
+
+    .summary-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    .summary-sub {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .summary-small {
+        color: #64748b;
+    }
+
+    .profit-box {
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    /* =========================
+       GRID
     ========================= */
 
     .erp-grid {
         display: grid;
-        grid-template-columns: 1.3fr 0.7fr;
-        gap: 20px;
-        align-items: start;
+        grid-template-columns: 1.3fr .7fr;
+        gap: 24px;
     }
-
-    /* LEFT & RIGHT SIDE */
 
     .erp-left,
     .erp-right {
         display: flex;
         flex-direction: column;
-        gap: 20px;
-    }
-
-    .erp-right {
-        border-left: 2px solid #e5e7eb;
-        padding-left: 20px;
+        gap: 24px;
     }
 
     /* =========================
-       CARD DESIGN
+       CARD
     ========================= */
 
     .saas-card {
-        border: 1px solid #e3e8ef;
-        border-radius: 14px;
-        background: #ffffff;
+        background: #fff;
+        border-radius: 18px;
         overflow: hidden;
-        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-        transition: all 0.25s ease;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
     }
 
-    .saas-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-    }
-
-    /* =========================
-       CARD HEADER
-    ========================= */
-
-    .saas-card .card-header {
-        background: linear-gradient(90deg, #0a6ed1, #1b90ff);
+    .card-title-bar {
+        padding: 16px 20px;
+        background: linear-gradient(90deg, #0f172a, #1e293b);
         color: #fff;
+        font-size: 15px;
         font-weight: 700;
-        font-size: 14px;
-        padding: 14px 18px;
-        border: none;
-        letter-spacing: 0.3px;
+    }
+
+    .success-bar {
+        background: linear-gradient(90deg, #047857, #10b981);
+    }
+
+    .info-bar {
+        background: linear-gradient(90deg, #0369a1, #0ea5e9);
+    }
+
+    .warning-bar {
+        background: linear-gradient(90deg, #b45309, #f59e0b);
     }
 
     /* =========================
-       CARD BODY
+       FORM
     ========================= */
 
-    .saas-card .card-body {
-        padding: 20px;
-    }
-
-    /* =========================
-       FORM LABEL
-    ========================= */
-
-    label {
+    .form-label {
         font-size: 12px;
         font-weight: 700;
         color: #475569;
-        margin-bottom: 6px;
-        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-input {
+        height: 46px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 14px;
+    }
+
+    .form-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
     }
 
     /* =========================
-       INPUT STYLE
+       APPROVAL
     ========================= */
 
-    .input-style {
-        width: 100%;
-        height: 42px;
-        border-radius: 8px;
-        border: 1px solid #cfd7e3;
-        background: #fff;
-        padding: 8px 12px;
-        font-size: 13px;
-        transition: all 0.2s ease;
+    .approval-card {
+        border-radius: 18px;
+        overflow: hidden;
     }
 
-    textarea.input-style {
-        height: auto;
-        min-height: 90px;
-    }
-
-    .input-style:focus {
-        border-color: #1b90ff;
-        box-shadow: 0 0 0 3px rgba(27, 144, 255, 0.15);
-        outline: none;
-    }
-
-    .input-style.bg-light {
-        background: #f8fafc !important;
+    .approval-header {
+        background: #dc2626;
+        color: #fff;
+        font-weight: 700;
+        padding: 16px 20px;
     }
 
     /* =========================
-       SMALL TEXT
-    ========================= */
-
-    small {
-        font-size: 11px;
-    }
-
-    /* =========================
-       BUTTONS
-    ========================= */
-
-    .btn-success {
-        background: #1b90ff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        height: 42px;
-    }
-
-    .btn-success:hover {
-        background: #0a6ed1;
-    }
-
-    .btn-primary {
-        border-radius: 8px;
-        height: 42px;
-        font-weight: 600;
-    }
-
-    /* =========================
-       ACTION BAR
+       ACTION
     ========================= */
 
     .action-bar {
         position: sticky;
         bottom: 0;
         background: #fff;
-        border-top: 1px solid #e5e7eb;
-        padding: 14px 18px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 24px;
-        z-index: 100;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, .06);
     }
 
     /* =========================
-       TOP SUMMARY CARD
+       MOBILE
     ========================= */
 
-    .top-margin-card {
-        border-radius: 18px;
-        overflow: hidden;
-        border: none;
-    }
-
-    .top-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 4px;
-    }
-
-    .top-value {
-        font-size: 22px;
-        font-weight: 700;
-    }
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 991px) {
+    @media(max-width:991px) {
 
         .erp-grid {
             grid-template-columns: 1fr;
         }
 
-        .erp-right {
-            border-left: none;
-            padding-left: 0;
+        .summary-item {
+            border-right: none !important;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .action-bar {
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .action-bar .btn {
             width: 100%;
         }
+
     }
 </style>
+
 {% endblock %}

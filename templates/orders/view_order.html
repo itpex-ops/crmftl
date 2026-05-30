@@ -312,7 +312,7 @@
     <!-- Buttons -->
     <div class="d-flex gap-2 flex-wrap mb-4">
 
-        <a href="{% url 'assign_vehicle' order.id %}" class="btn btn-warning action-btn">
+        <a href="{% url 'assign_vehicle' order.id %}" class="btn btn-warning">
             🚚 Assign Vehicle
         </a>
 
@@ -324,7 +324,7 @@
         {% endwith %}
         {% endif %}
 
-        <a href="{% url 'order_list' %}" class="btn btn-secondary action-btn">
+        <a href="{% url 'orders_management' %}" class="btn btn-secondary action-btn">
             ⬅ Back Orders
         </a>
 

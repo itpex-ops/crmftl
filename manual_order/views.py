@@ -152,3 +152,23 @@ def manual_order_create(request):
             return redirect("manual_order_create")
 
     return render(request, "manual_order/form.html",{ "vehicle_types": vehicle_types})
+
+from django.shortcuts import render, get_object_or_404
+from .models import ManualOrder
+
+def view_existing_order(request, id):
+
+    manual_order = get_object_or_404(
+        ManualOrder,
+        id= id
+    )
+
+    context = {
+        'manual_order': manual_order
+    }
+
+    return render(
+        request,
+        'manual_order/view_existing_order.html',
+        context
+    )

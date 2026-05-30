@@ -10,5 +10,6 @@ urlpatterns = [
     path("tracking/<int:order_id>/", views.tracking_update, name="tracking_page"),
     path("create/<int:enquiry_id>/", views.create_order_from_enquiry, name="create_order"),
     path('view_order/<int:order_id>/', views.view_order,name= 'view_order'),
+    path('orders/',views.orders_management,name='orders_management'),
 
 ]

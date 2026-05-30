@@ -29,7 +29,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from enquiries.models import Enquiry
 from .models import Order
+from itertools import chain
+from operator import attrgetter
 
+from django.shortcuts import render
+
+from orders.models import Order
+from manual_order.models import ManualOrder
 # orders/views.py
 
 from django.shortcuts import render
@@ -48,7 +54,72 @@ from django.shortcuts import get_object_or_404, redirect, render
 from enquiries.models import Enquiry
 from .models import Order
 
+from itertools import chain
+from operator import attrgetter
 
+from django.shortcuts import render
+
+from orders.models import Order
+from manual_order.models import ManualOrder
+
+
+from itertools import chain
+from operator import attrgetter
+
+def orders_management(request):
+
+    orders_qs = (
+        Order.objects
+        .select_related('enquiry')
+        .all()
+    )
+
+    manual_orders_qs = (
+        ManualOrder.objects
+        .select_related('customer', 'pricing', 'payment')
+        .all()
+    )
+
+    # attach source
+    for o in orders_qs:
+        
+        o.order_source = "crm"
+
+    for o in manual_orders_qs:
+        o.order_source = "manual"
+
+    merged_orders = sorted(
+        chain(orders_qs, manual_orders_qs),
+        key=attrgetter('created_at'),
+        reverse=True
+    )
+
+    assigned_count = 0
+    not_assigned_count = 0
+
+    for order in merged_orders:
+
+        vehicle_exists = False
+
+        if order.order_source == "crm":
+            vehicle_exists = hasattr(order, "vehicle_obj") and order.vehicle_obj
+
+        else:
+            # safer check (adjust based on your model)
+            vehicle_exists = order.vehicle_set.exists() if hasattr(order, "vehicle_set") else False
+
+        if vehicle_exists:
+            assigned_count += 1
+        else:
+            not_assigned_count += 1
+
+    return render(request, "orders/orders.html", {
+        "orders": merged_orders,
+        "total_orders": len(merged_orders),
+        "assigned_count": assigned_count,
+        "not_assigned_count": not_assigned_count,
+        "pending_count": not_assigned_count,
+    })
 # =====================================================
 # HELPERS
 # =====================================================
@@ -452,7 +523,7 @@ def tracking_update(request, order_id):
 
 @property
 def profit(self):
-    vehicle_cost = sum(v.total_freight for v in self.vehicles.all())
+    vehicle_cost = sum(v.total_freight for v in self.vehicle.all())
     return (self.total_rate or 0) - vehicle_cost
 
 # views.py

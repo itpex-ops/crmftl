@@ -222,7 +222,7 @@
             {% endif %}
 
             {% if 'orders' in role_perms or 'orders_list' in role_perms %}
-            <a href="{% url 'order_list' %}">
+            <a href="{% url 'orders_management' %}">
                 <i class="bi bi-receipt me-2"></i> List
             </a>
             {% endif %}

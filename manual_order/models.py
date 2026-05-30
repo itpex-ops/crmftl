@@ -12,7 +12,6 @@ class Customer(models.Model):
         return f"{self.customer_code} - {self.name}"
 
 VEHICLE_TYPES = [
-
     # OPEN BODY
     ('Open Body 9 Ft', 'Open Body 9 Ft'),
     ('Open Body 10 Ft', 'Open Body 10 Ft'),
@@ -35,17 +34,22 @@ VEHICLE_TYPES = [
     ('Container 32 Ft', 'Container 32 Ft'),
 
     # TRAILER
-    ('Flat Low Bed 20 Ft', 'Flat Low Bed 20 Ft'),
-    ('Flat Low Bed 32 Ft', 'Flat Low Bed 32 Ft'),
-    ('Flat Low Bed 40 Ft', 'Flat Low Bed 40 Ft'),
+    ('Trailer Flat Low Bed 20 Ft','Trailer Flat Low Bed 20 Ft'),
+    ('Trailer Flat Low Bed 32 Ft','Trailer Flat Low Bed 32 Ft'),
+    ('Trailer Flat Low Bed 40 Ft','Trailer Flat Low Bed 40 Ft'),
 
-    ('Flat High Bed 20 Ft', 'Flat High Bed 20 Ft'),
-    ('Flat High Bed 32 Ft', 'Flat High Bed 32 Ft'),
-    ('Flat High Bed 40 Ft', 'Flat High Bed 40 Ft'),
+    ('Trailer Flat High Bed 20 Ft', 'Trailer Flat High Bed 20 Ft'),
+    ('Trailer Flat High Bed 32 Ft', 'Trailer Flat High Bed 32 Ft'),
+    ('Trailer Flat High Bed 40 Ft', 'Trailer Flat High Bed 40 Ft'),
 
     # SPECIAL
     ('JCB', 'JCB'),
     ('ODC', 'ODC'),
+    ('TATA ACE','Tata Ace 7 Ft'),
+    ('TATA 407','Tata 407 10 to 12 Ft'),
+    ('Bolero PickUP','Bolero Pickup 8 to 10 Ft'),
+    ('Dost 8 to 9 Ft','Dost 8 to 9 Ft'),
+    ('BadaDost 10 Ft','BadaDost 10 Ft'),
 
     # TORRES
     ('Torres 6 Wheels', 'Torres 6 Wheels'),
@@ -56,15 +60,26 @@ VEHICLE_TYPES = [
 ]
 
 class ManualOrder(models.Model):
-    order_no = models.CharField(max_length=20, unique=True)
 
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    order_no = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True
+    )
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE
+    )
 
     customer_name = models.CharField(max_length=150)
+
     customer_contact = models.CharField(max_length=15)
+
     email = models.EmailField(blank=True, null=True)
 
     origin = models.TextField(blank=True)
+
     destination = models.TextField(blank=True)
 
     vehicle_type = models.CharField(
@@ -72,23 +87,49 @@ class ManualOrder(models.Model):
         choices=VEHICLE_TYPES,
         blank=True,
         null=True
-    )    
-    vehicle_description = models.CharField(max_length=200, blank=True)
+    )
 
-    material = models.CharField(max_length=200, blank=True)
+    vehicle_description = models.CharField(
+        max_length=200,
+        blank=True
+    )
+
+    material = models.CharField(
+        max_length=200,
+        blank=True
+    )
 
     pieces = models.IntegerField(default=0)
+
     tonnage = models.FloatField(default=0)
 
     expected_rate = models.FloatField(default=0)
 
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+
+        if not self.order_no:
+
+            today = timezone.now().strftime("%d%m%y")
+
+            count_today = ManualOrder.objects.filter(
+                order_no__startswith=f"EX-{today}"
+            ).count() + 1
+
+            self.order_no = f"EX-{today}-{str(count_today).zfill(3)}"
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.order_no
-    
+  
 class Pricing(models.Model):
     order = models.OneToOneField(ManualOrder, on_delete=models.CASCADE)
 
@@ -119,23 +160,3 @@ class Payment(models.Model):
 
     transaction_id = models.CharField(max_length=100, blank=True)
     remarks = models.TextField(blank=True)
-
-class ExistingCustomerVehicle(models.Model):
-    order = models.ForeignKey(ManualOrder, on_delete=models.CASCADE, related_name="exvehicles")
-    vehicle_number = models.CharField(max_length=50)
-    driver_number = models.CharField(max_length=15)
-    owner_number = models.CharField(max_length=15)
-
-    freight_amount = models.FloatField(default=0)
-
-    UPI_CHOICES = (
-        ('gpay', 'Google Pay'),
-        ('phonepe', 'PhonePe'),
-        ('paytm', 'Paytm'),
-    )
-
-    upi_app = models.CharField(max_length=20, choices=UPI_CHOICES, blank=True)
-    upi_id = models.CharField(max_length=100, blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
