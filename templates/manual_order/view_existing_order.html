@@ -23,7 +23,7 @@
     <!-- ACTION BUTTONS (SaaS STYLE TOP BAR) -->
     <div class="d-flex gap-2 flex-wrap mb-4">
 
-        <a href="{% url 'assign_vehicle' manual_order.id %}" class="btn btn-warning">
+        <a href="{% url 'assign_vehicle' manual_order.id  %}" class="btn btn-warning">
             🚚 Assign Vehicle
         </a>
         {% if manual_order.vehicles.all %}
@@ -58,8 +58,12 @@
 
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="mb-0 fw-bold">Order Information</h5>
+                    <hr>
+                    <div class="col-md-6">
+                        <h6> VEHICLE ASSIGED AT</h6>
+                        <div class="value-text">{{ manual_order.vehicle_assign_date }}</div>
+                    </div>
                 </div>
-
                 <div class="card-body">
 
                     <div class="row g-4">

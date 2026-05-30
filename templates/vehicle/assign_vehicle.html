@@ -561,232 +561,137 @@
 </div>
 
 <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        // =========================
-        // SOURCE
-        // =========================
-
-        const sourceSelect =
-            document.getElementById("source_select");
-
-        const sourceOther =
-            document.getElementById("source_other");
-
-        sourceSelect.addEventListener("change", function () {
-
-            if (this.value === "others") {
-
-                sourceOther.style.display = "block";
-
-            } else {
-
-                sourceOther.style.display = "none";
-                sourceOther.value = "";
-
-            }
-
-        });
-
-        // =========================
-        // FREIGHT CALCULATION
-        // =========================
-
-        const freight =
-            document.getElementById("freight_amount");
-
-        const halting =
-            document.getElementById("halting");
-
-        const loading =
-            document.getElementById("loading_unloading");
-
-        const brokerage =
-            document.getElementById("brokerage");
-
-        const advance =
-            document.getElementById("advance");
-
-        const total =
-            document.getElementById("total_freight");
-
-        const balance =
-            document.getElementById("balance");
-
-        const approvalSection =
-            document.getElementById("approvalSection");
-
-        const approvalName =
-            document.getElementById("approvalName");
-
-        const saveBtn =
-            document.getElementById("saveBtn");
-
-        const approvalError =
-            document.getElementById("approvalError");
-
-        function calcFreight() {
-
-            let f =
-                parseFloat(freight.value) || 0;
-
-            let h =
-                parseFloat(halting.value) || 0;
-
-            let l =
-                parseFloat(loading.value) || 0;
-
-            let b =
-                parseFloat(brokerage.value) || 0;
-
-            let a =
-                parseFloat(advance.value) || 0;
-
-            let sellingRate =
-                parseFloat("{{ selling_price }}") || 0;
-
-            let totalFreight =
-                f + h + l + b;
-
-            let balanceAmount =
-                totalFreight - a;
-
-            let profit =
-                sellingRate - totalFreight;
-
-            let margin =
-                sellingRate > 0
-                    ? ((profit / sellingRate) * 100)
-                    : 0;
-
-            total.value =
-                totalFreight.toFixed(2);
-
-            balance.value =
-                balanceAmount.toFixed(2);
-
-            document.getElementById(
-                "finalFreightView"
-            ).innerHTML =
-                "₹ " + totalFreight.toFixed(2);
-
-            document.getElementById(
-                "expectedFreight"
-            ).innerHTML =
-                "₹ " +
-                (sellingRate * 0.75).toFixed(2);
-
-            document.getElementById(
-                "currentMargin"
-            ).innerHTML =
-                margin.toFixed(2) + "%";
-
-            const profitBox =
-                document.getElementById(
-                    "profitAmount"
-                );
-
-            if (profit >= 0) {
-
-                profitBox.innerHTML =
-                    "Profit ₹ " + profit.toFixed(2);
-
-                profitBox.className =
-                    "profit-box text-success";
-
-            } else {
-
-                profitBox.innerHTML =
-                    "Loss ₹ " + Math.abs(profit).toFixed(2);
-
-                profitBox.className =
-                    "profit-box text-danger";
-
-            }
-
-            const marginText =
-                document.getElementById(
-                    "marginText"
-                );
-
-            // =========================
-            // APPROVAL
-            // =========================
-
-            if (margin < 13 || profit < 0) {
-
-                approvalSection.style.display =
-                    "block";
-
-                marginText.innerHTML =
-                    "⚠ Approval required due to low margin.";
-
-                document.getElementById(
-                    "currentMargin"
-                ).className =
-                    "badge rounded-pill bg-danger";
-
-                if (
-                    approvalName.value.trim() === ""
-                ) {
-
-                    saveBtn.disabled = true;
-
-                    approvalError.innerHTML =
-                        "Manager approval required.";
-
-                } else {
-
-                    saveBtn.disabled = false;
-
-                    approvalError.innerHTML = "";
-
-                }
-
-            } else {
-
-                approvalSection.style.display =
-                    "none";
-
-                saveBtn.disabled = false;
-
-                marginText.innerHTML =
-                    "✅ Margin is healthy.";
-
-                document.getElementById(
-                    "currentMargin"
-                ).className =
-                    "badge rounded-pill bg-success";
-
-            }
-
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // SOURCE HANDLING
+    // =========================
+    const sourceSelect = document.getElementById("source_select");
+    const sourceOther = document.getElementById("source_other");
+
+    sourceSelect.addEventListener("change", function () {
+        if (this.value === "others") {
+            sourceOther.style.display = "block";
+        } else {
+            sourceOther.style.display = "none";
+            sourceOther.value = "";
         }
-
-        [
-            freight,
-            halting,
-            loading,
-            brokerage,
-            advance
-        ].forEach(el => {
-
-            el.addEventListener(
-                "input",
-                calcFreight
-            );
-
-        });
-
-        approvalName.addEventListener(
-            "input",
-            calcFreight
-        );
-
-        calcFreight();
-
     });
 
+    // =========================
+    // ELEMENTS
+    // =========================
+    const freight = document.getElementById("freight_amount");
+    const halting = document.getElementById("halting");
+    const loading = document.getElementById("loading_unloading");
+    const brokerage = document.getElementById("brokerage");
+    const advance = document.getElementById("advance");
+
+    const total = document.getElementById("total_freight");
+    const balance = document.getElementById("balance");
+
+    const approvalSection = document.getElementById("approvalSection");
+    const approvalName = document.getElementById("approvalName");
+    const saveBtn = document.getElementById("saveBtn");
+    const approvalError = document.getElementById("approvalError");
+
+    const marginText = document.getElementById("marginText");
+    const profitBox = document.getElementById("profitAmount");
+
+    // Selling price from backend
+    const sellingRate = parseFloat("{{ selling_price }}") || 0;
+
+    // =========================
+    // CALCULATION FUNCTION
+    // =========================
+    function calcFreight() {
+
+        const f = parseFloat(freight.value) || 0;
+        const h = parseFloat(halting.value) || 0;
+        const l = parseFloat(loading.value) || 0;
+        const b = parseFloat(brokerage.value) || 0;
+        const a = parseFloat(advance.value) || 0;
+
+        const totalFreight = f + h + l + b;
+        const balanceAmount = totalFreight - a;
+        const profit = sellingRate - totalFreight;
+
+        const margin = sellingRate > 0
+            ? (profit / sellingRate) * 100
+            : 0;
+
+        // =========================
+        // UI UPDATE
+        // =========================
+        total.value = totalFreight.toFixed(2);
+        balance.value = balanceAmount.toFixed(2);
+
+        document.getElementById("finalFreightView").innerHTML =
+            "₹ " + totalFreight.toFixed(2);
+
+        document.getElementById("expectedFreight").innerHTML =
+            "₹ " + (sellingRate * 0.75).toFixed(2);
+
+        document.getElementById("currentMargin").innerHTML =
+            margin.toFixed(2) + "%";
+
+        // =========================
+        // PROFIT / LOSS DISPLAY
+        // =========================
+        if (profit >= 0) {
+            profitBox.innerHTML = "Profit ₹ " + profit.toFixed(2);
+            profitBox.className = "profit-box text-success";
+        } else {
+            profitBox.innerHTML = "Loss ₹ " + Math.abs(profit).toFixed(2);
+            profitBox.className = "profit-box text-danger";
+        }
+
+        // =========================
+        // APPROVAL LOGIC (ONLY LOSS)
+        // =========================
+        if (profit < 0) {
+
+            approvalSection.style.display = "block";
+            marginText.innerHTML = "⚠ Loss detected. Manager approval required.";
+
+            document.getElementById("currentMargin").className =
+                "badge rounded-pill bg-danger";
+
+            if (approvalName.value.trim() === "") {
+                saveBtn.disabled = true;
+                approvalError.innerHTML = "Manager approval required for loss orders.";
+            } else {
+                saveBtn.disabled = false;
+                approvalError.innerHTML = "";
+            }
+
+        } else {
+
+            approvalSection.style.display = "none";
+            saveBtn.disabled = false;
+
+            marginText.innerHTML = "✅ Profit order. No approval needed.";
+
+            document.getElementById("currentMargin").className =
+                "badge rounded-pill bg-success";
+        }
+    }
+
+    // =========================
+    // EVENTS
+    // =========================
+    [freight, halting, loading, brokerage, advance].forEach(el => {
+        el.addEventListener("input", calcFreight);
+    });
+
+    approvalName.addEventListener("input", calcFreight);
+
+    // =========================
+    // INITIAL RUN
+    // =========================
+    calcFreight();
+
+});
 </script>
 
 <style>

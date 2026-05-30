@@ -119,6 +119,7 @@ def manual_order_create(request):
                 tonnage=request.POST.get("tonnage") or 0,
 
                 expected_rate=request.POST.get("expected_rate") or 0,
+                vehicle_assign_date=request.POST.get("vehicle_assign_date"),
 
                 created_by=request.user
             )

@@ -105,6 +105,8 @@ class ManualOrder(models.Model):
 
     expected_rate = models.FloatField(default=0)
 
+    vehicle_assign_date = models.DateTimeField(null=True,blank=True)
+
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

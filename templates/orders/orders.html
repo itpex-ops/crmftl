@@ -129,7 +129,7 @@
 
                             {% else %}
 
-                            {% if order.order_source == "manual" %}
+                            {% if order.order_type == "manual" %}
                            
 
                             <a href="{% url 'view_existing_order' order.id %}" class="fw-semibold text-decoration-none">
