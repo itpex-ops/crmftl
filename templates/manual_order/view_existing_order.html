@@ -23,7 +23,7 @@
     <!-- ACTION BUTTONS (SaaS STYLE TOP BAR) -->
     <div class="d-flex gap-2 flex-wrap mb-4">
 
-        <a href="{% url 'assign_vehicle' manual_order.id  %}" class="btn btn-warning">
+        <a href="{% url 'assign_vehicle' order.id  %}" class="btn btn-warning">
             🚚 Assign Vehicle
         </a>
         {% if manual_order.vehicles.all %}
