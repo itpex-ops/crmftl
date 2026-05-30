@@ -21,12 +21,12 @@ class Vehicle(models.Model):
         blank=True
     )
 
-    manual_order = models.ForeignKey(
+    manual_order = models.OneToOneField(
     ManualOrder,
     on_delete=models.CASCADE,
+    related_name="vehicle",
     null=True,
-    blank=True,
-    related_name='vehicles'
+    blank=True
 )
 
     # =========================
@@ -253,24 +253,32 @@ class Vehicle(models.Model):
     def save(self, *args, **kwargs):
 
         # =========================
-        # ORDER TYPE VALIDATION (NEW)
+        # ORDER TYPE VALIDATION
         # =========================
 
-        if hasattr(self, "order_type"):
+        if self.order_type == "crm":
 
-            if self.order_type == "crm" and not self.order:
-                raise ValueError("CRM vehicle must have Order")
-
-            if self.order_type == "manual" and not self.manual_order:
-                raise ValueError("Manual vehicle must have ManualOrder")
-
-        else:
-            # fallback (old system safety)
-            if not self.order and not self.manual_order:
+            if not self.order:
                 raise ValueError(
-                    "Vehicle must be linked to Order or ManualOrder"
+                    "CRM vehicle must have Order"
                 )
 
+            if self.manual_order:
+                raise ValueError(
+                    "CRM vehicle cannot have ManualOrder"
+                )
+
+        elif self.order_type == "manual":
+
+            if not self.manual_order:
+                raise ValueError(
+                    "Manual vehicle must have ManualOrder"
+                )
+
+            if self.order:
+                raise ValueError(
+                    "Manual vehicle cannot have Order"
+                )
         # =========================
         # BALANCE
         # =========================
@@ -313,7 +321,6 @@ class Vehicle(models.Model):
             if last_vehicle and last_vehicle.ftl_no:
 
                 try:
-                    # safer parsing
                     last_num = int(
                         last_vehicle.ftl_no.replace("FTL", "").strip()
                     )
@@ -323,21 +330,88 @@ class Vehicle(models.Model):
                     new_num = 1
 
             self.ftl_no = f"FTL{new_num:03d}"
+
         super().save(*args, **kwargs)
+            # =========================
+    # HELPERS
+    # =========================
+
+    @property
+    def tracking(self):
+
+        if self.order:
+            return getattr(
+                self.order,
+                "tracking",
+                None
+            )
+
+        if self.manual_order:
+            return getattr(
+                self.manual_order,
+                "tracking",
+                None
+            )
+
+        return None
+
+
+    @property
+    def assigned_date(self):
+
+        if self.order:
+            return self.order.vehicle_place_date
+
+        if self.manual_order:
+            return self.manual_order.vehicle_assign_date
+
+        return None
+
+
+    @property
+    def order_no(self):
+
+        if self.order:
+            return self.order.order_no
+
+        if self.manual_order:
+            return self.manual_order.order_no
+
+        return "-"
+
+
+    @property
+    def trip_status(self):
+
+        tracking = self.tracking
+
+        if not tracking:
+            return "No Tracking"
+
+        if tracking.settled:
+            return "Settled"
+
+        if tracking.delivered:
+            return "Delivered"
+
+        if tracking.fleet_departed:
+            return "In Transit"
+
+        if tracking.invoice_eway:
+            return "Invoice / Eway"
+
+        if tracking.pod_received:
+            return "POD Received"
+
+        return "Pending"
+
 
     # =========================
     # STRING
     # =========================
 
     def __str__(self):
-
-        if self.order:
-            return f"{self.ftl_no} - {self.order.order_no}"
-
-        if self.manual_order:
-            return f"{self.ftl_no} - {self.manual_order.order_no}"
-
-        return self.ftl_no
+        return f"{self.ftl_no} - {self.order_no}"
 
 
 class Tracking(models.Model):
@@ -345,6 +419,25 @@ class Tracking(models.Model):
     # =========================
     # ORDER RELATION
     # =========================
+
+    STATUS_CHOICES = [
+    ("vehicle_placed", "Vehicle Placed"),
+    ("vehicle_document", "Vehicle Document"),
+    ("invoice_eway", "Invoice / E-way"),
+    ("advance_to_fleet", "Advance To Fleet"),
+    ("fleet_departed", "Fleet Departed"),
+    ("advance_received", "Advance Received"),
+    ("arrived", "Arrived"),
+    ("delivered", "Delivered"),
+    ("pod_received", "POD Received"),
+    ("settled", "Settled"),
+    ]
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="vehicle_placed"
+    )
 
     order = models.OneToOneField(
         Order,

@@ -24,12 +24,34 @@ class CustomerTransaction(models.Model):
 
 class VehicleTransaction(models.Model):
     TYPE_CHOICES = [
+        ('advance', 'Advance Payment'),
+        ('balance', 'Balance Payment'),
+
         ('fuel', 'Fuel'),
         ('driver_advance', 'Driver Advance'),
         ('toll', 'Toll'),
         ('rent', 'Vehicle Rent'),
         ('maintenance', 'Maintenance'),
     ]
+    PAYMENT_MODE_CHOICES = [
+            ('upi', 'UPI'),
+            ('bank', 'Bank Transfer'),
+            ('cash', 'Cash'),
+        ]
+
+    payment_mode = models.CharField(
+            max_length=20,
+            choices=PAYMENT_MODE_CHOICES,
+            blank=True,
+            null=True
+        )
+
+    transaction_no = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+    
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=30, choices=TYPE_CHOICES)

@@ -222,8 +222,12 @@
                                 class="btn btn-sm btn-outline-primary action-btn">
                                 <i class="bi bi-journal-text"></i> Ledger
                             </a>
+                            <a href="{% url 'vehicle_payments' v.vehicle_id %}"
+                                class="btn btn-sm btn-outline-primary action-btn">
+                                <i class="bi bi-journal-text"></i> Payments
+                            </a>
 
-                            {% if v.balance|default:0 == 0 %}
+                            <!-- {% if v.balance|default:0 == 0 %}
 
                             <button class="btn btn-sm btn-secondary action-btn" disabled>
                                 <i class="bi bi-lock-fill"></i> Advance
@@ -254,7 +258,7 @@
                                 <i class="bi bi-pencil-square"></i> Edit
                             </a>
 
-                            {% endif %}
+                            {% endif %} -->
 
                         </td>
 

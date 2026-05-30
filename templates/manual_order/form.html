@@ -32,7 +32,10 @@
                         </div>
 
                         <div class="col-md-6">
-                            <input name="customer_contact" class="form-control" placeholder="Mobile" required>
+                            <input type="tel" name="customer_contact" class="form-control" maxlength="10"
+                                pattern="[0-9]{10}" inputmode="numeric" required
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                            <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
                         <div class="col-md-6">
@@ -92,7 +95,6 @@
                         <div class="col-md-4">
                             <input name="tonnage" class="form-control" placeholder="Tonnage">
                         </div>
-
                     </div>
                 </div>
 
@@ -158,7 +160,6 @@
                     <div class="card-header saas-title">💳 Payment</div>
 
                     <div class="card-body">
-
                         <select name="payment_mode" class="form-select mb-2">
                             <option value="">Mode</option>
                             <option>Cash</option>

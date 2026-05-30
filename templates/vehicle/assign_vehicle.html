@@ -8,7 +8,7 @@
     <!-- ========================= -->
 
     <div class="summary-card mb-4">
-
+        
         <div class="row g-0 align-items-center">
 
             <div class="col-lg-2 col-md-4 summary-item border-end">
@@ -35,17 +35,9 @@
 
                     ₹
                     {% if order.total_rate %}
-
                     {{ order.total_rate }}
-
-                    {% elif manual_order.pricing %}
-
-                    {{ manual_order.pricing.total_amount }}
-
                     {% else %}
-
-                    0
-
+                    {{ order.pricing.total_amount }}
                     {% endif %}
 
                 </div>
@@ -561,137 +553,137 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    // =========================
-    // SOURCE HANDLING
-    // =========================
-    const sourceSelect = document.getElementById("source_select");
-    const sourceOther = document.getElementById("source_other");
-
-    sourceSelect.addEventListener("change", function () {
-        if (this.value === "others") {
-            sourceOther.style.display = "block";
-        } else {
-            sourceOther.style.display = "none";
-            sourceOther.value = "";
-        }
-    });
-
-    // =========================
-    // ELEMENTS
-    // =========================
-    const freight = document.getElementById("freight_amount");
-    const halting = document.getElementById("halting");
-    const loading = document.getElementById("loading_unloading");
-    const brokerage = document.getElementById("brokerage");
-    const advance = document.getElementById("advance");
-
-    const total = document.getElementById("total_freight");
-    const balance = document.getElementById("balance");
-
-    const approvalSection = document.getElementById("approvalSection");
-    const approvalName = document.getElementById("approvalName");
-    const saveBtn = document.getElementById("saveBtn");
-    const approvalError = document.getElementById("approvalError");
-
-    const marginText = document.getElementById("marginText");
-    const profitBox = document.getElementById("profitAmount");
-
-    // Selling price from backend
-    const sellingRate = parseFloat("{{ selling_price }}") || 0;
-
-    // =========================
-    // CALCULATION FUNCTION
-    // =========================
-    function calcFreight() {
-
-        const f = parseFloat(freight.value) || 0;
-        const h = parseFloat(halting.value) || 0;
-        const l = parseFloat(loading.value) || 0;
-        const b = parseFloat(brokerage.value) || 0;
-        const a = parseFloat(advance.value) || 0;
-
-        const totalFreight = f + h + l + b;
-        const balanceAmount = totalFreight - a;
-        const profit = sellingRate - totalFreight;
-
-        const margin = sellingRate > 0
-            ? (profit / sellingRate) * 100
-            : 0;
+    document.addEventListener("DOMContentLoaded", function () {
 
         // =========================
-        // UI UPDATE
+        // SOURCE HANDLING
         // =========================
-        total.value = totalFreight.toFixed(2);
-        balance.value = balanceAmount.toFixed(2);
+        const sourceSelect = document.getElementById("source_select");
+        const sourceOther = document.getElementById("source_other");
 
-        document.getElementById("finalFreightView").innerHTML =
-            "₹ " + totalFreight.toFixed(2);
-
-        document.getElementById("expectedFreight").innerHTML =
-            "₹ " + (sellingRate * 0.75).toFixed(2);
-
-        document.getElementById("currentMargin").innerHTML =
-            margin.toFixed(2) + "%";
-
-        // =========================
-        // PROFIT / LOSS DISPLAY
-        // =========================
-        if (profit >= 0) {
-            profitBox.innerHTML = "Profit ₹ " + profit.toFixed(2);
-            profitBox.className = "profit-box text-success";
-        } else {
-            profitBox.innerHTML = "Loss ₹ " + Math.abs(profit).toFixed(2);
-            profitBox.className = "profit-box text-danger";
-        }
-
-        // =========================
-        // APPROVAL LOGIC (ONLY LOSS)
-        // =========================
-        if (profit < 0) {
-
-            approvalSection.style.display = "block";
-            marginText.innerHTML = "⚠ Loss detected. Manager approval required.";
-
-            document.getElementById("currentMargin").className =
-                "badge rounded-pill bg-danger";
-
-            if (approvalName.value.trim() === "") {
-                saveBtn.disabled = true;
-                approvalError.innerHTML = "Manager approval required for loss orders.";
+        sourceSelect.addEventListener("change", function () {
+            if (this.value === "others") {
+                sourceOther.style.display = "block";
             } else {
-                saveBtn.disabled = false;
-                approvalError.innerHTML = "";
+                sourceOther.style.display = "none";
+                sourceOther.value = "";
+            }
+        });
+
+        // =========================
+        // ELEMENTS
+        // =========================
+        const freight = document.getElementById("freight_amount");
+        const halting = document.getElementById("halting");
+        const loading = document.getElementById("loading_unloading");
+        const brokerage = document.getElementById("brokerage");
+        const advance = document.getElementById("advance");
+
+        const total = document.getElementById("total_freight");
+        const balance = document.getElementById("balance");
+
+        const approvalSection = document.getElementById("approvalSection");
+        const approvalName = document.getElementById("approvalName");
+        const saveBtn = document.getElementById("saveBtn");
+        const approvalError = document.getElementById("approvalError");
+
+        const marginText = document.getElementById("marginText");
+        const profitBox = document.getElementById("profitAmount");
+
+        // Selling price from backend
+        const sellingRate = parseFloat("{{ selling_price }}") || 0;
+
+        // =========================
+        // CALCULATION FUNCTION
+        // =========================
+        function calcFreight() {
+
+            const f = parseFloat(freight.value) || 0;
+            const h = parseFloat(halting.value) || 0;
+            const l = parseFloat(loading.value) || 0;
+            const b = parseFloat(brokerage.value) || 0;
+            const a = parseFloat(advance.value) || 0;
+
+            const totalFreight = f + h + l + b;
+            const balanceAmount = totalFreight - a;
+            const profit = sellingRate - totalFreight;
+
+            const margin = sellingRate > 0
+                ? (profit / sellingRate) * 100
+                : 0;
+
+            // =========================
+            // UI UPDATE
+            // =========================
+            total.value = totalFreight.toFixed(2);
+            balance.value = balanceAmount.toFixed(2);
+
+            document.getElementById("finalFreightView").innerHTML =
+                "₹ " + totalFreight.toFixed(2);
+
+            document.getElementById("expectedFreight").innerHTML =
+                "₹ " + (sellingRate * 0.75).toFixed(2);
+
+            document.getElementById("currentMargin").innerHTML =
+                margin.toFixed(2) + "%";
+
+            // =========================
+            // PROFIT / LOSS DISPLAY
+            // =========================
+            if (profit >= 0) {
+                profitBox.innerHTML = "Profit ₹ " + profit.toFixed(2);
+                profitBox.className = "profit-box text-success";
+            } else {
+                profitBox.innerHTML = "Loss ₹ " + Math.abs(profit).toFixed(2);
+                profitBox.className = "profit-box text-danger";
             }
 
-        } else {
+            // =========================
+            // APPROVAL LOGIC (ONLY LOSS)
+            // =========================
+            if (profit < 0) {
 
-            approvalSection.style.display = "none";
-            saveBtn.disabled = false;
+                approvalSection.style.display = "block";
+                marginText.innerHTML = "⚠ Loss detected. Manager approval required.";
 
-            marginText.innerHTML = "✅ Profit order. No approval needed.";
+                document.getElementById("currentMargin").className =
+                    "badge rounded-pill bg-danger";
 
-            document.getElementById("currentMargin").className =
-                "badge rounded-pill bg-success";
+                if (approvalName.value.trim() === "") {
+                    saveBtn.disabled = true;
+                    approvalError.innerHTML = "Manager approval required for loss orders.";
+                } else {
+                    saveBtn.disabled = false;
+                    approvalError.innerHTML = "";
+                }
+
+            } else {
+
+                approvalSection.style.display = "none";
+                saveBtn.disabled = false;
+
+                marginText.innerHTML = "✅ Profit order. No approval needed.";
+
+                document.getElementById("currentMargin").className =
+                    "badge rounded-pill bg-success";
+            }
         }
-    }
 
-    // =========================
-    // EVENTS
-    // =========================
-    [freight, halting, loading, brokerage, advance].forEach(el => {
-        el.addEventListener("input", calcFreight);
+        // =========================
+        // EVENTS
+        // =========================
+        [freight, halting, loading, brokerage, advance].forEach(el => {
+            el.addEventListener("input", calcFreight);
+        });
+
+        approvalName.addEventListener("input", calcFreight);
+
+        // =========================
+        // INITIAL RUN
+        // =========================
+        calcFreight();
+
     });
-
-    approvalName.addEventListener("input", calcFreight);
-
-    // =========================
-    // INITIAL RUN
-    // =========================
-    calcFreight();
-
-});
 </script>
 
 <style>

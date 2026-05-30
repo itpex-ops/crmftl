@@ -72,95 +72,56 @@
 
                         <!-- Tracking Status -->
                         <td>
-                            {% if vehicle.order.tracking %}
 
-                            {% if vehicle.order.tracking.settled %}
-                            <span class="badge bg-success">Settled</span>
+                            {% with status=vehicle.trip_status %}
 
-                            {% elif vehicle.order.tracking.delivered %}
-                            <span class="badge bg-success">Delivered</span>
+                            {% if status == "Settled" %}
+                            <span class="badge bg-success">{{ status }}</span>
 
-                            {% elif vehicle.order.tracking.fleet_departed %}
-                            <span class="badge bg-info">In Transit</span>
+                            {% elif status == "Delivered" %}
+                            <span class="badge bg-success">{{ status }}</span>
 
-                            {% elif vehicle.order.tracking.invoice_eway %}
-                            <span class="badge bg-warning text-dark">Invoice / Eway</span>
+                            {% elif status == "In Transit" %}
+                            <span class="badge bg-info">{{ status }}</span>
 
-                            {% elif vehicle.order.tracking.pod_received %}
-                            <span class="badge bg-primary text-light">POD Received</span>
+                            {% elif status == "Invoice / Eway" %}
+                            <span class="badge bg-warning text-dark">{{ status }}</span>
 
-                            {% else %}
-                            <span class="badge bg-secondary">Pending</span>
-
-                            {% endif %}
+                            {% elif status == "POD Received" %}
+                            <span class="badge bg-primary">{{ status }}</span>
 
                             {% else %}
-                            <span class="badge bg-secondary">No Tracking</span>
+                            <span class="badge bg-secondary">{{ status }}</span>
                             {% endif %}
+
+                            {% endwith %}
+
                         </td>
 
                         <!-- Vehicle Place Date -->
                         <td class="text-muted">
-                            {% if vehicle.order.vehicle_place_date %}
-                            {{ vehicle.order.vehicle_place_date|date:"d M Y h:i A" }}
+                            {% if vehicle.assigned_date %}
+                            {{ vehicle.assigned_date|date:"d M Y h:i A" }}
                             {% else %}
-                            {{ vehicle.order.vehicle_reassign_date|date:"d M Y h:i A" }}
+                            -
                             {% endif %}
                         </td>
+                        <!-- Actions -->
+                        <td>
+                            {% if vehicle.tracking and vehicle.tracking.settled %}
 
-                     <!-- Actions -->
-<td class="text-center">
+                            <button class="btn btn-light btn-sm" disabled>
+                                🔒 Trip Closed
+                            </button>
 
-    {% if vehicle.order.tracking.settled %}
+                            {% else %}
 
-        <button class="btn btn-light btn-sm" disabled>
-            🔒 Trip Closed
-        </button>
+                            <a href="{% url 'tracking_page' vehicle.id %}" class="btn btn-success btn-sm">
+                                🚚 Open Tracking
+                            </a>
 
-    {% else %}
-
-        {% now "Y-m-d H:i:s" as current_time %}
-
-        {% if vehicle.order.vehicle_place_date %}
-
-            {% if vehicle.order.vehicle_place_date|date:"Y-m-d H:i:s" <= current_time %}
-
-                <a href="{% url 'tracking_page' vehicle.id %}"
-                   class="btn btn-success btn-sm">
-
-                    🚚 Open Tracking
-
-                </a>
-
-            {% elif vehicle.order.vehicle_reassign_date %}
-
-                <a href="{% url 'tracking_page' vehicle.id %}"
-                   class="btn btn-success btn-sm">
-
-                    🚚 Open Tracking
-
-                </a>
-
-            {% else %}
-
-                <button class="btn btn-warning btn-sm" disabled>
-                    ⏰ Waiting Time
-                </button>
-
-            {% endif %}
-
-        {% else %}
-
-            <button class="btn btn-secondary btn-sm" disabled>
-                📅 No Vehicle Date
-            </button>
-
-        {% endif %}
-
-    {% endif %}
-
-</td>
-
+                            {% endif %}
+                        </td>
                     </tr>
 
                     {% empty %}

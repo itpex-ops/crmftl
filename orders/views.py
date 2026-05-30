@@ -96,8 +96,11 @@ def orders_management(request):
         
         o.order_source = "crm"
 
-    for o in manual_orders_qs:
-        o.order_source = "manual"
+    for order in manual_orders_qs:
+        order.order_source = "manual"
+        order.vehicle = Vehicle.objects.filter(
+            manual_order=order
+        ).first()
 
     merged_orders = sorted(
         chain(orders_qs, manual_orders_qs),

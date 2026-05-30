@@ -1,0 +1,181 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h4 class="mb-1">
+                Vehicle Payments
+            </h4>
+
+            <small class="text-muted">
+                {{ vehicle.ftl_no }} |
+                {{ vehicle.vehicle_number }}
+            </small>
+        </div>
+
+        <div>
+
+            <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="btn btn-success">
+
+                <i class="bi bi-cash-stack"></i>
+                Advance Payment
+
+            </a>
+
+            <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="btn btn-primary">
+
+                <i class="bi bi-wallet2"></i>
+                Balance Payment
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Advance Paid
+                    </small>
+
+                    <h3 class="text-success">
+                        ₹{{ total_advance }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Balance Paid
+                    </small>
+
+                    <h3 class="text-primary">
+                        ₹{{ total_balance }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- ADVANCE -->
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header bg-success text-white">
+                    Advance Payments
+                </div>
+
+                <div class="card-body p-0">
+
+                    <table class="table table-sm mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Mode</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for p in advances %}
+                            <tr>
+                                <td>{{ p.date }}</td>
+                                <td>{{ p.payment_mode }}</td>
+                                <td>₹{{ p.amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No advance payments</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BALANCE -->
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header bg-primary text-white">
+                    Balance Payments
+                </div>
+
+                <div class="card-body p-0">
+
+                    <table class="table table-sm mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Mode</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for p in balances %}
+                            <tr>
+                                <td>{{ p.date }}</td>
+                                <td>{{ p.payment_mode }}</td>
+                                <td>₹{{ p.amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No balance payments</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -17,7 +17,141 @@ from .models import (
     BankTransaction,
     LedgerEntry
 )
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def pay_vehicle_advance2(request, vehicle_id):
+
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+
+    if request.method == "POST":
+
+        print("POST RECEIVED")
+        print(request.POST)
+
+        payment = VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type="advance",
+            amount=request.POST.get("amount"),
+            remarks=request.POST.get("remarks"),
+            created_by=request.user
+        )
+
+        print("PAYMENT ID:", payment.id)
+
+        return redirect("vehicle_payments", vehicle_id=vehicle.id)
+
+    return render(
+        request,
+        "accounts/pay_vehicle_advance.html",
+        {"vehicle": vehicle}
+    )
+from django.db.models import Sum
+from django.shortcuts import render, get_object_or_404
+
+@login_required
+def vehicle_payments(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    advances = VehicleTransaction.objects.filter(
+        vehicle=vehicle,
+        transaction_type='advance'
+    )
+
+    balances = VehicleTransaction.objects.filter(
+        vehicle=vehicle,
+        transaction_type='balance'
+    )
+
+    total_advance = advances.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    total_balance = balances.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    context = {
+        'vehicle': vehicle,
+        'advances': advances.order_by('-id'),
+        'balances': balances.order_by('-id'),
+        'total_advance': total_advance,
+        'total_balance': total_balance,
+    }
+
+    return render(
+        request,
+        'accounts/vehicle_payments.html',
+        context
+    )
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+from vehicles.models import Vehicle
+from accounts.models import VehicleTransaction, LedgerEntry
+
+
+@login_required
+def pay_vehicle_advance(request, vehicle_id):
+
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+
+    if request.method == "POST":
+
+        try:
+            amount = request.POST.get("amount")
+            payment_mode = request.POST.get("payment_mode")
+            transaction_no = request.POST.get("transaction_no")
+            remarks = request.POST.get("remarks")
+
+            print("AMOUNT =", amount)
+            print("MODE =", payment_mode)
+
+            payment = VehicleTransaction.objects.create(
+                vehicle=vehicle,
+                transaction_type="advance",
+                payment_mode=payment_mode,
+                transaction_no=transaction_no,
+                amount=amount,
+                remarks=remarks,
+                created_by=request.user
+            )
+
+            print("PAYMENT SAVED:", payment.id)
+
+            LedgerEntry.objects.create(
+                account_type="vehicle",
+                vehicle=vehicle,
+                credit=float(amount),
+                remarks=f"Advance Payment - {payment_mode}"
+            )
+
+            print("LEDGER SAVED")
+
+            messages.success(
+                request,
+                "Advance payment added successfully."
+            )
+
+            return redirect(
+                "vehicle_payments",
+                vehicle_id=vehicle.id
+            )
+
+        except Exception as e:
+            print("ERROR:", e)
+            raise
+
+    return render(
+        request,
+        "accounts/pay_vehicle_advance.html",
+        {"vehicle": vehicle}
+    )
 def accounts_dashboard(request):
 
     customer_total = CustomerTransaction.objects.aggregate(
@@ -58,59 +192,55 @@ def accounts_dashboard(request):
 
     return render(request, 'dashboards/accounts_dashboard.html', context)
 
+@login_required
 def pay_vehicle_balance(request, vehicle_id):
 
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
 
     if request.method == "POST":
 
-        amount = float(request.POST.get("amount", 0))
-        mode = request.POST.get("mode")
+        amount = request.POST.get("amount")
+        payment_mode = request.POST.get("payment_mode")
+        transaction_no = request.POST.get("transaction_no")
         remarks = request.POST.get("remarks")
 
-        current_balance = float(vehicle.balance or 0)
-
-        # Prevent over payment
-        if amount > current_balance:
-            messages.error(
-                request,
-                f"Amount exceeds pending balance ₹{current_balance}"
-            )
-            return redirect("pay_vehicle_balance", vehicle_id=vehicle.id)
-
-        # Update balance
-        vehicle.balance = current_balance - amount
-
-        if vehicle.balance < 0:
-            vehicle.balance = 0
-
-        vehicle.save()
-
-        # Vehicle Ledger Entry
-        LedgerEntry.objects.create(
-            account_type="Vehicle",
+        VehicleTransaction.objects.create(
             vehicle=vehicle,
-            debit=amount,
-            credit=0,
-            remarks=f"Final Balance Paid - {mode} - {remarks}"
+            transaction_type="balance",
+            payment_mode=payment_mode,
+            transaction_no=transaction_no,
+            amount=amount,
+            remarks=remarks,
+            created_by=request.user
         )
 
-        # Bank / Cash Ledger Entry
         LedgerEntry.objects.create(
-            account_type="Bank",
+            account_type="vehicle",
             vehicle=vehicle,
-            debit=amount,
-            credit=0,
-            remarks=f"Vehicle Balance Payment - {vehicle.vehicle_number}"
+            credit=float(amount),
+            remarks=f"Balance Payment - {payment_mode}"
         )
 
-        messages.success(request, "Vehicle balance paid successfully.")
-        return redirect("vehicle_accounts")
+        messages.success(
+            request,
+            "Balance payment added successfully."
+        )
 
-    return render(request, "accounts/pay_vehicle_balance.html", {
-        "vehicle": vehicle
-    })
+        return redirect(
+            "vehicle_payments",
+            vehicle_id=vehicle.id
+        )
 
+    return render(
+        request,
+        "accounts/pay_vehicle_balance.html",
+        {
+            "vehicle": vehicle
+        }
+    )
 def edit_vehicle_account(request, vehicle_id):
 
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
@@ -144,7 +274,7 @@ def edit_vehicle_account(request, vehicle_id):
         "vehicle": vehicle
     })
 
-def pay_vehicle_advance(request, vehicle_id):
+def pay_vehicle_advance1(request, vehicle_id):
 
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
@@ -300,7 +430,7 @@ def vehicle_accounts(request):
             "vehicle_id": v.id,
             "ftlno" : v.ftl_no,
             "vehicle": v.vehicle_number,
-            "order_no": v.order.order_no,
+            "order_no": v.order_no,
             "freight": float(v.freight_amount or 0),
             "advance": float(v.advance or 0),
             "balance": float(v.balance or 0),

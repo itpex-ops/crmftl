@@ -371,12 +371,25 @@ def order_status_api(request):
     return JsonResponse({"orders": data})
 
 def assigned_vehicles(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    vehicles = order.vehicles.all().order_by('-created_at')  # newest first
-    return render(request, 'vehicle/assigned.html', {
-        'order': order,
-        'vehicles': vehicles,
-    })
+
+    source = request.GET.get("source", "crm")
+
+    model = ManualOrder if source == "manual" else Order
+
+    order = get_object_or_404(model, id=order_id)
+
+    vehicles = [order.vehicle] if hasattr(order, "vehicle") else []
+
+    return render(
+        request,
+        "vehicle/assigned.html",
+        {
+            "order": order,
+            "vehicles": vehicles,
+            "source": source,
+        }
+    )
+
 
 def assign_vehicle12(request, order_id):
     order = get_object_or_404(Order, id=order_id)
