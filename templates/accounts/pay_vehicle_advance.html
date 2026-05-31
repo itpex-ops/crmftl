@@ -1,69 +1,260 @@
 {% extends 'layouts/base.html' %}
-
 {% block content %}
 
-<div class="container mt-4">
+<div class="container-fluid mt-3">
 
-    <div class="card">
+    <div class="row">
 
-        <div class="card-header bg-success text-white">
-            Advance Payment
+        <!-- Vehicle Details -->
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-3">
+
+                <div class="card-header bg-primary text-white">
+                    Vehicle Details
+                </div>
+
+                <div class="card-body">
+
+                    <p><strong>FTL :</strong> {{ vehicle.ftl_no }}</p>
+
+                    <p>
+                        <strong>Vehicle :</strong>
+                        {{ vehicle.vehicle_number }}
+                    </p>
+
+                    <p>
+                        <strong>Driver :</strong>
+                        {{ vehicle.driver_number }}
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Freight :</strong>
+                        ₹{{ vehicle.freight_amount }}
+                    </p>
+
+                    <p class="text-success">
+                        <strong>Advance Paid :</strong>
+                        ₹{{ vehicle.advance }}
+                    </p>
+
+                    <p class="text-danger">
+                        <strong>Balance :</strong>
+                        ₹{{ vehicle.balance }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Bank Details -->
+
+            <div class="card shadow-sm mb-3">
+
+                <div class="card-header bg-success text-white">
+                    Bank Details
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+                        <strong>Beneficiary:</strong><br>
+                        {{ vehicle.beneficiary_name }}
+                    </p>
+
+                    <p>
+                        <strong>Account Name:</strong><br>
+                        {{ vehicle.account_name }}
+                    </p>
+
+                    <p>
+                        <strong>Account Number:</strong><br>
+                        {{ vehicle.account_number }}
+                    </p>
+
+                    <p>
+                        <strong>IFSC:</strong><br>
+                        {{ vehicle.ifsc }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- UPI -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-dark text-white">
+                    UPI Details
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+                        <strong>UPI App:</strong><br>
+                        {{ vehicle.upi_app|upper }}
+                    </p>
+
+                    <p>
+                        <strong>UPI ID:</strong><br>
+                        {{ vehicle.upi_id }}
+                    </p>
+
+                    <p>
+                        <strong>UPI Number:</strong><br>
+                        {{ vehicle.upi_number }}
+                    </p>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="card-body">
+        <!-- Payment Form -->
 
-            <h6>
-                Vehicle : {{ vehicle.vehicle_number }}
-            </h6>
+        <div class="col-lg-8">
 
-            <form method="post">
+            <div class="card shadow-sm mb-3">
 
-                {% csrf_token %}
-
-                <div class="mb-3">
-                    <label>Amount</label>
-                    <input type="number"
-                           step="0.01"
-                           name="amount"
-                           class="form-control"
-                           required>
+                <div class="card-header bg-success text-white">
+                    Add Advance Payment
                 </div>
 
-                <div class="mb-3">
-                    <label>Payment Mode</label>
+                <div class="card-body">
 
-                    <select name="payment_mode"
-                            class="form-select">
+                    <form method="post">
 
-                        <option value="upi">UPI</option>
-                        <option value="bank">Bank</option>
-                        <option value="cash">Cash</option>
+                        {% csrf_token %}
 
-                    </select>
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                <label>Amount</label>
+
+                                <input type="number"
+                                       step="0.01"
+                                       name="amount"
+                                       class="form-control"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <label>Payment Mode</label>
+
+                                <select name="payment_mode"
+                                        class="form-select">
+
+                                    <option value="upi">UPI</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="cash">Cash</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <label>Transaction No</label>
+
+                                <input type="text"
+                                       name="transaction_no"
+                                       class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Remarks</label>
+
+                            <textarea name="remarks"
+                                      class="form-control"></textarea>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            Save Advance Payment
+
+                        </button>
+
+                    </form>
+
                 </div>
 
-                <div class="mb-3">
-                    <label>Transaction Number</label>
+            </div>
 
-                    <input type="text"
-                           name="transaction_no"
-                           class="form-control">
+            <!-- History -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-secondary text-white">
+
+                    Advance Payment History
+
                 </div>
 
-                <div class="mb-3">
-                    <label>Remarks</label>
+                <div class="card-body">
 
-                    <textarea name="remarks"
-                              class="form-control"></textarea>
+                    <table class="table table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Mode</th>
+                                <th>Txn No</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for p in advance_payments %}
+
+                            <tr>
+
+                                <td>{{ p.date }}</td>
+
+                                <td>
+                                    ₹{{ p.amount }}
+                                </td>
+
+                                <td>
+                                    {{ p.payment_mode }}
+                                </td>
+
+                                <td>
+                                    {{ p.transaction_no }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No payments found
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
                 </div>
 
-                <button type="submit"
-                        class="btn btn-success">
-
-                    Save Advance
-                </button>
-
-            </form>
+            </div>
 
         </div>
 

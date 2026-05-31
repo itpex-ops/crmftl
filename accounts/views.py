@@ -96,62 +96,80 @@ from vehicles.models import Vehicle
 from accounts.models import VehicleTransaction, LedgerEntry
 
 
+from decimal import Decimal
+from django.db.models import Sum
+
 @login_required
 def pay_vehicle_advance(request, vehicle_id):
 
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    advance_payments = VehicleTransaction.objects.filter(
+        vehicle=vehicle,
+        transaction_type="advance"
+    ).order_by("-id")
+
+    total_advance = advance_payments.aggregate(
+        total=Sum("amount")
+    )["total"] or Decimal("0")
 
     if request.method == "POST":
 
-        try:
-            amount = request.POST.get("amount")
-            payment_mode = request.POST.get("payment_mode")
-            transaction_no = request.POST.get("transaction_no")
-            remarks = request.POST.get("remarks")
+        amount = Decimal(
+            request.POST.get("amount", 0)
+        )
 
-            print("AMOUNT =", amount)
-            print("MODE =", payment_mode)
+        payment_mode = request.POST.get("payment_mode")
+        transaction_no = request.POST.get("transaction_no")
+        remarks = request.POST.get("remarks")
 
-            payment = VehicleTransaction.objects.create(
-                vehicle=vehicle,
-                transaction_type="advance",
-                payment_mode=payment_mode,
-                transaction_no=transaction_no,
-                amount=amount,
-                remarks=remarks,
-                created_by=request.user
-            )
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type="advance",
+            payment_mode=payment_mode,
+            transaction_no=transaction_no,
+            amount=amount,
+            remarks=remarks,
+            created_by=request.user
+        )
 
-            print("PAYMENT SAVED:", payment.id)
+        # Update Vehicle Advance
+        vehicle.advance += amount
+        vehicle.save()
 
-            LedgerEntry.objects.create(
-                account_type="vehicle",
-                vehicle=vehicle,
-                credit=float(amount),
-                remarks=f"Advance Payment - {payment_mode}"
-            )
+        LedgerEntry.objects.create(
+            account_type="vehicle",
+            vehicle=vehicle,
+            credit=float(amount),
+            remarks=f"Advance Payment ({payment_mode})"
+        )
 
-            print("LEDGER SAVED")
+        messages.success(
+            request,
+            "Advance payment added successfully."
+        )
 
-            messages.success(
-                request,
-                "Advance payment added successfully."
-            )
+        return redirect(
+            "pay_vehicle_advance",
+            vehicle_id=vehicle.id
+        )
 
-            return redirect(
-                "vehicle_payments",
-                vehicle_id=vehicle.id
-            )
-
-        except Exception as e:
-            print("ERROR:", e)
-            raise
+    context = {
+        "vehicle": vehicle,
+        "advance_payments": advance_payments,
+        "total_advance": total_advance,
+    }
 
     return render(
         request,
         "accounts/pay_vehicle_advance.html",
-        {"vehicle": vehicle}
+        context
     )
+
+
 def accounts_dashboard(request):
 
     customer_total = CustomerTransaction.objects.aggregate(
