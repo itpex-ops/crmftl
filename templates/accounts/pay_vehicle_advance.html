@@ -1,83 +1,252 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 {% block content %}
 
-<div class="container-fluid mt-3">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+body{
+    background:#f5f7fb;
+}
+
+.page-header{
+    background:linear-gradient(135deg,#db8017,#cca644);
+    color:#fff;
+    border-radius:18px;
+    padding:24px;
+    margin-bottom:20px;
+}
+
+.card-modern{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+}
+
+.card-modern .card-body{
+    padding:20px;
+}
+
+.stat-box{
+    background:#fff;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
+    text-align:center;
+}
+
+.stat-label{
+    font-size:12px;
+    text-transform:uppercase;
+    color:#64748b;
+}
+
+.stat-value{
+    font-size:24px;
+    font-weight:700;
+}
+
+.freight{
+    color:#2563eb;
+}
+
+.advance{
+    color:#16a34a;
+}
+
+.balance{
+    color:#dc2626;
+}
+
+.bank-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:12px;
+}
+
+.copy-box{
+    background:#eef2ff;
+    border-radius:8px;
+    padding:8px 10px;
+    font-family:monospace;
+}
+
+.form-control,
+.form-select{
+    border-radius:12px;
+    min-height:48px;
+}
+
+.btn-save{
+    border-radius:12px;
+    padding:12px 24px;
+}
+
+.history-table thead{
+    background:#f8fafc;
+}
+
+.history-table th{
+    font-size:13px;
+}
+
+.badge-status{
+    background:#dcfce7;
+    color:#166534;
+    padding:6px 12px;
+    border-radius:30px;
+}
+</style>
+
+<div class="container-fluid py-3">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+                <h3 class="mb-1">
+                    Advance Payment
+                </h3>
+
+                <small>
+                    {{ vehicle.ftl_no }} | {{ vehicle.vehicle_number }}
+                </small>
+            </div>
+
+            <span class="badge-status">
+                Active Trip
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Freight Amount
+                </div>
+
+                <div class="stat-value freight">
+                    ₹{{ vehicle.freight_amount }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Advance Paid
+                </div>
+
+                <div class="stat-value advance">
+                    ₹{{ vehicle.advance }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Balance
+                </div>
+
+                <div class="stat-value balance">
+                    ₹{{ vehicle.balance }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <div class="row">
 
-        <!-- Vehicle Details -->
+        <!-- LEFT -->
+
         <div class="col-lg-4">
 
-            <div class="card shadow-sm mb-3">
+            <!-- Vehicle -->
 
-                <div class="card-header bg-primary text-white">
-                    Vehicle Details
-                </div>
+            <div class="card card-modern mb-3">
 
                 <div class="card-body">
 
-                    <p><strong>FTL :</strong> {{ vehicle.ftl_no }}</p>
+                    <h5 class="mb-3">
+                        <i class="bi bi-truck"></i>
+                        Vehicle Details
+                    </h5>
+
+                    <p><strong>FTL:</strong> {{ vehicle.ftl_no }}</p>
 
                     <p>
-                        <strong>Vehicle :</strong>
+                        <strong>Vehicle No:</strong>
                         {{ vehicle.vehicle_number }}
                     </p>
 
                     <p>
-                        <strong>Driver :</strong>
+                        <strong>Driver No:</strong>
                         {{ vehicle.driver_number }}
-                    </p>
-
-                    <hr>
-
-                    <p>
-                        <strong>Freight :</strong>
-                        ₹{{ vehicle.freight_amount }}
-                    </p>
-
-                    <p class="text-success">
-                        <strong>Advance Paid :</strong>
-                        ₹{{ vehicle.advance }}
-                    </p>
-
-                    <p class="text-danger">
-                        <strong>Balance :</strong>
-                        ₹{{ vehicle.balance }}
                     </p>
 
                 </div>
 
             </div>
 
-            <!-- Bank Details -->
+            <!-- Bank -->
 
-            <div class="card shadow-sm mb-3">
-
-                <div class="card-header bg-success text-white">
-                    Bank Details
-                </div>
+            <div class="card card-modern mb-3">
 
                 <div class="card-body">
 
-                    <p>
-                        <strong>Beneficiary:</strong><br>
-                        {{ vehicle.beneficiary_name }}
-                    </p>
+                    <h5 class="mb-3">
+                        <i class="bi bi-bank"></i>
+                        Bank Details
+                    </h5>
 
-                    <p>
-                        <strong>Account Name:</strong><br>
-                        {{ vehicle.account_name }}
-                    </p>
+                    <div class="bank-box">
 
-                    <p>
-                        <strong>Account Number:</strong><br>
-                        {{ vehicle.account_number }}
-                    </p>
+                        <p>
+                            <strong>Beneficiary</strong><br>
+                            {{ vehicle.beneficiary_name|default:"-" }}
+                        </p>
 
-                    <p>
-                        <strong>IFSC:</strong><br>
-                        {{ vehicle.ifsc }}
-                    </p>
+                        <p>
+                            <strong>Account Number</strong>
+
+                            <div class="copy-box">
+                                {{ vehicle.account_number|default:"-" }}
+                            </div>
+                        </p>
+
+                        <p>
+                            <strong>IFSC</strong>
+
+                            <div class="copy-box">
+                                {{ vehicle.ifsc|default:"-" }}
+                            </div>
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -85,28 +254,39 @@
 
             <!-- UPI -->
 
-            <div class="card shadow-sm">
-
-                <div class="card-header bg-dark text-white">
-                    UPI Details
-                </div>
+            <div class="card card-modern">
 
                 <div class="card-body">
 
-                    <p>
-                        <strong>UPI App:</strong><br>
-                        {{ vehicle.upi_app|upper }}
-                    </p>
+                    <h5 class="mb-3">
+                        <i class="bi bi-phone"></i>
+                        UPI Details
+                    </h5>
 
-                    <p>
-                        <strong>UPI ID:</strong><br>
-                        {{ vehicle.upi_id }}
-                    </p>
+                    <div class="bank-box">
 
-                    <p>
-                        <strong>UPI Number:</strong><br>
-                        {{ vehicle.upi_number }}
-                    </p>
+                        <p>
+                            <strong>UPI App</strong><br>
+                            {{ vehicle.upi_app|upper }}
+                        </p>
+
+                        <p>
+                            <strong>UPI ID</strong>
+
+                            <div class="copy-box">
+                                {{ vehicle.upi_id|default:"-" }}
+                            </div>
+                        </p>
+
+                        <p>
+                            <strong>UPI Number</strong>
+
+                            <div class="copy-box">
+                                {{ vehicle.upi_number|default:"-" }}
+                            </div>
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -114,17 +294,20 @@
 
         </div>
 
-        <!-- Payment Form -->
+        <!-- RIGHT -->
 
         <div class="col-lg-8">
 
-            <div class="card shadow-sm mb-3">
+            <!-- FORM -->
 
-                <div class="card-header bg-success text-white">
-                    Add Advance Payment
-                </div>
+            <div class="card card-modern mb-4">
 
                 <div class="card-body">
+
+                    <h4 class="mb-4">
+                        <i class="bi bi-cash-stack"></i>
+                        Add Advance Payment
+                    </h4>
 
                     <form method="post">
 
@@ -134,25 +317,31 @@
 
                             <div class="col-md-4 mb-3">
 
-                                <label>Amount</label>
+                                <label class="form-label">
+                                    Amount
+                                </label>
 
-                                <input type="number"
-                                       step="0.01"
-                                       name="amount"
-                                       class="form-control"
-                                       required>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    name="amount"
+                                    class="form-control"
+                                    required>
 
                             </div>
 
                             <div class="col-md-4 mb-3">
 
-                                <label>Payment Mode</label>
+                                <label class="form-label">
+                                    Payment Mode
+                                </label>
 
-                                <select name="payment_mode"
-                                        class="form-select">
+                                <select
+                                    name="payment_mode"
+                                    class="form-select">
 
                                     <option value="upi">UPI</option>
-                                    <option value="bank">Bank</option>
+                                    <option value="bank">Bank Transfer</option>
                                     <option value="cash">Cash</option>
 
                                 </select>
@@ -161,11 +350,14 @@
 
                             <div class="col-md-4 mb-3">
 
-                                <label>Transaction No</label>
+                                <label class="form-label">
+                                    Transaction No
+                                </label>
 
-                                <input type="text"
-                                       name="transaction_no"
-                                       class="form-control">
+                                <input
+                                    type="text"
+                                    name="transaction_no"
+                                    class="form-control">
 
                             </div>
 
@@ -173,15 +365,20 @@
 
                         <div class="mb-3">
 
-                            <label>Remarks</label>
+                            <label class="form-label">
+                                Remarks
+                            </label>
 
-                            <textarea name="remarks"
-                                      class="form-control"></textarea>
+                            <textarea
+                                name="remarks"
+                                rows="4"
+                                class="form-control"></textarea>
 
                         </div>
 
-                        <button type="submit"
-                                class="btn btn-success">
+                        <button class="btn btn-success btn-save">
+
+                            <i class="bi bi-check-circle"></i>
 
                             Save Advance Payment
 
@@ -193,64 +390,75 @@
 
             </div>
 
-            <!-- History -->
+            <!-- HISTORY -->
 
-            <div class="card shadow-sm">
-
-                <div class="card-header bg-secondary text-white">
-
-                    Advance Payment History
-
-                </div>
+            <div class="card card-modern">
 
                 <div class="card-body">
 
-                    <table class="table table-bordered">
+                    <h4 class="mb-3">
+                        Payment History
+                    </h4>
 
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Mode</th>
-                                <th>Txn No</th>
-                            </tr>
-                        </thead>
+                    <div class="table-responsive">
 
-                        <tbody>
+                        <table class="table table-hover history-table align-middle">
 
-                            {% for p in advance_payments %}
+                            <thead>
 
-                            <tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Mode</th>
+                                    <th>Transaction No</th>
+                                    <th>User</th>
+                                </tr>
 
-                                <td>{{ p.date }}</td>
+                            </thead>
 
-                                <td>
-                                    ₹{{ p.amount }}
-                                </td>
+                            <tbody>
 
-                                <td>
-                                    {{ p.payment_mode }}
-                                </td>
+                                {% for p in advance_payments %}
 
-                                <td>
-                                    {{ p.transaction_no }}
-                                </td>
+                                <tr>
 
-                            </tr>
+                                    <td>{{ p.date }}</td>
 
-                            {% empty %}
+                                    <td class="fw-bold text-success">
+                                        ₹{{ p.amount }}
+                                    </td>
 
-                            <tr>
-                                <td colspan="4" class="text-center">
-                                    No payments found
-                                </td>
-                            </tr>
+                                    <td>
+                                        {{ p.payment_mode|upper }}
+                                    </td>
 
-                            {% endfor %}
+                                    <td>
+                                        {{ p.transaction_no }}
+                                    </td>
 
-                        </tbody>
+                                    <td>
+                                        {{ p.created_by }}
+                                    </td>
 
-                    </table>
+                                </tr>
+
+                                {% empty %}
+
+                                <tr>
+
+                                    <td colspan="5" class="text-center text-muted">
+                                        No advance payments found
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
 
