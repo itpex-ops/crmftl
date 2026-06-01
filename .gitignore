@@ -8,7 +8,7 @@ __pycache__/
 local_settings.py
 db.sqlite3
 media/
-
+staticfiles/
 
 # Environment variables
 .env
@@ -43,8 +43,7 @@ dist/
 # */migrations/*
 # !*/migrations/__init__.py
 
-# Static collected files
-/static/
+
 
 # Celery / Redis (if used)
 celerybeat-schedule
