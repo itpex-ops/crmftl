@@ -10,6 +10,31 @@ import json
 from django.contrib.auth import get_user_model
 from decimal import Decimal
 User = get_user_model()
+from django.http import JsonResponse
+from customers.models import ExCustomer
+
+
+def search_customer(request):
+
+    customer_code = request.GET.get("customer_code")
+
+    customer = ExCustomer.objects.filter(
+        customer_code=customer_code
+    ).first()
+
+    if customer:
+
+        return JsonResponse({
+            "found": True,
+            "id": customer.id,
+            "name": customer.name,
+            "phone1": customer.phone1,
+            "email": customer.email,
+        })
+
+    return JsonResponse({
+        "found": False
+    })
 
 @login_required
 def edit_enquiry(request, id):
@@ -412,6 +437,7 @@ def create_enquiry(request):
             "vehicle_types": vehicle_types
         }
     )
+
 @login_required
 def enquiry_list(request):
     user = request.user

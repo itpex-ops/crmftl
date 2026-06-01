@@ -1,107 +1,217 @@
 {% extends 'layouts/base.html' %}
-
 {% block content %}
 
-<div class="container mt-4">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <div class="card shadow-sm">
+<style>
+body{
+    background:#f5f7fb;
+}
 
-        <div class="card-header bg-primary text-white">
+.page-header{
+    background: linear-gradient(135deg, #db8017,#cca644);
+    color: white;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
 
-            <h5 class="mb-0">
-                Balance Payment
-            </h5>
+.card-modern{
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
 
-        </div>
+.stat-card{
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
 
-        <div class="card-body">
+.stat-title{
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+}
 
-            <div class="mb-3">
+.stat-value{
+    font-size: 26px;
+    font-weight: 700;
+}
 
-                <strong>Vehicle:</strong>
-                {{ vehicle.vehicle_number }}
+.balance{
+    color: #dc2626;
+}
 
-            </div>
+.btn-modern{
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-weight: 600;
+}
 
-            <form method="post">
+.table thead{
+    background: #f8fafc;
+}
 
-                {% csrf_token %}
+.badge-mode{
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #eef2ff;
+    color: #3730a3;
+}
 
-                <div class="mb-3">
+.section-title{
+    font-weight: 700;
+    font-size: 16px;
+}
+</style>
 
-                    <label class="form-label">
-                        Amount
-                    </label>
+<div class="container-fluid py-3">
 
-                    <input type="number"
-                           step="0.01"
-                           name="amount"
-                           class="form-control"
-                           required>
+<!-- HEADER -->
+<div class="page-header d-flex justify-content-between align-items-center">
 
-                </div>
+    <div>
+        <h4 class="mb-1">Balance Payment</h4>
+        <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
+    </div>
 
-                <div class="mb-3">
+    <div class="d-flex gap-2">
 
-                    <label class="form-label">
-                        Payment Mode
-                    </label>
+        <a href="{% url 'pay_vehicle_advance' vehicle.id %}"
+           class="btn btn-success btn-modern">
 
-                    <select name="payment_mode"
-                            class="form-select">
-
-                        <option value="upi">UPI</option>
-                        <option value="bank">Bank Transfer</option>
-                        <option value="cash">Cash</option>
-
-                    </select>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Transaction Number
-                    </label>
-
-                    <input type="text"
-                           name="transaction_no"
-                           class="form-control">
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Remarks
-                    </label>
-
-                    <textarea name="remarks"
-                              rows="3"
-                              class="form-control"></textarea>
-
-                </div>
-
-                <button type="submit"
-                        class="btn btn-primary">
-
-                    <i class="bi bi-wallet2"></i>
-                    Save Balance Payment
-
-                </button>
-
-                <a href="{% url 'vehicle_payments' vehicle.id %}"
-                   class="btn btn-secondary">
-
-                    Cancel
-
-                </a>
-
-            </form>
-
-        </div>
+            <i class="bi bi-cash-stack"></i> Advance
+        </a>
 
     </div>
+
+</div>
+
+<!-- SUMMARY -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <div class="stat-card">
+            <div class="stat-title">Total Freight</div>
+            <div class="stat-value">
+                ₹{{ vehicle.freight_amount|default:0 }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-card">
+            <div class="stat-title">Pending Balance</div>
+            <div class="stat-value balance">
+                ₹{{ vehicle.remaining_balance_amount }}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+<!-- FORM -->
+<div class="col-lg-5">
+
+<div class="card card-modern">
+<div class="card-body">
+
+<h5 class="mb-4">Add Balance Payment</h5>
+
+<form method="post">
+{% csrf_token %}
+
+<div class="mb-3">
+<label>Amount</label>
+<input type="number" step="0.01" name="amount" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label>Payment Mode</label>
+<select name="payment_mode" class="form-select">
+<option value="upi">UPI</option>
+<option value="bank">Bank</option>
+<option value="cash">Cash</option>
+</select>
+</div>
+
+<div class="mb-3">
+<label>Transaction No</label>
+<input type="text" name="transaction_no" class="form-control">
+</div>
+
+<div class="mb-3">
+<label>Remarks</label>
+<textarea name="remarks" class="form-control"></textarea>
+</div>
+
+<button class="btn btn-primary btn-modern w-100">
+<i class="bi bi-wallet2"></i> Save Balance Payment
+</button>
+
+</form>
+
+</div>
+</div>
+
+</div>
+
+<!-- HISTORY -->
+<div class="col-lg-7">
+
+<div class="card card-modern">
+<div class="card-body">
+
+<div class="section-title text-primary mb-3">
+Balance Payment History
+</div>
+
+<table class="table table-hover align-middle">
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Amount</th>
+<th>Mode</th>
+<th>Txn No</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for p in balance_payments %}
+<tr>
+<td>{{ p.created_at|date:"d M Y" }}</td>
+<td class="fw-bold text-primary">₹{{ p.amount }}</td>
+<td>
+<span class="badge-mode">{{ p.payment_mode|upper }}</span>
+</td>
+<td>{{ p.transaction_no }}</td>
+</tr>
+{% empty %}
+<tr>
+<td colspan="4" class="text-center text-muted">
+No balance payments found
+</td>
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+</div>
+
+</div>
+
+</div>
 
 </div>
 

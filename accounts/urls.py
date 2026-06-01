@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
 
     # 📊 Accounts Dashboard
-    path('', views.accounts_dashboard, name='accounts_dashboard'),
+    #path('', views.accounts_dashboard, name='accounts_dashboard'),
 
     # 👤 CUSTOMER ACCOUNTS (summary)
     path('customer/', views.customer_accounts, name='customer_accounts'),
@@ -17,7 +17,7 @@ urlpatterns = [
     path('vehicle-ledger/<int:vehicle_id>/',views.vehicle_ledger,name='vehicle_ledger'),
     path('edit-vehicle-account/<int:vehicle_id>/',views.edit_vehicle_account,name='edit_vehicle_account'),
     # 🏦 BANK ACCOUNTS
-    path('bank/', views.bank_accounts, name='bank_accounts'),
+    #path('bank/', views.bank_accounts, name='bank_accounts'),
     path('customer-edit/<int:enquiry_id>/', views.edit_customer_account, name='edit_customer_account'),
     path('customer-payment/<int:enquiry_id>/', views.receive_customer_payment, name='receive_customer_payment'),
 

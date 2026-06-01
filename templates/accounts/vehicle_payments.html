@@ -6,7 +6,7 @@
 <style>
 
 .page-header{
-    background: linear-gradient(135deg, #0f172a, #1e293b);
+    background: linear-gradient(135deg, #db8017,#cca644);
     color: white;
     padding: 22px;
     border-radius: 16px;
@@ -23,8 +23,8 @@
     border: none;
     border-radius: 16px;
     padding: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     background: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
 .stat-title{
@@ -36,10 +36,6 @@
 .stat-value{
     font-size: 26px;
     font-weight: 700;
-}
-
-.advance{
-    color: #16a34a;
 }
 
 .balance{
@@ -64,9 +60,12 @@
     color: #3730a3;
 }
 
-.section-title{
-    font-weight: 700;
-    font-size: 16px;
+.warning-box{
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
 }
 
 </style>
@@ -77,211 +76,150 @@
     <div class="page-header d-flex justify-content-between align-items-center">
 
         <div>
-
-            <h4 class="mb-1">
-                Vehicle Payments
-            </h4>
-
-            <small>
-                {{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}
-            </small>
-
+            <h4 class="mb-1">Balance Payment</h4>
+            <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
         </div>
 
-        <div class="d-flex gap-2">
-
-            <a href="{% url 'pay_vehicle_advance' vehicle.id %}"
-               class="btn btn-success btn-modern">
-
-                <i class="bi bi-cash-stack"></i>
-                Advance
-
-            </a>
-
-            <a href="{% url 'pay_vehicle_balance' vehicle.id %}"
-               class="btn btn-primary btn-modern">
-
-                <i class="bi bi-wallet2"></i>
-                Balance
-
-            </a>
-
-        </div>
+        <a href="{% url 'vehicle_payments' vehicle.id %}"
+           class="btn btn-warning btn-modern">
+            <i class="bi bi-cash-stack"></i> Advance
+        </a>
 
     </div>
 
-    <!-- STATS -->
+    <!-- OVERPAY WARNING -->
+    {% if vehicle.remaining_balance_amount < 0 %}
+    <div class="warning-box mb-3">
+        ⚠️ Overpayment detected! Paid amount exceeds total freight.
+    </div>
+    {% endif %}
 
+    <!-- SUMMARY -->
     <div class="row g-3 mb-4">
 
         <div class="col-md-6">
-
             <div class="stat-card">
-
-                <div class="stat-title">
-                    Total Advance Paid
-                </div>
-
-                <div class="stat-value advance">
-                    ₹{{ total_advance }}
-                </div>
-
+                <div class="stat-title">Total Freight</div>
+                <div class="stat-value">₹{{ vehicle.freight_amount|floatformat:2 }}</div>
             </div>
-
         </div>
 
         <div class="col-md-6">
-
             <div class="stat-card">
-
-                <div class="stat-title">
-                    Total Balance Paid
-                </div>
-
+                <div class="stat-title">Pending Balance</div>
                 <div class="stat-value balance">
-                    ₹{{ total_balance }}
+                    ₹{{ vehicle.remaining_balance_amount|floatformat:2 }}
                 </div>
-
             </div>
-
         </div>
 
     </div>
 
-    <div class="row g-3">
+    <div class="row">
 
-        <!-- ADVANCE -->
-        <div class="col-lg-6">
+        <!-- FORM -->
+        <div class="col-lg-5">
 
             <div class="card card-modern">
-
                 <div class="card-body">
 
-                    <div class="section-title text-success mb-3">
-                        <i class="bi bi-cash-stack"></i>
-                        Advance Payments
-                    </div>
+                    <h5 class="mb-4">Add Balance Payment</h5>
 
-                    <div class="table-responsive">
+                    <form method="post">
+                        {% csrf_token %}
 
-                        <table class="table table-hover align-middle">
+                        <div class="mb-3">
+                            <label>Amount</label>
+                            <input type="number" step="0.01" name="amount"
+                                   class="form-control" required>
+                        </div>
 
-                            <thead>
+                        <div class="mb-3">
+                            <label>Payment Mode</label>
+                            <select name="payment_mode" class="form-select">
+                                <option value="upi">UPI</option>
+                                <option value="bank">Bank</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
 
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Mode</th>
-                                    <th>Amount</th>
-                                </tr>
+                        <div class="mb-3">
+                            <label>Transaction No</label>
+                            <input type="text" name="transaction_no" class="form-control">
+                        </div>
 
-                            </thead>
+                        <div class="mb-3">
+                            <label>Remarks</label>
+                            <textarea name="remarks" class="form-control"></textarea>
+                        </div>
 
-                            <tbody>
+                        <button class="btn btn-primary btn-modern w-100">
+                            <i class="bi bi-wallet2"></i> Save Balance Payment
+                        </button>
 
-                                {% for p in advances %}
-
-                                <tr>
-
-                                    <td>{{ p.date }}</td>
-
-                                    <td>
-                                        <span class="badge-mode">
-                                            {{ p.payment_mode|upper }}
-                                        </span>
-                                    </td>
-
-                                    <td class="fw-bold text-success">
-                                        ₹{{ p.amount }}
-                                    </td>
-
-                                </tr>
-
-                                {% empty %}
-
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        No advance payments found
-                                    </td>
-                                </tr>
-
-                                {% endfor %}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
+                    </form>
 
                 </div>
-
             </div>
 
         </div>
 
-        <!-- BALANCE -->
-        <div class="col-lg-6">
+        <!-- HISTORY -->
+        <div class="col-lg-7">
 
             <div class="card card-modern">
-
                 <div class="card-body">
 
                     <div class="section-title text-primary mb-3">
-                        <i class="bi bi-wallet2"></i>
-                        Balance Payments
+                        Balance Payment History
                     </div>
 
-                    <div class="table-responsive">
+                    <table class="table table-hover align-middle">
 
-                        <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Mode</th>
+                                <th>Txn No</th>
+                            </tr>
+                        </thead>
 
-                            <thead>
+                        <tbody>
 
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Mode</th>
-                                    <th>Amount</th>
-                                </tr>
+                            {% for p in balances %}
 
-                            </thead>
+                            <tr>
+                                <td>{{ p.created_at|date:"d-m-Y H:i" }}</td>
 
-                            <tbody>
+                                <td class="fw-bold text-primary">
+                                    ₹{{ p.amount|floatformat:2 }}
+                                </td>
 
-                                {% for p in balances %}
+                                <td>
+                                    <span class="badge-mode">
+                                        {{ p.payment_mode|upper }}
+                                    </span>
+                                </td>
 
-                                <tr>
+                                <td>{{ p.transaction_no }}</td>
+                            </tr>
 
-                                    <td>{{ p.date }}</td>
+                            {% empty %}
 
-                                    <td>
-                                        <span class="badge-mode">
-                                            {{ p.payment_mode|upper }}
-                                        </span>
-                                    </td>
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    No balance payments found
+                                </td>
+                            </tr>
 
-                                    <td class="fw-bold text-primary">
-                                        ₹{{ p.amount }}
-                                    </td>
+                            {% endfor %}
 
-                                </tr>
+                        </tbody>
 
-                                {% empty %}
-
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        No balance payments found
-                                    </td>
-                                </tr>
-
-                                {% endfor %}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
+                    </table>
 
                 </div>
-
             </div>
 
         </div>

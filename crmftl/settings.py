@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'vehicles',
     'manual_order',
     'channels',
+    'customers'
    
 ]
 AUTH_USER_MODEL = 'authentications.User'

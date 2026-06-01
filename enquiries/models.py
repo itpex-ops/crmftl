@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from customers.models import ExCustomer
 
 VEHICLE_TYPES = [
     # OPEN BODY
@@ -51,6 +52,22 @@ VEHICLE_TYPES = [
 ]
 
 class Enquiry(models.Model):
+
+    customer = models.ForeignKey(
+        ExCustomer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="enquiries"
+    )
+
+    customer_code = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+
     enquiry_no = models.CharField(max_length=20, unique=True, blank=True)
 
     customer_name = models.CharField(max_length=200)
@@ -145,6 +162,10 @@ class Enquiry(models.Model):
 
     def __str__(self):
         return f"{self.enquiry_no} - {self.customer_name}"
+    
+    @property
+    def is_existing_customer(self):
+        return self.customer_id is not None
 
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

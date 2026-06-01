@@ -141,6 +141,43 @@ from django.db.models import Count, Sum
 
 from .models import Vehicle, Tracking
 
+
+
+def tracking_view(request):
+    query = request.GET.get("q")
+    tracking = None
+    vehicle = None
+
+    if query:
+        tracking = Tracking.objects.select_related("order").filter(
+            lr_no__icontains=query
+        ).first()
+
+        if not tracking:
+            tracking = Tracking.objects.select_related("order").filter(
+                order__ftl_no__icontains=query
+            ).first()
+
+        if tracking:
+            vehicle = tracking.order  # adjust if your FK is different
+
+    return render(request, "tracking.html", {
+        "tracking": tracking,
+        "vehicle": vehicle
+    })
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+from .models import Tracking, TrackingDocument
+
+# vehicles/views.py
+
+from django.shortcuts import render
+from django.db.models import Count, Sum
+
+from .models import Vehicle, Tracking
+
 def vehicles_dashboard(request):
 
     total_vehicles = Vehicle.objects.count()

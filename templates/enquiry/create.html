@@ -1,10 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-
 {% block content %}
 
-<div class="container-fluid mt-3">
 
+<div class="container-fluid mt-3">
     {% if messages %}
     <div class="mb-3">
         {% for message in messages %}
@@ -15,6 +14,51 @@
         {% endfor %}
     </div>
     {% endif %}
+    <!-- Exsisting Customer -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+
+            <form method="GET">
+                <div class="row">
+
+                    <div class="col-md-10">
+                        <label class="form-label">
+                            Existing Customer Code
+                        </label>
+
+                        <input type="text" name="customer_code" class="form-control" placeholder="CUST00001"
+                            value="{{ customer_code }}">
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    {% if customer %}
+
+    <div class="alert alert-success">
+        <strong>Customer Found:</strong>
+        {{ customer.customer_code }} - {{ customer.name }}
+    </div>
+
+    <input type="hidden" name="customer_id" value="{{ customer.id }}">
+
+    {% elif customer_code %}
+
+    <div class="alert alert-warning">
+        Customer not found. Please enter customer details manually.
+    </div>
+
+   {% else %}
+ 
 
     <!-- HEADER -->
     <div class="card shadow-sm border-0 mb-4 p-4">
@@ -24,6 +68,9 @@
 
     <form method="POST">
         {% csrf_token %}
+        {% if customer %}
+        <input type="hidden" name="customer_id" value="{{ customer.id }}">
+        {% endif %}
 
         <div class="row g-4">
 
@@ -38,20 +85,39 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Customer Name</label>
-                            <input type="text" name="customer_name" class="form-control" required>
+                            <input type="text" name="customer_name" class="form-control"
+                                value="{{ customer.name|default:'' }}" required>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Mobile Number</label>
                             <input type="tel" name="customer_contact" class="form-control" maxlength="10"
-                                pattern="[0-9]{10}" inputmode="numeric" required
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}"
+                                required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control">
+                            <input type="email" name="email" class="form-control"
+                                value="{{ customer.email|default:'' }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">GST Number</label>
+                            <input type="text" name="gst_number" class="form-control"
+                                value="{{ customer.gst_number|default:'' }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" name="pincode" class="form-control"
+                                value="{{ customer.pincode|default:'' }}">
                         </div>
 
                         <div class="col-md-3">
@@ -283,6 +349,7 @@
             </div>
         </div>
     </form>
+ {% endif %}
 </div>
 
 <style>
@@ -365,138 +432,138 @@
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const lengthInput =
-        document.querySelector('[name="length"]');
+        const lengthInput =
+            document.querySelector('[name="length"]');
 
-    const breadthInput =
-        document.querySelector('[name="breadth"]');
+        const breadthInput =
+            document.querySelector('[name="breadth"]');
 
-    const heightInput =
-        document.querySelector('[name="height"]');
+        const heightInput =
+            document.querySelector('[name="height"]');
 
-    const unitInput =
-        document.querySelector('[name="dimension_unit"]');
+        const unitInput =
+            document.querySelector('[name="dimension_unit"]');
 
-    const dimensionBox =
-        document.getElementById("dimensionBox");
+        const dimensionBox =
+            document.getElementById("dimensionBox");
 
-    function calculateDimension() {
+        function calculateDimension() {
 
-        const unit = unitInput.value;
+            const unit = unitInput.value;
 
-        // =========================
-        // SHOW / HIDE
-        // =========================
+            // =========================
+            // SHOW / HIDE
+            // =========================
 
-        if (unit !== "") {
+            if (unit !== "") {
 
-            dimensionBox.classList.remove("d-none");
+                dimensionBox.classList.remove("d-none");
 
-        } else {
+            } else {
 
-            dimensionBox.classList.add("d-none");
+                dimensionBox.classList.add("d-none");
 
-            return;
+                return;
+            }
+
+            // =========================
+            // INPUT VALUES
+            // =========================
+
+            let length =
+                parseFloat(lengthInput.value) || 0;
+
+            let breadth =
+                parseFloat(breadthInput.value) || 0;
+
+            let height =
+                parseFloat(heightInput.value) || 0;
+
+            // =========================
+            // CALCULATIONS
+            // =========================
+
+            const volume =
+                length * breadth * height;
+
+            let volumetric = 0;
+
+            if (unit === "cm") {
+
+                volumetric = volume / 4500;
+            }
+
+            else if (unit === "inch") {
+
+                volumetric = volume / 274.6;
+            }
+
+            else if (unit === "feet") {
+
+                volumetric = volume / 0.1589;
+            }
+
+            else if (unit === "meter") {
+
+                volumetric = volume / 0.0045;
+            }
+
+            // =========================
+            // DISPLAY
+            // =========================
+
+            document
+                .getElementById("convertedDimension")
+                .innerText =
+
+                `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} ${unit.toUpperCase()}`;
+
+            document
+                .getElementById("volumeResult")
+                .innerText =
+
+                volume.toFixed(3);
+
+            document
+                .getElementById("volumetric_weight")
+                .innerText =
+
+                volumetric.toFixed(3) + " KG";
         }
 
         // =========================
-        // INPUT VALUES
+        // EVENTS
         // =========================
 
-        let length =
-            parseFloat(lengthInput.value) || 0;
+        unitInput.addEventListener(
+            "change",
+            calculateDimension
+        );
 
-        let breadth =
-            parseFloat(breadthInput.value) || 0;
+        lengthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
-        let height =
-            parseFloat(heightInput.value) || 0;
+        breadthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
-        // =========================
-        // CALCULATIONS
-        // =========================
-
-        const volume =
-            length * breadth * height;
-
-        let volumetric = 0;
-
-        if (unit === "cm") {
-
-            volumetric = volume / 4500;
-        }
-
-        else if (unit === "inch") {
-
-            volumetric = volume / 274.6;
-        }
-
-        else if (unit === "feet") {
-
-            volumetric = volume / 0.1589;
-        }
-
-        else if (unit === "meter") {
-
-            volumetric = volume / 0.0045;
-        }
+        heightInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
         // =========================
-        // DISPLAY
+        // LOAD EXISTING VALUES
         // =========================
 
-        document
-            .getElementById("convertedDimension")
-            .innerText =
+        calculateDimension();
 
-            `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} ${unit.toUpperCase()}`;
-
-        document
-            .getElementById("volumeResult")
-            .innerText =
-
-            volume.toFixed(3);
-
-        document
-            .getElementById("volumetric_weight")
-            .innerText =
-
-            volumetric.toFixed(3) + " KG";
-    }
-
-    // =========================
-    // EVENTS
-    // =========================
-
-    unitInput.addEventListener(
-        "change",
-        calculateDimension
-    );
-
-    lengthInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    breadthInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    heightInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    // =========================
-    // LOAD EXISTING VALUES
-    // =========================
-
-    calculateDimension();
-
-});
+    });
 
 </script>
 <script>

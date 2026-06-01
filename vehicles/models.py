@@ -2,7 +2,7 @@
 from django.db import models
 from django.db import transaction
 from decimal import Decimal
-
+from django.db.models import Sum
 from orders.models import Order
 from manual_order.models import ManualOrder
 
@@ -12,7 +12,7 @@ class Vehicle(models.Model):
     # =========================
     # ORDER RELATIONS
     # =========================
-
+    is_overpaid = models.BooleanField(default=False)
     order = models.OneToOneField(
         Order,
         on_delete=models.CASCADE,
@@ -245,10 +245,93 @@ class Vehicle(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+     
+    @property
+    def total_advance_paid(self):
+        return self.vehicletransaction_set.filter(
+            transaction_type="advance"
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
 
-    # =========================
-    # SAVE
-    # =========================
+    @property
+    def total_balance_paid(self):
+        return self.vehicletransaction_set.filter(
+            transaction_type="balance"
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    
+    @property
+    def total_paid(self):
+        return self.total_advance_paid + self.total_balance_paid
+
+    def clean_accounting(self):
+
+        total_freight = self.total_freight or Decimal("0")
+        total_paid = self.total_paid or Decimal("0")
+
+        if total_paid > total_freight:
+            self.is_overpaid = True
+        else:
+            self.is_overpaid = False
+
+    @property
+    def computed_balance(self):
+        return self.remaining_balance_amount
+    
+    @property
+    def tracking(self):
+        if self.order:
+            return getattr(self.order, "tracking", None)
+        if self.manual_order:
+            return getattr(self.manual_order, "tracking", None)
+        return None
+
+    from decimal import Decimal
+
+    @property
+    def total_paid(self):
+        return self.total_advance_paid + self.total_balance_paid
+
+
+    @property
+    def remaining_balance_amount(self):
+        return (self.total_freight or Decimal("0")) - (self.total_paid or Decimal("0"))
+
+
+    @property
+    def is_overpaid(self):
+        return self.remaining_balance_amount < 0
+
+
+    @property
+    def is_payment_completed(self):
+        return self.remaining_balance_amount <= 0
+    @property
+    def is_trip_completed(self):
+        tracking = self.tracking
+
+        delivered = getattr(tracking, "delivered", False) if tracking else False
+        settled = getattr(tracking, "settled", False) if tracking else False
+
+        return bool(
+            delivered and settled and self.remaining_balance_amount <= 0
+        )
+
+    @property
+    def payment_status(self):
+
+        if self.is_overpaid:
+            return "OVERPAID ⚠️"
+
+        if self.remaining_balance_amount == 0:
+            return "SETTLED"
+
+        if self.remaining_balance_amount > 0:
+            return "PENDING"
+
+        return "INVALID"
+
+    @property
+    def is_locked(self):
+        return self.is_trip_completed or self.is_payment_completed
 
     def save(self, *args, **kwargs):
 
@@ -292,12 +375,18 @@ class Vehicle(models.Model):
         # TOTAL FREIGHT
         # =========================
 
+        # recompute totals first
         self.total_freight = (
             Decimal(self.freight_amount or 0)
             + Decimal(self.halting or 0)
             + Decimal(self.loading_unloading or 0)
             + Decimal(self.brokerage or 0)
         )
+
+        self.balance = Decimal(self.freight_amount or 0) - Decimal(self.advance or 0)
+
+        # ACCOUNTING CHECK
+        self.clean_accounting()
 
         # =========================
         # AUTO FTL NUMBER
@@ -332,9 +421,6 @@ class Vehicle(models.Model):
             self.ftl_no = f"FTL{new_num:03d}"
 
         super().save(*args, **kwargs)
-            # =========================
-    # HELPERS
-    # =========================
 
     @property
     def tracking(self):
@@ -404,11 +490,6 @@ class Vehicle(models.Model):
             return "POD Received"
 
         return "Pending"
-
-
-    # =========================
-    # STRING
-    # =========================
 
     def __str__(self):
         return f"{self.ftl_no} - {self.order_no}"

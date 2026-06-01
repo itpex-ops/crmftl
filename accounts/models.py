@@ -61,7 +61,7 @@ class VehicleTransaction(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.vehicle.vehicle_no
+        return self.vehicle.vehicle_number
 
 class BankTransaction(models.Model):
     TYPE_CHOICES = [

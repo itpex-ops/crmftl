@@ -199,7 +199,7 @@
                         <!-- STATUS -->
                         <td>
 
-                            {% if v.balance|default:0 == 0 %}
+                            {% if v.is_locked %}
 
                             <span class="badge-soft badge-paid">Completed</span>
 
@@ -220,45 +220,13 @@
 
                             <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
                                 class="btn btn-sm btn-outline-primary action-btn">
-                                <i class="bi bi-journal-text"></i> Ledger
+                                Ledger
                             </a>
+
                             <a href="{% url 'vehicle_payments' v.vehicle_id %}"
                                 class="btn btn-sm btn-outline-primary action-btn">
-                                <i class="bi bi-journal-text"></i> Payments
+                                Payments
                             </a>
-
-                            <!-- {% if v.balance|default:0 == 0 %}
-
-                            <button class="btn btn-sm btn-secondary action-btn" disabled>
-                                <i class="bi bi-lock-fill"></i> Advance
-                            </button>
-
-                            <button class="btn btn-sm btn-secondary action-btn" disabled>
-                                <i class="bi bi-lock-fill"></i> Balance
-                            </button>
-
-                            <button class="btn btn-sm btn-secondary action-btn" disabled>
-                                <i class="bi bi-lock-fill"></i> Edit
-                            </button>
-
-                            {% else %}
-
-                            <a href="{% url 'pay_vehicle_advance' v.vehicle_id %}"
-                                class="btn btn-sm btn-outline-success action-btn">
-                                <i class="bi bi-cash-stack"></i> Advance
-                            </a>
-
-                            <a href="{% url 'pay_vehicle_balance' v.vehicle_id %}"
-                                class="btn btn-sm btn-outline-dark action-btn">
-                                <i class="bi bi-wallet2"></i> Balance
-                            </a>
-
-                            <a href="{% url 'edit_vehicle_account' v.vehicle_id %}"
-                                class="btn btn-sm btn-outline-warning action-btn">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-
-                            {% endif %} -->
 
                         </td>
 
