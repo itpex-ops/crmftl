@@ -1,122 +1,10 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
-
+{% load static %}
 <!-- =========================
 PAGE STYLES
 ========================= -->
 
-<style>
-
-body{
-    background:#f5f7fb;
-}
-
-.page-header{
-    background:linear-gradient(135deg,#2563eb,#1e40af);
-    border-radius:18px;
-    padding:22px;
-    color:#fff;
-    margin-bottom:20px;
-}
-
-.card-box{
-    background:#fff;
-    border-radius:18px;
-    padding:24px;
-    box-shadow:0 4px 14px rgba(0,0,0,.06);
-    margin-bottom:20px;
-}
-
-.section-title{
-    font-size:15px;
-    font-weight:700;
-    margin-bottom:18px;
-    color:#0f172a;
-    border-left:4px solid #2563eb;
-    padding-left:10px;
-}
-
-label{
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:6px;
-    color:#334155;
-}
-
-.form-control,
-.form-select{
-    border-radius:10px;
-    min-height:44px;
-    border:1px solid #dbe2ea;
-}
-
-.form-control:focus,
-.form-select:focus{
-    box-shadow:none;
-    border-color:#2563eb;
-}
-
-textarea.form-control{
-    min-height:90px;
-}
-
-.btn-save{
-    background:#2563eb;
-    border:none;
-    padding:11px 22px;
-    border-radius:10px;
-    font-weight:600;
-}
-
-.btn-save:hover{
-    background:#1e40af;
-}
-
-.status-badge{
-    padding:6px 14px;
-    border-radius:30px;
-    font-size:12px;
-    font-weight:600;
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.route-box{
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:12px;
-    padding:14px;
-    margin-bottom:12px;
-}
-
-.dimension-result-box{
-    border:1px solid #e2e8f0;
-    border-radius:14px;
-    background:#f8fafc;
-    padding:18px;
-}
-
-.result-title{
-    font-size:15px;
-    font-weight:700;
-    margin-bottom:14px;
-    color:#0f172a;
-}
-
-.result-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-    font-size:14px;
-}
-
-.result-row strong{
-    color:#1e293b;
-    font-weight:700;
-}
-
-</style>
 
 <div class="container-fluid mt-3">
 
@@ -178,10 +66,8 @@ textarea.form-control{
                                 Customer Name
                             </label>
 
-                            <input type="text"
-                                   name="customer_name"
-                                   class="form-control"
-                                   value="{{ enquiry.customer_name|default_if_none:'' }}">
+                            <input type="text" name="customer_name" class="form-control"
+                                value="{{ enquiry.customer_name|default_if_none:'' }}">
 
                         </div>
 
@@ -191,10 +77,8 @@ textarea.form-control{
                                 Customer Contact
                             </label>
 
-                            <input type="text"
-                                   name="customer_contact"
-                                   class="form-control"
-                                   value="{{ enquiry.customer_contact|default_if_none:'' }}">
+                            <input type="text" name="customer_contact" class="form-control"
+                                value="{{ enquiry.customer_contact|default_if_none:'' }}">
 
                         </div>
 
@@ -204,10 +88,8 @@ textarea.form-control{
                                 Email
                             </label>
 
-                            <input type="email"
-                                   name="email"
-                                   class="form-control"
-                                   value="{{ enquiry.email|default_if_none:'' }}">
+                            <input type="email" name="email" class="form-control"
+                                value="{{ enquiry.email|default_if_none:'' }}">
 
                         </div>
 
@@ -217,10 +99,8 @@ textarea.form-control{
                                 Lead Source
                             </label>
 
-                            <input type="text"
-                                   name="lead_source"
-                                   class="form-control"
-                                   value="{{ enquiry.lead_source|default_if_none:'' }}">
+                            <input type="text" name="lead_source" class="form-control"
+                                value="{{ enquiry.lead_source|default_if_none:'' }}">
 
                         </div>
 
@@ -230,10 +110,8 @@ textarea.form-control{
                                 Reference Name
                             </label>
 
-                            <input type="text"
-                                   name="reference_name"
-                                   class="form-control"
-                                   value="{{ enquiry.reference_name|default_if_none:'' }}">
+                            <input type="text" name="reference_name" class="form-control"
+                                value="{{ enquiry.reference_name|default_if_none:'' }}">
 
                         </div>
 
@@ -259,8 +137,7 @@ textarea.form-control{
                                 Vehicle Type
                             </label>
 
-                            <select name="vehicle_type"
-                                    class="form-select">
+                            <select name="vehicle_type" class="form-select">
 
                                 <option value="">
                                     Select Vehicle
@@ -268,8 +145,7 @@ textarea.form-control{
 
                                 {% for value, label in vehicle_types %}
 
-                                <option value="{{ value }}"
-                                    {% if enquiry.vehicle_type == value %}selected{% endif %}>
+                                <option value="{{ value }}" {% if enquiry.vehicle_type == value %}selected{% endif %}>
 
                                     {{ label }}
 
@@ -288,7 +164,7 @@ textarea.form-control{
                             </label>
 
                             <textarea name="vehicle_description"
-                                      class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }}</textarea>
+                                class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }}</textarea>
 
                         </div>
 
@@ -298,10 +174,8 @@ textarea.form-control{
                                 Pickups
                             </label>
 
-                            <input type="number"
-                                   name="pickups"
-                                   class="form-control"
-                                   value="{{ enquiry.pickups|default_if_none:'' }}">
+                            <input type="number" name="pickups" class="form-control"
+                                value="{{ enquiry.pickups|default_if_none:'' }}">
 
                         </div>
 
@@ -311,10 +185,8 @@ textarea.form-control{
                                 Deliveries
                             </label>
 
-                            <input type="number"
-                                   name="deliveries"
-                                   class="form-control"
-                                   value="{{ enquiry.deliveries|default_if_none:'' }}">
+                            <input type="number" name="deliveries" class="form-control"
+                                value="{{ enquiry.deliveries|default_if_none:'' }}">
 
                         </div>
 
@@ -324,10 +196,8 @@ textarea.form-control{
                                 KMS
                             </label>
 
-                            <input type="text"
-                                   name="kms"
-                                   class="form-control"
-                                   value="{{ enquiry.kms|default_if_none:'' }}">
+                            <input type="text" name="kms" class="form-control"
+                                value="{{ enquiry.kms|default_if_none:'' }}">
 
                         </div>
 
@@ -353,10 +223,8 @@ textarea.form-control{
                                 Material
                             </label>
 
-                            <input type="text"
-                                   name="material"
-                                   class="form-control"
-                                   value="{{ enquiry.material|default_if_none:'' }}">
+                            <input type="text" name="material" class="form-control"
+                                value="{{ enquiry.material|default_if_none:'' }}">
 
                         </div>
 
@@ -366,10 +234,8 @@ textarea.form-control{
                                 Pieces
                             </label>
 
-                            <input type="number"
-                                   name="pieces"
-                                   class="form-control"
-                                   value="{{ enquiry.pieces|default_if_none:'' }}">
+                            <input type="number" name="pieces" class="form-control"
+                                value="{{ enquiry.pieces|default_if_none:'' }}">
 
                         </div>
 
@@ -379,11 +245,8 @@ textarea.form-control{
                                 Tonnage
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="tonnage"
-                                   class="form-control"
-                                   value="{{ enquiry.tonnage|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="tonnage" class="form-control"
+                                value="{{ enquiry.tonnage|default_if_none:'' }}">
 
                         </div>
 
@@ -393,11 +256,8 @@ textarea.form-control{
                                 KG
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="kg"
-                                   class="form-control"
-                                   value="{{ enquiry.kg|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="kg" class="form-control"
+                                value="{{ enquiry.kg|default_if_none:'' }}">
 
                         </div>
 
@@ -423,31 +283,25 @@ textarea.form-control{
                                 Dimension Unit
                             </label>
 
-                            <select name="dimension_unit"
-                                    class="form-select"
-                                    id="dimensionUnit">
+                            <select name="dimension_unit" class="form-select" id="dimensionUnit">
 
                                 <option value="">
                                     Select
                                 </option>
 
-                                <option value="cm"
-                                    {% if enquiry.dimension_unit == 'cm' %}selected{% endif %}>
+                                <option value="cm" {% if enquiry.dimension_unit == 'cm' %}selected{% endif %}>
                                     CM
                                 </option>
 
-                                <option value="inch"
-                                    {% if enquiry.dimension_unit == 'inch' %}selected{% endif %}>
+                                <option value="inch" {% if enquiry.dimension_unit == 'inch' %}selected{% endif %}>
                                     INCH
                                 </option>
 
-                                <option value="feet"
-                                    {% if enquiry.dimension_unit == 'feet' %}selected{% endif %}>
+                                <option value="feet" {% if enquiry.dimension_unit == 'feet' %}selected{% endif %}>
                                     FEET
                                 </option>
 
-                                <option value="meter"
-                                    {% if enquiry.dimension_unit == 'meter' %}selected{% endif %}>
+                                <option value="meter" {% if enquiry.dimension_unit == 'meter' %}selected{% endif %}>
                                     METER
                                 </option>
 
@@ -461,12 +315,8 @@ textarea.form-control{
                                 Length
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="length"
-                                   id="lengthInput"
-                                   class="form-control"
-                                   value="{{ enquiry.length|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="length" id="lengthInput" class="form-control"
+                                value="{{ enquiry.length|default_if_none:'' }}">
 
                         </div>
 
@@ -476,12 +326,8 @@ textarea.form-control{
                                 Breadth
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="breadth"
-                                   id="breadthInput"
-                                   class="form-control"
-                                   value="{{ enquiry.breadth|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="breadth" id="breadthInput" class="form-control"
+                                value="{{ enquiry.breadth|default_if_none:'' }}">
 
                         </div>
 
@@ -491,12 +337,8 @@ textarea.form-control{
                                 Height
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="height"
-                                   id="heightInput"
-                                   class="form-control"
-                                   value="{{ enquiry.height|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="height" id="heightInput" class="form-control"
+                                value="{{ enquiry.height|default_if_none:'' }}">
 
                         </div>
 
@@ -506,8 +348,7 @@ textarea.form-control{
 
                     <div class="row mt-4">
 
-                        <div class="col-md-6 d-none"
-                             id="dimensionBox">
+                        <div class="col-md-6 d-none" id="dimensionBox">
 
                             <div class="dimension-result-box">
 
@@ -559,15 +400,10 @@ textarea.form-control{
 
                     <!-- HIDDEN SAVE FIELDS -->
 
-                    <input type="hidden"
-                           name="volume"
-                           id="volumeInput"
-                           value="{{ enquiry.volume|default_if_none:'' }}">
+                    <input type="hidden" name="volume" id="volumeInput" value="{{ enquiry.volume|default_if_none:'' }}">
 
-                    <input type="hidden"
-                           name="volumetric_weight"
-                           id="volumetricWeightInput"
-                           value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
+                    <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
+                        value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
 
                 </div>
 
@@ -583,9 +419,7 @@ textarea.form-control{
                             Routes
                         </span>
 
-                        <button type="button"
-                                class="btn btn-primary btn-sm"
-                                id="addRoute">
+                        <button type="button" class="btn btn-primary btn-sm" id="addRoute">
 
                             + Add Route
 
@@ -607,10 +441,7 @@ textarea.form-control{
                                         From
                                     </label>
 
-                                    <input type="text"
-                                           name="origin[]"
-                                           class="form-control"
-                                           value="{{ route.origin }}">
+                                    <input type="text" name="origin[]" class="form-control" value="{{ route.origin }}">
 
                                 </div>
 
@@ -620,17 +451,14 @@ textarea.form-control{
                                         To
                                     </label>
 
-                                    <input type="text"
-                                           name="destination[]"
-                                           class="form-control"
-                                           value="{{ route.destination }}">
+                                    <input type="text" name="destination[]" class="form-control"
+                                        value="{{ route.destination }}">
 
                                 </div>
 
                                 <div class="col-md-2 d-flex align-items-end">
 
-                                    <button type="button"
-                                            class="btn btn-danger w-100 removeRoute">
+                                    <button type="button" class="btn btn-danger w-100 removeRoute">
 
                                         Remove
 
@@ -666,11 +494,8 @@ textarea.form-control{
                                 Expected Rate
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="expected_rate"
-                                   class="form-control"
-                                   value="{{ enquiry.expected_rate|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                value="{{ enquiry.expected_rate|default_if_none:'' }}">
 
                         </div>
 
@@ -680,11 +505,8 @@ textarea.form-control{
                                 Approval Rate
                             </label>
 
-                            <input type="number"
-                                   step="0.01"
-                                   name="approval_rate"
-                                   class="form-control"
-                                   value="{{ enquiry.approval_rate|default_if_none:'' }}">
+                            <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                value="{{ enquiry.approval_rate|default_if_none:'' }}">
 
                         </div>
 
@@ -712,10 +534,8 @@ textarea.form-control{
                             Status
                         </label>
 
-                        <input type="text"
-                               name="status"
-                               class="form-control"
-                               value="{{ enquiry.status|default_if_none:'' }}">
+                        <input type="text" name="status" class="form-control"
+                            value="{{ enquiry.status|default_if_none:'' }}">
 
                     </div>
 
@@ -726,7 +546,7 @@ textarea.form-control{
                         </label>
 
                         <textarea name="cancel_reason"
-                                  class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+                            class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
 
                     </div>
 
@@ -736,15 +556,13 @@ textarea.form-control{
 
                     <div class="d-grid gap-2">
 
-                        <button type="submit"
-                                class="btn btn-primary btn-save">
+                        <button type="submit" class="btn btn-primary btn-save">
 
                             💾 Update Enquiry
 
                         </button>
 
-                        <a href="{% url 'enquiry_list' %}"
-                           class="btn btn-light">
+                        <a href="{% url 'enquiry_list' %}" class="btn btn-light">
 
                             Cancel
 
@@ -761,18 +579,15 @@ textarea.form-control{
     </form>
 
 </div>
-
-<!-- =========================
-ROUTE JS
-========================= -->
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 <script>
 
-document
-.getElementById("addRoute")
-.addEventListener("click", function(){
+    document
+        .getElementById("addRoute")
+        .addEventListener("click", function () {
 
-    let html = `
+            let html = `
 
     <div class="route-box route-row">
 
@@ -819,21 +634,21 @@ document
 
     `;
 
-    document
-    .getElementById("routeContainer")
-    .insertAdjacentHTML("beforeend", html);
+            document
+                .getElementById("routeContainer")
+                .insertAdjacentHTML("beforeend", html);
 
-});
+        });
 
-document.addEventListener("click", function(e){
+    document.addEventListener("click", function (e) {
 
-    if(e.target.classList.contains("removeRoute")){
+        if (e.target.classList.contains("removeRoute")) {
 
-        e.target.closest(".route-row").remove();
+            e.target.closest(".route-row").remove();
 
-    }
+        }
 
-});
+    });
 
 </script>
 
@@ -843,132 +658,132 @@ DIMENSION JS
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const lengthInput =
-        document.getElementById("lengthInput");
+        const lengthInput =
+            document.getElementById("lengthInput");
 
-    const breadthInput =
-        document.getElementById("breadthInput");
+        const breadthInput =
+            document.getElementById("breadthInput");
 
-    const heightInput =
-        document.getElementById("heightInput");
+        const heightInput =
+            document.getElementById("heightInput");
 
-    const unitInput =
-        document.getElementById("dimensionUnit");
+        const unitInput =
+            document.getElementById("dimensionUnit");
 
-    const dimensionBox =
-        document.getElementById("dimensionBox");
+        const dimensionBox =
+            document.getElementById("dimensionBox");
 
-    function calculateDimension() {
+        function calculateDimension() {
 
-        const unit = unitInput.value;
+            const unit = unitInput.value;
 
-        if (unit !== "") {
+            if (unit !== "") {
 
-            dimensionBox.classList.remove("d-none");
+                dimensionBox.classList.remove("d-none");
 
-        } else {
+            } else {
 
-            dimensionBox.classList.add("d-none");
+                dimensionBox.classList.add("d-none");
 
-            return;
+                return;
+            }
+
+            let length =
+                parseFloat(lengthInput.value) || 0;
+
+            let breadth =
+                parseFloat(breadthInput.value) || 0;
+
+            let height =
+                parseFloat(heightInput.value) || 0;
+
+            // CONVERT TO CM
+
+            if (unit === "inch") {
+
+                length *= 2.54;
+                breadth *= 2.54;
+                height *= 2.54;
+            }
+
+            else if (unit === "feet") {
+
+                length *= 30.48;
+                breadth *= 30.48;
+                height *= 30.48;
+            }
+
+            else if (unit === "meter") {
+
+                length *= 100;
+                breadth *= 100;
+                height *= 100;
+            }
+
+            // CALCULATE
+
+            const volume =
+                length * breadth * height;
+
+            const volumetric =
+                volume / 4500;
+
+            // DISPLAY
+
+            document
+                .getElementById("convertedDimension")
+                .innerText =
+                `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} CM`;
+
+            document
+                .getElementById("volumeResult")
+                .innerText =
+                volume.toFixed(2);
+
+            document
+                .getElementById("volumetricWeight")
+                .innerText =
+                volumetric.toFixed(2) + " KG";
+
+            // SAVE TO HIDDEN INPUTS
+
+            document
+                .getElementById("volumeInput")
+                .value =
+                volume.toFixed(2);
+
+            document
+                .getElementById("volumetricWeightInput")
+                .value =
+                volumetric.toFixed(2);
+
         }
 
-        let length =
-            parseFloat(lengthInput.value) || 0;
+        unitInput.addEventListener(
+            "change",
+            calculateDimension
+        );
 
-        let breadth =
-            parseFloat(breadthInput.value) || 0;
+        lengthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
-        let height =
-            parseFloat(heightInput.value) || 0;
+        breadthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
-        // CONVERT TO CM
+        heightInput.addEventListener(
+            "input",
+            calculateDimension
+        );
 
-        if (unit === "inch") {
+        calculateDimension();
 
-            length *= 2.54;
-            breadth *= 2.54;
-            height *= 2.54;
-        }
-
-        else if (unit === "feet") {
-
-            length *= 30.48;
-            breadth *= 30.48;
-            height *= 30.48;
-        }
-
-        else if (unit === "meter") {
-
-            length *= 100;
-            breadth *= 100;
-            height *= 100;
-        }
-
-        // CALCULATE
-
-        const volume =
-            length * breadth * height;
-
-        const volumetric =
-            volume / 4500;
-
-        // DISPLAY
-
-        document
-        .getElementById("convertedDimension")
-        .innerText =
-        `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} CM`;
-
-        document
-        .getElementById("volumeResult")
-        .innerText =
-        volume.toFixed(2);
-
-        document
-        .getElementById("volumetricWeight")
-        .innerText =
-        volumetric.toFixed(2) + " KG";
-
-        // SAVE TO HIDDEN INPUTS
-
-        document
-        .getElementById("volumeInput")
-        .value =
-        volume.toFixed(2);
-
-        document
-        .getElementById("volumetricWeightInput")
-        .value =
-        volumetric.toFixed(2);
-
-    }
-
-    unitInput.addEventListener(
-        "change",
-        calculateDimension
-    );
-
-    lengthInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    breadthInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    heightInput.addEventListener(
-        "input",
-        calculateDimension
-    );
-
-    calculateDimension();
-
-});
+    });
 
 </script>
 

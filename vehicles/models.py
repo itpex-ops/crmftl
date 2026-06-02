@@ -8,10 +8,6 @@ from manual_order.models import ManualOrder
 
 
 class Vehicle(models.Model):
-
-    # =========================
-    # ORDER RELATIONS
-    # =========================
     is_overpaid = models.BooleanField(default=False)
     order = models.OneToOneField(
         Order,

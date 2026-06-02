@@ -1,89 +1,39 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from authentications.decorators import allowed_roles
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from orders.models import Order
 from .forms import VehicleForm
 from django.urls import reverse
-from .models import Vehicle, Tracking
 from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from decimal import Decimal
 from django.utils.dateparse import parse_datetime
-from django.shortcuts import render
-from vehicles.models import Vehicle, Tracking
+from vehicles.models import Vehicle, Tracking,TrackingDocument
 from django.db.models import Q
-
+from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-
-from decimal import Decimal
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-
-from .models import Order, Vehicle, Tracking
 from manual_order.models import ManualOrder
-
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
-
-from .models import Order, ManualOrder, Vehicle
-
-
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
-
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from decimal import Decimal
-
 from orders.models import Order
-from manual_order.models import ManualOrder
-from vehicles.models import Vehicle
-
+from django.db.models import Count, Sum
+from django.views.decorators.http import require_POST
 
 @login_required
 def assign_vehicle(request, order_id):
-
     order_source = request.GET.get("manual", "crm")
     print("s",order_source)
-
-    # =========================
-    # LOAD ORDER + SELLING PRICE
-    # =========================
-    if order_source == "manual": #order_source
+    if order_source == "manual":
         order = get_object_or_404(ManualOrder, id=order_id)
-
         selling_price = (
             getattr(order.pricing, "total_amount", 0)
             if getattr(order, "pricing", None)
-            else 0
-        )
-
+            else 0)
         vehicle_filter = {"manual_order": order, "order_type": "manual"}
-
     else:
         order = get_object_or_404(Order, id=order_id)
-
         selling_price = getattr(order, "total_rate", 0) or 0
-
         vehicle_filter = {"order": order, "order_type": "crm"}
-
     existing_vehicle = Vehicle.objects.filter(**vehicle_filter).first()
-
-    # =========================
-    # POST
-    # =========================
     if request.method == "POST":
-
         Vehicle.objects.create(
             **vehicle_filter,
             vehicle_number=request.POST.get("vehicle_number"),
@@ -129,19 +79,6 @@ def tracking_view(request):
         "vehicle": vehicle
     })
 
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.views.decorators.http import require_POST
-from .models import Tracking, TrackingDocument
-
-# vehicles/views.py
-
-from django.shortcuts import render
-from django.db.models import Count, Sum
-
-from .models import Vehicle, Tracking
-
-
 
 def tracking_view(request):
     query = request.GET.get("q")
@@ -166,17 +103,6 @@ def tracking_view(request):
         "vehicle": vehicle
     })
 
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.views.decorators.http import require_POST
-from .models import Tracking, TrackingDocument
-
-# vehicles/views.py
-
-from django.shortcuts import render
-from django.db.models import Count, Sum
-
-from .models import Vehicle, Tracking
 
 def vehicles_dashboard(request):
 

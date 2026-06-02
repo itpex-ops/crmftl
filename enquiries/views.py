@@ -9,32 +9,10 @@ from django.utils import timezone
 import json
 from django.contrib.auth import get_user_model
 from decimal import Decimal
+from django.db.models import Q
 User = get_user_model()
 from django.http import JsonResponse
 from customers.models import ExCustomer
-
-
-def search_customer(request):
-
-    customer_code = request.GET.get("customer_code")
-
-    customer = ExCustomer.objects.filter(
-        customer_code=customer_code
-    ).first()
-
-    if customer:
-
-        return JsonResponse({
-            "found": True,
-            "id": customer.id,
-            "name": customer.name,
-            "phone1": customer.phone1,
-            "email": customer.email,
-        })
-
-    return JsonResponse({
-        "found": False
-    })
 
 @login_required
 def edit_enquiry(request, id):
@@ -188,10 +166,6 @@ def edit_enquiry(request, id):
         context
     )
 
-# ==============================
-# CREATE NOTIFICATION FUNCTION
-# ==============================
-
 def send_notification(user, enquiry, message):
 
     if user:
@@ -200,10 +174,6 @@ def send_notification(user, enquiry, message):
             enquiry=enquiry,
             message=message
         )
-
-# ==============================
-# NOTIFICATION PAGE
-# ==============================
 
 @login_required
 def notifications(request):
@@ -235,10 +205,6 @@ def notifications(request):
             'notification_count': notification_count
         }
     )
-
-# ==============================
-# ADMIN CONFIRM ENQUIRY
-# ==============================
 
 @login_required
 def confirm_enquiry(request, enquiry_id):
@@ -278,6 +244,18 @@ def confirm_enquiry(request, enquiry_id):
 
 @login_required
 def create_enquiry(request):
+    customer = None
+    search_value = request.GET.get("customer_code", "").strip()
+    if search_value:
+        customer = ExCustomer.objects.filter(
+            Q(customer_code__iexact=search_value) |
+            Q(phone1__icontains=search_value) |
+            Q(phone2__icontains=search_value) |
+            Q(name__icontains=search_value) |
+            Q(gst_number__icontains=search_value) |
+            Q(pan_number__icontains=search_value)
+        ).first()
+    
     vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
     if request.method == "POST":
         customer_name = request.POST.get("customer_name") or None
@@ -434,7 +412,9 @@ def create_enquiry(request):
         request,
         "enquiry/create.html",
         {
-            "vehicle_types": vehicle_types
+            "vehicle_types": vehicle_types,
+            "search_value": search_value,
+            "customer": customer,
         }
     )
 

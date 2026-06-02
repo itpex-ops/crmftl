@@ -2,7 +2,7 @@ from django.db import models
 from enquiries.models import Enquiry
 from vehicles.models import Vehicle
 from django.conf import settings
-
+from django.core.exceptions import ValidationError
 
 class CustomerTransaction(models.Model):
     TYPE_CHOICES = [
@@ -59,6 +59,26 @@ class VehicleTransaction(models.Model):
     remarks = models.TextField(blank=True, null=True)
     date = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    def clean(self):
+        super().clean()
+
+        if self.transaction_type in ["advance", "balance"]:
+
+            remaining = self.vehicle.remaining_balance_amount
+
+            # Exclude current payment when editing
+            if self.pk:
+                old = VehicleTransaction.objects.get(pk=self.pk)
+
+                if old.transaction_type in ["advance", "balance"]:
+                    remaining += old.amount
+
+            if self.amount > remaining:
+                raise ValidationError({
+                    "amount":
+                    f"Amount exceeds remaining balance. Remaining: ₹{remaining}"
+                })
 
     def __str__(self):
         return self.vehicle.vehicle_number

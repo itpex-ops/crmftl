@@ -124,47 +124,33 @@ def vehicle_accounts(request):
         "data": data
     })
 
+def create_vehicle_payment(request, vehicle, payment_type):
 
-def create_vehicle_payment(request, vehicle, transaction_type):
+    amount = Decimal(request.POST.get("amount") or 0)
 
-    if vehicle.is_locked:
-        messages.error(request, "❌ Payment locked. Trip already completed.")
-        return None
-
-    try:
-        amount = Decimal(request.POST.get("amount") or 0)
-    except InvalidOperation:
-        messages.error(request, "❌ Invalid amount.")
-        return None
-
-    if amount <= 0:
-        messages.error(request, "❌ Amount must be greater than zero.")
-        return None
-
-    # ❗ OVERPAYMENT CHECK (IMPORTANT)
     remaining = vehicle.remaining_balance_amount
 
+    # Prevent overpayment
     if amount > remaining:
+
         messages.error(
             request,
-            f"❌ Cannot pay more than remaining balance ({remaining})."
+            f"❌ Amount exceeds remaining balance. Remaining: ₹{remaining}"
         )
-        return None
+
+        return False
 
     VehicleTransaction.objects.create(
         vehicle=vehicle,
-        transaction_type=transaction_type,
+        transaction_type=payment_type,
         amount=amount,
         payment_mode=request.POST.get("payment_mode"),
         transaction_no=request.POST.get("transaction_no"),
         remarks=request.POST.get("remarks"),
-        created_by=request.user
+        created_by=request.user,
     )
 
     return True
-
-
-
 
 def edit_vehicle_account(request, vehicle_id):
 

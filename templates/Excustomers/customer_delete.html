@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card shadow-sm">
+
+        <div class="card-body text-center">
+
+            <h5>
+                Delete Customer?
+            </h5>
+
+            <p>
+                {{ customer.name }}
+            </p>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <button class="btn btn-danger">
+                    Yes Delete
+                </button>
+
+                <a href="{% url 'customer_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

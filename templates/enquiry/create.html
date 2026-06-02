@@ -2,433 +2,383 @@
 {% load static %}
 {% block content %}
 
-
-<div class="container-fluid mt-3">
-    {% if messages %}
-    <div class="mb-3">
+<div class="container-fluid">
+    <!-- {% if messages %}
+    <div class="">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
-    </div>
-    {% endif %}
+    </div> 
+    {% endif %}-->
     <!-- Exsisting Customer -->
     <div class="card mb-3 shadow-sm">
         <div class="card-body">
 
             <form method="GET">
+
                 <div class="row">
 
-                    <div class="col-md-10">
-                        <label class="form-label">
-                            Existing Customer Code
-                        </label>
+                    <div class="col">
 
-                        <input type="text" name="customer_code" class="form-control" placeholder="CUST00001"
-                            value="{{ customer_code }}">
+                        <div class="section-title">
+                            Search Customer
+                        </div>
+
+                        <input type="text" name="customer_code" class="form-control"
+                            placeholder="Customer Code / Mobile / Name / GST / PAN" value="{{ search_value }}">
+
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
+
                         <button class="btn btn-primary w-100">
                             Search
                         </button>
+
                     </div>
 
                 </div>
+
             </form>
 
         </div>
     </div>
-
     {% if customer %}
-
     <div class="alert alert-success">
-        <strong>Customer Found:</strong>
-        {{ customer.customer_code }} - {{ customer.name }}
-    </div>
 
+        <h6 class="mb-3">
+            ✅ Customer Found
+        </h6>
+
+        <!-- <div class="row">
+
+            <div class="col-md-2">
+                <strong>Code</strong><br>
+                {{ customer.customer_code }}
+            </div>
+
+            <div class="col-md-3">
+                <strong>Name</strong><br>
+                {{ customer.name }}
+            </div>
+
+            <div class="col-md-2">
+                <strong>Mobile</strong><br>
+                {{ customer.phone1 }}
+            </div>
+
+            <div class="col-md-3">
+                <strong>Email</strong><br>
+                {{ customer.email|default:"-" }}
+            </div>
+
+            <div class="col-md-2">
+                <strong>GST</strong><br>
+                {{ customer.gst_number|default:"-" }}
+            </div>
+
+        </div> -->
+
+    </div>
+    {% endif %}
+   
+   <!-- <div class="alert alert-warning">
+
+        Customer not found.
+
+        <a href="{% url 'customer_create' %}">
+            Create Customer
+        </a> -->
+
+<!-- HEADER -->
+<div class="page-header">
+    <h4>🚚 Create Enquiry</h4>
+    <small>Fill all required details</small>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    {% if customer %}
     <input type="hidden" name="customer_id" value="{{ customer.id }}">
+    {% endif %}
 
-    {% elif customer_code %}
+    <div class="row">
 
-    <div class="alert alert-warning">
-        Customer not found. Please enter customer details manually.
-    </div>
-
-   {% else %}
- 
-
-    <!-- HEADER -->
-    <div class="card shadow-sm border-0 mb-4 p-4">
-        <h4 class="fw-semibold mb-1">🚚 Create Enquiry</h4>
-        <small class="text-muted">Fill all required details</small>
-    </div>
-
-    <form method="POST">
-        {% csrf_token %}
-        {% if customer %}
-        <input type="hidden" name="customer_id" value="{{ customer.id }}">
-        {% endif %}
-
-        <div class="row g-4">
-
-            <!-- LEFT SIDE -->
-            <div class="col-lg-8">
-
-                <!-- CUSTOMER DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">👤 Customer Details</div>
-
-                    <div class="card-body row g-3">
-
-                        <div class="col-md-4">
-                            <label class="form-label">Customer Name</label>
-                            <input type="text" name="customer_name" class="form-control"
-                                value="{{ customer.name|default:'' }}" required>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Mobile Number</label>
-                            <input type="tel" name="customer_contact" class="form-control" maxlength="10"
-                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}"
-                                required>
-                            <small class="text-muted">Enter 10 digit mobile number</small>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control"
-                                value="{{ customer.email|default:'' }}">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">GST Number</label>
-                            <input type="text" name="gst_number" class="form-control"
-                                value="{{ customer.gst_number|default:'' }}">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">City</label>
-                            <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Pincode</label>
-                            <input type="text" name="pincode" class="form-control"
-                                value="{{ customer.pincode|default:'' }}">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">Lead Source</label>
-                            <select name="lead_source" class="form-select">
-                                <option value="">Select</option>
-                                <option value="justdial">Just Dial</option>
-                                <option value="inbound">Inbound</option>
-                                <option value="outbound">Outbound</option>
-                                <option value="social media">Social Media</option>
-                                <option value="reference">Reference</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">Reference/SocialMedia</label>
-                            <input type="text" name="reference_name" class="form-control">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">No. of Pickups</label>
-                            <input type="number" step="any" name="pickups" id="pickups" class="form-control" min="1"
-                                max="10" value="1">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">No. of Deliveries</label>
-                            <input type="number" step="any" name="deliveries" id="deliveries" class="form-control"
-                                min="1" max="10" value="1">
-                        </div>
-
-                        <div id="origin-container" class="col-12">
-                            <label class="form-label">Pickup PIN Code</label>
-                            <input type="tel" name="origin_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
-                                inputmode="numeric" required
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
-                            <small class="text-muted">Enter 6 digit pincode</small>
-                        </div>
-
-                        <div id="destination-container" class="col-12">
-                            <label class="form-label">Delivery PIN Code</label>
-                            <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
-                                pattern="[0-9]{6}" inputmode="numeric" required
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
-                            <small class="text-muted">Enter 6 digit pincode</small>
-                        </div>
-
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+            <!-- CUSTOMER DETAILS -->
+            <div class="card mb-3 section-card">
+                <div class="section-title">👤 Customer Details</div>
+                <div class="card-body row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" name="customer_name" class="form-control"
+                            value="{{ customer.name|default:'' }}" {% if customer %}readonly{% endif %} required>
                     </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="tel" name="customer_contact" class="form-control" maxlength="10"
+                            pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" 
+                            {% if customer %}readonly{% endif %} required>
+                        <small class="text-muted">Enter 10 digit mobile number</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ customer.email|default:'' }}" 
+                        {% if customer %}readonly{% endif %}>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">GST Number</label>
+                        <input type="text" name="gst_number" class="form-control"
+                            value="{{ customer.gst_number|default:'' }}" {% if customer %}readonly{% endif %}>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">City</label>
+                        <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}" 
+                            {% if customer %}readonly{% endif %}>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Pincode</label>
+                        <input type="text" name="pincode" class="form-control" value="{{ customer.pincode|default:'' }}"
+                            {% if customer %}readonly{% endif %}>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Lead Source</label>
+                        <select name="lead_source" class="form-select">
+                            <option value="">Select</option>
+                            <option value="justdial">Just Dial</option>
+                            <option value="inbound">Inbound</option>
+                            <option value="outbound">Outbound</option>
+                            <option value="social media">Social Media</option>
+                            <option value="reference">Reference</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Reference/SocialMedia</label>
+                        <input type="text" name="reference_name" class="form-control">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">No. of Pickups</label>
+                        <input type="number" step="any" name="pickups" id="pickups" class="form-control" min="1"
+                            max="10" value="1">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">No. of Deliveries</label>
+                        <input type="number" step="any" name="deliveries" id="deliveries" class="form-control" min="1"
+                            max="10" value="1">
+                    </div>
+
+                    <div id="origin-container" class="col-12">
+                        <label class="form-label">Pickup PIN Code</label>
+                        <input type="tel" name="origin_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
+                            inputmode="numeric" required
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+                        <small class="text-muted">Enter 6 digit pincode</small>
+                    </div>
+
+                    <div id="destination-container" class="col-12">
+                        <label class="form-label">Delivery PIN Code</label>
+                        <input type="tel" name="destination_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
+                            inputmode="numeric" required
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+                        <small class="text-muted">Enter 6 digit pincode</small>
+                    </div>
+
                 </div>
+            </div>
 
-                <!-- ROUTE & VEHICLE -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📍 Route & Vehicle</div>
+            <!-- ROUTE & VEHICLE -->
+            <div class="card mb-3 section-card">
+                <div class="section-title">📍 Route & Vehicle</div>
 
-                    <div class="card-body row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Vehicle Type</label>
+                <div class="card-body row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Vehicle Type</label>
 
-                            <select name="vehicle_type" class="form-select vehicle-select">
-                                <option value="">Select Vehicle</option>
-                                {% for value, label in vehicle_types %}
-                                <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        <select name="vehicle_type" class="form-select vehicle-select">
+                            <option value="">Select Vehicle</option>
+                            {% for value, label in vehicle_types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                        <!-- Tom Select CSS -->
-                        <link rel="stylesheet"
-                            href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+                    <!-- Tom Select CSS -->
+                    <link rel="stylesheet"
+                        href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
 
-                        <!-- Tom Select JS -->
-                        <script
-                            src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+                    <!-- Tom Select JS -->
+                    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
 
-                                new TomSelect(".vehicle-select", {
-                                    create: false,
-                                    sortField: {
-                                        field: "text",
-                                        direction: "asc"
-                                    },
-                                    placeholder: "Search Vehicle Type..."
-                                });
-
+                            new TomSelect(".vehicle-select", {
+                                create: false,
+                                sortField: {
+                                    field: "text",
+                                    direction: "asc"
+                                },
+                                placeholder: "Search Vehicle Type..."
                             });
-                        </script>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Vehicle Description</label>
-                            <input type="text" name="vehicle_description" class="form-control">
-                        </div>
+                        });
+                    </script>
 
-                        <div class="col-md-4">
-                            <label class="form-label">KMs</label>
-                            <input type="number" step="any" name="kilometers" class="form-control">
-                        </div>
-
-
-                        <div class="col-md-4">
-                            <label class="form-label">Material</label>
-                            <input type="text" name="material" class="form-control">
-                        </div>
-
+                    <div class="col-md-4">
+                        <label class="form-label">Vehicle Description</label>
+                        <input type="text" name="vehicle_description" class="form-control">
                     </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">KMs</label>
+                        <input type="number" step="any" name="kms" class="form-control">
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label class="form-label">Material</label>
+                        <input type="text" name="material" class="form-control">
+                    </div>
+
                 </div>
+            </div>
 
-                <!-- LOAD DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📦 Load Details</div>
+            <!-- LOAD DETAILS -->
+            <div class="card mb-3 section-card">
+                <div class="section-title">📦 Load Details</div>
 
-                    <div class="card-body row g-3">
+                <div class="card-body row g-3">
 
-                        <div class="col-md-3">
-                            <label class="form-label">Pieces</label>
-                            <input type="number" step="any" name="pieces" class="form-control">
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Pieces</label>
+                        <input type="number" step="any" name="pieces" class="form-control">
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Tonnage</label>
-                            <input type="number" step="any" name="tonnage" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">KG</label>
-                            <input type="number" step="any" name="kg" class="form-control">
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tonnage</label>
+                        <input type="number" step="any" name="tonnage" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">KG</label>
+                        <input type="number" step="any" name="kg" class="form-control">
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Dimension Unit</label>
-                            <select name="dimension_unit" class="form-select">
-                                <option value="">Select</option>
-                                <option value="cm">cm</option>
-                                <option value="inch">inch</option>
-                                <option value="feet">feet</option>
-                                <option value="meter">meter</option>
-                            </select>
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Dimension Unit</label>
+                        <select name="dimension_unit" class="form-select">
+                            <option value="">Select</option>
+                            <option value="cm">cm</option>
+                            <option value="inch">inch</option>
+                            <option value="feet">feet</option>
+                            <option value="meter">meter</option>
+                        </select>
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Length</label>
-                            <input type="number" step="any" name="length" class="form-control">
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Length</label>
+                        <input type="number" step="any" name="length" class="form-control">
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Breadth</label>
-                            <input type="number" step="any" name="breadth" class="form-control">
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Breadth</label>
+                        <input type="number" step="any" name="breadth" class="form-control">
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Height</label>
-                            <input type="number" step="any" name="height" class="form-control">
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Height</label>
+                        <input type="number" step="any" name="height" class="form-control">
+                    </div>
 
-                        <div class="col-md-6 d-none" id="dimensionBox">
+                    <div class="col-md-6 d-none" id="dimensionBox">
 
-                            <div class="dimension-result-box">
+                        <div class="dimension-result-box">
 
-                                <div class="result-title">
-                                    📐 Dimension Calculation
-                                </div>
+                            <div class="result-title">
+                                📐 Dimension Calculation
+                            </div>
 
-                                <!-- Converted Size -->
+                            <!-- Converted Size -->
 
-                                <div class="result-row">
-                                    <span>
-                                        Converted Size
-                                    </span>
+                            <div class="result-row">
+                                <span>
+                                    Converted Size
+                                </span>
 
-                                    <strong id="convertedDimension">
-                                        0 × 0 × 0 CM
-                                    </strong>
-                                </div>
+                                <strong id="convertedDimension">
+                                    0 × 0 × 0 CM
+                                </strong>
+                            </div>
 
-                                <!-- Volumetric Weight -->
+                            <!-- Volumetric Weight -->
 
-                                <div class="result-row volumetric-highlight">
-                                    <span>
-                                        Volumetric Weight
-                                    </span>
+                            <div class="result-row volumetric-highlight">
+                                <span>
+                                    Volumetric Weight
+                                </span>
 
-                                    <strong id="volumetric_weight">
-                                        0 KG
-                                    </strong>
-                                </div>
+                                <strong id="volumetric_weight">
+                                    0 KG
+                                </strong>
+                            </div>
 
-                                <!-- Volume -->
+                            <!-- Volume -->
 
-                                <div class="result-row small-volume">
-                                    <span>
-                                        Volume
-                                    </span>
+                            <div class="result-row small-volume">
+                                <span>
+                                    Volume
+                                </span>
 
-                                    <small id="volumeResult">
-                                        0 CM³
-                                    </small>
-                                </div>
-
+                                <small id="volumeResult">
+                                    0 CM³
+                                </small>
                             </div>
 
                         </div>
 
-
-                        <div class="col-md-3">
-                            <label class="form-label">Expected Rate ₹</label>
-                            <input type="number" step="any" name="expected_rate" class="form-control">
-                        </div>
-
-                        <div class="col-md-3 ms-auto d-flex align-items-end">
-                            <button type="submit" class="btn btn-success w-100">
-                                💾 Save Enquiry
-                            </button>
-                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- RIGHT SIDE -->
-            <div class="col-lg-4">
-                <div class="card mb-3 section-card">
-                    <div class="section-title">👤 Enquiry Generated By</div>
-                    <div class="card-body">
-                        <label class="form-label">User Name</label>
-                        <div class="form-control bg-light">
-                            <strong>{{ request.user.username }}</strong>
-                        </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Expected Rate ₹</label>
+                        <input type="number" step="any" name="expected_rate" class="form-control">
+                    </div>
+
+                    <div class="col-md-3 ms-auto d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">
+                            💾 Save Enquiry
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
- {% endif %}
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-4">
+            <div class="card mb-3 section-card">
+                <div class="section-title">👤 Enquiry Generated By</div>
+                <div class="card-body">
+                    <label class="form-label">User Name</label>
+                    <div class="form-control bg-light">
+                        <strong>{{ request.user.username }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 </div>
-
-<style>
-    .dimension-result-box {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        background: #f8fafc;
-        margin-top: 10px;
-    }
-
-    .result-title {
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: #111827;
-    }
-
-    .result-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
-
-    .result-row strong {
-        color: #0f172a;
-    }
-
-    .ts-wrapper.single .ts-control {
-        min-height: 38px;
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        overflow: hidden;
-    }
-
-    .ts-wrapper.single .ts-control input {
-        width: 1px !important;
-        min-width: 1px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    .ts-wrapper.single .item {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    input[type="text"],
-    textarea {
-        text-transform: uppercase;
-    }
-
-    .section-card {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, .05);
-    }
-
-    .section-title {
-        font-weight: 600;
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        background: #f9f9f9;
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 8px;
-        text-transform: uppercase;
-    }
-
-    .form-label {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 6px;
-    }
-</style>
 
 <script>
 
@@ -580,6 +530,6 @@
     });
 </script>
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
-<link rel="stylesheet" href="{% static 'assets/enquiry/css/enquiry.css' %}">
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 {% endblock %}
