@@ -105,7 +105,6 @@ from authentications.models import User
 from enquiries.models import Enquiry
 from orders.models import Order
 from vehicles.models import Vehicle, Tracking
-from manual_order.models import ManualOrder, Payment
 
 
 def user_dashboard(request):
@@ -119,7 +118,6 @@ def user_dashboard(request):
     ).count()
 
     total_orders = Order.objects.count()
-    manual_orders = ManualOrder.objects.count()
     total_vehicles = Vehicle.objects.count()
 
     running_vehicles = Tracking.objects.filter(
@@ -129,10 +127,6 @@ def user_dashboard(request):
 
     delivered_orders = Tracking.objects.filter(
         delivered=True
-    ).count()
-
-    pending_payments = Payment.objects.exclude(
-        payment_status='paid'
     ).count()
 
     revenue = Order.objects.aggregate(
@@ -165,11 +159,9 @@ def user_dashboard(request):
         "total_enquiries": total_enquiries,
         "converted_enquiries": converted_enquiries,
         "total_orders": total_orders,
-        "manual_orders": manual_orders,
         "total_vehicles": total_vehicles,
         "running_vehicles": running_vehicles,
         "delivered_orders": delivered_orders,
-        "pending_payments": pending_payments,
         "revenue": revenue,
         "pending_amount": pending_amount,
         "recent_orders": recent_orders,

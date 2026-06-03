@@ -350,7 +350,7 @@ body {
     /* better creamy */
     color: #333;
     position: fixed;
-    width: 190px;
+    width: 220px;
     transition: all .3s ease;
     z-index: 1000;
     overflow-y: auto;
@@ -398,7 +398,7 @@ body {
 
 /* ===== CONTENT ===== */
 .content {
-    margin-left: 160px;
+    margin-left: 200px;
     padding: 90px 25px 25px;
     transition: all .3s ease;
     margin-top: -20px;
@@ -456,17 +456,19 @@ body {
         margin-left: 0;
     }
 }
-.logo-area{
-    padding:6px;
-    text-align:left;
+
+.logo-area {
+    padding: 6px;
+    text-align: left;
 }
-.logo-box{
-    background:#ffc107;
-    padding:8px 16px;
-    display:inline-block;
-    border-radius:8px;
-    font-weight:700;
-    font-size:20px;
+
+.logo-box {
+    background: #ffc107;
+    padding: 8px 16px;
+    display: inline-block;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 20px;
 }
 
 
@@ -1085,4 +1087,3 @@ tbody td {
         min-width: 180px;
     }
 }
-

@@ -1,8 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet"
-href="{% static 'assets/common/css/common.css' %}">
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 <div class="container-fluid">
     {% if messages %}
     <div class="mb-2">
@@ -39,100 +38,70 @@ href="{% static 'assets/common/css/common.css' %}">
 
                             <div class="col-md-4">
                                 <label class="form-label">Customer Code</label>
-                                <input type="text"
-                                       class="form-control readonly-box"
-                                       value="{{ next_customer_code }}"
-                                       readonly>
+                                <input type="text" class="form-control readonly-box" value="{{ next_customer_code }}"
+                                    readonly>
                             </div>
 
                             <div class="col-md-8">
                                 <label class="form-label">Customer Name *</label>
-                                <input type="text"
-                                       name="name"
-                                       class="form-control"
-                                       required>
+                                <input type="text" name="name" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Mobile Number 1 *</label>
-                                <input type="tel"
-                                       name="phone1"
-                                       class="form-control"
-                                       maxlength="10"
-                                       required>
+                                <input type="tel" name="phone1" class="form-control" maxlength="10" required>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Mobile Number 2</label>
-                                <input type="tel"
-                                       name="phone2"
-                                       class="form-control"
-                                       maxlength="10">
+                                <input type="tel" name="phone2" class="form-control" maxlength="10">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
-                                <input type="email"
-                                       name="email"
-                                       class="form-control">
+                                <input type="email" name="email" class="form-control">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">PAN Number</label>
-                                <input type="text"
-                                       name="pan_number"
-                                       class="form-control">
+                                <input type="text" name="pan_number" class="form-control" maxlength="10"
+                                    style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                    title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label">GST Number</label>
-                                <input type="text"
-                                       name="gst_number"
-                                       class="form-control">
+                                <input type="text" name="gst_number" class="form-control">
                             </div>
 
                             <div class="col-md-3">
                                 <label class="form-label">State</label>
-                                <input type="text"
-                                       name="state"
-                                       class="form-control">
+                                <input type="text" name="state" class="form-control">
                             </div>
 
                             <div class="col-md-3">
                                 <label class="form-label">State Code</label>
-                                <input type="text"
-                                       name="state_code"
-                                       class="form-control">
+                                <input type="text" name="state_code" class="form-control">
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label">Address *</label>
-                                <textarea name="address"
-                                          rows="2"
-                                          class="form-control"
-                                          required></textarea>
+                                <textarea name="address" rows="2" class="form-control" required></textarea>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">City</label>
-                                <input type="text"
-                                       name="city"
-                                       class="form-control">
+                                <input type="text" name="city" class="form-control">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Pincode</label>
-                                <input type="text"
-                                       name="pincode"
-                                       maxlength="6"
-                                       class="form-control">
+                                <input type="text" name="pincode" maxlength="6" class="form-control">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label">Status</label>
 
-                                <select name="is_active"
-                                        class="form-select">
+                                <select name="is_active" class="form-select">
 
                                     <option value="True">
                                         ACTIVE
@@ -146,8 +115,7 @@ href="{% static 'assets/common/css/common.css' %}">
                             </div>
 
                             <div class="col-md-4 ms-auto d-flex align-items-end">
-                                <button type="submit"
-                                        class="btn btn-success w-100 btn-save">
+                                <button type="submit" class="btn btn-success w-100 btn-save">
                                     💾 Save Customer
                                 </button>
                             </div>
@@ -200,22 +168,26 @@ href="{% static 'assets/common/css/common.css' %}">
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    document
-        .querySelectorAll('input[type="text"], textarea')
-        .forEach(function(input){
+        document
+            .querySelectorAll('input[type="text"], textarea')
+            .forEach(function (input) {
 
-            input.addEventListener("input", function(){
+                input.addEventListener("input", function () {
 
-                this.value =
-                    this.value.toUpperCase();
+                    this.value =
+                        this.value.toUpperCase();
+
+                });
 
             });
 
-        });
-
-});
+    });
 </script>
-
+<script>
+    document.querySelector('input[name="pan_number"]').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+</script>
 {% endblock %}

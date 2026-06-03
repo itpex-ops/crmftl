@@ -418,6 +418,7 @@ def create_enquiry(request):
         }
     )
 
+
 @login_required
 def enquiry_list(request):
     user = request.user

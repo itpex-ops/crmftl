@@ -87,8 +87,6 @@
 
                         <th width="220">Order No</th>
 
-                        <th width="120">Source</th>
-
                         <th width="250">Customer</th>
 
                         <th width="260">Route</th>
@@ -98,6 +96,7 @@
                         <th width="150">Rate ₹</th>
 
                         <th width="180">Status</th>
+
 
                     </tr>
 
@@ -118,62 +117,22 @@
 
                         <!-- ORDER NO -->
                         <td>
-
                             {% if request.user.role == 'sales' %}
-
                             <span class="fw-semibold">
-
                                 {{ order.order_no }}
+                            </span>
 
+                            {% elif order.vehicles.all %}
+                            <span class="fw-semibold text-success">
+                                {{ order.order_no }}
                             </span>
 
                             {% else %}
-
-                            {% if order.order_source == "manual" %}
-                           
-
-                            <a href="{% url 'view_existing_order' order.id %}" class="fw-semibold text-decoration-none">
-
-                                {{ order.order_no }}
-
-                            </a>
-
-                            {% else %}
-
                             <a href="{% url 'view_order' order.id %}" class="fw-semibold text-decoration-none">
-
                                 {{ order.order_no }}
-
                             </a>
-
                             {% endif %}
-
-                            {% endif %}
-
                         </td>
-                        <!-- SOURCE -->
-                        <td>
-
-                            {% if order.order_source == "manual" %}
-
-                            <span class="badge bg-success">
-
-                                Manual
-
-                            </span>
-
-                            {% else %}
-
-                            <span class="badge bg-primary">
-
-                                CRM
-
-                            </span>
-
-                            {% endif %}
-
-                        </td>
-
 
                         <!-- CUSTOMER -->
                         <td>
@@ -193,36 +152,37 @@
                         </td>
 
                         <!-- ROUTE -->
-
                         <td>
 
-                            {% if order.order_source == "manual" %}
+                            {% if order.routes %}
 
-                            <div class="route-pill">
+                            <div class="route-modern">
+                                <small>Pickups :</small>
 
-                                {{ order.origin }}
-                                →
-                                {{ order.destination }}
+                                <span class="route-side origin-side">
+                                    {% for r in order.routes %}
+                                    {{ r.origin }}{% if not forloop.last %} + {% endif %}
+
+                                    {% endfor %}
+
+                                </span>
+
+                                <small>Drops :</small>
+
+                                <span class="route-side destination-side">
+
+                                    {% for r in order.routes %}
+                                    {{ r.destination }}{% if not forloop.last %} + {% endif %}
+
+                                    {% endfor %}
+
+                                </span>
 
                             </div>
 
                             {% else %}
 
-                            {% for route in order.routes %}
-
-                            <div class="route-pill">
-
-                                {{ route.origin }}
-                                →
-                                {{ route.destination }}
-
-                            </div>
-
-                            {% empty %}
-
-                            -
-
-                            {% endfor %}
+                            <span class="text-muted">-</span>
 
                             {% endif %}
 
@@ -231,108 +191,100 @@
                         <!-- VEHICLE -->
 
                         <td>
-
-                            <!-- MANUAL ORDER VEHICLE -->
-                            {% if order.vehicle and order.vehicle.vehicle_number %}
-
+                            {% with vehicle=order.vehicles.first %}
+                            {% if vehicle %}
                             <span class="badge bg-success mb-1">
                                 Assigned
                             </span>
 
                             <div class="small fw-semibold">
-                                🚚 {{ order.vehicle.vehicle_number }}
+                                🚚 {{ vehicle.vehicle_number }}
                             </div>
-
-                            <!-- CRM ORDER VEHICLE -->
-                            {% elif order.vehicle_obj and order.vehicle_obj.vehicle_number %}
-
-                            <span class="badge bg-success mb-1">
-                                Assigned
-                            </span>
-
-                            <div class="small fw-semibold">
-                                🚚 {{ order.vehicle_obj.vehicle_number }}
-                            </div>
-
                             {% else %}
-
                             <span class="badge bg-danger">
                                 Not Assigned
                             </span>
-
                             {% endif %}
-
+                            {% endwith %}
                         </td>
 
                         <!-- RATE -->
                         <td class="fw-semibold text-success">
-
-                            {% if order.order_source == "manual" %}
-
-                            ₹ {{ order.pricing.total_amount|default:"0" }}
-
-                            {% else %}
-
                             ₹ {{ order.total_rate|default:"0" }}
-
-                            {% endif %}
-
                         </td>
 
                         <!-- STATUS -->
                         <td>
 
-                            {% if order.order_source == "manual" %}
-
-                            {% if order.vehicle %}
-
-                            <span class="badge bg-success">
-
-                                Vehicle Assigned
-
-                            </span>
-
-                            {% else %}
-
-                            <span class="badge bg-warning text-dark">
-
-                                Pending Assignment
-
-                            </span>
-
-                            {% endif %}
-
-                            {% else %}
-
                             {% if order.tracking %}
 
-                            {% if order.tracking.delivered %}
+                            {% if order.tracking.settled %}
+                            <span class="badge bg-dark">
+                                Settled
+                            </span>
 
+                            {% elif order.tracking.pod_received %}
+                            <span class="badge bg-primary">
+                                POD Received
+                            </span>
+
+                            {% elif order.tracking.delivered %}
                             <span class="badge bg-success">
-
                                 Delivered
+                            </span>
 
+                            {% elif order.tracking.advance_received %}
+                            <span class="badge bg-primary">
+                                Advance Received
+                            </span>
+
+                            {% elif order.tracking.arrived %}
+                            <span class="badge bg-info">
+                                Arrived
+                            </span>
+
+                            {% elif order.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">
+                                In Transit
+                            </span>
+
+                            {% elif order.tracking.invoice_eway %}
+                            <span class="badge bg-secondary">
+                                Invoice / Eway
+                            </span>
+
+                            {% elif order.tracking.lr_no %}
+                            <span class="badge bg-secondary">
+                                LR Generated
+                            </span>
+
+                            {% elif order.tracking.vehicle_document %}
+                            <span class="badge bg-info">
+                                Vehicle Document
+                            </span>
+
+                            {% elif order.tracking.vehicle_placed %}
+                            <span class="badge bg-primary">
+                                Vehicle Placed
                             </span>
 
                             {% else %}
-
                             <span class="badge bg-warning text-dark">
-
-                                In Progress
-
+                                Tracking Started
                             </span>
-
                             {% endif %}
+
+                            {% elif order.vehicles.exists %}
+
+                            <span class="badge bg-info">
+                                Vehicle Assigned
+                            </span>
 
                             {% else %}
 
                             <span class="badge bg-secondary">
-
                                 Pending
-
                             </span>
-
-                            {% endif %}
 
                             {% endif %}
 
@@ -344,7 +296,7 @@
 
                     <tr>
 
-                        <td colspan="8" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
 
                             No Orders Found
 
@@ -355,13 +307,9 @@
                     {% endfor %}
 
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
 <style>

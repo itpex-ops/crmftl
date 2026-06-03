@@ -4,492 +4,169 @@ from django.db import transaction
 from decimal import Decimal
 from django.db.models import Sum
 from orders.models import Order
-from manual_order.models import ManualOrder
-
+from django.core.exceptions import ValidationError
 
 class Vehicle(models.Model):
-    is_overpaid = models.BooleanField(default=False)
-    order = models.OneToOneField(
+    order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name="vehicle",
-        null=True,
-        blank=True
+        related_name='vehicles'   # 🔥 IMPORTANT
     )
 
-    manual_order = models.OneToOneField(
-    ManualOrder,
-    on_delete=models.CASCADE,
-    related_name="vehicle",
-    null=True,
-    blank=True
-)
-
-    # =========================
-    # BASIC
-    # =========================
-
-    ftl_no = models.CharField(
-        max_length=20,
-        unique=True,
-        blank=True,
-        null=True
-    )
-
-    vehicle_number = models.CharField(
-        max_length=50
-    )
-
-    driver_number = models.CharField(
-        max_length=15
-    )
-
-    owner_number = models.CharField(
-        max_length=15,
-        blank=True,
-        null=True
-    )
-
-    # =========================
-    # SOURCE
-    # =========================
+    ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    vehicle_number = models.CharField(max_length=50)
+    driver_number = models.CharField(max_length=15)
+    owner_number = models.CharField(max_length=15, blank=True, null=True)
 
     SOURCE_TYPES = [
-        ('direct', 'Direct'),
-        ('transporters', 'Transporters'),
-        ('brokers', 'Brokers'),
-        ('drivers', 'Drivers'),
-        ('others', 'Others'),
+        ('direct','Direct'),
+        ('transporters','Transporters'),
+        ('brokers','Brokers'),
+        ('drivers','Drivers'),
+        ('others','Others')
     ]
+    
+    source = models.CharField(max_length=100, choices = SOURCE_TYPES, blank=True, null=True )
 
-    source = models.CharField(
-        max_length=100,
-        choices=SOURCE_TYPES,
-        blank=True,
-        null=True
-    )
+    # 💰 MONEY FIELDS (use DecimalField)
+    freight_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    halting = models.DecimalField(max_digits=200,decimal_places=2,default=0)
+    loading_unloading = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    brokerage = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_freight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    advance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    ORDER_TYPE = [
-        ('crm', 'CRM Order'),
-        ('manual', 'Manual Order'),
-    ]
-
-    order_type = models.CharField(
-        max_length=10,
-        choices=ORDER_TYPE,
-        default='crm'
-    )
-
-    # =========================
-    # FREIGHT
-    # =========================
-
-    freight_amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    halting = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    loading_unloading = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    brokerage = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    total_freight = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    advance = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    balance = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0
-    )
-
-    margin_percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=0
-    )
-
-    profit_amount = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=0
-    )
-
-    # =========================
-    # APPROVAL
-    # =========================
-
-    approval_required = models.BooleanField(
-        default=False
-    )
-
-    approval_name = models.CharField(
-        max_length=120,
-        blank=True,
-        null=True
-    )
-
-    approval_reason = models.TextField(
-        blank=True,
-        null=True
-    )
-
-    # =========================
-    # BANK
-    # =========================
-
-    account_name = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True
-    )
-
-    account_number = models.CharField(
-        max_length=30,
-        blank=True,
-        null=True
-    )
-
-    ifsc = models.CharField(
-        max_length=20,
-        blank=True,
-        null=True
-    )
-
-    ac_type = models.CharField(
-        max_length=20,
-        blank=True,
-        null=True
-    )
-
-    bank_verified = models.BooleanField(
-        default=False
-    )
-
-    bank_verified_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
-
-    beneficiary_name = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True
-    )
-
-    # =========================
-    # UPI
-    # =========================
+    # 💳 PAYMENT
+    account_name = models.CharField(max_length=100, blank=True, null=True)
+    account_number = models.CharField(max_length=30, blank=True, null=True)
+    ifsc = models.CharField(max_length=20, blank=True, null=True)
+    ac_type = models.CharField(max_length=20, blank = True, null=True)
+    bank_verified = models.BooleanField(default=False)
+    bank_verified_at = models.DateTimeField(null=True, blank=True)
+    beneficiary_name = models.CharField(max_length=100, blank=True, null=True)
 
     UPI_CHOICES = [
-        ('phonepe', 'PhonePe'),
-        ('gpay', 'Google Pay'),
-        ('paytm', 'Paytm'),
-        ('other', 'Other'),
+    ('phonepe', 'PhonePe'),
+    ('gpay', 'Google Pay'),
+    ('paytm', 'Paytm'),
+    ('other', 'Other'),
     ]
 
-    upi_app = models.CharField(
-        max_length=10,
-        choices=UPI_CHOICES,
-        default='phonepe'
-    )
+    upi_app = models.CharField(max_length=10, choices=UPI_CHOICES, default='phonepe')
+    upi_id = models.CharField(max_length=200,blank=True,null=True)
+    upi_number = models.CharField(max_length=200, blank=True,null=True)
+    vehicle_reassign_date = models.DateTimeField(blank=True,null=True)
+    is_overpaid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    upi_id = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
-
-    upi_number = models.CharField(
-        max_length=15,
-        blank=True,
-        null=True
-    )
-
-    # =========================
-    # OTHER
-    # =========================
-
-    vehicle_reassign_date = models.DateTimeField(
-        blank=True,
-        null=True
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-     
+    def clean(self):
+        total_freight = Decimal(self.total_freight or 0)
+        if total_freight < 0:
+            raise ValidationError("Invalid freight amount")
+        
     @property
     def total_advance_paid(self):
-        return self.vehicletransaction_set.filter(
+        return self.transactions.filter(
             transaction_type="advance"
-        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or Decimal("0")
+
 
     @property
     def total_balance_paid(self):
-        return self.vehicletransaction_set.filter(
+
+        return self.transactions.filter(
             transaction_type="balance"
-        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
-    
-    @property
-    def total_paid(self):
-        return self.total_advance_paid + self.total_balance_paid
-
-    def clean_accounting(self):
-
-        total_freight = self.total_freight or Decimal("0")
-        total_paid = self.total_paid or Decimal("0")
-
-        if total_paid > total_freight:
-            self.is_overpaid = True
-        else:
-            self.is_overpaid = False
-
-    @property
-    def computed_balance(self):
-        return self.remaining_balance_amount
-    
-    @property
-    def tracking(self):
-        if self.order:
-            return getattr(self.order, "tracking", None)
-        if self.manual_order:
-            return getattr(self.manual_order, "tracking", None)
-        return None
-
-    from decimal import Decimal
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or Decimal("0")
 
     @property
     def total_paid(self):
-        return self.total_advance_paid + self.total_balance_paid
 
+        return self.transactions.filter(
+            transaction_type__in=['advance', 'balance']
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or 0
 
     @property
     def remaining_balance_amount(self):
-        return (self.total_freight or Decimal("0")) - (self.total_paid or Decimal("0"))
-
-
-    @property
-    def is_overpaid(self):
-        return self.remaining_balance_amount < 0
-
+        total_freight = Decimal(self.total_freight or 0)
+        paid = Decimal(self.total_paid or 0)
+        return max(total_freight - paid, Decimal("0"))
 
     @property
     def is_payment_completed(self):
         return self.remaining_balance_amount <= 0
+
     @property
     def is_trip_completed(self):
-        tracking = self.tracking
-
-        delivered = getattr(tracking, "delivered", False) if tracking else False
-        settled = getattr(tracking, "settled", False) if tracking else False
-
-        return bool(
-            delivered and settled and self.remaining_balance_amount <= 0
-        )
-
-    @property
-    def payment_status(self):
-
-        if self.is_overpaid:
-            return "OVERPAID ⚠️"
-
-        if self.remaining_balance_amount == 0:
-            return "SETTLED"
-
-        if self.remaining_balance_amount > 0:
-            return "PENDING"
-
-        return "INVALID"
+        if hasattr(self.order, "tracking"):
+            return self.order.tracking.delivered
+        return False
 
     @property
     def is_locked(self):
-        return self.is_trip_completed or self.is_payment_completed
+
+        if hasattr(self.order, "tracking"):
+            return self.order.tracking.settled
+        return False
+
+    @property
+    def total_expense(self):
+
+            return self.transactions.aggregate(
+                total=Sum('amount')
+            )['total'] or 0
+
+    @property
+    def can_take_advance(self):
+        return self.remaining_balance_amount > 0
 
     def save(self, *args, **kwargs):
-
-        # =========================
-        # ORDER TYPE VALIDATION
-        # =========================
-
-        if self.order_type == "crm":
-
-            if not self.order:
-                raise ValueError(
-                    "CRM vehicle must have Order"
-                )
-
-            if self.manual_order:
-                raise ValueError(
-                    "CRM vehicle cannot have ManualOrder"
-                )
-
-        elif self.order_type == "manual":
-
-            if not self.manual_order:
-                raise ValueError(
-                    "Manual vehicle must have ManualOrder"
-                )
-
-            if self.order:
-                raise ValueError(
-                    "Manual vehicle cannot have Order"
-                )
-        # =========================
-        # BALANCE
-        # =========================
-
-        self.balance = (
-            Decimal(self.freight_amount or 0)
-            - Decimal(self.advance or 0)
-        )
-
-        # =========================
-        # TOTAL FREIGHT
-        # =========================
-
-        # recompute totals first
         self.total_freight = (
             Decimal(self.freight_amount or 0)
-            + Decimal(self.halting or 0)
-            + Decimal(self.loading_unloading or 0)
             + Decimal(self.brokerage or 0)
+            + Decimal(self.loading_unloading or 0)
+            + Decimal(self.halting or 0)
         )
 
-        self.balance = Decimal(self.freight_amount or 0) - Decimal(self.advance or 0)
+        self.balance = (
+            Decimal(self.total_freight or 0)
+            - Decimal(self.advance or 0)
 
-        # ACCOUNTING CHECK
-        self.clean_accounting()
+        )
 
-        # =========================
-        # AUTO FTL NUMBER
-        # =========================
+        # 🔥 RUN VALIDATION BEFORE SAVE
+        #self.full_clean()
 
         if not self.ftl_no:
-
             with transaction.atomic():
-
                 last_vehicle = (
                     Vehicle.objects
                     .select_for_update()
-                    .exclude(ftl_no__isnull=True)
-                    .exclude(ftl_no__exact='')
+                    .filter(ftl_no__isnull=False)
                     .order_by('-id')
                     .first()
                 )
 
-            new_num = 1
-
-            if last_vehicle and last_vehicle.ftl_no:
-
-                try:
-                    last_num = int(
-                        last_vehicle.ftl_no.replace("FTL", "").strip()
-                    )
+                if last_vehicle and last_vehicle.ftl_no:
+                    try:
+                        last_num = int(last_vehicle.ftl_no.replace("FTL", ""))
+                    except ValueError:
+                        last_num = 0
                     new_num = last_num + 1
-
-                except (ValueError, AttributeError):
+                else:
                     new_num = 1
 
-            self.ftl_no = f"FTL{new_num:03d}"
+                self.ftl_no = f"FTL{new_num:03d}"
 
         super().save(*args, **kwargs)
-
-    @property
-    def tracking(self):
-
-        if self.order:
-            return getattr(
-                self.order,
-                "tracking",
-                None
-            )
-
-        if self.manual_order:
-            return getattr(
-                self.manual_order,
-                "tracking",
-                None
-            )
-
-        return None
-
-
-    @property
-    def assigned_date(self):
-
-        if self.order:
-            return self.order.vehicle_place_date
-
-        if self.manual_order:
-            return self.manual_order.vehicle_assign_date
-
-        return None
-
-
-    @property
-    def order_no(self):
-
-        if self.order:
-            return self.order.order_no
-
-        if self.manual_order:
-            return self.manual_order.order_no
-
-        return "-"
-
-
-    @property
-    def trip_status(self):
-
-        tracking = self.tracking
-
-        if not tracking:
-            return "No Tracking"
-
-        if tracking.settled:
-            return "Settled"
-
-        if tracking.delivered:
-            return "Delivered"
-
-        if tracking.fleet_departed:
-            return "In Transit"
-
-        if tracking.invoice_eway:
-            return "Invoice / Eway"
-
-        if tracking.pod_received:
-            return "POD Received"
-
-        return "Pending"
-
-    def __str__(self):
-        return f"{self.ftl_no} - {self.order_no}"
-
 
 class Tracking(models.Model):
 
@@ -508,6 +185,7 @@ class Tracking(models.Model):
     ("delivered", "Delivered"),
     ("pod_received", "POD Received"),
     ("settled", "Settled"),
+    ("lr_generated", "LR Generated"),
     ]
 
     status = models.CharField(
@@ -523,15 +201,6 @@ class Tracking(models.Model):
         null=True,
         blank=True
     )
-
-    manual_order = models.OneToOneField(
-        ManualOrder,
-        on_delete=models.CASCADE,
-        related_name="tracking",
-        null=True,
-        blank=True
-    )
-
     # =========================
     # STATUS
     # =========================
@@ -606,7 +275,6 @@ class Tracking(models.Model):
 
         return "Tracking"
 
-
 class TrackingDocument(models.Model):
 
     tracking = models.ForeignKey(
@@ -625,4 +293,3 @@ class TrackingDocument(models.Model):
 
     def __str__(self):
         return self.file.name
-

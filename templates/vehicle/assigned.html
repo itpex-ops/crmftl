@@ -73,42 +73,63 @@
                         <!-- Tracking Status -->
                         <td>
 
-                            {% with status=vehicle.trip_status %}
+                            {% if vehicle.order.tracking %}
 
-                            {% if status == "Settled" %}
-                            <span class="badge bg-success">{{ status }}</span>
+                            {% if vehicle.order.tracking.settled %}
+                            <span class="badge bg-dark">Settled</span>
 
-                            {% elif status == "Delivered" %}
-                            <span class="badge bg-success">{{ status }}</span>
+                            {% elif vehicle.order.tracking.pod_received %}
+                            <span class="badge bg-primary">POD Received</span>
 
-                            {% elif status == "In Transit" %}
-                            <span class="badge bg-info">{{ status }}</span>
+                            {% elif vehicle.order.tracking.delivered %}
+                            <span class="badge bg-success">Delivered</span>
 
-                            {% elif status == "Invoice / Eway" %}
-                            <span class="badge bg-warning text-dark">{{ status }}</span>
+                            {% elif vehicle.order.tracking.arrived %}
+                            <span class="badge bg-info">Arrived</span>
 
-                            {% elif status == "POD Received" %}
-                            <span class="badge bg-primary">{{ status }}</span>
+                            {% elif vehicle.order.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">Fleet Departed</span>
+
+                            {% elif vehicle.order.tracking.invoice_eway %}
+                            <span class="badge bg-secondary">Invoice / Eway</span>
+
+                            {% elif vehicle.order.tracking.lr_no_b %}
+                            <span class="badge bg-secondary">LR Generated</span>
+
+                            {% elif vehicle.order.tracking.vehicle_document %}
+                            <span class="badge bg-info">Vehicle Document</span>
+
+                            {% elif vehicle.order.tracking.vehicle_placed %}
+                            <span class="badge bg-primary">Vehicle Placed</span>
+
+                            {% elif vehicle.order.tracking.advance_received %}
+                            <span class="badge bg-success">Advance Received</span>
 
                             {% else %}
-                            <span class="badge bg-secondary">{{ status }}</span>
+                            <span class="badge bg-secondary">Tracking Started</span>
                             {% endif %}
 
-                            {% endwith %}
+                            {% else %}
+
+                            <span class="badge bg-secondary">
+                                Vehicle Assigned
+                            </span>
+
+                            {% endif %}
 
                         </td>
 
                         <!-- Vehicle Place Date -->
                         <td class="text-muted">
-                            {% if vehicle.assigned_date %}
-                            {{ vehicle.assigned_date|date:"d M Y h:i A" }}
+                            {% if vehicle.order.vehicle_place_date %}
+                            {{ vehicle.order.vehicle_place_date|date:"d M Y h:i A" }}
                             {% else %}
                             -
                             {% endif %}
                         </td>
                         <!-- Actions -->
                         <td>
-                            {% if vehicle.tracking and vehicle.tracking.settled %}
+                            {% if vehicle.order.tracking and vehicle.order.tracking.settled %}
 
                             <button class="btn btn-light btn-sm" disabled>
                                 🔒 Trip Closed

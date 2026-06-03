@@ -75,6 +75,65 @@
         font-size: 12px;
         line-height: 1.4;
     }
+
+    .lock-card {
+        position: relative;
+        background: linear-gradient(135deg, #ff4d4d, #c0392b);
+        color: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        overflow: hidden;
+        min-width: 160px;
+    }
+
+    /* content */
+    .lock-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .lock-icon {
+        font-size: 20px;
+        animation: pulse 1.5s infinite;
+    }
+
+    /* swipe layer */
+    .swipe-layer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.15);
+        transition: 0.4s ease;
+        z-index: 1;
+    }
+
+    /* hover animation (desktop) */
+    .lock-card:hover .swipe-layer {
+        left: 0;
+    }
+
+    /* pulse animation */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.2);
+            opacity: 0.6;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 </style>
 
 <div class="container-fluid">
@@ -96,7 +155,6 @@
         </div>
 
     </div>
-
     <!-- SUMMARY -->
     <div class="row g-3 mb-3">
 
@@ -168,8 +226,8 @@
                         <!-- <td>{{ v.order_no|default_if_none:"" }}</td> -->
 
                         <td class="amount freight">₹{{ v.freight|default:0 }}</td>
-                        <td class="amount advance text-success">₹{{ v.advance|default:0 }}</td>
-                        <td class="amount balance text-danger">₹{{ v.balance|default:0 }}</td>
+                        <td class="amount advance text-success">₹{{ v.advance }}</td>
+                        <td class="amount balance text-danger">₹{{ v.balance }}</td>
 
                         <!-- FULL PROCESS -->
                         <td class="timeline">
@@ -216,20 +274,42 @@
                         </td>
 
                         <!-- ACTIONS -->
-                        <td class="d-flex gap-1 flex-wrap">
+                        <td>
 
-                            <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
-                                class="btn btn-sm btn-outline-primary action-btn">
-                                Ledger
-                            </a>
+                            {% if v.is_locked %}
 
-                            <a href="{% url 'vehicle_payments' v.vehicle_id %}"
-                                class="btn btn-sm btn-outline-primary action-btn">
-                                Payments
-                            </a>
+                            <div class="lock-card">
+
+                                <div class="lock-content">
+                                    <i class="bi bi-lock-fill lock-icon"></i>
+                                    <div>
+                                        <div class="fw-bold">Board Locked</div>
+                                        <small>Swipe to unlock</small>
+                                    </div>
+                                </div>
+
+                                <!-- swipe overlay -->
+                                <div class="swipe-layer"></div>
+
+                            </div>
+
+                            {% else %}
+
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
+                                    class="btn btn-sm btn-outline-primary">
+                                    Ledger
+                                </a>
+
+                                <a href="{% url 'vehicle_payments' v.vehicle_id %}"
+                                    class="btn btn-sm btn-outline-success">
+                                    Payments
+                                </a>
+                            </div>
+
+                            {% endif %}
 
                         </td>
-
                     </tr>
                     {% endif %}
                     {% endfor %}
@@ -294,5 +374,6 @@
 
     });
 </script>
+
 
 {% endblock %}

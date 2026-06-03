@@ -4,110 +4,172 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
+    /* Advance = Green */
+    .row-advance {
+        background: #e9f9ee;
+        border-left: 4px solid #28a745;
+    }
 
-.page-header{
-    background: linear-gradient(135deg, #db8017,#cca644);
-    color: white;
-    padding: 22px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
+    /* Balance = Orange */
+    .row-balance {
+        background: #fff4e6;
+        border-left: 4px solid #fd7e14;
+    }
 
-.card-modern{
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-}
+    /* Other = Blue/Grey */
+    .row-other {
+        background: #eef5ff;
+        border-left: 4px solid #0d6efd;
+    }
 
-.stat-card{
-    border: none;
-    border-radius: 16px;
-    padding: 18px;
-    background: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
+    /* Hover effect (all rows) */
+    .table-hover tbody tr:hover {
+        transform: scale(1.01);
+        transition: 0.2s;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
 
-.stat-title{
-    font-size: 12px;
-    color: #64748b;
-    text-transform: uppercase;
-}
+    /* ================= TABS ================= */
+    .tab-bar {
+        display: flex;
+        gap: 10px;
+        background: #f5f6fa;
+        padding: 10px;
+        border-radius: 14px;
+        overflow-x: auto;
+    }
 
-.stat-value{
-    font-size: 26px;
-    font-weight: 700;
-}
+    .tab-btn {
+        flex: 1;
+        text-align: center;
+        padding: 10px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        color: #444;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
 
-.balance{
-    color: #2563eb;
-}
+    .tab-btn:hover {
+        transform: translateY(-1px);
+        background: #fff7e6;
+        border-color: #ffb84d;
+        color: #d97706;
+    }
 
-.btn-modern{
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-weight: 600;
-}
+    /* Active tab */
+    .tab-btn.active {
+        background: linear-gradient(135deg, #db8017, #cca644);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 6px 15px rgba(219, 128, 23, 0.25);
+    }
 
-.table thead{
-    background: #f8fafc;
-}
+    @keyframes fade {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
 
-.badge-mode{
-    font-size: 11px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: #eef2ff;
-    color: #3730a3;
-}
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-.warning-box{
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 600;
-}
+    /* ================= SKELETON ================= */
+    .skeleton {
+        background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+        background-size: 400% 100%;
+        animation: shimmer 1.2s ease-in-out infinite;
+        border-radius: 10px;
+    }
 
+    @keyframes shimmer {
+        0% {
+            background-position: 100% 0;
+        }
+
+        100% {
+            background-position: 0 0;
+        }
+    }
+
+    .skel-card {
+        padding: 14px;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
+        margin-bottom: 10px;
+    }
+
+    .skel-line {
+        height: 12px;
+        margin: 8px 0;
+    }
+
+    .skel-title {
+        height: 16px;
+        width: 60%;
+    }
+
+    .skel-small {
+        height: 10px;
+        width: 40%;
+    }
 </style>
 
 <div class="container-fluid py-3">
 
     <!-- HEADER -->
     <div class="page-header d-flex justify-content-between align-items-center">
-
         <div>
-            <h4 class="mb-1">Balance Payment</h4>
+            <h4 class="mb-1">
+                <i class="bi bi-cash-coin"></i> Vehicle Payment Center
+            </h4>
             <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
         </div>
 
-        <a href="{% url 'vehicle_payments' vehicle.id %}"
-           class="btn btn-warning btn-modern">
-            <i class="bi bi-cash-stack"></i> Advance
-        </a>
-
+        <div>
+            <span class="badge bg-light text-dark">Finance Dashboard</span>
+        </div>
     </div>
 
-    <!-- OVERPAY WARNING -->
-    {% if vehicle.remaining_balance_amount < 0 %}
-    <div class="warning-box mb-3">
-        ⚠️ Overpayment detected! Paid amount exceeds total freight.
-    </div>
-    {% endif %}
-
-    <!-- SUMMARY -->
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-6">
+    <!-- STATS -->
+    <div class="row g-3 mt-3">
+        <div class="col-md-3">
             <div class="stat-card">
                 <div class="stat-title">Total Freight</div>
-                <div class="stat-value">₹{{ vehicle.freight_amount|floatformat:2 }}</div>
+                <div class="stat-value">₹{{ vehicle.total_freight|floatformat:2 }}</div>
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="stat-card">
-                <div class="stat-title">Pending Balance</div>
-                <div class="stat-value balance">
+                <div class="stat-title">Advance Paid</div>
+                <div class="stat-value text-primary">
+                    ₹{{ vehicle.total_advance_paid|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-title">Total Paid</div>
+                <div class="stat-value text-success">
+                    ₹{{ vehicle.total_paid|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-title">Balance</div>
+                <div class="stat-value text-danger">
                     ₹{{ vehicle.remaining_balance_amount|floatformat:2 }}
                 </div>
             </div>
@@ -115,109 +177,113 @@
 
     </div>
 
-    <div class="row">
 
-        <!-- FORM -->
+    <!-- ================= TAB CONTENT ================= -->
+    <div class="tab-bar">
+        {% if vehicle.remaining_balance_amount > 0 %}
+        <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="tab-btn">
+            Advance
+        </a>
+        {% else %}
+        <span class="tab-btn disabled">
+            Advance (Closed)
+        </span>
+        {% endif %}
+
+
+        {% if vehicle.remaining_balance_amount > 0 %}
+        <a href="{% url 'pay_vehicle_balance' vehicle.id %}"
+            class="tab-btn {% if request.resolver_match.url_name == 'vehicle_balance' %}active{% endif %}">
+            Balance
+        </a>
+        {% else %}
+        <span class="tab-btn disabled">
+            Balance (Completed)
+        </span>
+        {% endif %}
+
+        <a href="{% url 'pay_vehicle_other' vehicle.id %}"
+            class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
+            Other
+        </a>
+
+    </div>
+
+    <!-- SKELETON -->
+    <div id="skeleton-loader">
+        <div class="skel-card">
+            <div class="skeleton skel-line skel-title"></div>
+            <div class="skeleton skel-line"></div>
+            <div class="skeleton skel-line skel-small"></div>
+        </div>
+    </div>
+
+    <!-- VEHICLE + HISTORY -->
+    <div class="row mt-3">
+
         <div class="col-lg-5">
 
-            <div class="card card-modern">
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">Vehicle Details</div>
                 <div class="card-body">
-
-                    <h5 class="mb-4">Add Balance Payment</h5>
-
-                    <form method="post">
-                        {% csrf_token %}
-
-                        <div class="mb-3">
-                            <label>Amount</label>
-                            <input type="number" step="0.01" name="amount"
-                                   class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Payment Mode</label>
-                            <select name="payment_mode" class="form-select">
-                                <option value="upi">UPI</option>
-                                <option value="bank">Bank</option>
-                                <option value="cash">Cash</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Transaction No</label>
-                            <input type="text" name="transaction_no" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Remarks</label>
-                            <textarea name="remarks" class="form-control"></textarea>
-                        </div>
-
-                        <button class="btn btn-primary btn-modern w-100">
-                            <i class="bi bi-wallet2"></i> Save Balance Payment
-                        </button>
-
-                    </form>
-
+                    <div><b>FTL:</b> {{ vehicle.ftl_no }}</div>
+                    <div><b>Vehicle:</b> {{ vehicle.vehicle_number }}</div>
+                    <div><b>Driver:</b> {{ vehicle.driver_number }}</div>
+                    <div><b>Owner:</b> {{ vehicle.owner_number }}</div>
                 </div>
             </div>
 
         </div>
 
-        <!-- HISTORY -->
         <div class="col-lg-7">
 
-            <div class="card card-modern">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Payment History</div>
+                <div class="card-body p-0">
 
-                    <div class="section-title text-primary mb-3">
-                        Balance Payment History
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Mode</th>
+                                    <th>Txn</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in transactions %}
+                                <tr class="{{ p.row_class }}">
+
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ p.date|date:"d-m-Y" }}</td>
+
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ p.label }}
+                                        </span>
+                                    </td>
+
+                                    <td>₹{{ p.amount|floatformat:2 }}</td>
+                                    <td>{{ p.payment_mode|upper }}</td>
+                                    <td>{{ p.transaction_no|default:"-" }}</td>
+                                    <td>{{ p.remarks|default:"-" }}</td>
+
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        No payment history
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
                     </div>
-
-                    <table class="table table-hover align-middle">
-
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Mode</th>
-                                <th>Txn No</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            {% for p in balances %}
-
-                            <tr>
-                                <td>{{ p.created_at|date:"d-m-Y H:i" }}</td>
-
-                                <td class="fw-bold text-primary">
-                                    ₹{{ p.amount|floatformat:2 }}
-                                </td>
-
-                                <td>
-                                    <span class="badge-mode">
-                                        {{ p.payment_mode|upper }}
-                                    </span>
-                                </td>
-
-                                <td>{{ p.transaction_no }}</td>
-                            </tr>
-
-                            {% empty %}
-
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">
-                                    No balance payments found
-                                </td>
-                            </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
 
                 </div>
             </div>
@@ -225,7 +291,27 @@
         </div>
 
     </div>
-
 </div>
+
+<script>
+    function openTab(event, tabName) {
+
+        document.querySelectorAll('.tab-content')
+            .forEach(el => el.classList.remove('active'));
+
+        document.querySelectorAll('.tab-btn')
+            .forEach(el => el.classList.remove('active'));
+
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    window.addEventListener("load", function () {
+        setTimeout(() => {
+            const sk = document.getElementById("skeleton-loader");
+            if (sk) sk.style.display = "none";
+        }, 800);
+    });
+</script>
 
 {% endblock %}

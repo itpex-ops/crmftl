@@ -93,11 +93,6 @@
 
         <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
 
-            {% if 'orders_manual' in role_perms %}
-            <a href="{% url 'manual_order_create' %}">
-                <i class="bi bi-plus-square me-2"></i> Manual
-            </a>
-            {% endif %}
 
             {% if 'orders' in role_perms or 'orders_list' in role_perms %}
             <a href="{% url 'orders_management' %}">

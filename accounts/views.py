@@ -22,31 +22,66 @@ from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .models import VehicleTransaction
+
+
+def create_vehicle_payment(
+    request,
+    vehicle,
+    transaction_type
+):
+    try:
+
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type=transaction_type,
+            amount=request.POST.get("amount"),
+            payment_mode=request.POST.get("payment_mode"),
+            transaction_no=request.POST.get("transaction_no"),
+            remarks=request.POST.get("remarks"),
+            created_by=request.user
+        )
+
+        return True
+
+    except Exception as e:
+
+        messages.error(request, str(e))
+        return False
+
+@login_required
 def vehicle_payments(request, vehicle_id):
 
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
-    transactions = (
-        vehicle.vehicletransaction_set
-        .all()
-        .order_by("-id")
-    )
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).order_by("id")
+
+    adv = 0
+    bal = 0
+    oth = 0
+
+    for t in transactions:
+
+        if t.transaction_type == "advance":
+            adv += 1
+            t.label = f"Advance {adv}"
+            t.row_class = "row-advance"
+
+        elif t.transaction_type == "balance":
+            bal += 1
+            t.label = f"Balance{bal}"
+            t.row_class = "row-balance"
+
+        else:
+            oth += 1
+            t.label = f"OtherS{oth}"
+            t.row_class = "row-other"
 
     context = {
         "vehicle": vehicle,
         "transactions": transactions,
-
-        # FINANCIALS (single source of truth)
-        "total_advance": vehicle.total_advance_paid,
-        "total_balance": vehicle.total_balance_paid,
-        "total_paid": vehicle.total_paid,
-        "remaining_balance": vehicle.remaining_balance_amount,
-
-        # STATUS FLAGS
-        "trip_completed": vehicle.is_trip_completed,
-        "payment_completed": vehicle.is_payment_completed,
-        "is_locked": vehicle.is_locked,
-        "is_overpaid": vehicle.is_overpaid,
     }
 
     return render(request, "accounts/vehicle_payments.html", context)
@@ -57,47 +92,89 @@ def pay_vehicle_advance(request, vehicle_id):
 
     if request.method == "POST":
 
-        success = create_vehicle_payment(
-            request,
-            vehicle,
-            "advance"
+        amount = Decimal(request.POST.get("amount") or 0)
+
+        total_freight = Decimal(vehicle.total_freight or 0)
+        total_advance = Decimal(vehicle.total_advance_paid or 0)
+
+        balance = total_freight - total_advance
+
+        # ❌ RULE 1: if balance is 0, no advance allowed
+        if balance <= 0:
+            messages.error(request, "Advance not allowed. Balance is already zero.")
+            return redirect("vehicle_payments", vehicle.id)
+
+        # ❌ RULE 2: advance cannot exceed remaining balance
+        if amount > balance:
+            messages.error(
+                request,
+                f"Advance cannot exceed balance ₹{balance}"
+            )
+            return redirect("vehicle_payments", vehicle.id)
+
+        # SAVE PAYMENT
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            amount=amount,
+            transaction_type="advance",
+            created_by=request.user
         )
 
-        if success:
-            messages.success(request, "✅ Advance payment recorded successfully.")
-            return redirect("vehicle_payments", vehicle_id=vehicle.id)
+        messages.success(request, "Advance payment added successfully.")
+        return redirect("vehicle_payments", vehicle.id)
 
-        return redirect("vehicle_payments", vehicle_id=vehicle.id)
+    return render(request, "accounts/pay_vehicle_advance.html", {"vehicle": vehicle})
 
-    return render(request, "accounts/pay_vehicle_advance.html", {
-        "vehicle": vehicle
-    })
-
+@login_required
 def pay_vehicle_balance(request, vehicle_id):
 
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
     if request.method == "POST":
 
-        success = create_vehicle_payment(
-            request,
-            vehicle,
-            "balance"
+        amount = Decimal(request.POST.get("amount") or 0)
+
+        remaining = vehicle.remaining_balance_amount
+
+        # 🔴 RULE 1: no balance if already cleared
+        if remaining <= 0:
+            messages.error(request, "Balance already completed. No payment allowed.")
+            return redirect("pay_vehicle_balance", vehicle.id)
+
+        # 🔴 RULE 2: cannot exceed remaining balance
+        if amount > remaining:
+            messages.error(
+                request,
+                f"Balance payment cannot exceed ₹{remaining}"
+            )
+            return redirect("pay_vehicle_balance", vehicle.id)
+
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type="balance",
+            amount=amount,
+            created_by=request.user
         )
 
-        if success:
-            messages.success(request, "✅ Balance payment recorded successfully.")
-            return redirect("vehicle_payments", vehicle_id=vehicle.id)
+        messages.success(request, "Balance payment added.")
+        return redirect("pay_vehicle_balance", vehicle.id)
 
-        return redirect("vehicle_payments", vehicle_id=vehicle.id)
+    balances = VehicleTransaction.objects.filter(
+        vehicle=vehicle,
+        transaction_type="balance"
+    ).order_by("-id")
 
     return render(request, "accounts/pay_vehicle_balance.html", {
-        "vehicle": vehicle
+        "vehicle": vehicle,
+        "balances": balances
     })
-
+@login_required
 def vehicle_accounts(request):
 
-    vehicles = Vehicle.objects.select_related("order", "manual_order")
+    vehicles = Vehicle.objects.select_related(
+        "order",
+        "order__tracking"
+    )
 
     data = []
 
@@ -107,50 +184,69 @@ def vehicle_accounts(request):
             "vehicle_id": v.id,
             "ftlno": v.ftl_no,
             "vehicle": v.vehicle_number,
-
-            # ACCOUNTING (FINAL SOURCE OF TRUTH)
             "freight": v.total_freight,
             "paid": v.total_paid,
-            "balance": v.remaining_balance_amount,
-
-            # FLAGS
+            "advance" : v.advance,
+            "balance": v.balance,
             "trip_completed": v.is_trip_completed,
             "payment_completed": v.is_payment_completed,
             "is_locked": v.is_locked,
             "is_overpaid": v.is_overpaid,
         })
 
-    return render(request, "accounts/vehicle.html", {
-        "data": data
-    })
-
-def create_vehicle_payment(request, vehicle, payment_type):
-
-    amount = Decimal(request.POST.get("amount") or 0)
-
-    remaining = vehicle.remaining_balance_amount
-
-    # Prevent overpayment
-    if amount > remaining:
-
-        messages.error(
-            request,
-            f"❌ Amount exceeds remaining balance. Remaining: ₹{remaining}"
-        )
-
-        return False
-
-    VehicleTransaction.objects.create(
-        vehicle=vehicle,
-        transaction_type=payment_type,
-        amount=amount,
-        payment_mode=request.POST.get("payment_mode"),
-        transaction_no=request.POST.get("transaction_no"),
-        remarks=request.POST.get("remarks"),
-        created_by=request.user,
+    return render(
+        request,
+        "accounts/vehicle.html",
+        {"data": data}
     )
 
-    return True
+@login_required
+def pay_vehicle_other(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    if request.method == "POST":
+
+        success = create_vehicle_payment(
+            request,
+            vehicle,
+            request.POST.get(
+                "transaction_type"
+            )
+        )
+
+        if success:
+
+            messages.success(
+                request,
+                "Expense added."
+            )
+
+            return redirect(
+                "pay_vehicle_other",
+                vehicle.id
+            )
+
+    others = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).exclude(
+        transaction_type__in=[
+            "advance",
+            "balance"
+        ]
+    ).order_by("-id")
+
+    return render(
+        request,
+        "accounts/pay_vehicle_other.html",
+        {
+            "vehicle": vehicle,
+            "others": others
+        }
+    )
 
 def edit_vehicle_account(request, vehicle_id):
 

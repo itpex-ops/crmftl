@@ -20,8 +20,6 @@ urlpatterns = [
     #path('bank/', views.bank_accounts, name='bank_accounts'),
     path('customer-edit/<int:enquiry_id>/', views.edit_customer_account, name='edit_customer_account'),
     path('customer-payment/<int:enquiry_id>/', views.receive_customer_payment, name='receive_customer_payment'),
-
-
     path(
     'vehicle/<int:vehicle_id>/payments/',
     views.vehicle_payments,
@@ -38,5 +36,10 @@ path(
     'vehicle/<int:vehicle_id>/balance/',
     views.pay_vehicle_balance,
     name='pay_vehicle_balance'
+),
+path(
+    "vehicle/<int:vehicle_id>/payments/other/",
+    views.pay_vehicle_other,
+    name="pay_vehicle_other"
 ),
 ]

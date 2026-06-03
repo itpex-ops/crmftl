@@ -12,73 +12,57 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 from django.contrib import messages
-from manual_order.models import ManualOrder
 from orders.models import Order
 from django.db.models import Count, Sum
 from django.views.decorators.http import require_POST
 
+from django.core.exceptions import ValidationError
+
 @login_required
 def assign_vehicle(request, order_id):
-    order_source = request.GET.get("manual", "crm")
-    print("s",order_source)
-    if order_source == "manual":
-        order = get_object_or_404(ManualOrder, id=order_id)
-        selling_price = (
-            getattr(order.pricing, "total_amount", 0)
-            if getattr(order, "pricing", None)
-            else 0)
-        vehicle_filter = {"manual_order": order, "order_type": "manual"}
-    else:
-        order = get_object_or_404(Order, id=order_id)
-        selling_price = getattr(order, "total_rate", 0) or 0
-        vehicle_filter = {"order": order, "order_type": "crm"}
-    existing_vehicle = Vehicle.objects.filter(**vehicle_filter).first()
-    if request.method == "POST":
-        Vehicle.objects.create(
-            **vehicle_filter,
-            vehicle_number=request.POST.get("vehicle_number"),
-            driver_number=request.POST.get("driver_number"),
-            owner_number=request.POST.get("owner_number"),
-            source=request.POST.get("source"),
-            freight_amount=request.POST.get("freight_amount") or 0,
-            halting=request.POST.get("halting") or 0,
-            loading_unloading=request.POST.get("loading_unloading") or 0,
-            brokerage=request.POST.get("brokerage") or 0,
-            advance=request.POST.get("advance") or 0,
-        )
 
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+
+        try:
+
+            vehicle = Vehicle(
+                order=order,
+                vehicle_number=request.POST.get("vehicle_number"),
+                driver_number=request.POST.get("driver_number"),
+                owner_number=request.POST.get("owner_number"),
+                source=request.POST.get("source"),
+                freight_amount=Decimal(request.POST.get("freight_amount") or 0),
+                halting=Decimal(request.POST.get("halting") or 0),
+                loading_unloading=Decimal(request.POST.get("loading_unloading") or 0),
+                brokerage=Decimal(request.POST.get("brokerage") or 0),
+                #advance=Decimal(request.POST.get("advance") or 0),
+                upi_app=request.POST.get("upi_app"),
+                upi_id=request.POST.get("upi_id"),
+                upi_number=request.POST.get("upi_number"),
+                account_name=request.POST.get("account_name"),
+                account_number=request.POST.get("account_number"),
+                ifsc=request.POST.get("ifsc"),
+                ac_type=request.POST.get("ac_type"),
+                beneficiary_name=request.POST.get("beneficiary_name")
+            )
+
+            # 🔥 SAFE VALIDATION
+            vehicle.clean()
+
+            vehicle.save()
+
+        except ValidationError as e:
+            messages.error(request, e.messages[0])
+            return redirect("assign_vehicle", order_id=order.id)
+
+        Tracking.objects.get_or_create(order=order)
+
+        messages.success(request, "Vehicle assigned successfully.")
         return redirect("orders_management")
 
-    return render(request, "vehicle/assign_vehicle.html", {
-        "order": order,
-        "existing_vehicle": existing_vehicle,
-        "source": order_source,
-        "selling_price": float(selling_price)
-    })
-
-def tracking_view(request):
-    query = request.GET.get("q")
-    tracking = None
-    vehicle = None
-
-    if query:
-        tracking = Tracking.objects.select_related("order").filter(
-            lr_no__icontains=query
-        ).first()
-
-        if not tracking:
-            tracking = Tracking.objects.select_related("order").filter(
-                order__ftl_no__icontains=query
-            ).first()
-
-        if tracking:
-            vehicle = tracking.order  # adjust if your FK is different
-
-    return render(request, "tracking.html", {
-        "tracking": tracking,
-        "vehicle": vehicle
-    })
-
+    return render(request, "vehicle/assign_vehicle.html", {"order": order})
 
 def tracking_view(request):
     query = request.GET.get("q")
@@ -228,65 +212,6 @@ def public_tracking(request):
 
     return render(request, "vehicle/public_tracking.html", context)
 
-@login_required 
-def assign_vehicle32(request, order_id):
-
-    order = get_object_or_404(Order, id=order_id)
-
-    if request.method == "POST":
-
-        # SOURCE
-        source = request.POST.get("source")
-        source_other = request.POST.get("source_other")
-
-        if source == "others" and source_other:
-            source = source_other
-
-        Vehicle.objects.create(
-            order=order,
-
-            # BASIC
-            vehicle_number=request.POST.get("vehicle_number"),
-            driver_number=request.POST.get("driver_number"),
-            owner_number=request.POST.get("owner_number"),
-            source=source,
-
-            # MONEY
-            freight_amount=Decimal(request.POST.get("freight_amount") or 0),
-            halting=Decimal(request.POST.get("halting") or 0),
-            loading_unloading=Decimal(request.POST.get("loading_unloading") or 0),
-            brokerage=Decimal(request.POST.get("brokerage") or 0),
-
-            # ❗ OPTIONAL: no need to send these, model auto calculates
-            advance=Decimal(request.POST.get("advance") or 0),
-
-            # PAYMENT
-            upi_app=request.POST.get("upi_app"),
-            upi_id=request.POST.get("upi_id"),
-            upi_number=request.POST.get("upi_number"),
-
-            #account_name=request.POST.get("account_name"),
-            account_number=request.POST.get("account_number"),
-            ifsc=request.POST.get("ifsc"),
-            ac_type=request.POST.get("ac_type"),
-            beneficiary_name=request.POST.get('account_beneficiary_name'),
-
-            # ❗ TEMP: just accept flags (no strict validation)
-            bank_verified = request.POST.get("bank_verified") == "1",
-        )
-
-        # AUTO CREATE TRACKING
-        Tracking.objects.get_or_create(order=order)
-
-        messages.success(request, "Vehicle assigned successfully.")
-        return redirect("order_list")
-
-    return render(
-        request,
-        "vehicle/assign_vehicle.html",
-        {"order": order}
-    )
-
 def order_status_api(request):
 
     orders = Order.objects.select_related('tracking', 'vehicles')
@@ -334,25 +259,12 @@ def order_status_api(request):
     return JsonResponse({"orders": data})
 
 def assigned_vehicles(request, order_id):
-
-    source = request.GET.get("source", "crm")
-
-    model = ManualOrder if source == "manual" else Order
-
-    order = get_object_or_404(model, id=order_id)
-
-    vehicles = [order.vehicle] if hasattr(order, "vehicle") else []
-
-    return render(
-        request,
-        "vehicle/assigned.html",
-        {
-            "order": order,
-            "vehicles": vehicles,
-            "source": source,
-        }
-    )
-
+    order = get_object_or_404(Order, id=order_id)
+    vehicles = order.vehicles.all().order_by('-created_at')
+    return render(request, 'vehicle/assigned.html', {
+        'order': order,
+        'vehicles': vehicles,
+    })
 
 def assign_vehicle12(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -362,7 +274,7 @@ def assign_vehicle12(request, order_id):
             vehicle = form.save(commit=False)
             vehicle.order = order
             vehicle.save()
-            return redirect('order_list')
+            return redirect('order_management')
     else:
         form = VehicleForm()
     return render(request, 'vehicle/assign_vehicle.html', {
@@ -453,6 +365,7 @@ def tracking_page(request, vehicle_id):
         # -----------------------
         tracking.vehicle_placed = 'vehicle_placed' in request.POST
         tracking.vehicle_document = 'vehicle_document' in request.POST
+        tracking.lr_no_b = 'lr_no_b' in request.POST
         tracking.invoice_eway = 'invoice_eway' in request.POST
         tracking.advance_to_fleet = 'advance_to_fleet' in request.POST
         tracking.fleet_departed = 'fleet_departed' in request.POST
@@ -461,12 +374,8 @@ def tracking_page(request, vehicle_id):
         tracking.delivered = 'delivered' in request.POST
         tracking.pod_received = 'pod_received' in request.POST
         tracking.settled = 'settled' in request.POST
-
-        # LR NO
-        tracking.lr_no = request.POST.get(
-            'lr_no',
-            ''
-        ).strip()
+        tracking.lr_no = request.POST.get('lr_no', '').strip()
+    
 
         # REMARKS
         tracking.remarks = request.POST.get(
@@ -490,6 +399,35 @@ def tracking_page(request, vehicle_id):
 
         if tracking.delivered and not tracking.delivered_at:
             tracking.delivered_at = now
+        if tracking.settled:
+            tracking.status = "settled"
+
+        elif tracking.pod_received:
+            tracking.status = "pod_received"
+
+        elif tracking.delivered:
+            tracking.status = "delivered"
+
+        elif tracking.arrived:
+            tracking.status = "arrived"
+
+        elif tracking.advance_received:
+            tracking.status = "advance_received"
+
+        elif tracking.fleet_departed:
+            tracking.status = "fleet_departed"
+
+        elif tracking.invoice_eway:
+            tracking.status = "invoice_eway"
+
+        elif tracking.lr_no_b:
+            tracking.status = "invoice_eway"   # or create LR status choice
+
+        elif tracking.vehicle_document:
+            tracking.status = "vehicle_document"
+
+        elif tracking.vehicle_placed:
+            tracking.status = "vehicle_placed"
 
         tracking.save()
 

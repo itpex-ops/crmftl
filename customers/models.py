@@ -75,6 +75,7 @@ class ExCustomer(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.CharField(max_length=40,blank=True,null=True)
 
     class Meta:
         ordering = ["name"]
