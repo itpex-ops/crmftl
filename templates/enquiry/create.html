@@ -122,9 +122,8 @@
                         <div class="col-md-4">
                             <label class="form-label">Mobile Number</label>
                             <input type="tel" name="customer_contact" class="form-control" maxlength="10"
-                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}"
-
-                                {% if customer %}readonly{% endif %} required>
+                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" {% if
+                                customer %}readonly{% endif %} required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
@@ -139,7 +138,6 @@
                             <input type="text" name="gst_number" class="form-control"
                                 value="{{ customer.gst_number|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
-                        {% endif %}
                         <div class="col-md-4">
                             <label class="form-label">City</label>
                             <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}"
@@ -151,6 +149,8 @@
                             <input type="text" name="pincode" class="form-control"
                                 value="{{ customer.pincode|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
+                        {% endif %}
+
                         <div class="col-md-3">
                             <label class="form-label">Lead Source</label>
                             <select name="lead_source" class="form-select">
