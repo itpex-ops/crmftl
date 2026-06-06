@@ -77,7 +77,7 @@
     <div class="card table-card shadow-sm border-0">
         <div class="table-container">
 
-<table class="table table-hover align-middle mb-0 text-center">
+            <table class="table table-hover align-middle mb-0 text-center">
                 <thead>
 
                     <tr>
@@ -151,25 +151,25 @@
                         </td>
 
                         <!-- ROUTE -->
-                       <td class="text-start">
-    {% if order.routes %}
-    <div class="route-modern">
-        <small class="text-muted fw-bold">Pickups</small>
-        <span class="route-side">
-            {% for r in order.routes %}
-                {{ r.origin }}{% if not forloop.last %} + {% endif %}
-            {% endfor %}
-        </span>
+                        <td class="text-start">
+                            {% if order.routes %}
+                            <div class="route-modern">
+                                <small class="text-muted fw-bold">Pickups</small>
+                                <span class="route-side">
+                                    {% for r in order.routes %}
+                                    {{ r.origin }}{% if not forloop.last %} + {% endif %}
+                                    {% endfor %}
+                                </span>
 
-        <small class="text-muted fw-bold mt-1">Drops</small>
-        <span class="route-side">
-            {% for r in order.routes %}
-                {{ r.destination }}{% if not forloop.last %} + {% endif %}
-            {% endfor %}
-        </span>
-    </div>
-    {% endif %}
-</td>
+                                <small class="text-muted fw-bold mt-1">Drops</small>
+                                <span class="route-side">
+                                    {% for r in order.routes %}
+                                    {{ r.destination }}{% if not forloop.last %} + {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </td>
 
                         <!-- VEHICLE -->
 
@@ -300,73 +300,91 @@
         background: #f5f7fb;
     }
 
+
+    .table-container {
+        max-height: 70vh;
+        /* adjust as needed */
+        overflow-y: auto;
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
     .table {
-    table-layout: fixed;
-    width: 100%;
-}
+        min-width: 1420px;
+        /* total width of columns */
+        margin-bottom: 0;
+    }
 
-.table th,
-.table td {
-    vertical-align: middle;
-}
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: #fff;
+        box-shadow: 0 2px 0 rgba(0, 0, 0, .05);
+    }
 
-thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    padding: 14px 12px;
-    border-bottom: 1px solid #dee2e6;
-}
+    .table th,
+    .table td {
+        vertical-align: middle;
+    }
 
-tbody td {
-    padding: 14px 12px;
-    font-size: 14px;
-    text-align: center;
-}
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        padding: 14px 12px;
+        border-bottom: 1px solid #dee2e6;
+    }
 
-/* Customer */
-.table th:nth-child(3),
-.table td:nth-child(3) {
-    text-align: left;
-}
+    tbody td {
+        padding: 14px 12px;
+        font-size: 14px;
+        text-align: center;
+    }
 
-/* Route */
-.table th:nth-child(4),
-.table td:nth-child(4) {
-    text-align: left;
-}
+    /* Customer */
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        text-align: left;
+    }
 
-/* Vehicle */
-.table th:nth-child(5),
-.table td:nth-child(5) {
-    text-align: center;
-}
+    /* Route */
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        text-align: left;
+    }
 
-/* Status */
-.table th:nth-child(7),
-.table td:nth-child(7) {
-    text-align: center;
-}
+    /* Vehicle */
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        text-align: center;
+    }
 
-.route-modern {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    line-height: 1.4;
-    white-space: normal;
-}
+    /* Status */
+    .table th:nth-child(7),
+    .table td:nth-child(7) {
+        text-align: center;
+    }
 
-.route-side {
-    word-break: break-word;
-}
+    .route-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        line-height: 1.4;
+        white-space: normal;
+    }
 
-.order-row {
-    height: 80px;
-}
+    .route-side {
+        word-break: break-word;
+    }
+
+    .order-row {
+        height: 80px;
+    }
 
     .order-row:hover {
         background: #f8fafc;

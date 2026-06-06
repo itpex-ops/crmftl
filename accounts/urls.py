@@ -42,4 +42,15 @@ path(
     views.pay_vehicle_other,
     name="pay_vehicle_other"
 ),
+path(
+    "vehicle/<int:vehicle_id>/advance/confirm/",
+    views.confirm_vehicle_advance,
+    name="confirm_vehicle_advance"
+),
+
+path(
+    "vehicle/<int:vehicle_id>/advance/success/",
+    views.advance_success,
+    name="advance_success"
+),
 ]

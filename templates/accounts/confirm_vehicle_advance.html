@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-warning">
+            Confirm Transfer
+        </div>
+
+        <div class="card-body">
+
+            <h4>
+                ₹ {{ amount }}
+            </h4>
+
+            <hr>
+
+            <p>
+                <strong>Beneficiary</strong><br>
+                {{ vehicle.beneficiary_name }}
+            </p>
+
+            <p>
+                <strong>Account Number</strong><br>
+                {{ vehicle.account_number }}
+            </p>
+
+            <p>
+                <strong>IFSC</strong><br>
+                {{ vehicle.ifsc }}
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <select
+                    name="payment_mode"
+                    class="form-select mb-3">
+                    <option value="bank">
+                        Bank Transfer
+                    </option>
+
+                    <option value="upi">
+                        UPI
+                    </option>
+                </select>
+
+                <input
+                    type="text"
+                    name="transaction_no"
+                    class="form-control mb-3"
+                    placeholder="Enter UTR Number"
+                    required
+                >
+
+                <button
+                    class="btn btn-success"
+                >
+                    Transfer Completed
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

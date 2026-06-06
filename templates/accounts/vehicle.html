@@ -157,7 +157,6 @@
     </div>
     <!-- SUMMARY -->
     <div class="row g-3 mb-3">
-
         <div class="col-md-3">
             <div class="card-box">
                 <small class="text-muted">Total Trips</small>
@@ -190,11 +189,8 @@
 
     <!-- TABLE -->
     <div class="card-box">
-
         <div class="table-responsive">
-
             <table class="table table-bordered align-middle" id="vehicleTable">
-
                 <thead>
                     <tr>
                         <th>FTL No</th>
@@ -208,14 +204,10 @@
                         <th width="240">Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {% for v in data %}
                     {% if v.ftlno %}
                     <tr>
-
-                        <!-- Ledger -->
                         <td>
                             <a href="{% url 'vehicle_ledger' v.vehicle_id %}" class="fw-semibold text-decoration-none">
                                 {{ v.ftlno }}

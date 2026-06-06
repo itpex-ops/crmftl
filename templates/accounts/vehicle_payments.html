@@ -141,36 +141,58 @@
 
     <!-- STATS -->
     <div class="row g-3 mt-3">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-title">Total Freight</div>
-                <div class="stat-value">₹{{ vehicle.total_freight|floatformat:2 }}</div>
-            </div>
-        </div>
 
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-title">Advance Paid</div>
-                <div class="stat-value text-primary">
-                    ₹{{ vehicle.total_advance_paid|floatformat:2 }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <small class="text-muted">Total Freight</small>
+                    <h4 class="fw-bold">
+                        ₹{{ vehicle.total_freight|floatformat:2 }}
+                    </h4>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-title">Total Paid</div>
-                <div class="stat-value text-success">
-                    ₹{{ vehicle.total_paid|floatformat:2 }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <small class="text-muted">Advance Paid</small>
+                    <h4 class="fw-bold text-primary">
+                        ₹{{ vehicle.total_advance_paid|floatformat:2 }}
+                    </h4>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-title">Balance</div>
-                <div class="stat-value text-danger">
-                    ₹{{ vehicle.remaining_balance_amount|floatformat:2 }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <small class="text-muted">Balance Paid</small>
+                    <h4 class="fw-bold text-success">
+                        ₹{{ vehicle.total_balance_paid|floatformat:2 }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-danger">
+                <div class="card-body text-center">
+                    <small class="text-muted">Remaining Balance</small>
+
+                    <h4 class="fw-bold text-danger">
+                        ₹{{ vehicle.remaining_balance_amount|floatformat:2 }}
+                    </h4>
+
+                    {% if vehicle.is_payment_completed %}
+                    <span class="badge bg-success">
+                        Payment Completed
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">
+                        Pending
+                    </span>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -180,7 +202,7 @@
 
     <!-- ================= TAB CONTENT ================= -->
     <div class="tab-bar">
-        {% if vehicle.remaining_balance_amount > 0 %}
+        {% if vehicle.can_take_advance %}
         <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="tab-btn">
             Advance
         </a>
@@ -191,15 +213,10 @@
         {% endif %}
 
 
-        {% if vehicle.remaining_balance_amount > 0 %}
-        <a href="{% url 'pay_vehicle_balance' vehicle.id %}"
-            class="tab-btn {% if request.resolver_match.url_name == 'vehicle_balance' %}active{% endif %}">
+        {% if vehicle.is_trip_completed and not vehicle.is_payment_completed %}
+        <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="tab-btn">
             Balance
         </a>
-        {% else %}
-        <span class="tab-btn disabled">
-            Balance (Completed)
-        </span>
         {% endif %}
 
         <a href="{% url 'pay_vehicle_other' vehicle.id %}"
@@ -220,9 +237,7 @@
 
     <!-- VEHICLE + HISTORY -->
     <div class="row mt-3">
-
         <div class="col-lg-5">
-
             <div class="card mb-3">
                 <div class="card-header bg-success text-white">Vehicle Details</div>
                 <div class="card-body">
@@ -232,86 +247,152 @@
                     <div><b>Owner:</b> {{ vehicle.owner_number }}</div>
                 </div>
             </div>
+            <div class="card mb-3">
+    <div class="card-header bg-warning">
+        Payment Details
+    </div>
 
-        </div>
+    <div class="card-body">
 
-        <div class="col-lg-7">
+        <div><b>Beneficiary:</b> {{ vehicle.beneficiary_name|default:"-" }}</div>
 
-            <div class="card">
-                <div class="card-header bg-dark text-white">Payment History</div>
-                <div class="card-body p-0">
+        <div><b>Account Name:</b> {{ vehicle.account_name|default:"-" }}</div>
 
-                    <div class="table-responsive">
-                        <table class="table mb-0 table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                    <th>Mode</th>
-                                    <th>Txn</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for p in transactions %}
-                                <tr class="{{ p.row_class }}">
+        <div><b>Account No:</b> {{ vehicle.account_number|default:"-" }}</div>
 
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ p.date|date:"d-m-Y" }}</td>
+        <div><b>IFSC:</b> {{ vehicle.ifsc|default:"-" }}</div>
 
-                                    <td>
-                                        <span class="badge bg-secondary">
-                                            {{ p.label }}
-                                        </span>
-                                    </td>
-
-                                    <td>₹{{ p.amount|floatformat:2 }}</td>
-                                    <td>{{ p.payment_mode|upper }}</td>
-                                    <td>{{ p.transaction_no|default:"-" }}</td>
-                                    <td>{{ p.remarks|default:"-" }}</td>
-
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        No payment history
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-
-                        </table>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
+        <div><b>UPI:</b> {{ vehicle.upi_id|default:"-" }}</div>
 
     </div>
 </div>
 
-<script>
-    function openTab(event, tabName) {
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    Payment Progress
+                </div>
 
-        document.querySelectorAll('.tab-content')
-            .forEach(el => el.classList.remove('active'));
+                <div class="card-body">
 
-        document.querySelectorAll('.tab-btn')
-            .forEach(el => el.classList.remove('active'));
+                    <div class="progress mb-3" style="height:20px">
 
-        document.getElementById(tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
+                        {% if vehicle.total_freight > 0 %}
 
-    window.addEventListener("load", function () {
-        setTimeout(() => {
-            const sk = document.getElementById("skeleton-loader");
-            if (sk) sk.style.display = "none";
-        }, 800);
-    });
-</script>
+                        <div class="progress-bar bg-success"
+                            style="width:{% widthratio vehicle.total_paid vehicle.total_freight 100 %}%">
 
-{% endblock %}
+                            {% else %}
+
+                            <div class="progress-bar bg-secondary" style="width:0%">
+
+                                {% endif %}
+
+                            </div>
+
+                            <div>
+                                Paid :
+                                ₹{{ vehicle.total_paid|floatformat:2 }}
+                            </div>
+
+                            <div>
+                                Remaining :
+                                ₹{{ vehicle.remaining_balance_amount|floatformat:2 }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">Payment History</div>
+                        <div class="card-body p-0">
+
+                            <div class="table-responsive">
+                                <table class="table mb-0 table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Amount</th>
+                                            <th>Mode</th>
+                                            <th>Txn</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in transactions %}
+                                        <tr class="{{ p.row_class }}">
+
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ p.date|date:"d-m-Y" }}</td>
+
+                                            <td>
+
+                                                {% if p.transaction_type == 'advance' %}
+                                                <span class="badge bg-primary">
+                                                    Advance
+                                                </span>
+
+                                                {% elif p.transaction_type == 'balance' %}
+                                                <span class="badge bg-success">
+                                                    Balance
+                                                </span>
+
+                                                {% else %}
+                                                <span class="badge bg-secondary">
+                                                    {{ p.get_transaction_type_display }}
+                                                </span>
+                                                {% endif %}
+
+                                            </td>
+
+                                            <td>₹{{ p.amount|floatformat:2 }}</td>
+                                            <td>{{ p.payment_mode|upper }}</td>
+                                            <td>{{ p.transaction_no|default:"-" }}</td>
+                                            <td>{{ p.remarks|default:"-" }}</td>
+
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                No payment history
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            function openTab(event, tabName) {
+
+                document.querySelectorAll('.tab-content')
+                    .forEach(el => el.classList.remove('active'));
+
+                document.querySelectorAll('.tab-btn')
+                    .forEach(el => el.classList.remove('active'));
+
+                document.getElementById(tabName).classList.add('active');
+                event.currentTarget.classList.add('active');
+            }
+
+            window.addEventListener("load", function () {
+                setTimeout(() => {
+                    const sk = document.getElementById("skeleton-loader");
+                    if (sk) sk.style.display = "none";
+                }, 800);
+            });
+        </script>
+
+        {% endblock %}

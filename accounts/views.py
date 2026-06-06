@@ -23,6 +23,23 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import VehicleTransaction
+from django.core.exceptions import ValidationError
+
+def clean(self):
+
+    if self.transaction_type == "advance":
+
+        remaining = self.vehicle.remaining_balance_amount
+
+        if remaining <= 0:
+            raise ValidationError(
+                "Advance not allowed. Balance is zero."
+            )
+
+        if self.amount > remaining:
+            raise ValidationError(
+                f"Advance cannot exceed {remaining}"
+            )
 
 
 def create_vehicle_payment(
@@ -32,7 +49,7 @@ def create_vehicle_payment(
 ):
     try:
 
-        VehicleTransaction.objects.create(
+        txn = VehicleTransaction(
             vehicle=vehicle,
             transaction_type=transaction_type,
             amount=request.POST.get("amount"),
@@ -42,7 +59,31 @@ def create_vehicle_payment(
             created_by=request.user
         )
 
+        txn.full_clean()   # runs clean()
+
+        txn.save()
+
+        # Create Ledger Entry
+        LedgerEntry.objects.create(
+            account_type="vehicle",
+            vehicle=vehicle,
+            order=vehicle.order,
+            voucher_no=txn.transaction_no,
+            debit=txn.amount,
+            credit=0,
+            remarks=f"{transaction_type.title()} Payment"
+        )
+
         return True
+
+    except ValidationError as e:
+
+        messages.error(
+            request,
+            ", ".join(e.messages)
+        )
+
+        return False
 
     except Exception as e:
 
@@ -88,42 +129,116 @@ def vehicle_payments(request, vehicle_id):
 
 def pay_vehicle_advance(request, vehicle_id):
 
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
 
     if request.method == "POST":
 
-        amount = Decimal(request.POST.get("amount") or 0)
+        amount = Decimal(
+            request.POST.get("amount")
+        )
 
-        total_freight = Decimal(vehicle.total_freight or 0)
-        total_advance = Decimal(vehicle.total_advance_paid or 0)
+        if amount > vehicle.remaining_balance_amount:
 
-        balance = total_freight - total_advance
-
-        # ❌ RULE 1: if balance is 0, no advance allowed
-        if balance <= 0:
-            messages.error(request, "Advance not allowed. Balance is already zero.")
-            return redirect("vehicle_payments", vehicle.id)
-
-        # ❌ RULE 2: advance cannot exceed remaining balance
-        if amount > balance:
             messages.error(
                 request,
-                f"Advance cannot exceed balance ₹{balance}"
+                "Amount exceeds remaining balance."
             )
-            return redirect("vehicle_payments", vehicle.id)
 
-        # SAVE PAYMENT
-        VehicleTransaction.objects.create(
+            return redirect(
+                "pay_vehicle_advance",
+                vehicle.id
+            )
+
+        request.session["advance_amount"] = str(amount)
+
+        return redirect(
+            "confirm_vehicle_advance",
+            vehicle.id
+        )
+
+    return render(
+        request,
+        "accounts/pay_vehicle_advance.html",
+        {
+            "vehicle": vehicle
+        }
+    )
+
+def confirm_vehicle_advance(
+    request,
+    vehicle_id
+):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    amount = Decimal(
+        request.session.get(
+            "advance_amount",
+            "0"
+        )
+    )
+
+    if request.method == "POST":
+
+        utr = request.POST.get(
+            "transaction_no"
+        )
+
+        txn = VehicleTransaction.objects.create(
             vehicle=vehicle,
-            amount=amount,
             transaction_type="advance",
+            amount=amount,
+            payment_mode=request.POST.get(
+                "payment_mode"
+            ),
+            transaction_no=utr,
+            remarks="Advance transferred",
             created_by=request.user
         )
 
-        messages.success(request, "Advance payment added successfully.")
-        return redirect("vehicle_payments", vehicle.id)
+        LedgerEntry.objects.create(
+            account_type="vehicle",
+            vehicle=vehicle,
+            order=vehicle.order,
+            debit=amount,
+            credit=0,
+            voucher_no=utr,
+            remarks="Advance Payment"
+        )
 
-    return render(request, "accounts/pay_vehicle_advance.html", {"vehicle": vehicle})
+        if hasattr(vehicle.order, "tracking"):
+
+            tracking = vehicle.order.tracking
+
+            tracking.advance_to_fleet = True
+
+            tracking.save(
+                update_fields=[
+                    "advance_to_fleet"
+                ]
+            )
+
+        request.session["last_utr"] = utr
+
+        return redirect(
+            "advance_success",
+            vehicle.id
+        )
+
+    return render(
+        request,
+        "accounts/confirm_vehicle_advance.html",
+        {
+            "vehicle": vehicle,
+            "amount": amount
+        }
+    )
 
 @login_required
 def pay_vehicle_balance(request, vehicle_id):
@@ -168,6 +283,31 @@ def pay_vehicle_balance(request, vehicle_id):
         "vehicle": vehicle,
         "balances": balances
     })
+
+def advance_success(
+    request,
+    vehicle_id
+):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    return render(
+        request,
+        "accounts/advance_success.html",
+        {
+            "vehicle": vehicle,
+            "utr": request.session.get(
+                "last_utr"
+            )
+        }
+    )
+
+
+
+
 @login_required
 def vehicle_accounts(request):
 
@@ -199,6 +339,8 @@ def vehicle_accounts(request):
         "accounts/vehicle.html",
         {"data": data}
     )
+
+
 
 @login_required
 def pay_vehicle_other(request, vehicle_id):
