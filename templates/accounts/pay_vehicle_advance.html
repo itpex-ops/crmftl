@@ -2,6 +2,86 @@
 {% block content %}
 
 <style>
+    .history-title {
+        font-weight: 700;
+        color: #6a1b9a;
+        margin-bottom: 15px;
+    }
+
+    .history-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border: 1px solid #ececec;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+        transition: .2s;
+    }
+
+    .history-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .history-type {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .history-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .advance-icon {
+        background: #00a651;
+    }
+
+    .balance-icon {
+        background: #2962ff;
+    }
+
+    .other-icon {
+        background: #9c27b0;
+    }
+
+    .history-label {
+        font-weight: 600;
+    }
+
+    .history-date {
+        color: #888;
+        font-size: 13px;
+    }
+
+    .history-amount {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .history-bottom {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .history-divider {
+        height: 1px;
+        background: #eee;
+        margin: 10px 0;
+    }
+
     .payment-wrapper {
         max-width: 550px;
         margin: auto;
@@ -108,6 +188,86 @@
             height: 48px;
         }
     }
+
+    .history-title {
+        font-weight: 700;
+        color: #6a1b9a;
+        margin-bottom: 15px;
+    }
+
+    .history-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border: 1px solid #ececec;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+        transition: .2s;
+    }
+
+    .history-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .history-type {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .history-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .advance-icon {
+        background: #00a651;
+    }
+
+    .balance-icon {
+        background: #2962ff;
+    }
+
+    .other-icon {
+        background: #9c27b0;
+    }
+
+    .history-label {
+        font-weight: 600;
+    }
+
+    .history-date {
+        color: #888;
+        font-size: 13px;
+    }
+
+    .history-amount {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .history-bottom {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .history-divider {
+        height: 1px;
+        background: #eee;
+        margin: 10px 0;
+    }
 </style>
 
 <div class="container py-4">
@@ -148,23 +308,90 @@
                             Advance Amount
                         </label>
 
-                        <input type="number"
-                               step="0.01"
-                               name="amount"
-                               class="form-control"
-                               placeholder="Enter amount"
-                               required>
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
+                            required>
                     </div>
 
-                    <button type="submit"
-                            class="btn btn-success pay-btn">
-                        Pay Now
+                    <button type="submit" class="btn btn-success pay-btn">
+                        Pay
                     </button>
 
                 </form>
 
             </div>
+            <hr class="my-4">
 
+            <h5 class="history-title">
+                <i class="bi bi-clock-history"></i>
+                Recent Payments
+            </h5>
+
+            {% for p in transactions %}
+
+            <div class="history-card">
+
+                <div class="history-top">
+
+                    <div class="history-type">
+
+                        {% if p.transaction_type == 'advance' %}
+                        <div class="history-icon advance-icon">
+                            <i class="bi bi-arrow-up"></i>
+                        </div>
+
+                        {% elif p.transaction_type == 'balance' %}
+                        <div class="history-icon balance-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+
+                        {% else %}
+                        <div class="history-icon other-icon">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        {% endif %}
+
+                        <div>
+                            <div class="history-label">
+                                {{ p.get_transaction_type_display }}
+                            </div>
+
+                            <div class="history-date">
+                                {{ p.date|date:"d M Y" }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="history-amount">
+                        ₹{{ p.amount|floatformat:2 }}
+                    </div>
+
+                </div>
+
+                <div class="history-divider"></div>
+
+                <div class="history-bottom">
+
+                    <strong>Mode:</strong>
+                    {{ p.payment_mode|upper }}
+
+                    {% if p.transaction_no %}
+                    <br>
+                    <strong>UTR:</strong>
+                    {{ p.transaction_no }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="alert alert-light text-center">
+                No payment history available
+            </div>
+
+            {% endfor %}
         </div>
 
     </div>
