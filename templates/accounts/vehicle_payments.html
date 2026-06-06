@@ -4,89 +4,182 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-    /* Advance = Green */
-    .row-advance {
-        background: #e9f9ee;
-        border-left: 4px solid #28a745;
+    :root {
+        --primary: #6a1b9a;
+        --secondary: #9c27b0;
+        --success: #00a651;
+        --bg: #f4f6fb;
     }
 
-    /* Balance = Orange */
-    .row-balance {
-        background: #fff4e6;
-        border-left: 4px solid #fd7e14;
+    body {
+        background: var(--bg);
     }
 
-    /* Other = Blue/Grey */
-    .row-other {
-        background: #eef5ff;
-        border-left: 4px solid #0d6efd;
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        padding: 24px;
+        border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(106, 27, 154, .20);
     }
 
-    /* Hover effect (all rows) */
-    .table-hover tbody tr:hover {
-        transform: scale(1.01);
-        transition: 0.2s;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    .page-header h4 {
+        font-weight: 700;
+        margin: 0;
     }
 
-    /* ================= TABS ================= */
+    .page-header small {
+        opacity: .9;
+    }
+
+    /* CARDS */
+    .card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+        transition: .25s;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        border: none;
+        font-weight: 600;
+    }
+
+    /* STATS */
+    .stats-card {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .stats-card small {
+        color: #777;
+        font-weight: 500;
+    }
+
+    .stats-card h4 {
+        font-weight: 700;
+        margin-top: 8px;
+    }
+
+    /* YONO TABS */
     .tab-bar {
         display: flex;
-        gap: 10px;
-        background: #f5f6fa;
-        padding: 10px;
-        border-radius: 14px;
+        gap: 12px;
+        background: #fff;
+        padding: 12px;
+        border-radius: 18px;
         overflow-x: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .05);
+        margin-top: 20px;
     }
 
     .tab-btn {
         flex: 1;
+        min-width: 130px;
         text-align: center;
-        padding: 10px 14px;
-        border-radius: 12px;
+        padding: 14px;
+        border-radius: 14px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 14px;
-        color: #444;
-        background: #ffffff;
-        border: 1px solid #e5e5e5;
-        transition: all 0.25s ease;
-        white-space: nowrap;
+        color: #555;
+        background: #f5f5f5;
+        transition: .3s;
+        border: none;
     }
 
     .tab-btn:hover {
-        transform: translateY(-1px);
-        background: #fff7e6;
-        border-color: #ffb84d;
-        color: #d97706;
-    }
-
-    /* Active tab */
-    .tab-btn.active {
-        background: linear-gradient(135deg, #db8017, #cca644);
         color: #fff;
-        border-color: transparent;
-        box-shadow: 0 6px 15px rgba(219, 128, 23, 0.25);
+        background: linear-gradient(135deg,
+                var(--primary),
+                var(--secondary));
     }
 
-    @keyframes fade {
-        from {
-            opacity: 0;
-            transform: translateY(6px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .tab-btn.active {
+        color: #fff;
+        background: linear-gradient(135deg,
+                var(--primary),
+                var(--secondary));
+        box-shadow: 0 8px 18px rgba(106, 27, 154, .20);
     }
 
-    /* ================= SKELETON ================= */
+    /* PAYMENT ROWS */
+    .row-advance {
+        background: #eefaf2;
+        border-left: 5px solid #00a651;
+    }
+
+    .row-balance {
+        background: #eef4ff;
+        border-left: 5px solid #2962ff;
+    }
+
+    .row-other {
+        background: #faf1ff;
+        border-left: 5px solid #9c27b0;
+    }
+
+    /* TABLE */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background: #f8f9fc;
+    }
+
+    .table thead th {
+        border: none;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        border-color: #f0f0f0;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #faf5ff;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* PROGRESS */
+    .progress {
+        height: 22px;
+        border-radius: 50px;
+        background: #ececec;
+    }
+
+    .progress-bar {
+        border-radius: 50px;
+        background: linear-gradient(90deg,
+                #00a651,
+                #34d27b);
+    }
+
+    /* BADGES */
+    .badge {
+        border-radius: 30px;
+        padding: 8px 12px;
+        font-weight: 600;
+    }
+
+    /* SKELETON */
     .skeleton {
-        background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+        background: linear-gradient(90deg,
+                #ececec 25%,
+                #f5f5f5 50%,
+                #ececec 75%);
         background-size: 400% 100%;
-        animation: shimmer 1.2s ease-in-out infinite;
-        border-radius: 10px;
+        animation: shimmer 1.4s infinite;
     }
 
     @keyframes shimmer {
@@ -100,26 +193,52 @@
     }
 
     .skel-card {
-        padding: 14px;
-        border-radius: 14px;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
-        margin-bottom: 10px;
+        border-radius: 18px;
+        padding: 18px;
     }
 
-    .skel-line {
-        height: 12px;
-        margin: 8px 0;
+    /* DETAIL LIST */
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f1f1;
     }
 
-    .skel-title {
-        height: 16px;
-        width: 60%;
+    .detail-row:last-child {
+        border-bottom: none;
     }
 
-    .skel-small {
-        height: 10px;
-        width: 40%;
+    .detail-label {
+        color: #777;
+    }
+
+    .detail-value {
+        font-weight: 600;
+    }
+
+    /* MOBILE */
+    @media(max-width:768px) {
+
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header .badge {
+            margin-top: 10px;
+        }
+
+        .tab-btn {
+            min-width: 150px;
+        }
+
+        .table-responsive {
+            font-size: 13px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
     }
 </style>
 
@@ -143,12 +262,10 @@
     <div class="row g-3 mt-3">
 
         <div class="col-md-3">
-            <div class="card shadow-sm border-0">
-                <div class="card-body text-center">
-                    <small class="text-muted">Total Freight</small>
-                    <h4 class="fw-bold">
-                        ₹{{ vehicle.total_freight|floatformat:2 }}
-                    </h4>
+            <div class="card">
+                <div class="card-body stats-card">
+                    <small>Total Freight</small>
+                    <h4>₹{{ vehicle.total_freight|floatformat:2 }}</h4>
                 </div>
             </div>
         </div>
@@ -239,12 +356,32 @@
     <div class="row mt-3">
         <div class="col-lg-5">
             <div class="card mb-3">
-                <div class="card-header bg-success text-white">Vehicle Details</div>
+                <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
+                    Vehicle Details
+                </div>
+
                 <div class="card-body">
-                    <div><b>FTL:</b> {{ vehicle.ftl_no }}</div>
-                    <div><b>Vehicle:</b> {{ vehicle.vehicle_number }}</div>
-                    <div><b>Driver:</b> {{ vehicle.driver_number }}</div>
-                    <div><b>Owner:</b> {{ vehicle.owner_number }}</div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">FTL No</span>
+                        <span class="detail-value">{{ vehicle.ftl_no }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Vehicle</span>
+                        <span class="detail-value">{{ vehicle.vehicle_number }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Driver</span>
+                        <span class="detail-value">{{ vehicle.driver_number }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Owner</span>
+                        <span class="detail-value">{{ vehicle.owner_number }}</span>
+                    </div>
+
                 </div>
             </div>
             <div class="card mb-3">
@@ -252,7 +389,7 @@
                     Payment Details
                 </div>
 
-               
+
 
             </div>
 
@@ -294,7 +431,10 @@
 
                 <div class="col-lg-7">
                     <div class="card">
-                        <div class="card-header bg-dark text-white">Payment History</div>
+                        <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Payment History
+                        </div>
                         <div class="card-body p-0">
 
                             <div class="table-responsive">
