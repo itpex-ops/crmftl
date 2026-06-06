@@ -1,39 +1,169 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
+<style>
+    .payment-wrapper {
+        max-width: 550px;
+        margin: auto;
+    }
+
+    .payment-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .payment-header {
+        background: linear-gradient(135deg, #198754, #28a745);
+        color: white;
+        padding: 18px 24px;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .vehicle-info {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .vehicle-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        word-break: break-word;
+    }
+
+    .balance-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .balance-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .balance-amount {
+        color: #198754;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        height: 52px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .pay-btn {
+        width: 100%;
+        height: 52px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .vehicle-number {
+            font-size: 1.25rem;
+        }
+
+        .balance-amount {
+            font-size: 1.5rem;
+        }
+
+        .payment-header {
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-body {
+            padding: 18px;
+        }
+
+        .vehicle-number {
+            font-size: 1.1rem;
+        }
+
+        .balance-amount {
+            font-size: 1.3rem;
+        }
+
+        .form-control,
+        .pay-btn {
+            height: 48px;
+        }
+    }
+</style>
+
 <div class="container py-4">
 
-    <div class="card shadow-sm">
+    <div class="payment-wrapper">
 
-        <div class="card-header bg-success text-white">
-            Advance Payment
-        </div>
+        <div class="card payment-card shadow">
 
-        <div class="card-body">
+            <div class="payment-header">
+                Advance Payment
+            </div>
 
-            <h5>
-                {{ vehicle.vehicle_number }}
-            </h5>
+            <div class="card-body">
 
-            <p>
-                Remaining Balance :
-                ₹ {{ vehicle.remaining_balance_amount }}
-            </p>
+                <div class="vehicle-info">
 
-            <form method="post">
-                {% csrf_token %}
+                    <div class="vehicle-number">
+                        {{ vehicle.vehicle_number }}
+                    </div>
 
-                <label>
-                    Amount
-                </label>
+                    <div class="balance-box">
+                        <div class="balance-label">
+                            Remaining Balance
+                        </div>
 
-                <input type="number" step="0.01" name="amount" class="form-control" required>
+                        <div class="balance-amount">
+                            ₹ {{ vehicle.remaining_balance_amount }}
+                        </div>
+                    </div>
 
-                <button class="btn btn-success mt-3">
-                    Pay To Account
-                </button>
+                </div>
 
-            </form>
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Advance Amount
+                        </label>
+
+                        <input type="number"
+                               step="0.01"
+                               name="amount"
+                               class="form-control"
+                               placeholder="Enter amount"
+                               required>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-success pay-btn">
+                        Pay Now
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
