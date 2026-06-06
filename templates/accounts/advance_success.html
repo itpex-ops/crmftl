@@ -9,7 +9,7 @@
     }
 
     .success-wrapper {
-        max-width: 500px;
+        max-width: 520px;
         margin: auto;
     }
 
@@ -18,75 +18,94 @@
         border-radius: 24px;
         overflow: hidden;
         background: #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
     }
 
     .success-header {
         background: linear-gradient(135deg, #00a651, #2ecc71);
-        padding: 40px 20px;
-        text-align: center;
         color: #fff;
+        text-align: center;
+        padding: 40px 20px;
     }
 
     .success-icon {
         width: 100px;
         height: 100px;
         margin: auto;
-        background: rgba(255, 255, 255, .15);
         border-radius: 50%;
+        background: rgba(255, 255, 255, .18);
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(4px);
     }
 
     .success-icon i {
-        font-size: 60px;
+        font-size: 55px;
         color: #fff;
     }
 
     .success-title {
-        margin-top: 18px;
         font-size: 28px;
         font-weight: 700;
+        margin-top: 18px;
     }
 
     .success-subtitle {
         opacity: .95;
-        margin-top: 6px;
-    }
-
-    .transaction-box {
-        background: #f8f9fc;
-        border: 1px solid #ececec;
-        border-radius: 18px;
-        padding: 20px;
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .transaction-label {
-        color: #888;
-        font-size: 12px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .utr-number {
-        font-size: 22px;
-        font-weight: 700;
-        color: #222;
-        word-break: break-all;
+        margin-top: 8px;
     }
 
     .status-chip {
         display: inline-block;
         background: #e9f9ee;
         color: #00a651;
-        font-weight: 600;
         padding: 8px 16px;
         border-radius: 30px;
-        margin-top: 15px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .info-card {
+        background: #f8f9fc;
+        border: 1px solid #ececec;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .info-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #222;
+        word-break: break-all;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #666;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #222;
     }
 
     .ledger-btn {
@@ -101,7 +120,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 25px;
         transition: .3s;
     }
 
@@ -112,9 +130,9 @@
 
     .secure-text {
         text-align: center;
-        color: #888;
         font-size: 13px;
-        margin-top: 18px;
+        color: #888;
+        margin-top: 16px;
     }
 
     @media(max-width:576px) {
@@ -128,7 +146,7 @@
             font-size: 24px;
         }
 
-        .utr-number {
+        .info-value {
             font-size: 18px;
         }
 
@@ -139,7 +157,7 @@
 
     <div class="success-wrapper">
 
-        <div class="card shadow success-card">
+        <div class="card success-card">
 
             <div class="success-header">
 
@@ -159,18 +177,56 @@
 
             <div class="card-body p-4">
 
-                <div class="status-chip">
-                    ✓ Amount Credited
+                <div class="text-center">
+
+                    <div class="status-chip">
+                        ✓ Amount Credited
+                    </div>
+
                 </div>
 
-                <div class="transaction-box">
+                <div class="info-card text-center">
 
-                    <div class="transaction-label">
+                    <div class="info-label">
                         UTR Number
                     </div>
 
-                    <div class="utr-number">
+                    <div class="info-value">
                         {{ utr }}
+                    </div>
+
+                </div>
+
+                <div class="info-card">
+
+                    <div class="summary-row">
+                        <span class="summary-label">
+                            Vehicle
+                        </span>
+
+                        <span class="summary-value">
+                            {{ vehicle.vehicle_number }}
+                        </span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">
+                            Status
+                        </span>
+
+                        <span class="summary-value text-success">
+                            Successful
+                        </span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">
+                            Date
+                        </span>
+
+                        <span class="summary-value">
+                            {% now "d M Y" %}
+                        </span>
                     </div>
 
                 </div>
