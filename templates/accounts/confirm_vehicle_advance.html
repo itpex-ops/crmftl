@@ -1,9 +1,31 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
     body {
         background: #f4f6fb;
+    }
+
+    .transfer-btn {
+        width: 100%;
+        height: 56px;
+        border: none;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+    }
+
+    .transfer-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(156, 39, 176, 0.25);
+    }
+
+    .transfer-btn:active {
+        transform: scale(0.98);
     }
 
     .transfer-wrapper {
@@ -174,8 +196,7 @@
                             Payment Mode
                         </label>
 
-                        <select name="payment_mode"
-                                class="form-select">
+                        <select name="payment_mode" class="form-select">
                             <option value="bank">
                                 Bank Transfer
                             </option>
@@ -191,15 +212,13 @@
                             UTR / Transaction Number
                         </label>
 
-                        <input type="text"
-                               name="transaction_no"
-                               class="form-control"
-                               placeholder="Enter transaction reference"
-                               required>
+                        <input type="text" name="transaction_no" class="form-control"
+                            placeholder="Enter transaction reference" required>
                     </div>
 
-                    <button class="transfer-btn">
-                        ✓ Transfer Completed
+                    <button type="submit" class="transfer-btn">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Confirm & Transfer
                     </button>
 
                 </form>
