@@ -219,7 +219,7 @@
                         </td>
                         <!-- ACTION -->
                         <td class="text-end">
-                            {% if is_admin or is_superadmin %}
+                           
                             <div class="d-flex justify-content-end gap-1 flex-wrap">
                                 <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
                                     data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
@@ -228,9 +228,8 @@
                                     data-status="{{ e.status }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                {% endif %}
+                                
                                 <!-- Confirm -->
-                                {% if is_sales %}
                                 <button type="button" class="icon-btn text-success action-btn" data-id="{{ e.id }}"
                                     data-rate="{{ e.approval_rate|default_if_none:'' }}" data-action="confirm">
 
@@ -251,7 +250,7 @@
                                     ❌
 
                                 </button>
-                                {% endif %}
+                            
 
                             </div>
 
