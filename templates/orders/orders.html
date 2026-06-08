@@ -73,27 +73,33 @@
     </div>
 
     <!-- TABLE -->
-    <div class="card table-card shadow-sm border-0">
+    <div class="card table-card p-3">
         <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="custom-table-head">
 
-            <table class="table table-hover align-middle mb-0 text-center">
-                <thead>
+                    <tr class="main-head-row">
 
-                    <tr>
+                        <th rowspan="2" class="main-th">
+                            Date</th>
 
-                        <th width="170">Date</th>
+                        <th rowspan="2" class="main-th">
+                            Order No</th>
 
-                        <th width="220">Order No</th>
+                        <th rowspan="2" class="main-th">
+                            Customer</th>
 
-                        <th width="220">Customer</th>
+                        <th rowspan="2" class="main-th">
+                            Route</th>
 
-                        <th width="260">Route</th>
+                        <th rowspan="2" class="main-th">
+                            Vehicle</th>
 
-                        <th width="220">Vehicle</th>
+                        <th rowspan="2" class="main-th">
+                            Rate ₹</th>
 
-                        <th width="150">Rate ₹</th>
-
-                        <th width="180">Status</th>
+                        <th rowspan="2" class="main-th">
+                            Status</th>
 
 
                     </tr>
@@ -150,11 +156,11 @@
                         </td>
 
                         <!-- ROUTE -->
-                        <td class="text-start">
+                        <td>
                             {% if order.routes %}
                             <div class="route-modern">
                                 <small class="text-muted fw-bold">Pickups</small>
-                                <span class="route-side">
+                                <span class="route-side origin-side">
                                     {% for r in order.routes %}
                                     {{ r.origin }}{% if not forloop.last %} + {% endif %}
                                     {% endfor %}
@@ -271,18 +277,12 @@
                             {% endif %}
 
                         </td>
-
                     </tr>
 
                     {% empty %}
-
                     <tr>
-
                         <td colspan="7" class="text-center text-muted py-4">
-
-                            No Orders Found
-
-                        </td>
+                            No Orders Found  </td>
 
                     </tr>
 

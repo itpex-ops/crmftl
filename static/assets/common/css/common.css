@@ -494,7 +494,7 @@ body {
 
 /* TABLE */
 
-#commontable {
+#table {
     min-width: 1450px;
     width: max-content;
     border-collapse: separate;
@@ -519,7 +519,7 @@ body {
     border-radius: 18px;
 }
 
-#commontable {
+#table {
     width: 100%;
     min-width: 1450px;
     border-collapse: separate;
@@ -532,7 +532,7 @@ body {
        STICKY HEADER
     ========================== */
 
-#commontable thead th {
+#table thead th {
     position: sticky;
     background: #fff;
     white-space: nowrap;
@@ -617,24 +617,24 @@ body {
 
 /* FIRST COLUMN */
 
-#commontable th:nth-child(1),
-#commontable td:nth-child(1) {
+#table th:nth-child(1),
+#table td:nth-child(1) {
     position: sticky;
     left: 0;
     z-index: 35;
-    min-width: 120px;
+    min-width: 50px;
     background: #fff;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04);
 }
 
 /* SECOND COLUMN */
 
-#commontable th:nth-child(2),
-#commontable td:nth-child(2) {
+#table th:nth-child(2),
+#table td:nth-child(2) {
     position: sticky;
     left: 120px;
     z-index: 34;
-    min-width: 180px;
+    min-width: 100px;
     background: #fff;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04);
 }
@@ -1014,7 +1014,7 @@ tbody td {
 
 @media (max-width: 768px) {
 
-    #commontable {
+    #table {
         min-width: 1100px;
     }
 
@@ -1077,14 +1077,14 @@ tbody td {
 
     /* REDUCE STICKY WIDTHS */
 
-    #commontable th:nth-child(1),
-    #commontable td:nth-child(1) {
+    #table th:nth-child(1),
+    #table td:nth-child(1) {
         min-width: 140px;
         text-align: center;
     }
 
-    #commontable th:nth-child(2),
-    #commontable td:nth-child(2) {
+    #table th:nth-child(2),
+    #table td:nth-child(2) {
         left: 140px;
         min-width: 180px;
         text-align: center;
