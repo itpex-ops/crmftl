@@ -357,20 +357,14 @@ body {
     z-index: 1000;
     overflow-y: auto;
     border-right: 1px solid #eee;
-    padding-top: 70px;
+    padding-top:20px;
+    
 }
 
 .sidebar.hide {
     margin-left: -240px;
 }
 
-/* LOGO */
-.sidebar img {
-    max-width: 120px;
-    border-radius: 10px;
-}
-
-/* MENU */
 .sidebar a {
     color: #555;
     display: block;
@@ -391,14 +385,12 @@ body {
     color: white;
 }
 
-/* KEEP SUBMENU SAME */
 .submenu a {
     font-size: 14px;
     padding-left: 35px;
     color: #666;
 }
 
-/* ===== CONTENT ===== */
 .content {
     margin-left: 200px;
     padding: 90px 25px 25px;
@@ -410,7 +402,6 @@ body {
     margin-left: 0;
 }
 
-/* ===== NAVBAR ===== */
 #mainNavbar {
     height: 65px;
     backdrop-filter: blur(10px);
@@ -424,7 +415,6 @@ body {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* NOTIFICATION */
 .notif-badge {
     position: absolute;
     top: -5px;
@@ -432,7 +422,6 @@ body {
     font-size: 10px;
 }
 
-/* USER */
 .user-avatar {
     width: 34px;
     height: 34px;
@@ -447,7 +436,7 @@ body {
 /* MOBILE */
 @media (max-width:768px) {
     .sidebar {
-        margin-left: -240px;
+        margin-left: -10px;
     }
 
     .sidebar.show {
@@ -458,21 +447,6 @@ body {
         margin-left: 0;
     }
 }
-
-.logo-area {
-    padding: 6px;
-    text-align: left;
-}
-
-.logo-box {
-    background: #ffc107;
-    padding: 8px 16px;
-    display: inline-block;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 20px;
-}
-
 
 .ftl-text {
     margin-top: 6px;
