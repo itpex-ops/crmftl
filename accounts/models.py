@@ -137,7 +137,7 @@ class VehicleTransaction(models.Model):
         null=True
     )
 
-    date = models.DateField(
+    date = models.DateTimeField(
         auto_now_add=True
     )
 

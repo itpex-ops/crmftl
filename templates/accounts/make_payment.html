@@ -1,0 +1,40 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-credit-card"></i>
+            Make Payment
+        </h5>
+    </div>
+
+    <div class="card-body">
+
+        <label class="form-label">Select Payment Type</label>
+
+        <select id="paymentType" class="form-select">
+            <option value="">-- Select Payment Type --</option>
+
+            {% if vehicle.can_take_advance %}
+            <option value="{% url 'pay_vehicle_advance' vehicle.id %}">
+                Advance Payment
+            </option>
+            {% endif %}
+
+            <option value="{% url 'pay_vehicle_balance' vehicle.id %}">
+                Balance Payment
+            </option>
+
+            <option value="{% url 'vehicle_other' vehicle.id %}">
+                Other Payment
+            </option>
+        </select>
+
+    </div>
+</div>
+
+<script>
+document.getElementById('paymentType').addEventListener('change', function () {
+    if (this.value) {
+        window.location.href = this.value;
+    }
+});
+</script>

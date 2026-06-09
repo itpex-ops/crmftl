@@ -29,6 +29,7 @@
         background: #f8fafc;
         white-space: nowrap;
         font-size: 13px;
+        text-align: center;
     }
 
     .badge-soft {
@@ -143,7 +144,6 @@
 
         <div>
             <div class="page-title">Vehicle Accounts</div>
-
             <div class="sub-title">
                 Vehicle Accounts | Advance Payment | Delivery Stage Payment | Document Clearance Balance
             </div>
@@ -167,7 +167,7 @@
         <div class="col-md-3">
             <div class="card-box">
                 <small class="text-muted">Freight Amount</small>
-                <div class="stat-value text-primary" id="sumFreight">₹ </div>
+                <div class="stat-value text-primary" id="sumFreight">₹0</div>
             </div>
         </div>
 
@@ -267,7 +267,6 @@
 
                         <!-- ACTIONS -->
                         <td>
-
                             {% if v.is_locked %}
 
                             <div class="lock-card">
@@ -287,11 +286,11 @@
 
                             {% else %}
 
-                            <div class="d-flex gap-1 flex-wrap">
-                                <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
+                            <div class="flex-wrap">
+                                <!-- <a href="{% url 'vehicle_ledger' v.vehicle_id %}"
                                     class="btn btn-sm btn-outline-primary">
                                     Ledger
-                                </a>
+                                </a> -->
 
                                 <a href="{% url 'vehicle_payments' v.vehicle_id %}"
                                     class="btn btn-sm btn-outline-success">
@@ -305,15 +304,10 @@
                     </tr>
                     {% endif %}
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
@@ -366,6 +360,5 @@
 
     });
 </script>
-
 
 {% endblock %}

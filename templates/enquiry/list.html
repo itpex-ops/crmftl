@@ -158,39 +158,24 @@
                             </small>
                         </td>
                         <td>
-
                             {% if e.routes %}
-
                             <div class="route-modern">
                                 <small>Pickups :</small>
-
                                 <span class="route-side origin-side">
                                     {% for r in e.routes %}
                                     {{ r.origin }}{% if not forloop.last %} + {% endif %}
-
                                     {% endfor %}
-
                                 </span>
-
                                 <small>Drops :</small>
-
                                 <span class="route-side destination-side">
-
                                     {% for r in e.routes %}
                                     {{ r.destination }}{% if not forloop.last %} + {% endif %}
-
                                     {% endfor %}
-
                                 </span>
-
                             </div>
-
                             {% else %}
-
                             <span class="text-muted">-</span>
-
                             {% endif %}
-
                         </td>
                         <!-- VEHICLE -->
                         <td>

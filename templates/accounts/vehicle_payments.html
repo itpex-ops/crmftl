@@ -330,13 +330,12 @@
         {% endif %}
 
 
-        {% if vehicle.is_trip_completed and not vehicle.is_payment_completed %}
         <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="tab-btn">
             Balance
         </a>
-        {% endif %}
 
-        <a href="{% url 'pay_vehicle_other' vehicle.id %}"
+
+        <a href="{% url 'vehicle_other' vehicle.id %}"
             class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
             Other
         </a>
@@ -354,7 +353,7 @@
 
     <!-- VEHICLE + HISTORY -->
     <div class="row mt-3">
-        <div class="col-lg-5">
+        <div class="col-lg-6">
             <div class="card mb-3">
                 <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
                     Vehicle Details
@@ -384,8 +383,79 @@
 
                 </div>
             </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Payment History
+                </div>
+                <div class="card-body p-0">
 
-            <div class="card mb-3">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Mode</th>
+                                    <th>Txn</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in transactions %}
+                                <tr class="{{ p.row_class }}">
+
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ p.date|date:"d-m-Y" }}</td>
+
+                                    <td>
+
+                                        {% if p.transaction_type == 'advance' %}
+                                        <span class="badge bg-primary">
+                                            Advance
+                                        </span>
+
+                                        {% elif p.transaction_type == 'balance' %}
+                                        <span class="badge bg-success">
+                                            Balance
+                                        </span>
+
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ p.get_transaction_type_display }}
+                                        </span>
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>₹{{ p.amount|floatformat:2 }}</td>
+                                    <td>{{ p.payment_mode|upper }}</td>
+                                    <td>{{ p.transaction_no|default:"-" }}</td>
+                                    <td>{{ p.remarks|default:"-" }}</td>
+
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        No payment history
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+        <!-- <div class="card mb-3">
                 <div class="card-header bg-info text-white">
                     Payment Progress
                 </div>
@@ -419,101 +489,31 @@
 
                         </div>
                     </div>
-                </div>
+                </div>-->
+    </div>
 
-                <div class="col-lg-7">
-                    <div class="card">
-                        <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
-                            <i class="bi bi-clock-history me-2"></i>
-                            Payment History
-                        </div>
-                        <div class="card-body p-0">
 
-                            <div class="table-responsive">
-                                <table class="table mb-0 table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Date</th>
-                                            <th>Type</th>
-                                            <th>Amount</th>
-                                            <th>Mode</th>
-                                            <th>Txn</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for p in transactions %}
-                                        <tr class="{{ p.row_class }}">
 
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ p.date|date:"d-m-Y" }}</td>
 
-                                            <td>
+    <script>
+        function openTab(event, tabName) {
 
-                                                {% if p.transaction_type == 'advance' %}
-                                                <span class="badge bg-primary">
-                                                    Advance
-                                                </span>
+            document.querySelectorAll('.tab-content')
+                .forEach(el => el.classList.remove('active'));
 
-                                                {% elif p.transaction_type == 'balance' %}
-                                                <span class="badge bg-success">
-                                                    Balance
-                                                </span>
+            document.querySelectorAll('.tab-btn')
+                .forEach(el => el.classList.remove('active'));
 
-                                                {% else %}
-                                                <span class="badge bg-secondary">
-                                                    {{ p.get_transaction_type_display }}
-                                                </span>
-                                                {% endif %}
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
 
-                                            </td>
+        window.addEventListener("load", function () {
+            setTimeout(() => {
+                const sk = document.getElementById("skeleton-loader");
+                if (sk) sk.style.display = "none";
+            }, 800);
+        });
+    </script>
 
-                                            <td>₹{{ p.amount|floatformat:2 }}</td>
-                                            <td>{{ p.payment_mode|upper }}</td>
-                                            <td>{{ p.transaction_no|default:"-" }}</td>
-                                            <td>{{ p.remarks|default:"-" }}</td>
-
-                                        </tr>
-                                        {% empty %}
-                                        <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
-                                                No payment history
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-
-                                </table>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-        <script>
-            function openTab(event, tabName) {
-
-                document.querySelectorAll('.tab-content')
-                    .forEach(el => el.classList.remove('active'));
-
-                document.querySelectorAll('.tab-btn')
-                    .forEach(el => el.classList.remove('active'));
-
-                document.getElementById(tabName).classList.add('active');
-                event.currentTarget.classList.add('active');
-            }
-
-            window.addEventListener("load", function () {
-                setTimeout(() => {
-                    const sk = document.getElementById("skeleton-loader");
-                    if (sk) sk.style.display = "none";
-                }, 800);
-            });
-        </script>
-
-        {% endblock %}
+    {% endblock %}

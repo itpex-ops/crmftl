@@ -1,215 +1,165 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 {% block content %}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<style>
-body{
-    background:#f5f7fb;
-}
 
-.page-header{
-    background: linear-gradient(135deg, #db8017,#cca644);
-    color: white;
-    padding: 22px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+<div class="container-fluid py-1">
 
-.card-modern{
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-}
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center">
 
-.stat-card{
-    border: none;
-    border-radius: 16px;
-    padding: 18px;
-    background: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
+        <div>
+            <h4 class="mb-1">Balance Payment</h4>
+            <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
+        </div>
 
-.stat-title{
-    font-size: 12px;
-    color: #64748b;
-    text-transform: uppercase;
-}
+        <div class="d-flex gap-2">
 
-.stat-value{
-    font-size: 26px;
-    font-weight: 700;
-}
+            <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="btn btn-success btn-modern">
 
-.balance{
-    color: #dc2626;
-}
+                <i class="bi bi-cash-stack"></i> Advance
+            </a>
 
-.btn-modern{
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-weight: 600;
-}
-
-.table thead{
-    background: #f8fafc;
-}
-
-.badge-mode{
-    font-size: 11px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: #eef2ff;
-    color: #3730a3;
-}
-
-.section-title{
-    font-weight: 700;
-    font-size: 16px;
-}
-</style>
-
-<div class="container-fluid py-3">
-
-<!-- HEADER -->
-<div class="page-header d-flex justify-content-between align-items-center">
-
-    <div>
-        <h4 class="mb-1">Balance Payment</h4>
-        <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
-    </div>
-
-    <div class="d-flex gap-2">
-
-        <a href="{% url 'pay_vehicle_advance' vehicle.id %}"
-           class="btn btn-success btn-modern">
-
-            <i class="bi bi-cash-stack"></i> Advance
-        </a>
+        </div>
 
     </div>
 
-</div>
-
-<!-- SUMMARY -->
-<div class="row g-3 mb-4">
-
-    <div class="col-md-6">
-        <div class="stat-card">
-            <div class="stat-title">Total Freight</div>
-            <div class="stat-value">
-                ₹{{ vehicle.freight_amount|default:0 }}
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="stat-card">
+                <div class="stat-title">Total Freight</div>
+                <div class="stat-value">
+                    ₹{{ vehicle.total_freight|default:0 }}
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="stat-card">
-            <div class="stat-title">Pending Balance</div>
-            <div class="stat-value balance">
-                ₹{{ vehicle.remaining_balance_amount }}
+        <div class="col-md-6">
+            <div class="stat-card">
+                <div class="stat-title">Pending Balance</div>
+                <div class="stat-value balance">
+                    ₹{{ vehicle.remaining_balance_amount }}
+                </div>
             </div>
         </div>
+
     </div>
 
-</div>
+    <div class="row">
 
-<div class="row">
+        <!-- FORM -->
+        <div class="col-lg-5">
 
-<!-- FORM -->
-<div class="col-lg-5">
+            <div class="card card-modern">
+                <div class="card-body">
 
-<div class="card card-modern">
-<div class="card-body">
+                    <h5 class="mb-4">Add Balance Payment</h5>
 
-<h5 class="mb-4">Add Balance Payment</h5>
+                    <form method="post">
+                        {% csrf_token %}
 
-<form method="post">
-{% csrf_token %}
+                        <div class="mb-3">
+                            <label>Amount</label>
+                            <input type="number" step="0.01" name="amount" class="form-control" required>
+                        </div>
 
-<div class="mb-3">
-<label>Amount</label>
-<input type="number" step="0.01" name="amount" class="form-control" required>
-</div>
+                        <div class="mb-3">
+                            <label>Payment Mode</label>
+                            <select name="payment_mode" class="form-select">
+                                <option value="upi">UPI</option>
+                                <option value="bank">Bank</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
 
-<div class="mb-3">
-<label>Payment Mode</label>
-<select name="payment_mode" class="form-select">
-<option value="upi">UPI</option>
-<option value="bank">Bank</option>
-<option value="cash">Cash</option>
-</select>
-</div>
+                        <div class="mb-3">
+                            <label>Reference No</label>
+                            <input type="text" class="form-control bg-light" value="{{ preview_transaction_no }}"
+                                readonly>
+                            <small class="text-muted">
+                                Generated automatically on save
+                            </small>
+                        </div>
+                </div>
 
-<div class="mb-3">
-<label>Transaction No</label>
-<input type="text" name="transaction_no" class="form-control">
-</div>
+                <button class="btn btn-primary btn-modern w-100">
+                    <i class="bi bi-wallet2"></i> Save Balance Payment
+                </button>
 
-<div class="mb-3">
-<label>Remarks</label>
-<textarea name="remarks" class="form-control"></textarea>
-</div>
+                </form>
 
-<button class="btn btn-primary btn-modern w-100">
-<i class="bi bi-wallet2"></i> Save Balance Payment
-</button>
+            </div>
+        </div>
 
-</form>
+    </div>
 
-</div>
-</div>
+    <!-- HISTORY -->
+    <div class="card card-modern">
+        <div class="card-body">
 
-</div>
+            <div class="section-title text-primary mb-3">
+                Balance Payment History
+            </div>
 
-<!-- HISTORY -->
-<div class="col-lg-7">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
 
-<div class="card card-modern">
-<div class="card-body">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Mode</th>
+                            <th>Txn No</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
 
-<div class="section-title text-primary mb-3">
-Balance Payment History
-</div>
+                    <tbody>
 
-<table class="table table-hover align-middle">
+                        {% for p in balance_payments %}
+                        <tr>
+                            <td>
+                                {{ p.date|date:"d M Y" }}
+                            </td>
 
-<thead>
-<tr>
-<th>Date</th>
-<th>Amount</th>
-<th>Mode</th>
-<th>Txn No</th>
-</tr>
-</thead>
+                            <td class="fw-bold text-primary">
+                                ₹{{ p.amount }}
+                            </td>
 
-<tbody>
+                            <td>
+                                <span class="badge-mode">
+                                    {{ p.payment_mode|upper }}
+                                </span>
+                            </td>
 
-{% for p in balance_payments %}
-<tr>
-<td>{{ p.created_at|date:"d M Y" }}</td>
-<td class="fw-bold text-primary">₹{{ p.amount }}</td>
-<td>
-<span class="badge-mode">{{ p.payment_mode|upper }}</span>
-</td>
-<td>{{ p.transaction_no }}</td>
-</tr>
-{% empty %}
-<tr>
-<td colspan="4" class="text-center text-muted">
-No balance payments found
-</td>
-</tr>
-{% endfor %}
+                            <td>
+                                <code>{{ p.transaction_no }}</code>
+                            </td>
 
-</tbody>
+                            <td>
+                                {{ p.remarks|default:"-" }}
+                            </td>
+                        </tr>
 
-</table>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                No balance payments found
+                            </td>
+                        </tr>
+                        {% endfor %}
 
-</div>
-</div>
+                    </tbody>
 
-</div>
+                </table>
+            </div>
+
+        </div>
+    </div>
 
 </div>
 

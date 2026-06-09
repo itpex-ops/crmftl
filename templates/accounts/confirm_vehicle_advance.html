@@ -209,12 +209,11 @@
 
                     <div class="mb-4">
                         <label class="form-label">
-                            UTR / Transaction Number
+                            Reference Number
                         </label>
 
-                        <input type="text" name="transaction_no" class="form-control"
-                            placeholder="Enter transaction reference" required>
-                    </div>
+                        <input type="text" class="form-control" value="{{ preview_utr }}" readonly>
+                    </div><input type="hidden" name="transaction_no">
 
                     <button type="submit" class="transfer-btn">
                         <i class="bi bi-shield-check me-2"></i>

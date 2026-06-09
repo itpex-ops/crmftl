@@ -166,8 +166,8 @@
                                     {% endfor %}
                                 </span>
 
-                                <small class="text-muted fw-bold mt-1">Drops</small>
-                                <span class="route-side">
+                                <small>Drops</small>
+                                <span class="route-side destination-side">
                                     {% for r in order.routes %}
                                     {{ r.destination }}{% if not forloop.last %} + {% endif %}
                                     {% endfor %}

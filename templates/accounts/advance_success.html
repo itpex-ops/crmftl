@@ -4,156 +4,158 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-    body {
-        background: #f4f6fb;
-    }
+body {
+    background: #f4f6fb;
+}
 
+.success-wrapper {
+    max-width: 420px;
+    margin: auto;
+}
+
+.success-card {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+
+.success-header {
+    background: linear-gradient(135deg,#00a651,#2ecc71);
+    color: #fff;
+    text-align: center;
+    padding: 22px 15px;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+    margin: auto;
+    border-radius: 50%;
+    background: rgba(255,255,255,.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-icon i {
+    font-size: 38px;
+    color: #fff;
+}
+
+.success-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.success-subtitle {
+    font-size: 13px;
+    margin-top: 4px;
+    opacity: .95;
+}
+
+.status-chip {
+    display: inline-block;
+    background: #e9f9ee;
+    color: #00a651;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.info-card {
+    background: #f8f9fc;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.info-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    word-break: break-all;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label,
+.summary-value {
+    font-size: 14px;
+}
+
+.summary-label {
+    color: #666;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #222;
+}
+
+.ledger-btn {
+    width: 100%;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#6a1b9a,#9c27b0);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+}
+
+.ledger-btn:hover {
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.secure-text {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 10px;
+}
+
+@media(max-width:576px) {
     .success-wrapper {
-        max-width: 520px;
-        margin: auto;
-    }
-
-    .success-card {
-        border: none;
-        border-radius: 24px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
-    }
-
-    .success-header {
-        background: linear-gradient(135deg, #00a651, #2ecc71);
-        color: #fff;
-        text-align: center;
-        padding: 40px 20px;
-    }
-
-    .success-icon {
-        width: 100px;
-        height: 100px;
-        margin: auto;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .18);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .success-icon i {
-        font-size: 55px;
-        color: #fff;
+        max-width: 100%;
     }
 
     .success-title {
-        font-size: 28px;
-        font-weight: 700;
-        margin-top: 18px;
-    }
-
-    .success-subtitle {
-        opacity: .95;
-        margin-top: 8px;
-    }
-
-    .status-chip {
-        display: inline-block;
-        background: #e9f9ee;
-        color: #00a651;
-        padding: 8px 16px;
-        border-radius: 30px;
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
-
-    .info-card {
-        background: #f8f9fc;
-        border: 1px solid #ececec;
-        border-radius: 18px;
-        padding: 20px;
-        margin-bottom: 15px;
-    }
-
-    .info-label {
-        font-size: 12px;
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
+        font-size: 20px;
     }
 
     .info-value {
-        font-size: 22px;
-        font-weight: 700;
-        color: #222;
-        word-break: break-all;
+        font-size: 16px;
     }
-
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    .summary-row:last-child {
-        border-bottom: none;
-    }
-
-    .summary-label {
-        color: #666;
-    }
-
-    .summary-value {
-        font-weight: 600;
-        color: #222;
-    }
-
-    .ledger-btn {
-        width: 100%;
-        height: 56px;
-        border: none;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #6a1b9a, #9c27b0);
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: .3s;
-    }
-
-    .ledger-btn:hover {
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
-    .secure-text {
-        text-align: center;
-        font-size: 13px;
-        color: #888;
-        margin-top: 16px;
-    }
-
-    @media(max-width:576px) {
-
-        .container {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        .success-title {
-            font-size: 24px;
-        }
-
-        .info-value {
-            font-size: 18px;
-        }
-
-    }
+}
 </style>
-
-<div class="container py-4">
+<div class="container py-2">
 
     <div class="success-wrapper">
 

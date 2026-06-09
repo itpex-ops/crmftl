@@ -25,6 +25,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import VehicleTransaction
 from django.core.exceptions import ValidationError
 
+from django.shortcuts import render, get_object_or_404
+from .models import Vehicle
+
+
+def make_payment(request, vehicle_id):
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    context = {
+        "vehicle": vehicle,
+    }
+    return render(
+        request,
+        "accounts/make_payment.html",
+         context
+    )
 def clean(self):
 
     if self.transaction_type == "advance":
@@ -41,14 +55,12 @@ def clean(self):
                 f"Advance cannot exceed {remaining}"
             )
 
-
 def create_vehicle_payment(
     request,
     vehicle,
     transaction_type
 ):
     try:
-
         txn = VehicleTransaction(
             vehicle=vehicle,
             transaction_type=transaction_type,
@@ -58,9 +70,7 @@ def create_vehicle_payment(
             remarks=request.POST.get("remarks"),
             created_by=request.user
         )
-
-        txn.full_clean()   # runs clean()
-
+        txn.full_clean()
         txn.save()
 
         # Create Ledger Entry
@@ -112,12 +122,12 @@ def vehicle_payments(request, vehicle_id):
 
         elif t.transaction_type == "balance":
             bal += 1
-            t.label = f"Balance{bal}"
+            t.label = f"Balance {bal}"
             t.row_class = "row-balance"
 
         else:
             oth += 1
-            t.label = f"OtherS{oth}"
+            t.label = f"OtherS {oth}"
             t.row_class = "row-other"
 
     context = {
@@ -128,49 +138,65 @@ def vehicle_payments(request, vehicle_id):
     return render(request, "accounts/vehicle_payments.html", context)
 
 def pay_vehicle_advance(request, vehicle_id):
-
     vehicle = get_object_or_404(
         Vehicle,
         id=vehicle_id
     )
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).order_by("-id")
+
+    adv = 0
+    bal = 0
+    oth = 0
+
+    for t in transactions:
+
+        if t.transaction_type == "advance":
+            adv += 1
+            t.label = f"Advance {adv}"
+            t.row_class = "row-advance"
+
+        elif t.transaction_type == "balance":
+            bal += 1
+            t.label = f"Balance {bal}"
+            t.row_class = "row-balance"
+
+        else:
+            oth += 1
+            t.label = f"OtherS {oth}"
+            t.row_class = "row-other"
 
     if request.method == "POST":
-
         amount = Decimal(
             request.POST.get("amount")
         )
-
         if amount > vehicle.remaining_balance_amount:
-
             messages.error(
                 request,
                 "Amount exceeds remaining balance."
             )
-
             return redirect(
                 "pay_vehicle_advance",
                 vehicle.id
             )
-
         request.session["advance_amount"] = str(amount)
-
-        return redirect(
-            "confirm_vehicle_advance",
-            vehicle.id
-        )
-
+        return redirect("confirm_vehicle_advance",vehicle.id)
     return render(
-        request,
-        "accounts/pay_vehicle_advance.html",
+        request,"accounts/pay_vehicle_advance.html",
         {
-            "vehicle": vehicle
+            "vehicle": vehicle ,
+            "transactions" :transactions
         }
     )
 
-def confirm_vehicle_advance(
-    request,
-    vehicle_id
-):
+from decimal import Decimal
+from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
+import random
+
+
+def confirm_vehicle_advance(request, vehicle_id):
 
     vehicle = get_object_or_404(
         Vehicle,
@@ -186,8 +212,11 @@ def confirm_vehicle_advance(
 
     if request.method == "POST":
 
-        utr = request.POST.get(
-            "transaction_no"
+        # Auto Generate Reference No
+        utr = (
+            f"ADV"
+            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            f"{random.randint(100,999)}"
         )
 
         txn = VehicleTransaction.objects.create(
@@ -231,14 +260,23 @@ def confirm_vehicle_advance(
             vehicle.id
         )
 
+    preview_utr = (
+        f"ADV"
+        f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+    )
+
     return render(
         request,
         "accounts/confirm_vehicle_advance.html",
         {
             "vehicle": vehicle,
-            "amount": amount
+            "amount": amount,
+            "preview_utr": preview_utr,
         }
     )
+
+from django.utils import timezone
+import random
 
 @login_required
 def pay_vehicle_balance(request, vehicle_id):
@@ -251,12 +289,13 @@ def pay_vehicle_balance(request, vehicle_id):
 
         remaining = vehicle.remaining_balance_amount
 
-        # 🔴 RULE 1: no balance if already cleared
         if remaining <= 0:
-            messages.error(request, "Balance already completed. No payment allowed.")
+            messages.error(
+                request,
+                "Balance already completed. No payment allowed."
+            )
             return redirect("pay_vehicle_balance", vehicle.id)
 
-        # 🔴 RULE 2: cannot exceed remaining balance
         if amount > remaining:
             messages.error(
                 request,
@@ -264,26 +303,47 @@ def pay_vehicle_balance(request, vehicle_id):
             )
             return redirect("pay_vehicle_balance", vehicle.id)
 
+        transaction_no = (
+            f"BAL"
+            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            f"{random.randint(100,999)}"
+        )
+
         VehicleTransaction.objects.create(
             vehicle=vehicle,
             transaction_type="balance",
             amount=amount,
+            payment_mode=request.POST.get("payment_mode"),
+            transaction_no=transaction_no,
+            remarks=request.POST.get("remarks"),
             created_by=request.user
         )
 
-        messages.success(request, "Balance payment added.")
+        messages.success(
+            request,
+            f"Balance payment added. Ref No: {transaction_no}"
+        )
+
         return redirect("pay_vehicle_balance", vehicle.id)
 
-    balances = VehicleTransaction.objects.filter(
+    preview_transaction_no = (
+        f"BAL{timezone.now().strftime('%Y%m%d%H%M%S')}"
+    )
+
+    balance_payments = VehicleTransaction.objects.filter(
         vehicle=vehicle,
         transaction_type="balance"
     ).order_by("-id")
 
-    return render(request, "accounts/pay_vehicle_balance.html", {
-        "vehicle": vehicle,
-        "balances": balances
-    })
-
+    return render(
+        request,
+        "accounts/pay_vehicle_balance.html",
+        {
+            "vehicle": vehicle,
+            "balance_payments": balance_payments,
+            "preview_transaction_no": preview_transaction_no,
+        }
+    )
 def advance_success(
     request,
     vehicle_id
@@ -305,21 +365,14 @@ def advance_success(
         }
     )
 
-
-
-
 @login_required
 def vehicle_accounts(request):
-
     vehicles = Vehicle.objects.select_related(
         "order",
         "order__tracking"
-    )
-
+    ).order_by("-id")
     data = []
-
     for v in vehicles:
-
         data.append({
             "vehicle_id": v.id,
             "ftlno": v.ftl_no,
@@ -339,8 +392,6 @@ def vehicle_accounts(request):
         "accounts/vehicle.html",
         {"data": data}
     )
-
-
 
 @login_required
 def pay_vehicle_other(request, vehicle_id):

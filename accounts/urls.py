@@ -40,7 +40,7 @@ path(
 path(
     "vehicle/<int:vehicle_id>/payments/other/",
     views.pay_vehicle_other,
-    name="pay_vehicle_other"
+    name="vehicle_other"
 ),
 path(
     "vehicle/<int:vehicle_id>/advance/confirm/",
@@ -53,4 +53,6 @@ path(
     views.advance_success,
     name="advance_success"
 ),
+path("vehicle/<int:vehicle_id/make_payment/",views.make_payment,name = "make_payment"),
+
 ]
