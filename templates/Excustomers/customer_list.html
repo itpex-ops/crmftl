@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
-
+{% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 <div class="container-fluid">
 
@@ -9,8 +10,7 @@
 
             <h4>Customers</h4>
 
-            <a href="{% url 'customer_create' %}"
-               class="btn btn-primary">
+            <a href="{% url 'customer_create' %}" class="btn btn-primary">
                 Add Customer
             </a>
 
@@ -23,11 +23,8 @@
 
             <div class="input-group">
 
-                <input type="text"
-                       name="q"
-                       class="form-control"
-                       placeholder="Search customer code / name / phone / GST"
-                       value="{{ query }}">
+                <input type="text" name="q" class="form-control" placeholder="Search customer code / name / phone / GST"
+                    value="{{ query }}">
 
                 <button class="btn btn-dark">
                     Search
@@ -37,74 +34,73 @@
 
         </form>
 
-        <div class="table-responsive">
+        <div class="card table-card p-3">
 
-            <table class="table table-bordered table-hover">
+            <div class="table-responsive">
 
-                <thead class="table-light">
-                    <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>GST</th>
-                        <th>City</th>
-                        <th>Status</th>
-                        <th width="150">Action</th>
-                    </tr>
-                </thead>
+                <table class="table align-middle">
+                    <thead class="custom-table-head">
+                        <tr class="main-head-row">
+                            <th rowspan="2" class="main-th">Code</th>
+                            <th rowspan="2" class="main-th">Name</th>
+                            <th rowspan="2" class="main-th">Phone</th>
+                            <th rowspan="2" class="main-th">GST</th>
+                            <th rowspan="2" class="main-th">City</th>
+                            <th rowspan="2" class="main-th">Status</th>
+                            <th rowspan="2" class="main-th">Action</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
+                    <tbody>
 
-                    {% for c in customers %}
+                        {% for c in customers %}
 
-                    <tr>
-                        <td>{{ c.customer_code }}</td>
-                        <td>{{ c.name }}</td>
-                        <td>{{ c.phone1 }}</td>
-                        <td>{{ c.gst_number }}</td>
-                        <td>{{ c.city }}</td>
+                        <tr>
+                            <td>{{ c.customer_code }}</td>
+                            <td>{{ c.name }}</td>
+                            <td>{{ c.phone1 }}</td>
+                            <td>{{ c.gst_number }}</td>
+                            <td>{{ c.city }}</td>
 
-                        <td>
-                            {% if c.is_active %}
+                            <td>
+                                {% if c.is_active %}
                                 <span class="badge bg-success">Active</span>
-                            {% else %}
+                                {% else %}
                                 <span class="badge bg-danger">Inactive</span>
-                            {% endif %}
-                        </td>
+                                {% endif %}
+                            </td>
 
-                        <td>
+                            <td>
 
-                            <a href="{% url 'customer_update' c.id %}"
-                               class="btn btn-warning btn-sm">
-                                Edit
-                            </a>
+                                <a href="{% url 'customer_update' c.id %}" class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
 
-                            <a href="{% url 'customer_delete' c.id %}"
-                               class="btn btn-danger btn-sm">
-                                Delete
-                            </a>
+                                <a href="{% url 'customer_delete' c.id %}" class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
 
-                    {% empty %}
+                        {% empty %}
 
-                    <tr>
-                        <td colspan="7" class="text-center">
-                            No customers found
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                No customers found
+                            </td>
+                        </tr>
 
-                    {% endfor %}
+                        {% endfor %}
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
-
-{% endblock %}
+    {% endblock %}

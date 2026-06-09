@@ -196,7 +196,7 @@
                             Payment Mode
                         </label>
 
-                        <select name="payment_mode" class="form-select">
+                        <select name="payment_mode" id="paymentMode" class="form-select">
                             <option value="bank">
                                 Bank Transfer
                             </option>
@@ -205,6 +205,25 @@
                                 UPI
                             </option>
                         </select>
+                    </div>
+
+                
+                    
+
+                    <!-- UPI Details -->
+                    <div id="upiDetails" style="display:none;">
+
+                        <div class="beneficiary-card">
+
+                            <div class="detail-label">
+                                UPI ID
+                            </div>
+
+                            <div class="detail-value">
+                                {{ vehicle.upi_id }}
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="mb-4">

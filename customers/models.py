@@ -84,7 +84,7 @@ class ExCustomer(models.Model):
         super().save(*args, **kwargs)
 
         if not self.customer_code:
-            self.customer_code = f"CUST{self.id:05d}"
+            self.customer_code = f"C{self.id:05d}"
             super().save(update_fields=["customer_code"])
 
     def __str__(self):

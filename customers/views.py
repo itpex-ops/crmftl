@@ -32,13 +32,20 @@ def validate_pan(pan):
     if not re.match(pattern, pan):
         raise ValidationError("Invalid PAN format")
 
+from django.db.models import Max
+
 @login_required
 def customer_create(request):
 
-    if request.method == "POST":
+    last_id = ExCustomer.objects.aggregate(
+        max_id=Max("id")
+    )["max_id"] or 0
 
+    next_customer_code = f"C{last_id + 1:05d}"
+
+    if request.method == "POST":
         try:
-            ExCustomer.objects.create(
+            customer = ExCustomer.objects.create(
                 name=request.POST.get("name"),
                 phone1=request.POST.get("phone1"),
                 phone2=request.POST.get("phone2"),
@@ -50,20 +57,29 @@ def customer_create(request):
                 address=request.POST.get("address"),
                 city=request.POST.get("city"),
                 pincode=request.POST.get("pincode"),
-                is_active=True if request.POST.get("is_active") == "True" else False,
-                created_by=request.user
+                is_active=request.POST.get("is_active") == "True",
+                created_by=request.user.username
             )
 
-            messages.success(request, "Customer created successfully!")
+            messages.success(
+                request,
+                f"Customer created successfully! Code: {customer.customer_code}"
+            )
+
             return redirect("customer_create")
 
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
 
     context = {
+        "next_customer_code": next_customer_code
     }
 
-    return render(request, "Excustomers/customer_form.html", context)
+    return render(
+        request,
+        "Excustomers/customer_form.html",
+        context
+    )
 
 def customer_update(request, pk):
     customer = get_object_or_404(ExCustomer, pk=pk)

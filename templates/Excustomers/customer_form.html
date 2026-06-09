@@ -49,12 +49,15 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Mobile Number 1 *</label>
-                                <input type="tel" name="phone1" class="form-control" maxlength="10" required>
+                                <input type="tel" name="phone1" class="form-control" maxlength="10" pattern="[0-9]{10}" 
+                                inputmode="numeric" required>
+                                <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Mobile Number 2</label>
-                                <input type="tel" name="phone2" class="form-control" maxlength="10">
+                                <input type="tel" name="phone2" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+                                <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
                             <div class="col-md-6">
@@ -74,13 +77,13 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">State</label>
-                                <input type="text" name="state" class="form-control">
+                                <label class="form-label">State *</label>
+                                <input type="text" name="state" class="form-control" required>
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">State Code</label>
-                                <input type="text" name="state_code" class="form-control">
+                                <label class="form-label">State Code *</label>
+                                <input type="text" name="state_code" class="form-control" required>
                             </div>
 
                             <div class="col-12">
@@ -89,19 +92,19 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">City</label>
-                                <input type="text" name="city" class="form-control">
+                                <label class="form-label">City *</label>
+                                <input type="text" name="city" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Pincode</label>
-                                <input type="text" name="pincode" maxlength="6" class="form-control">
+                                <label class="form-label">Pincode *</label>
+                                <input type="text" name="pincode" maxlength="6" class="form-control" required>
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Status</label>
+                                <label class="form-label">Status *</label>
 
-                                <select name="is_active" class="form-select">
+                                <select name="is_active" class="form-select" required>
 
                                     <option value="True">
                                         ACTIVE
@@ -165,7 +168,6 @@
     </form>
 
 </div>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
