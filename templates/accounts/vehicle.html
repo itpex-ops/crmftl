@@ -78,22 +78,27 @@
     }
 
     .lock-card {
-        position: relative;
         background: linear-gradient(135deg, #ff4d4d, #c0392b);
         color: #fff;
         border-radius: 12px;
-        padding: 14px;
-        overflow: hidden;
-        min-width: 160px;
+        width: 90px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+    }
+
+    .lock-icon {
+        font-size: 32px;
     }
 
     /* content */
     .lock-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
         position: relative;
         z-index: 2;
+        align-items: center;
+        text-align: center;
     }
 
     .lock-icon {
@@ -270,18 +275,7 @@
                             {% if v.is_locked %}
 
                             <div class="lock-card">
-
-                                <div class="lock-content">
-                                    <i class="bi bi-lock-fill lock-icon"></i>
-                                    <div>
-                                        <div class="fw-bold">Board Locked</div>
-                                        <small>Swipe to unlock</small>
-                                    </div>
-                                </div>
-
-                                <!-- swipe overlay -->
-                                <div class="swipe-layer"></div>
-
+                                <i class="bi bi-lock-fill lock-icon"></i>
                             </div>
 
                             {% else %}
