@@ -53,6 +53,6 @@ path(
     views.advance_success,
     name="advance_success"
 ),
-path("vehicle/<int:vehicle_id/make_payment/",views.make_payment,name = "make_payment"),
+path("vehicle/<int:vehicle_id>/make_payment/",views.make_payment,name = "make_payment"),
 
 ]
