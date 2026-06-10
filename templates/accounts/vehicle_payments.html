@@ -316,35 +316,35 @@
 
     </div>
 
+   <!-- ================= TAB CONTENT ================= -->
+<div class="tab-bar">
 
-    <!-- ================= TAB CONTENT ================= -->
-    <div class="tab-bar">
-        {% if vehicle.can_take_advance %}
+    {% if vehicle.can_take_advance %}
         <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="tab-btn">
             Advance
         </a>
-        {% else %}
+    {% else %}
+        <span class="tab-btn disabled">
             Advance (Closed)
         </span>
-        {% endif %}
+    {% endif %}
 
-        {% if vehicle.can_take_balance %}
-        <span class="tab-btn disabled">
-        Balance(Closed)
-        </span>
-        {% else %}
+    {% if vehicle.can_take_balance %}
         <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="tab-btn">
             Balance
         </a>
-        {% endif %}
+    {% else %}
+        <span class="tab-btn disabled">
+            Balance (Closed)
+        </span>
+    {% endif %}
 
+    <a href="{% url 'vehicle_other' vehicle.id %}"
+       class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
+        Other
+    </a>
 
-        <a href="{% url 'vehicle_other' vehicle.id %}"
-            class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
-            Other
-        </a>
-
-    </div>
+</div>
 
     <!-- SKELETON -->
     <div id="skeleton-loader">
