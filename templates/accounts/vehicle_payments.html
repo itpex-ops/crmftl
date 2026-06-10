@@ -324,15 +324,19 @@
             Advance
         </a>
         {% else %}
-        <span class="tab-btn disabled">
             Advance (Closed)
         </span>
         {% endif %}
 
-
+        {% if vehicle.can_take_balance %}
+        <span class="tab-btn disabled">
+        Balance(Closed)
+        </span>
+        {% else %}
         <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="tab-btn">
             Balance
         </a>
+        {% endif %}
 
 
         <a href="{% url 'vehicle_other' vehicle.id %}"
