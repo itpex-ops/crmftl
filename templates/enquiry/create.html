@@ -40,7 +40,8 @@
             ✅ Customer Found
         </h6>
     </div>
-    {% else %}
+    {% endif %}
+    {% if not customer %}
     <div class="alert alert-warning d-flex align-items-center">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <span>Customer not found. Please refer to the Customer List.</span>
@@ -80,11 +81,9 @@
                             {% if customer %}readonly{% endif %} required>
                         <small class="text-muted">Enter 10 digit mobile number</small>
                     </div>
-
                     <div class="col-md-4">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ customer.email|default:'' }}"
-                        {% if customer %}readonly{% endif %}>
+                        <input type="email" name="email" class="form-control" value="{{ customer.email|default:'' }}" {% if customer %}readonly{% endif %}>
                     </div>
                     {% if customer %}
                     <div class="col-md-4">
@@ -94,10 +93,8 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">City</label>
-                        <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}" {% if
-                            customer %}readonly{% endif %}>
+                        <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}" {% if customer %}readonly{% endif %}>
                     </div>
-
                     <div class="col-md-4">
                         <label class="form-label">Pincode</label>
                         <input type="text" name="pincode" class="form-control" value="{{ customer.pincode|default:'' }}"
