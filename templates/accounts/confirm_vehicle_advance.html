@@ -2,140 +2,89 @@
 {% block content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-    body {
-        background: #f4f6fb;
-    }
-
-    .transfer-btn {
-        width: 100%;
-        height: 56px;
-        border: none;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #6a1b9a, #9c27b0);
-        color: #fff;
-        font-weight: 700;
-        font-size: 16px;
-        letter-spacing: 0.3px;
-        transition: all 0.3s ease;
-    }
-
-    .transfer-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(156, 39, 176, 0.25);
-    }
-
-    .transfer-btn:active {
-        transform: scale(0.98);
-    }
-
     .transfer-wrapper {
-        max-width: 500px;
+        max-width: 350px;
         margin: auto;
     }
 
     .yono-card {
         border: none;
-        border-radius: 24px;
+        border-radius: 18px;
         overflow: hidden;
-        background: #fff;
     }
 
     .yono-header {
-        background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+        background: linear-gradient(135deg, #198754, #28a745);
         color: white;
-        padding: 30px 25px;
+        padding: 4px;
         text-align: center;
-    }
-
-    .yono-header small {
-        opacity: .9;
-        letter-spacing: 1px;
+        font-size: 14px;
+        font-weight: 500;
     }
 
     .amount-box {
-        font-size: 2.3rem;
-        font-weight: 700;
-        margin-top: 10px;
+        font-size: 1rem;
+        font-weight: 600;
     }
 
     .beneficiary-card {
-        background: #faf7fd;
-        border: 1px solid #eee;
-        border-radius: 18px;
-        padding: 18px;
-        margin-bottom: 20px;
-    }
-
-    .detail-label {
-        font-size: 12px;
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-
-    .detail-value {
-        font-size: 15px;
-        font-weight: 600;
-        color: #222;
-        margin-bottom: 14px;
-        word-break: break-word;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
     }
 
     .form-label {
-        font-weight: 600;
-        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 500;
     }
 
-    .form-select,
-    .form-control {
-        height: 52px;
-        border-radius: 14px;
-        border: 1px solid #ddd;
-        font-size: 15px;
-    }
-
-    .form-select:focus,
-    .form-control:focus {
-        box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.15);
-        border-color: #9c27b0;
+    .form-control,
+    .form-select {
+        height: 38px;
+        border-radius: 10px;
+        font-size: 13px;
     }
 
     .transfer-btn {
         width: 100%;
-        height: 56px;
+        height: 38px;
         border: none;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #6a1b9a, #9c27b0);
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
-        transition: .3s;
-    }
-
-    .transfer-btn:hover {
-        transform: translateY(-2px);
+        border-radius: 10px;
+        background: #198754;
+        color: #fff;
+        font-weight: 500;
+        font-size: 14px;
     }
 
     .secure-note {
         text-align: center;
+        font-size: 11px;
         color: #777;
-        font-size: 13px;
-        margin-top: 15px;
+        margin-top: 8px;
     }
 
-    @media (max-width: 576px) {
-        .container {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
 
-        .amount-box {
-            font-size: 1.9rem;
-        }
+    .detail-row:last-child {
+        margin-bottom: 0;
+    }
 
-        .yono-header {
-            padding: 25px 20px;
-        }
+    .detail-row strong {
+        font-size: 12px;
+    }
+
+    .detail-row span {
+        text-align: right;
+        font-size: 12px;
+        font-weight: 500;
+        word-break: break-all;
     }
 </style>
 
@@ -147,102 +96,85 @@
 
             <!-- Header -->
             <div class="yono-header">
-
-                <small>CONFIRM TRANSFER</small>
-
-                <div class="amount-box">
-                    ₹ {{ amount }}
-                </div>
-
+                Confirm Transfer
             </div>
 
-            <div class="card-body p-4">
+            <div class="card-body">
 
-                <!-- Beneficiary Details -->
-                <div class="beneficiary-card">
-
-                    <div class="detail-label">
-                        Beneficiary Name
+                <div class="text-center mb-3">
+                    <div class="vehicle-number">
+                        {{ vehicle.vehicle_number }}
                     </div>
 
-                    <div class="detail-value">
-                        {{ vehicle.beneficiary_name }}
+                    <div class="amount-box">
+                        ₹ {{ amount }}
                     </div>
-
-                    <div class="detail-label">
-                        Account Number
-                    </div>
-
-                    <div class="detail-value">
-                        {{ vehicle.account_number }}
-                    </div>
-
-                    <div class="detail-label">
-                        IFSC Code
-                    </div>
-
-                    <div class="detail-value">
-                        {{ vehicle.ifsc }}
-                    </div>
-
                 </div>
 
-                <!-- Form -->
-                <form method="post">
-                    {% csrf_token %}
+                <div class="card-body p-4">
 
-                    <div class="mb-3">
-                        <label class="form-label">
-                            Payment Mode
-                        </label>
+                    <!-- Form -->
+                    <form method="post">
+                        {% csrf_token %}
 
-                        <select name="payment_mode" id="paymentMode" class="form-select">
-                            <option value="bank">
-                                Bank Transfer
-                            </option>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Mode</label>
 
-                            <option value="upi">
-                                UPI
-                            </option>
-                        </select>
-                    </div>
-
-                
-                    
-
-                    <!-- UPI Details -->
-                    <div id="upiDetails" style="display:none;">
-
-                        <div class="beneficiary-card">
-
-                            <div class="detail-label">
-                                UPI ID
-                            </div>
-
-                            <div class="detail-value">
-                                {{ vehicle.upi_id }}
-                            </div>
+                            <select name="payment_mode" id="paymentMode" class="form-select">
+                                <option value="bank">Bank Transfer</option>
+                                <option value="upi">UPI</option>
+                            </select>
                         </div>
 
+                        <!-- BANK DETAILS -->
+                        <div id="bankDetails" class="beneficiary-card">
+
+                            <div class="detail-row">
+                                <strong>Account Name</strong>
+                                <span>{{ vehicle.beneficiary_name }}</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <strong>A/C No</strong>
+                                <span>{{ vehicle.account_number }}</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <strong>IFSC</strong>
+                                <span>{{ vehicle.ifsc }}</span>
+                            </div>
+
+                        </div>
+
+                        <!-- UPI DETAILS -->
+                        <div id="upiDetails" class="beneficiary-card" style="display:none;">
+
+                            <div class="detail-row">
+                                <strong>UPI ID</strong>
+                                <span>{{ vehicle.upi_id }}</span>
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                Reference Number
+                            </label>
+
+                            <input type="text" class="form-control" value="{{ preview_utr }}" readonly>
+                        </div><input type="hidden" name="transaction_no">
+
+                        <button type="submit" class="transfer-btn">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Confirm & Transfer
+                        </button>
+
+                    </form>
+
+                    <div class="secure-note">
+                        🔒 Secured Banking Transaction
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">
-                            Reference Number
-                        </label>
-
-                        <input type="text" class="form-control" value="{{ preview_utr }}" readonly>
-                    </div><input type="hidden" name="transaction_no">
-
-                    <button type="submit" class="transfer-btn">
-                        <i class="bi bi-shield-check me-2"></i>
-                        Confirm & Transfer
-                    </button>
-
-                </form>
-
-                <div class="secure-note">
-                    🔒 Secured Banking Transaction
                 </div>
 
             </div>
@@ -250,7 +182,29 @@
         </div>
 
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-</div>
+            const paymentMode = document.getElementById("paymentMode");
+            const bankDetails = document.getElementById("bankDetails");
+            const upiDetails = document.getElementById("upiDetails");
 
-{% endblock %}
+            function togglePaymentDetails() {
+
+                if (paymentMode.value === "bank") {
+                    bankDetails.style.display = "block";
+                    upiDetails.style.display = "none";
+                }
+                else if (paymentMode.value === "upi") {
+                    bankDetails.style.display = "none";
+                    upiDetails.style.display = "block";
+                }
+            }
+
+            paymentMode.addEventListener("change", togglePaymentDetails);
+
+            // Initial load
+            togglePaymentDetails();
+        });
+    </script>
+    {% endblock %}

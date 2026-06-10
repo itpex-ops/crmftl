@@ -3,166 +3,442 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    #upiDetails,
+    #bankDetails {
+        font-size: 12px;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
 
+    .detail-row {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        gap: 10px;
+    }
+
+    .detail-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-row strong {
+        white-space: nowrap;
+    }
+
+    .detail-row span {
+        text-align: right;
+        font-weight: 500;
+        word-break: break-all;
+    }
+
+    .recent-payments-scroll {
+        max-height: 250px;
+        /* adjust as needed */
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar-thumb {
+        background: #c5c5c5;
+        border-radius: 9px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+
+    .history-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 9px;
+        margin-bottom: 12px;
+        border: 1px solid #ececec;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+        transition: .2s;
+    }
+
+    .history-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .history-type {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+    }
+
+    .history-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .advance-icon {
+        background: #00a651;
+    }
+
+    .balance-icon {
+        background: #2962ff;
+    }
+
+    .other-icon {
+        background: #9c27b0;
+    }
+
+    .history-label {
+        font-weight: 600;
+        font-size: small;
+    }
+
+    .history-date {
+        color: #888;
+        font-size: 13px;
+    }
+
+    .history-amount {
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .history-bottom {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .history-divider {
+        height: 1px;
+        background: #eee;
+        margin: 10px 0;
+    }
+
+    .payment-wrapper {
+        max-width: 350px;
+        margin: auto;
+    }
+
+    .payment-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .payment-header {
+        background: linear-gradient(135deg, #198754, #28a745);
+        color: white;
+        padding: 3px;
+        font-weight: 500;
+        font-size: small;
+        text-align: center;
+    }
+
+    .vehicle-info {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .vehicle-number {
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: #333;
+        word-break: break-word;
+    }
+
+    .balance-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 3px;
+        margin-top: 15px;
+    }
+
+    .balance-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .balance-amount {
+        color: #198754;
+        font-size: 1.0rem;
+        font-weight: 500;
+    }
+
+    .form-label {
+        font-weight: 400;
+        margin-bottom: 8px;
+        font-size: smaller;
+    }
+
+    .form-control {
+        height: 52px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .pay-btn {
+        width: 100%;
+        height: 32px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .vehicle-number {
+            font-size: 1.25rem;
+        }
+
+        .balance-amount {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-body {
+            padding: 18px;
+        }
+
+        .vehicle-number {
+            font-size: 1.1rem;
+        }
+
+        .balance-amount {
+            font-size: 1.3rem;
+        }
+
+        .form-control,
+        .pay-btn {
+            height: 38px;
+        }
+    }
+
+    .history-title {
+        font-weight: 500;
+        color: #6a1b9a;
+        margin-bottom: 15px;
+        font-size: small;
+    }
+</style>
 
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 <div class="container-fluid py-1">
 
     <!-- HEADER -->
-    <div class="page-header d-flex justify-content-between align-items-center">
+    <div class="payment-wrapper mt-1">
 
-        <div>
-            <h4 class="mb-1">Balance Payment</h4>
-            <small>{{ vehicle.ftl_no }} • {{ vehicle.vehicle_number }}</small>
-        </div>
+        <div class="card payment-card shadow">
 
-        <div class="d-flex gap-2">
-
-            <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="btn btn-success btn-modern">
-
-                <i class="bi bi-cash-stack"></i> Advance
-            </a>
-
-        </div>
-
-    </div>
-
-    <!-- SUMMARY -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="stat-card">
-                <div class="stat-title">Total Freight</div>
-                <div class="stat-value">
-                    ₹{{ vehicle.total_freight|default:0 }}
-                </div>
+            <div class="payment-header">
+                Balance Payment
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="stat-card">
-                <div class="stat-title">Pending Balance</div>
-                <div class="stat-value balance">
-                    ₹{{ vehicle.remaining_balance_amount }}
-                </div>
-            </div>
-        </div>
+            <div class="card-body">
 
-    </div>
+                <div class="vehicle-info">
 
-    <div class="row">
+                    <div class="vehicle-number">
+                        {{ vehicle.vehicle_number }}
+                    </div>
 
-        <!-- FORM -->
-        <div class="col-lg-5">
-
-            <div class="card card-modern">
-                <div class="card-body">
-
-                    <h5 class="mb-4">Add Balance Payment</h5>
-
-                    <form method="post">
-                        {% csrf_token %}
-
-                        <div class="mb-3">
-                            <label>Amount</label>
-                            <input type="number" step="0.01" name="amount" class="form-control" required>
+                    <div class="balance-box">
+                        <div class="balance-label">
+                            Pending Balance
                         </div>
 
-                        <div class="mb-3">
-                            <label>Payment Mode</label>
-                            <select name="payment_mode" class="form-select">
-                                <option value="upi">UPI</option>
-                                <option value="bank">Bank</option>
-                                <option value="cash">Cash</option>
-                            </select>
+                        <div class="balance-amount">
+                            ₹ {{ vehicle.remaining_balance_amount }}
                         </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label>Reference No</label>
-                            <input type="text" class="form-control bg-light" value="{{ preview_transaction_no }}"
-                                readonly>
-                            <small class="text-muted">
-                                Generated automatically on save
-                            </small>
-                        </div>
                 </div>
 
-                <button class="btn btn-primary btn-modern w-100">
-                    <i class="bi bi-wallet2"></i> Save Balance Payment
-                </button>
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+
+                    <div class="mb-2">
+                        <label class="form-label">
+                            Balance Amount
+                        </label>
+
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
+                            required>
+                    </div>
+
+                   <!--  <div class="mb-2">
+                        <label class="form-label">
+                            Payment Mode
+                        </label>
+
+                        <select name="payment_mode" id="paymentMode" class="form-control">
+                            <option value="">Select</option>
+                            <option value="upi">UPI</option>
+                            <option value="bank">Bank</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </div>
+
+                    UPI DETAILS
+                    <div id="upiDetails" class="alert alert-success mt-2 d-none">
+                        <div class="detail-row">
+                        <strong>UPI</strong>
+                            <span>{{vehicle.upi_number}}</span>
+                        </div>
+                    </div>
+
+                    BANK DETAILS
+                    <div id="bankDetails" class="alert alert-primary mt-2 d-none">
+                        <div class="detail-row">
+                            <strong>Account Name</strong>
+                            <span>{{ vehicle.account_name }}</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <strong>A/C No</strong>
+                            <span>{{ vehicle.account_number }}</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <strong>IFSC</strong>
+                            <span>{{ vehicle.ifsc }}</span>
+                        </div>
+                    </div>-->
+
+                    <button type="submit" class="btn btn-primary pay-btn">
+                        Pay Balance
+                    </button> 
 
                 </form>
+                <hr class="my-2">
+
+                <h5 class="history-title">
+                    <i class="bi bi-clock-history"></i>
+                    Recent History
+                </h5>
+                <div class="recent-payments-scroll">
+
+                    {% for p in balance_payments %}
+
+                    <div class="history-card">
+
+                        <div class="history-top">
+
+                            <div class="history-type">
+
+                                <div class="history-icon balance-icon">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+
+                                <div>
+                                    <div class="history-label">
+                                        {{ p.label|default:"Balance Payment" }}
+                                    </div>
+
+                                    <div class="history-date">
+                                        {{ p.date|date:"d M Y h:i a" }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="history-amount">
+                                ₹{{ p.amount|floatformat:2 }}
+                            </div>
+
+                        </div>
+
+                        <div class="history-divider"></div>
+
+                        <div class="history-bottom">
+
+                            <strong>Mode:</strong>
+                            {{ p.payment_mode|upper }}
+
+                            {% if p.transaction_no %}
+                            <br>
+                            <strong>UTR:</strong>
+                            {{ p.transaction_no }}
+                            {% endif %}
+
+                            {% if p.remarks %}
+                            <br>
+                            <strong>Remarks:</strong>
+                            {{ p.remarks }}
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="alert alert-light text-center">
+                        No balance payments available
+                    </div>
+
+                    {% endfor %}
+
+                </div>
 
             </div>
+
         </div>
 
     </div>
 
-    <!-- HISTORY -->
-    <div class="card card-modern">
-        <div class="card-body">
 
-            <div class="section-title text-primary mb-3">
-                Balance Payment History
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Mode</th>
-                            <th>Txn No</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        {% for p in balance_payments %}
-                        <tr>
-                            <td>
-                                {{ p.date|date:"d M Y" }}
-                            </td>
-
-                            <td class="fw-bold text-primary">
-                                ₹{{ p.amount }}
-                            </td>
-
-                            <td>
-                                <span class="badge-mode">
-                                    {{ p.payment_mode|upper }}
-                                </span>
-                            </td>
-
-                            <td>
-                                <code>{{ p.transaction_no }}</code>
-                            </td>
-
-                            <td>
-                                {{ p.remarks|default:"-" }}
-                            </td>
-                        </tr>
-
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">
-                                No balance payments found
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-    </div>
 
 </div>
 
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
+        const paymentMode = document.getElementById('paymentMode');
+        const upiDetails = document.getElementById('upiDetails');
+        const bankDetails = document.getElementById('bankDetails');
+
+        function togglePaymentDetails() {
+
+            upiDetails.classList.add('d-none');
+            bankDetails.classList.add('d-none');
+
+            if (paymentMode.value === 'upi') {
+                upiDetails.classList.remove('d-none');
+            }
+
+            if (paymentMode.value === 'bank') {
+                bankDetails.classList.remove('d-none');
+            }
+        }
+
+        paymentMode.addEventListener('change', togglePaymentDetails);
+        togglePaymentDetails();
+    });
+</script>
 {% endblock %}

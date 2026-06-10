@@ -55,4 +55,15 @@ path(
 ),
 path("vehicle/<int:vehicle_id>/make_payment/",views.make_payment,name = "make_payment"),
 
+path(
+    "vehicle/<int:vehicle_id>/confirm-balance/",
+    views.confirm_vehicle_balance,
+    name="confirm_vehicle_balance"
+),
+path(
+    "vehicle/<int:vehicle_id>/balance-success/",
+    views.balance_success,
+    name="balance_success"
+),
+
 ]

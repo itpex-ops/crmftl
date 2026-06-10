@@ -190,11 +190,8 @@ def pay_vehicle_advance(request, vehicle_id):
         }
     )
 
-from decimal import Decimal
-from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 import random
-
 
 def confirm_vehicle_advance(request, vehicle_id):
 
@@ -275,8 +272,100 @@ def confirm_vehicle_advance(request, vehicle_id):
         }
     )
 
+from decimal import Decimal
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.contrib import messages
 import random
+
+@login_required
+def confirm_vehicle_balance(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    amount = Decimal(
+        request.session.get(
+            "balance_amount",
+            "0"
+        )
+    )
+
+    if amount <= 0:
+        messages.error(
+            request,
+            "Invalid balance amount."
+        )
+        return redirect(
+            "pay_vehicle_balance",
+            vehicle.id
+        )
+
+    if request.method == "POST":
+
+        utr = (
+            f"BAL"
+            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            f"{random.randint(100,999)}"
+        )
+
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type="balance",
+            amount=amount,
+            payment_mode=request.POST.get(
+                "payment_mode"
+            ),
+            transaction_no=utr,
+            remarks="Balance transferred",
+            created_by=request.user
+        )
+
+        LedgerEntry.objects.create(
+            account_type="vehicle",
+            vehicle=vehicle,
+            order=vehicle.order,
+            debit=amount,
+            credit=0,
+            voucher_no=utr,
+            remarks="Balance Payment"
+        )
+
+        if hasattr(vehicle.order, "tracking"):
+
+            tracking = vehicle.order.tracking
+
+            tracking.balance_paid  = True
+
+            tracking.save(
+                update_fields=[
+                    "balance_to_fleet"
+                ]
+            )
+
+        request.session["last_utr"] = utr
+
+        return redirect(
+            "balance_success",
+            vehicle.id
+        )
+
+    preview_utr = (
+        f"BAL"
+        f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+    )
+
+    return render(
+        request,
+        "accounts/confirm_vehicle_balance.html",
+        {
+            "vehicle": vehicle,
+            "amount": amount,
+            "preview_utr": preview_utr,
+        }
+    )
 
 @login_required
 def pay_vehicle_balance(request, vehicle_id):
@@ -344,6 +433,29 @@ def pay_vehicle_balance(request, vehicle_id):
             "preview_transaction_no": preview_transaction_no,
         }
     )
+
+@login_required
+def balance_success(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    utr = request.session.get(
+        "last_utr",
+        ""
+    )
+
+    return render(
+        request,
+        "accounts/balance_success.html",
+        {
+            "vehicle": vehicle,
+            "utr": utr
+        }
+    )
+
 def advance_success(
     request,
     vehicle_id

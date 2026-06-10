@@ -209,12 +209,13 @@ class Tracking(models.Model):
     vehicle_document = models.BooleanField(default=False)
     invoice_eway = models.BooleanField(default=False)
     advance_to_fleet = models.BooleanField(default=False)
+    balance_to_fleet = models.BooleanField(default=False)
     fleet_departed = models.BooleanField(default=False)
     advance_received = models.BooleanField(default=False)
     arrived = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
     pod_received = models.BooleanField(default=False)
-
+    balance_paid = models.BooleanField(default=False)
     lr_no_b = models.BooleanField(default=False)
 
     lr_no = models.CharField(
