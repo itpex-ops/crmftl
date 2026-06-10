@@ -1,0 +1,243 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+    body {
+        background: #f4f6fb;
+    }
+
+    .payment-wrapper {
+        max-width: 380px;
+        margin: auto;
+    }
+
+    .payment-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+    }
+
+    .payment-header {
+        background: linear-gradient(135deg, #198754, #28a745);
+        color: #fff;
+        text-align: center;
+        padding: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .customer-info {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .customer-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .enquiry-no {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .form-control,
+    .form-select {
+        height: 40px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #198754;
+    }
+
+    .pay-btn {
+        width: 100%;
+        height: 42px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    @media (max-width:576px) {
+
+        .payment-wrapper {
+            max-width: 100%;
+        }
+
+        .card-body {
+            padding: 14px;
+        }
+    }
+</style>
+
+<div class="container py-1">
+
+    <div class="payment-wrapper">
+
+        <div class="card payment-card">
+
+            <div class="payment-header">
+                Customer Payment
+            </div>
+
+            <div class="card-body">
+
+                <div class="customer-info">
+
+                    <div class="customer-name">
+                        {{ enquiry.customer_name }}
+                    </div>
+
+                    <div class="enquiry-no">
+                        {{ enquiry.enquiry_no }}
+                    </div>
+
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Amount
+                        </label>
+
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Date & Time
+                        </label>
+
+                        <input type="datetime-local" name="transaction_datetime" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Account
+                        </label>
+
+                        <select name="account_type" class="form-select" required>
+
+                            <option value="">
+                                Select Account
+                            </option>
+
+                            <option value="ltd">
+                                LTD
+                            </option>
+
+                            <option value="proprietor">
+                                Proprietor
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Payment Against
+                        </label>
+
+                        <select name="payment_against" class="form-select" required>
+
+                            <option value="">
+                                Select Type
+                            </option>
+
+                            <option value="advance">
+                                Advance
+                            </option>
+
+                            <option value="balance">
+                                Balance
+                            </option>
+
+                            <option value="others">
+                                Others
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Payment Mode
+                        </label>
+
+                        <select name="payment_mode" class="form-select" required>
+
+                            <option value="">
+                                Select Mode
+                            </option>
+
+                            <option value="cash">
+                                Cash
+                            </option>
+
+                            <option value="neft">
+                                NEFT
+                            </option>
+
+                            <option value="rtgs">
+                                RTGS
+                            </option>
+
+                            <option value="imps">
+                                IMPS
+                            </option>
+
+                            <option value="upi">
+                                UPI
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Remarks
+                        </label>
+
+                        <textarea name="remarks" class="form-control" rows="3"
+                            placeholder="Enter remarks (optional)"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success pay-btn">
+
+                        <i class="bi bi-arrow-right-circle me-1"></i>
+                        Continue
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

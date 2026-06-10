@@ -21,13 +21,204 @@ from django.contrib.auth.decorators import login_required
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
-
 from .models import VehicleTransaction
 from django.core.exceptions import ValidationError
-
 from django.shortcuts import render, get_object_or_404
 from .models import Vehicle
+from decimal import Decimal
+from django.utils import timezone
+from django.contrib import messages
+import random
 
+# Start Customers Payments #
+ 
+@login_required
+def customer_payment(request, enquiry_id):
+
+    enquiry = get_object_or_404(
+        Enquiry,
+        id=enquiry_id
+    )
+
+    transactions = CustomerTransaction.objects.filter(
+        enquiry=enquiry
+    ).order_by("-id")
+
+    if request.method == "POST":
+
+        request.session["customer_payment"] = {
+            "amount": request.POST.get("amount"),
+            "account_type": request.POST.get("account_type"),
+            "payment_against": request.POST.get("payment_against"),
+            "payment_mode": request.POST.get("payment_mode"),
+            "transaction_datetime": request.POST.get(
+                "transaction_datetime"
+            ),
+            "remarks": request.POST.get("remarks"),
+        }
+
+        return redirect(
+            "confirm_customer_payment",
+            enquiry.id
+        )
+
+    return render(
+        request,
+        "accounts/customers/customer_payment.html",
+        {
+            "enquiry": enquiry,
+            "transactions": transactions,
+        }
+    )
+
+@login_required
+def confirm_customer_payment(request, enquiry_id):
+
+    enquiry = get_object_or_404(
+        Enquiry,
+        id=enquiry_id
+    )
+
+    payment_data = request.session.get(
+        "customer_payment"
+    )
+
+    if not payment_data:
+
+        messages.error(
+            request,
+            "Payment details not found."
+        )
+
+        return redirect(
+            "customer_payment",
+            enquiry.id
+        )
+
+    amount = Decimal(
+        payment_data["amount"]
+    )
+
+    if request.method == "POST":
+
+        ref_no = (
+            f"CUST"
+            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+        )
+
+        CustomerTransaction.objects.create(
+            enquiry=enquiry,
+            amount=amount,
+            account_type=payment_data["account_type"],
+            payment_against=payment_data["payment_against"],
+            payment_mode=payment_data["payment_mode"],
+            transaction_datetime=payment_data[
+                "transaction_datetime"
+            ],
+            reference_no=ref_no,
+            remarks=payment_data["remarks"],
+            created_by=request.user,
+        )
+
+        request.session["last_customer_ref"] = ref_no
+
+        return redirect(
+            "customer_payment_success",
+            enquiry.id
+        )
+
+    return render(
+        request,
+        "accounts/customers/confirm_customer_payment.html",
+        {
+            "enquiry": enquiry,
+            "payment": payment_data,
+            "preview_ref": (
+                f"CUST"
+                f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            ),
+        }
+    )
+
+@login_required
+def customer_payment_success(request, enquiry_id):
+
+    enquiry = get_object_or_404(
+        Enquiry,
+        id=enquiry_id
+    )
+
+    ref_no = request.session.get(
+        "last_customer_ref"
+    )
+
+    transaction = CustomerTransaction.objects.filter(
+        enquiry=enquiry,
+        reference_no=ref_no
+    ).first()
+
+    return render(
+        request,
+        "accounts/customers/customer_payment_success.html",
+        {
+            "enquiry": enquiry,
+            "transaction": transaction,
+        }
+    )
+
+def customer_accounts(request):
+
+    enquiries = Enquiry.objects.all().order_by("-id")
+
+    data = []
+
+    for enquiry in enquiries:
+
+        total_received = CustomerTransaction.objects.filter(
+            enquiry=enquiry
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+
+        advance_received = CustomerTransaction.objects.filter(
+            enquiry=enquiry,
+            payment_against="advance"
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+
+        balance_received = CustomerTransaction.objects.filter(
+            enquiry=enquiry,
+            payment_against="balance"
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+
+        total_freight = enquiry.approval_rate or 0
+
+        pending_amount = total_freight - total_received
+
+        data.append({
+            "enquiry_id": enquiry.id,
+            "enquiry_no": enquiry.enquiry_no,
+            "customer": enquiry.customer_name,
+            "contact": enquiry.customer_contact,
+            "total_freight": total_freight,
+            "received": total_received,
+            "advance": advance_received,
+            "balance": balance_received,
+            "pending": pending_amount,
+        })
+
+    return render(
+        request,
+        "accounts/customer.html",
+        {
+            "data": data
+        }
+    )
+
+# End Customer Payments #
 
 def make_payment(request, vehicle_id):
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
@@ -190,9 +381,6 @@ def pay_vehicle_advance(request, vehicle_id):
         }
     )
 
-from django.utils import timezone
-import random
-
 def confirm_vehicle_advance(request, vehicle_id):
 
     vehicle = get_object_or_404(
@@ -272,12 +460,6 @@ def confirm_vehicle_advance(request, vehicle_id):
         }
     )
 
-from decimal import Decimal
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-from django.contrib import messages
-import random
-
 @login_required
 def confirm_vehicle_balance(request, vehicle_id):
 
@@ -292,16 +474,6 @@ def confirm_vehicle_balance(request, vehicle_id):
             "0"
         )
     )
-
-    if amount <= 0:
-        messages.error(
-            request,
-            "Invalid balance amount."
-        )
-        return redirect(
-            "pay_vehicle_balance",
-            vehicle.id
-        )
 
     if request.method == "POST":
 
@@ -333,18 +505,6 @@ def confirm_vehicle_balance(request, vehicle_id):
             remarks="Balance Payment"
         )
 
-        if hasattr(vehicle.order, "tracking"):
-
-            tracking = vehicle.order.tracking
-
-            tracking.balance_paid  = True
-
-            tracking.save(
-                update_fields=[
-                    "balance_to_fleet"
-                ]
-            )
-
         request.session["last_utr"] = utr
 
         return redirect(
@@ -370,67 +530,67 @@ def confirm_vehicle_balance(request, vehicle_id):
 @login_required
 def pay_vehicle_balance(request, vehicle_id):
 
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).order_by("-id")
+
+    adv = 0
+    bal = 0
+    oth = 0
+
+    for t in transactions:
+
+        if t.transaction_type == "advance":
+            adv += 1
+            t.label = f"Advance {adv}"
+            t.row_class = "row-advance"
+
+        elif t.transaction_type == "balance":
+            bal += 1
+            t.label = f"Balance {bal}"
+            t.row_class = "row-balance"
+
+        else:
+            oth += 1
+            t.label = f"Other {oth}"
+            t.row_class = "row-other"
 
     if request.method == "POST":
 
-        amount = Decimal(request.POST.get("amount") or 0)
+        amount = Decimal(
+            request.POST.get("amount")
+        )
 
-        remaining = vehicle.remaining_balance_amount
+        if amount > vehicle.remaining_balance_amount:
 
-        if remaining <= 0:
             messages.error(
                 request,
-                "Balance already completed. No payment allowed."
+                "Amount exceeds remaining balance."
             )
-            return redirect("pay_vehicle_balance", vehicle.id)
 
-        if amount > remaining:
-            messages.error(
-                request,
-                f"Balance payment cannot exceed ₹{remaining}"
+            return redirect(
+                "pay_vehicle_balance",
+                vehicle.id
             )
-            return redirect("pay_vehicle_balance", vehicle.id)
 
-        transaction_no = (
-            f"BAL"
-            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
-            f"{random.randint(100,999)}"
+        request.session["balance_amount"] = str(amount)
+
+        return redirect(
+            "confirm_vehicle_balance",
+            vehicle.id
         )
-
-        VehicleTransaction.objects.create(
-            vehicle=vehicle,
-            transaction_type="balance",
-            amount=amount,
-            payment_mode=request.POST.get("payment_mode"),
-            transaction_no=transaction_no,
-            remarks=request.POST.get("remarks"),
-            created_by=request.user
-        )
-
-        messages.success(
-            request,
-            f"Balance payment added. Ref No: {transaction_no}"
-        )
-
-        return redirect("pay_vehicle_balance", vehicle.id)
-
-    preview_transaction_no = (
-        f"BAL{timezone.now().strftime('%Y%m%d%H%M%S')}"
-    )
-
-    balance_payments = VehicleTransaction.objects.filter(
-        vehicle=vehicle,
-        transaction_type="balance"
-    ).order_by("-id")
 
     return render(
         request,
         "accounts/pay_vehicle_balance.html",
         {
             "vehicle": vehicle,
-            "balance_payments": balance_payments,
-            "preview_transaction_no": preview_transaction_no,
+            "transactions": transactions
         }
     )
 
@@ -513,43 +673,140 @@ def pay_vehicle_other(request, vehicle_id):
         id=vehicle_id
     )
 
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle,
+        transaction_type="others"
+    ).order_by("-id")
+
+    count = 0
+
+    for t in transactions:
+        count += 1
+        t.label = f"Other {count}"
+
     if request.method == "POST":
 
-        success = create_vehicle_payment(
-            request,
-            vehicle,
-            request.POST.get(
-                "transaction_type"
-            )
+        amount = Decimal(
+            request.POST.get("amount")
         )
 
-        if success:
+        request.session["other_amount"] = str(amount)
 
-            messages.success(
-                request,
-                "Expense added."
-            )
+        request.session["other_type"] = request.POST.get(
+            "transaction_type"
+        )
 
-            return redirect(
-                "pay_vehicle_other",
-                vehicle.id
-            )
-
-    others = VehicleTransaction.objects.filter(
-        vehicle=vehicle
-    ).exclude(
-        transaction_type__in=[
-            "advance",
-            "balance"
-        ]
-    ).order_by("-id")
+        return redirect(
+            "confirm_vehicle_other",
+            vehicle.id
+        )
 
     return render(
         request,
         "accounts/pay_vehicle_other.html",
         {
             "vehicle": vehicle,
-            "others": others
+            "transactions": transactions
+        }
+    )
+
+@login_required
+def confirm_vehicle_other(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    amount = Decimal(
+        request.session.get(
+            "other_amount",
+            "0"
+        )
+    )
+
+    if request.method == "POST":
+
+        utr = (
+            f"OTH"
+            f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            f"{random.randint(100,999)}"
+        )
+
+        transaction_type = request.session.get(
+            "other_type",
+            "others"
+                )
+
+        VehicleTransaction.objects.create(
+            vehicle=vehicle,
+            transaction_type=transaction_type,
+            amount=amount,
+            payment_mode=request.POST.get(
+                "payment_mode"
+            ),
+            transaction_no=utr,
+            utr_no=utr,
+            status="success",
+            remarks=transaction_type.replace("_", " ").title(),
+            created_by=request.user
+        )
+
+        LedgerEntry.objects.create(
+            account_type="vehicle",
+            vehicle=vehicle,
+            order=vehicle.order,
+            debit=amount,
+            credit=0,
+            voucher_no=utr,
+            remarks="Other Payment"
+        )
+
+        request.session["last_utr"] = utr
+
+        return redirect(
+            "other_success",
+            vehicle.id
+        )
+
+    preview_utr = (
+        f"OTH"
+        f"{timezone.now().strftime('%Y%m%d%H%M%S')}"
+    )
+
+    return render(
+        request,
+        "accounts/confirm_vehicle_other.html",
+        {
+            "vehicle": vehicle,
+            "amount": amount,
+            "payment_type": request.session.get("other_type"),
+            "preview_utr": preview_utr
+        }
+    )
+
+@login_required
+def other_success(request, vehicle_id):
+
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
+
+    utr = request.session.get(
+        "last_utr"
+    )
+
+    transaction = VehicleTransaction.objects.filter(
+        transaction_no=utr
+    ).first()
+
+    return render(
+        request,
+        "accounts/other_success.html",
+        {
+            "vehicle": vehicle,
+            "transaction": transaction
         }
     )
 
@@ -586,70 +843,10 @@ def edit_vehicle_account(request, vehicle_id):
         "vehicle": vehicle
     })
 
-def customer_accounts(request):
+from django.db.models import Sum
+from enquiries.models import Enquiry
+from accounts.models import CustomerTransaction
 
-    flts = Order.objects.select_related('enquiry').all().order_by('-id')
-
-    data = []
-
-    for o in flts:
-
-        # get FTL No from vehicle app
-        vehicle = Vehicle.objects.filter(order=o).first()
-
-        credit_date = o.created_at.date() + timedelta(days=7)
-
-        data.append({
-            "order_id": o.id,
-            "ftl_no": vehicle.ftl_no if vehicle else "",   # from vehicle app
-            "enquiry_id": o.enquiry.id,
-            "customer": o.customer_name,
-            "contact": o.customer_contact,
-            "total": o.total_rate or 0,
-            "advance": o.advance or 0,
-            "balance": o.balance or 0,
-            "topay": o.topay or 0,
-            "credit": o.credit or 0,
-            "credit_date": credit_date,
-        })
-
-    return render(request, "accounts/customer.html", {"data": data})
-
-def receive_customer_payment(request, enquiry_id):
-
-    enquiry = get_object_or_404(Enquiry, id=enquiry_id)
-
-    order = Order.objects.get(enquiry=enquiry)
-
-    if request.method == "POST":
-
-        amt = float(request.POST.get("amount"))
-
-        # reduce balance
-        order.balance = (order.balance or 0) - amt
-        order.save()
-
-        # ledger entry
-        LedgerEntry.objects.create(
-            enquiry=enquiry,
-            account_type="Customer",
-            credit=amt,
-            remarks="Payment Received"
-        )
-
-        LedgerEntry.objects.create(
-            enquiry=enquiry,
-            account_type="Bank",
-            credit=amt,
-            remarks="Customer Payment Bank In"
-        )
-
-        return redirect("customer_accounts")
-
-    return render(request, "accounts/receive_payment.html", {
-        "enquiry": enquiry,
-        "order": order
-    })
 
 def edit_customer_account(request, enquiry_id):
 

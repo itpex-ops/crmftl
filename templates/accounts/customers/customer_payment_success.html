@@ -1,0 +1,174 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<style>
+body{
+    background:#f4f6fb;
+}
+
+.transfer-wrapper{
+    max-width:420px;
+    margin:20px auto;
+}
+
+.success-card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.success-header{
+    background:linear-gradient(135deg,#198754,#28a745);
+    color:#fff;
+    text-align:center;
+    padding:10px;
+    font-size:15px;
+    font-weight:600;
+}
+
+.success-body{
+    padding:25px;
+}
+
+.success-icon{
+    font-size:70px;
+    color:#28a745;
+    margin-bottom:10px;
+}
+
+.success-title{
+    color:#28a745;
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.success-details{
+    background:#f8f9fa;
+    border:1px solid #e9ecef;
+    border-radius:12px;
+    padding:12px;
+    text-align:left;
+}
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px solid #ececec;
+}
+
+.detail-row:last-child{
+    border-bottom:none;
+}
+
+.detail-row strong{
+    font-size:13px;
+    color:#666;
+}
+
+.detail-row span{
+    font-size:13px;
+    font-weight:600;
+    text-align:right;
+}
+
+.utr-box{
+    margin-top:15px;
+    background:#e8f5e9;
+    color:#198754;
+    border-radius:10px;
+    padding:12px;
+    font-size:14px;
+    font-weight:700;
+    text-align:center;
+}
+
+.new-payment-btn{
+    width:100%;
+    height:44px;
+    border-radius:12px;
+    font-weight:600;
+    margin-top:18px;
+}
+
+@media(max-width:576px){
+
+    .transfer-wrapper{
+        max-width:100%;
+    }
+
+    .success-body{
+        padding:18px;
+    }
+
+    .success-title{
+        font-size:20px;
+    }
+}
+</style>
+<div class="container py-4">
+
+    <div class="transfer-wrapper">
+
+        <div class="card success-card shadow">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-check-circle-fill success-icon"></i>
+
+                <div class="success-title mt-3">
+                    Payment Saved Successfully
+                </div>
+
+                <div class="success-details">
+
+                    <div class="detail-row">
+                        <strong>Customer</strong>
+                        <span>{{ enquiry.customer_name }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <strong>Amount</strong>
+                        <span>₹ {{ transaction.amount }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <strong>Against</strong>
+                        <span>{{ transaction.payment_against }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <strong>Mode</strong>
+                        <span>{{ transaction.payment_mode }}</span>
+                    </div>
+
+                </div>
+
+                <div class="utr-box mt-3">
+
+                    REF NO :
+                    {{ transaction.reference_no }}
+
+                </div>
+
+                <a href="{% url 'customer_payment' enquiry.id %}"
+                   class="btn btn-success mt-3 w-100">
+
+                    New Payment
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

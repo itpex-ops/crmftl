@@ -118,16 +118,10 @@
                             Payment Mode
                         </label>
 
-                        <select name="payment_mode" id="paymentMode" class="form-select">
-
-                            <option value="bank">
-                                Bank Transfer
-                            </option>
-
-                            <option value="upi">
-                                UPI
-                            </option>
-
+                        <select name="payment_mode" id="paymentMode" class="form-select" required>
+                            <option value="">Select Payment Mode</option>
+                            <option value="bank">Bank Transfer</option>
+                            <option value="upi">UPI</option>
                         </select>
                     </div>
 
@@ -199,17 +193,20 @@
 
         function togglePaymentDetails() {
 
+            bankDetails.style.display = "none";
+            upiDetails.style.display = "none";
+
             if (paymentMode.value === "bank") {
                 bankDetails.style.display = "block";
-                upiDetails.style.display = "none";
-            } else {
-                bankDetails.style.display = "none";
+            }
+            else if (paymentMode.value === "upi") {
                 upiDetails.style.display = "block";
             }
         }
 
         paymentMode.addEventListener("change", togglePaymentDetails);
 
+        // Initial load
         togglePaymentDetails();
     });
 </script>

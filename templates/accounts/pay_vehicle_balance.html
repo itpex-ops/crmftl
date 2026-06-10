@@ -288,48 +288,8 @@
                         <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
                             required>
                     </div>
-
-                   <!--  <div class="mb-2">
-                        <label class="form-label">
-                            Payment Mode
-                        </label>
-
-                        <select name="payment_mode" id="paymentMode" class="form-control">
-                            <option value="">Select</option>
-                            <option value="upi">UPI</option>
-                            <option value="bank">Bank</option>
-                            <option value="cash">Cash</option>
-                        </select>
-                    </div>
-
-                    UPI DETAILS
-                    <div id="upiDetails" class="alert alert-success mt-2 d-none">
-                        <div class="detail-row">
-                        <strong>UPI</strong>
-                            <span>{{vehicle.upi_number}}</span>
-                        </div>
-                    </div>
-
-                    BANK DETAILS
-                    <div id="bankDetails" class="alert alert-primary mt-2 d-none">
-                        <div class="detail-row">
-                            <strong>Account Name</strong>
-                            <span>{{ vehicle.account_name }}</span>
-                        </div>
-
-                        <div class="detail-row">
-                            <strong>A/C No</strong>
-                            <span>{{ vehicle.account_number }}</span>
-                        </div>
-
-                        <div class="detail-row">
-                            <strong>IFSC</strong>
-                            <span>{{ vehicle.ifsc }}</span>
-                        </div>
-                    </div>-->
-
                     <button type="submit" class="btn btn-primary pay-btn">
-                        Pay Balance
+                        Pay
                     </button> 
 
                 </form>
@@ -341,7 +301,7 @@
                 </h5>
                 <div class="recent-payments-scroll">
 
-                    {% for p in balance_payments %}
+                    {% for p in transactions %}
 
                     <div class="history-card">
 
@@ -355,7 +315,7 @@
 
                                 <div>
                                     <div class="history-label">
-                                        {{ p.label|default:"Balance Payment" }}
+                                        {{ p.label|default:"" }}
                                     </div>
 
                                     <div class="history-date">

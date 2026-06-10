@@ -19,7 +19,6 @@ urlpatterns = [
     # 🏦 BANK ACCOUNTS
     #path('bank/', views.bank_accounts, name='bank_accounts'),
     path('customer-edit/<int:enquiry_id>/', views.edit_customer_account, name='edit_customer_account'),
-    path('customer-payment/<int:enquiry_id>/', views.receive_customer_payment, name='receive_customer_payment'),
     path(
     'vehicle/<int:vehicle_id>/payments/',
     views.vehicle_payments,
@@ -64,6 +63,35 @@ path(
     "vehicle/<int:vehicle_id>/balance-success/",
     views.balance_success,
     name="balance_success"
+),
+path(
+    "vehicle/<int:vehicle_id>/confirm-other/",
+    views.confirm_vehicle_other,
+    name="confirm_vehicle_other"
+),
+
+path(
+    "vehicle/<int:vehicle_id>/other-success/",
+    views.other_success,
+    name="other_success"
+),
+
+path(
+    "customer-payment/<int:enquiry_id>/",
+    views.customer_payment,
+    name="customer_payment"
+),
+
+path(
+    "customer-payment/<int:enquiry_id>/confirm/",
+    views.confirm_customer_payment,
+    name="confirm_customer_payment"
+),
+
+path(
+    "customer-payment/<int:enquiry_id>/success/",
+    views.customer_payment_success,
+    name="customer_payment_success"
 ),
 
 ]

@@ -9,16 +9,23 @@ from django.core.exceptions import ValidationError
 
 class CustomerTransaction(models.Model):
 
-    TYPE_CHOICES = [
-        ('invoice', 'Invoice Raised'),
-        ('advance', 'Advance Received'),
-        ('payment', 'Payment Received'),
+    PAYMENT_AGAINST_CHOICES = [
+        ('advance', 'Advance'),
+        ('balance', 'Balance'),
+        ('others', 'Others'),
+    ]
+
+    ACCOUNT_CHOICES = [
+        ('ltd', 'LTD'),
+        ('proprietor', 'Proprietor'),
     ]
 
     PAYMENT_MODES = [
         ('cash', 'Cash'),
+        ('neft', 'NEFT'),
+        ('rtgs', 'RTGS'),
+        ('imps', 'IMPS'),
         ('upi', 'UPI'),
-        ('bank', 'Bank Transfer'),
     ]
 
     enquiry = models.ForeignKey(
@@ -27,22 +34,32 @@ class CustomerTransaction(models.Model):
         related_name='customer_transactions'
     )
 
-    transaction_type = models.CharField(
-        max_length=30,
-        choices=TYPE_CHOICES
-    )
-
     amount = models.DecimalField(
         max_digits=12,
         decimal_places=2
     )
 
-    payment_mode = models.CharField(
-        max_length=20,
-        choices=PAYMENT_MODES,
-        blank=True,
-        null=True
+    account_type = models.CharField(
+    max_length=20,
+    choices=ACCOUNT_CHOICES,
+    null=True,
+    blank=True
     )
+
+    payment_against = models.CharField(
+        max_length=20,
+        choices=PAYMENT_AGAINST_CHOICES,
+        null=True,
+        blank=True
+    )
+
+
+    payment_mode = models.CharField(
+    max_length=20,
+    choices=PAYMENT_MODES,
+    blank=True,
+    null=True
+)
 
     reference_no = models.CharField(
         max_length=100,
@@ -55,9 +72,8 @@ class CustomerTransaction(models.Model):
         null=True
     )
 
-    date = models.DateField(
-        auto_now_add=True
-    )
+    transaction_datetime = models.DateTimeField(blank=True,
+        null=True)
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -65,8 +81,12 @@ class CustomerTransaction(models.Model):
         null=True
     )
 
+    created_at = models.DateTimeField(
+        auto_now_add=True,blank=True,
+        null=True
+    )
     def __str__(self):
-        return f"{self.enquiry.customer_name} - {self.amount}"
+        return f"{self.enquiry.customer_name} - ₹{self.amount}"
 
 class VehicleTransaction(models.Model):
 

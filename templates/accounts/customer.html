@@ -21,7 +21,7 @@
     }
 
     .table thead th {
-        background: #f8fafc; 
+        background: #f8fafc;
         font-size: 13px;
         white-space: nowrap;
         position: sticky;
@@ -124,49 +124,72 @@
 
                 <thead>
                     <tr>
-                        <th>FTL No</th>
+                        <th>Enquiry No</th>
                         <th>Customer</th>
                         <th>Contact</th>
-                        <th>Total</th>
+                        <th>Freight</th>
+                        <th>Received</th>
                         <th>Advance</th>
                         <th>Balance</th>
-                        <th>Credit Due</th>
+                        <th>Pending</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {% for row in data %}
-                    {% if row.ftl_no %}
+                    {% if row.enquiry_no %}
                     <tr>
 
-                        <!-- FTL NO -->
-                        <td>
-                            {{ row.ftl_no }}
-                        </td>
-
-                        <td>{{ row.customer|default_if_none:"" }}</td>
-                        <td>{{ row.contact|default_if_none:"" }}</td>
-
-                        <td class="amount total">₹{{ row.total|default:0 }}</td>
-                        <td class="amount advance text-success">₹{{ row.advance|default:0 }}</td>
-                        <td class="amount balance text-danger">₹{{ row.balance|default:0 }}</td>
+                        <td>{{ row.enquiry_no }}</td>
 
                         <td>
-                            {% if row.credit_date %}
-                            {{ row.credit_date }}
-                            {% else %}
-                            7 Days
-                            {% endif %}
+                            {{ row.customer }}
                         </td>
 
                         <td>
-                            {% if row.balance|default:0 == 0 %}
-                            <span class="badge-soft badge-ok">Paid</span>
-                            {% else %}
-                            <span class="badge-soft badge-warn">Pending</span>
-                            {% endif %}
+                            {{ row.contact }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ row.total_freight }}
+                        </td>
+
+                        <td class="amount text-success received">
+                            ₹{{ row.received }}
+                        </td>
+
+                        <td class="amount advance text-primary">
+                            ₹{{ row.advance }}
+                        </td>
+
+                        <td class="amount balance text-info">
+                            ₹{{ row.balance }}
+                        </td>
+
+                        <td class="amount pending text-danger">
+                            ₹{{ row.pending }}
+                        </td>
+
+                        <td>
+                            {% if row.pending <= 0 %} <span class="badge-soft badge-ok">
+                                Paid
+                                </span>
+                                {% else %}
+                                <span class="badge-soft badge-warn">
+                                    Pending
+                                </span>
+                                {% endif %}
+                        </td>
+
+                        <td>
+
+                            <a href="{% url 'customer_payment' row.enquiry_id %}" class="btn btn-sm btn-success">
+
+                                Pay
+
+                            </a>
+
                         </td>
 
                     </tr>
@@ -222,9 +245,32 @@
             bal += b;
             adv += a;
 
-            if (b > 0) {
-                due = adv - bal;
-            }
+            let pending = 0;
+            let received = 0;
+
+            document.querySelectorAll("#accountsTable tbody tr").forEach(row => {
+
+                let p = parseFloat(
+                    row.querySelector(".pending").innerText.replace(/[₹,]/g, '')
+                ) || 0;
+
+                let r = parseFloat(
+                    row.querySelector(".received").innerText.replace(/[₹,]/g, '')
+                ) || 0;
+
+                pending += p;
+                received += r;
+
+            });
+
+            document.getElementById("sumBalance").innerText =
+                "₹" + pending.toLocaleString("en-IN");
+
+            document.getElementById("sumAdvance").innerText =
+                "₹" + received.toLocaleString("en-IN");
+
+            document.getElementById("overDueCount").innerText =
+                document.querySelectorAll(".badge-warn").length;
 
         });
 
