@@ -82,8 +82,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ customer.email|default:'' }}" {%
-                            if customer %}readonly{% endif %}>
+                        <input type="email" name="email" class="form-control" value="{{ customer.email|default:'' }}" {% if customer %}readonly{% endif %}>
                     </div>
                     {% if customer %}
                     <div class="col-md-4">
