@@ -78,8 +78,7 @@
                         <div class="col-md-4">
                             <label class="form-label">Mobile Number</label>
                             <input type="tel" name="customer_contact" class="form-control" maxlength="10"
-                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" 
-                                {% if customer %}readonly{% endif %} required>
+                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" {% if customer %}readonly{% endif %} required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
@@ -334,6 +333,9 @@
         </div>
     </form>
 </div>
+
+<script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -484,6 +486,4 @@
     });
 </script>
 
-<script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 {% endblock %}

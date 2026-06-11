@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
             html += `
             <div class="row g-3 mb-2 shadow-sm p-2 rounded bg-light">
                 
-                <div class="col-md-6">
+                <div class="col-lg-6">
                     <input 
                         name="${type}[]" 
                         class="form-control" 
