@@ -88,6 +88,7 @@
                             <input type="email" name="email" class="form-control"
                                 value="{{ customer.email|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
+
                         {% if customer %}
                         <div class="col-md-4">
                             <label class="form-label">GST Number</label>
@@ -482,7 +483,7 @@
 
     });
 </script>
-{% endblock %}
 
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+{% endblock %}
