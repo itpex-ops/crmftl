@@ -80,26 +80,14 @@
 
                     <tr class="main-head-row">
 
-                        <th rowspan="2" class="main-th">
-                            Date</th>
-
-                        <th rowspan="2" class="main-th">
-                            Order No</th>
-
-                        <th rowspan="2" class="main-th">
-                            Customer</th>
-
-                        <th rowspan="2" class="main-th">
-                            Route</th>
-
-                        <th rowspan="2" class="main-th">
-                            Vehicle</th>
-
-                        <th rowspan="2" class="main-th">
-                            Rate ₹</th>
-
-                        <th rowspan="2" class="main-th">
-                            Status</th>
+                        <th width="60">Date</th>
+                        <th width="80">Order No</th>
+                        <th width="80">Customer</th>
+                        <th width="100">Route</th>
+                        <th width="90">Vehicle</th>
+                        <th width="80">Rate ₹</th>
+                        <th width="90">Status</th>
+                        <th width="90">Actions</th>
 
 
                     </tr>
@@ -159,20 +147,26 @@
                         <td>
                             {% if order.routes %}
                             <div class="route-modern">
-                                <small class="text-muted fw-bold">Pickups</small>
-                                <span class="route-side origin-side">
-                                    {% for r in order.routes %}
-                                    {{ r.origin }}{% if not forloop.last %} + {% endif %}
-                                    {% endfor %}
-                                </span>
+                                <div class="mb-1">
+                                    <small class="fw-bold text-primary">Pickups:</small>
+                                    <span class="route-side origin-side">
+                                        {% for r in order.routes %}
+                                        {{ r.origin }} ( {{ r.origin_pin }} ){% if not forloop.last %} + {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </div>
 
-                                <small>Drops</small>
-                                <span class="route-side destination-side">
-                                    {% for r in order.routes %}
-                                    {{ r.destination }}{% if not forloop.last %} + {% endif %}
-                                    {% endfor %}
-                                </span>
+                                <div>
+                                    <small class="fw-bold text-success">Drops:</small>
+                                    <span class="route-side destination-side">
+                                        {% for r in order.routes %}
+                                        {{ r.destination }} ( {{ r.destination_pin }} ){% if not forloop.last %} + {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </div>
                             </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
                             {% endif %}
                         </td>
 
@@ -277,12 +271,22 @@
                             {% endif %}
 
                         </td>
+                        <!-- Action -->
+                        <td class="text-center">
+                            {% with vehicle=order.vehicles.first %}
+                            {% if vehicle %}
+                            <a href="{% url 'edit_vehicle' vehicle.id %}" class="text-warning" title="Edit Vehicle">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
                     </tr>
 
                     {% empty %}
                     <tr>
                         <td colspan="7" class="text-center text-muted py-4">
-                            No Orders Found  </td>
+                            No Orders Found </td>
 
                     </tr>
 
@@ -293,7 +297,6 @@
         </div>
     </div>
 </div>
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 
 <script>

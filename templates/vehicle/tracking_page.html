@@ -1,10 +1,10 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-1">
 
     <!-- Header -->
-    <div class="card shadow-sm border-0 p-3 mb-4">
+    <div class="card shadow-sm border-0 p-3 mb-2">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
                 <h4 class="fw-bold mb-1">📍 Vehicle Tracking</h4>
@@ -88,6 +88,14 @@
                                        name="invoice_eway"
                                        {% if tracking.invoice_eway %}checked{% endif %}>
                                 Invoice / E-Way
+                            </label>
+                        </div>
+                         <div class="track-item">
+                            <label class="track-label">
+                                <input type="checkbox"
+                                       name="fleet_departed"
+                                       {% if tracking.advance_to_fleet %}checked{% endif %}>
+                                Advance Paid To Fleet
                             </label>
                         </div>
 
@@ -177,8 +185,8 @@
                             <label class="track-label">
                                 <input type="checkbox"
                                        name="advance_received"
-                                       {% if tracking.advance_received %}checked{% endif %}>
-                                Advance Received
+                                       {% if tracking.balance_trans_fleet %}checked{% endif %}>
+                                Balance Transfer To Fleet
                             </label>
                         </div>
 
@@ -287,58 +295,73 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    const checkboxes = document.querySelectorAll(
-        '.track-item input[type="checkbox"]'
-    );
+    const checkboxes = [
+        document.querySelector('input[name="vehicle_placed"]'),
+        document.querySelector('input[name="vehicle_document"]'),
+        document.querySelector('input[name="lr_no_b"]'),
+        document.querySelector('input[name="invoice_eway"]'),
+        document.querySelector('input[name="advance_to_fleet"]'),
+        document.querySelector('input[name="fleet_departed"]'),
+        document.querySelector('input[name="arrived"]'),
+        document.querySelector('input[name="delivered"]'),
+        document.querySelector('input[name="pod_received"]'),
+        document.querySelector('input[name="balance_trans_fleet"]'),
+        document.querySelector('input[name="settled"]')
+    ].filter(Boolean);
 
-    checkboxes.forEach(box => {
+    function updateCheckboxes() {
 
-        box.addEventListener("change", function () {
+        let checkedIndex = -1;
 
-            if (this.checked) {
+        checkboxes.forEach((box, index) => {
+            if (box.checked) {
+                checkedIndex = index;
+            }
+        });
 
-                checkboxes.forEach(other => {
+        checkboxes.forEach((box, index) => {
 
-                    if (other !== this) {
-                        other.checked = false;
-                        other.disabled = true;
-                    }
+            if (checkedIndex === -1) {
 
-                });
+                box.disabled = index !== 0;
 
             } else {
 
-                checkboxes.forEach(other => {
-                    other.disabled = false;
-                });
+                box.disabled = index > checkedIndex + 1;
 
-            }
-
-        });
-
-    });
-
-    // Restore state on page load
-    const checkedBox = Array.from(checkboxes)
-        .find(box => box.checked);
-
-    if (checkedBox) {
-
-        checkboxes.forEach(other => {
-
-            if (other !== checkedBox) {
-                other.disabled = true;
             }
 
         });
 
     }
 
-});
+    checkboxes.forEach((box, index) => {
 
+        box.addEventListener("change", function () {
+
+            if (this.checked) {
+
+                checkboxes.forEach((other, i) => {
+
+                    if (i !== index) {
+                        other.checked = false;
+                    }
+
+                });
+
+            }
+
+            updateCheckboxes();
+
+        });
+
+    });
+
+    updateCheckboxes();
+
+});
 </script>
 <style>
 
@@ -350,11 +373,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 .track-item{
     border:1px solid #e5e7eb;
-    border-radius:12px;
-    padding:14px 16px;
-    margin-bottom:12px;
+    border-radius:10px;
+    padding:8px 12px;
+    margin-bottom:8px;
     background:#fff;
-    transition:.2s;
 }
 
 .track-item:hover{

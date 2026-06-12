@@ -328,6 +328,7 @@ def edit_vehicle(request, vehicle_id):
         'vehicle': vehicle
     })
 
+
 # All vehicles
 def all_assigned_vehicles(request):
     vehicles = Vehicle.objects.select_related('order').order_by('-created_at')
@@ -367,9 +368,10 @@ def tracking_page(request, vehicle_id):
         tracking.vehicle_document = 'vehicle_document' in request.POST
         tracking.lr_no_b = 'lr_no_b' in request.POST
         tracking.invoice_eway = 'invoice_eway' in request.POST
+        tracking.advance_to_fleet = "advance_to_fleet" in request.POST
         tracking.advance_to_fleet = 'advance_to_fleet' in request.POST
         tracking.fleet_departed = 'fleet_departed' in request.POST
-        tracking.advance_received = 'advance_received' in request.POST
+        tracking.balance_trans_fleet = 'balance_trans_fleet' in request.POST
         tracking.arrived = 'arrived' in request.POST
         tracking.delivered = 'delivered' in request.POST
         tracking.pod_received = 'pod_received' in request.POST

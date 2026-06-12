@@ -180,9 +180,10 @@ class Tracking(models.Model):
     ("vehicle_placed", "Vehicle Placed"),
     ("vehicle_document", "Vehicle Document"),
     ("invoice_eway", "Invoice / E-way"),
+
     ("advance_to_fleet", "Advance To Fleet"),
     ("fleet_departed", "Fleet Departed"),
-    ("advance_received", "Advance Received"),
+    ("balance_trans_fleet", "Balance Transfer To Fleet"),
     ("arrived", "Arrived"),
     ("delivered", "Delivered"),
     ("pod_received", "POD Received"),

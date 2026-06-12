@@ -157,21 +157,27 @@
                                 {{ e.customer_contact }}
                             </small>
                         </td>
+                        <!-- Routes -->
                         <td>
                             {% if e.routes %}
                             <div class="route-modern">
-                                <small>Pickups :</small>
-                                <span class="route-side origin-side">
-                                    {% for r in e.routes %}
-                                    {{ r.origin }}{% if not forloop.last %} + {% endif %}
-                                    {% endfor %}
-                                </span>
-                                <small>Drops :</small>
-                                <span class="route-side destination-side">
-                                    {% for r in e.routes %}
-                                    {{ r.destination }}{% if not forloop.last %} + {% endif %}
-                                    {% endfor %}
-                                </span>
+                                <div class="mb-1">
+                                    <small class="fw-bold text-primary">Pickups:</small>
+                                    <span class="route-side origin-side">
+                                        {% for r in e.routes %}
+                                        {{ r.origin }} ({{ r.origin_pin }}){% if not forloop.last %} + {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <small class="fw-bold text-success">Drops:</small>
+                                    <span class="route-side destination-side">
+                                        {% for r in e.routes %}
+                                        {{ r.destination }} ({{ r.destination_pin }}){% if not forloop.last %} + {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </div>
                             </div>
                             {% else %}
                             <span class="text-muted">-</span>
