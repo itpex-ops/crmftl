@@ -373,11 +373,6 @@ def create_enquiry(request):
             route["destination_pin"]
         ):
             routes.append(route)
-
-        # =========================
-        # CREATE ENQUIRY
-        # =========================
-
         enquiry = Enquiry.objects.create(
 
             customer_name=customer_name,
@@ -419,14 +414,12 @@ def create_enquiry(request):
 
             created_by=request.user
         )
-
+        
         messages.success(
             request,
             f"{enquiry.enquiry_no} created successfully!"
         )
-
         return redirect("create_enquiry")
-
     return render(
         request,
         "enquiry/create.html",
@@ -436,7 +429,6 @@ def create_enquiry(request):
             "customer": customer,
         }
     )
-
 
 @login_required
 def enquiry_list(request):

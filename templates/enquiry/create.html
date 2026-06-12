@@ -70,13 +70,14 @@
                     <div class="card-body row g-3">
 
                         <div class="col-md-4">
-                            <label class="form-label">Customer Name</label>
+                            <label class="form-label">Customer Name
+                                <span class="text-danger fw-bold">*</span> </label>
                             <input type="text" name="customer_name" class="form-control"
                                 value="{{ customer.name|default:'' }}" {% if customer %}readonly{% endif %} required>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Mobile Number</label>
+                            <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
                             <input type="tel" name="customer_contact" class="form-control" maxlength="10"
                                 pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" {% if customer %}readonly{% endif %} required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
@@ -90,25 +91,31 @@
 
                         {% if customer %}
                         <div class="col-md-4">
-                            <label class="form-label">GST Number</label>
+                            <label class="form-label">GST Number
+                                <span class="text-danger fw-bold">*</span>
+                            </label>
                             <input type="text" name="gst_number" class="form-control"
                                 value="{{ customer.gst_number|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">City</label>
+                            <label class="form-label">City
+                                <span class="text-danger fw-bold">*</span>
+                            </label>
                             <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}"
                                 {% if customer %}readonly{% endif %}>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Pincode</label>
+                            <label class="form-label">Pincode
+                                <span class="text-danger fw-bold">*</span>
+                            </label>
                             <input type="text" name="pincode" class="form-control"
                                 value="{{ customer.pincode|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
                         {% endif %}
                         <div class="col-md-3">
-                            <label class="form-label">Lead Source</label>
+                            <label class="form-label">Lead Source<span class="text-danger fw-bold">*</span></label>
                             <select name="lead_source" class="form-select">
                                 <option value="">Select</option>
                                 <option value="justdial">Just Dial</option>
@@ -125,25 +132,27 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label">No. of Pickups</label>
+                            <label class="form-label">No. of Pickups<span class="text-danger fw-bold">*</span></label>
                             <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10"
                                 value="1">
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label">No. of Deliveries</label>
+                            <label class="form-label">No. of Deliveries
+                                <span class="text-danger fw-bold">*</span>
+                            </label>
                             <input type="number" name="deliveries" id="deliveries" class="form-control" min="1" max="10"
                                 value="1">
                         </div>
 
                         <div id="origin-container" class="col-md-3">
-                            <label class="form-label">Pickup PIN Code</label>
+                            <label class="form-label">Pickup PIN Code<span class="text-danger fw-bold">*</span></label>
                             <input type="tel" name="origin_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
                                 inputmode="numeric" required>
                         </div>
 
                         <div id="destination-container" class="col-md-3">
-                            <label class="form-label">Delivery PIN Code</label>
+                            <label class="form-label">Delivery PIN Code<span class="text-danger fw-bold">*</span></label>
                             <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
                                 pattern="[0-9]{6}" inputmode="numeric" required>
                         </div>
@@ -157,7 +166,7 @@
 
                     <div class="card-body row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">Vehicle Type</label>
+                            <label class="form-label">Vehicle Type<span class="text-danger fw-bold">*</span></label>
 
                             <select name="vehicle_type" class="form-select vehicle-select">
                                 <option value="">Select Vehicle</option>
@@ -191,7 +200,7 @@
                         </script>
 
                         <div class="col-md-4">
-                            <label class="form-label">Vehicle Description</label>
+                            <label class="form-label">Vehicle Description<span class="text-danger fw-bold">*</span></label>
                             <input type="text" name="vehicle_description" class="form-control">
                         </div>
 
@@ -202,7 +211,7 @@
 
 
                         <div class="col-md-4">
-                            <label class="form-label">Material</label>
+                            <label class="form-label">Material<span class="text-danger fw-bold">*</span></label>
                             <input type="text" name="material" class="form-control">
                         </div>
 
@@ -302,7 +311,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-3">
                             <label class="form-label">Expected Rate ₹</label>
