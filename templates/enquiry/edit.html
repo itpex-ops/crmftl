@@ -138,23 +138,16 @@ PAGE STYLES
                             </label>
 
                             <select name="vehicle_type" class="form-select">
-
                                 <option value="">
                                     Select Vehicle
                                 </option>
 
                                 {% for value, label in vehicle_types %}
-
                                 <option value="{{ value }}" {% if enquiry.vehicle_type == value %}selected{% endif %}>
-
                                     {{ label }}
-
                                 </option>
-
                                 {% endfor %}
-
                             </select>
-
                         </div>
 
                         <div class="col-md-6">
@@ -410,72 +403,82 @@ PAGE STYLES
                 <!-- =========================
                 ROUTES
                 ========================= -->
+                <div class="col-lg-4">
+                    <div class="card-box">
 
-                <div class="card-box">
+                        <div class="section-title d-flex justify-content-between align-items-center">
 
-                    <div class="section-title d-flex justify-content-between align-items-center">
+                            <span>
+                                Routes
+                            </span>
 
-                        <span>
-                            Routes
-                        </span>
+                            <button type="button" class="btn btn-primary btn-sm" id="addRoute">
 
-                        <button type="button" class="btn btn-primary btn-sm" id="addRoute">
+                                + Add Route
 
-                            + Add Route
+                            </button>
 
-                        </button>
+                        </div>
 
-                    </div>
+                        <div id="routeContainer">
 
-                    <div id="routeContainer">
+                            {% for route in enquiry.routes %}
 
-                        {% for route in enquiry.routes %}
+                            <div class="route-box route-row">
 
-                        <div class="route-box route-row">
+                                <div class="row">
 
-                            <div class="row">
+                                    <div class="col-md-6 mb-2">
 
-                                <div class="col-md-5 mb-2">
+                                        <label>
+                                            Origin
+                                        </label>
 
-                                    <label>
-                                        From
-                                    </label>
+                                        <input type="text" name="origin[]" class="form-control"
+                                            value="{{ route.origin }}">
+                                        <label>
+                                            Pincode
+                                        </label>
+                                        <input type="number" name="origin_pin[]" class="form-control"
+                                            value="{{ route.origin_pin }}">
 
-                                    <input type="text" name="origin[]" class="form-control" value="{{ route.origin }}">
+                                    </div>
 
-                                </div>
+                                    <div class="col-md-6 mb-2">
 
-                                <div class="col-md-5 mb-2">
+                                        <label>
+                                            Destination
+                                        </label>
 
-                                    <label>
-                                        To
-                                    </label>
+                                        <input type="text" name="destination[]" class="form-control"
+                                            value="{{ route.destination }}">
+                                        <label>
+                                            Pincode
+                                        </label>
+                                        <input type="number" name="destination_pin[]" class="form-control"
+                                            value="{{  route.destination_pin }}">
+                                    </div>
 
-                                    <input type="text" name="destination[]" class="form-control"
-                                        value="{{ route.destination }}">
+                                    <div class="col-md-6">
 
-                                </div>
+                                        <button type="button" class="btn btn-outline-danger w-100 removeRoute">
 
-                                <div class="col-md-2 d-flex align-items-end">
+                                            Remove
 
-                                    <button type="button" class="btn btn-danger w-100 removeRoute">
+                                        </button>
 
-                                        Remove
-
-                                    </button>
+                                    </div>
 
                                 </div>
 
                             </div>
 
+                            {% endfor %}
+
                         </div>
 
-                        {% endfor %}
-
                     </div>
-
                 </div>
-
                 <!-- =========================
                 RATE DETAILS
                 ========================= -->
@@ -582,74 +585,66 @@ PAGE STYLES
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 <script>
+document.getElementById("addRoute").addEventListener("click", function () {
 
-    document
-        .getElementById("addRoute")
-        .addEventListener("click", function () {
+    let html = `
+    <div class="route-box route-row border rounded p-3 mb-3">
 
-            let html = `
+        <div class="row g-2 align-items-end">
 
-    <div class="route-box route-row">
-
-        <div class="row">
-
-            <div class="col-md-5 mb-2">
-
-                <label>
-                    From
-                </label>
-
+            <div class="col-md-6">
+                <label class="form-label">Origin</label>
                 <input type="text"
                        name="origin[]"
                        class="form-control">
-
             </div>
 
-            <div class="col-md-5 mb-2">
+            <div class="col-md-6">
+                <label class="form-label">Origin Pin</label>
+                <input type="text"
+                       name="origin_pin[]"
+                       class="form-control">
+            </div>
 
-                <label>
-                    To
-                </label>
-
+            <div class="col-md-6">
+                <label class="form-label">Destination</label>
                 <input type="text"
                        name="destination[]"
                        class="form-control">
-
             </div>
 
-            <div class="col-md-2 d-flex align-items-end">
+            <div class="col-md-6">
+                <label class="form-label">Destination Pin</label>
+                <input type="text"
+                       name="destination_pin[]"
+                       class="form-control">
+            </div>
 
+            <div class="col-md-6">
                 <button type="button"
-                        class="btn btn-danger w-100 removeRoute">
-
+                        class="btn btn-outline-danger w-100 removeRoute">
                     Remove
-
                 </button>
-
             </div>
 
         </div>
 
     </div>
-
     `;
 
-            document
-                .getElementById("routeContainer")
-                .insertAdjacentHTML("beforeend", html);
+    document
+        .getElementById("routeContainer")
+        .insertAdjacentHTML("beforeend", html);
 
-        });
+});
 
-    document.addEventListener("click", function (e) {
+document.addEventListener("click", function (e) {
 
-        if (e.target.classList.contains("removeRoute")) {
+    if (e.target.classList.contains("removeRoute")) {
+        e.target.closest(".route-row").remove();
+    }
 
-            e.target.closest(".route-row").remove();
-
-        }
-
-    });
-
+});
 </script>
 
 <!-- =========================

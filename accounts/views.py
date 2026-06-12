@@ -657,6 +657,7 @@ def vehicle_accounts(request):
             "payment_completed": v.is_payment_completed,
             "is_locked": v.is_locked,
             "is_overpaid": v.is_overpaid,
+            "total_advance_paid" : v.total_advance_paid,
         })
 
     return render(

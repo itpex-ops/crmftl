@@ -127,26 +127,34 @@ def edit_enquiry(request, id):
             'cancel_reason'
         )
 
-        # ROUTES
+       # ROUTES
         origins = request.POST.getlist("origin[]")
+        origin_pins = request.POST.getlist("origin_pin[]")
         destinations = request.POST.getlist("destination[]")
+        destination_pins = request.POST.getlist("destination_pin[]")
 
         routes = []
 
-        for origin, destination in zip(origins, destinations):
+        max_rows = max(
+            len(origins),
+            len(origin_pins),
+            len(destinations),
+            len(destination_pins),
+        )
 
-            if origin.strip() or destination.strip():
+        for i in range(max_rows):
+            route = {
+                "origin": origins[i].strip() if i < len(origins) else "",
+                "origin_pin": origin_pins[i].strip() if i < len(origin_pins) else "",
+                "destination": destinations[i].strip() if i < len(destinations) else "",
+                "destination_pin": destination_pins[i].strip() if i < len(destination_pins) else "",
+            }
 
-                routes.append({
-                    "origin": origin.strip(),
-                    "destination": destination.strip(),
-                })
-
+            if any(route.values()):
+                routes.append(route)
 
         enquiry.routes = routes
-
         enquiry.save()
-
         messages.success(
             request,
             'Enquiry updated successfully'
@@ -341,19 +349,30 @@ def create_enquiry(request):
         # =========================
 
         origins = request.POST.getlist("origin[]")
+        origin_pins = request.POST.getlist("origin_pin[]")
         destinations = request.POST.getlist("destination[]")
-
+        destination_pins = request.POST.getlist("destination_pin[]")
         routes = []
-
-        for i in range(max(len(origins), len(destinations))):
-
+        max_rows = max(
+            len(origins),
+            len(origin_pins),
+            len(destinations),
+            len(destination_pins)
+        )
+        for i in range(max_rows):
             route = {
                 "origin": origins[i] if i < len(origins) else "",
+                "origin_pin": origin_pins[i] if i < len(origin_pins) else "",
                 "destination": destinations[i] if i < len(destinations) else "",
+                "destination_pin": destination_pins[i] if i < len(destination_pins) else "",
             }
-
-            if route["origin"] or route["destination"]:
-                routes.append(route)
+        if (
+            route["origin"] or
+            route["origin_pin"] or
+            route["destination"] or
+            route["destination_pin"]
+        ):
+            routes.append(route)
 
         # =========================
         # CREATE ENQUIRY

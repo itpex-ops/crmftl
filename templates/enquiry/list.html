@@ -161,23 +161,37 @@
                         <td>
                             {% if e.routes %}
                             <div class="route-modern">
-                                <div class="mb-1">
-                                    <small class="fw-bold text-primary">Pickups:</small>
-                                    <span class="route-side origin-side">
-                                        {% for r in e.routes %}
-                                        {{ r.origin }} ({{ r.origin_pin }}){% if not forloop.last %} + {% endif %}
-                                        {% endfor %}
+
+                                <!-- PICKUPS -->
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+
+                                    {% for r in e.routes %}
+                                    <span class="route-chip">
+                                        {{ r.origin }} [ {{ r.origin_pin }} ]
                                     </span>
+
+                                    {% if not forloop.last %}
+                                    <span class="route-plus">+</span>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
 
-                                <div>
-                                    <small class="fw-bold text-success">Drops:</small>
-                                    <span class="route-side destination-side">
-                                        {% for r in e.routes %}
-                                        {{ r.destination }} ({{ r.destination_pin }}){% if not forloop.last %} + {% endif %}
-                                        {% endfor %}
+                                <!-- DROPS -->
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+
+                                    {% for r in e.routes %}
+                                    <span class="route-chip">
+                                        {{ r.destination }} [ {{ r.destination_pin }} ]
                                     </span>
+
+                                    {% if not forloop.last %}
+                                    <span class="route-plus">+</span>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
+
                             </div>
                             {% else %}
                             <span class="text-muted">-</span>
@@ -351,6 +365,90 @@
     </div>
 </div>
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+<style>
+.route-modern{
+    max-width:150px;
+    min-height: 80px;
+}
+
+.route-card{
+    padding:3px 4px;
+    margin-bottom:3px;
+}
+
+.pickup-card{
+    background:#eef3fa;
+    border-left:4px solid #0d6efd;
+}
+
+.drop-card{
+    background:#eef7f1;
+    border-left:4px solid #198754;
+}
+
+.route-title{
+    font-size:9px;
+    font-weight:700;
+    margin-bottom:2x;
+    text-transform:uppercase;
+}
+
+.pickup-card .route-title{
+    color:#0d6efd;
+}
+
+.drop-card .route-title{
+    color:#198754;
+}
+
+.route-chip{
+    display:inline-block;
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:15px;
+    padding:2px 8px;
+    margin:2px;
+    font-size:9px;
+    font-weight:600;
+    line-height:1.4;
+}
+
+.route-plus{
+    font-size:11px;
+    font-weight:700;
+    color:#555;
+    margin:0 2px;
+}
+
+@media (max-width:768px){
+
+    .route-modern{
+        min-width:auto;
+        max-width:100%;
+    }
+
+    .route-card{
+        padding:6px;
+    }
+
+    .route-title{
+        font-size:6px;
+        margin-bottom:4px;
+    }
+
+    .route-chip{
+        font-size:9px;
+        padding:2px 6px;
+        margin:1px;
+    }
+
+    .route-plus{
+        font-size:10px;
+    }
+}
+</style>
+
 
 <!-- SEARCH -->
 <script>
