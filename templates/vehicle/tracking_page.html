@@ -260,14 +260,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const podBox = document.getElementById("podBox");
 
     function toggleLR() {
-        if(lrCheck){
+        if (lrCheck) {
             lrBox.style.display =
                 lrCheck.checked ? "block" : "none";
         }
     }
 
     function togglePOD() {
-        if(podCheck){
+        if (podCheck) {
             podBox.style.display =
                 podCheck.checked ? "block" : "none";
         }
@@ -283,13 +283,16 @@ document.addEventListener("DOMContentLoaded", function () {
         togglePOD();
     }
 
-    {% if tracking.settled %}
-    document.querySelectorAll(
-        'input, textarea'
-    ).forEach(el => {
-        el.disabled = true;
-    });
-    {% endif %}
+    const isSettled =
+        "{{ tracking.settled|yesno:'true,false' }}" === "true";
+
+    if (isSettled) {
+        document.querySelectorAll(
+            'input, textarea, button'
+        ).forEach(el => {
+            el.disabled = true;
+        });
+    }
 
 });
 
