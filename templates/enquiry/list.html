@@ -162,7 +162,7 @@
 
                                     {% for r in e.routes %}
                                     <span class="route-chip">
-                                        {% if r.origin %}
+
                                         {{ r.origin }}
                                         {% endif %}
                                         {% if r.origin_pin %}
@@ -173,20 +173,19 @@
                                 </div>
 
                                 <!-- DROPS -->
+                                {% if e.routes or if r.destination_pin %}
                                 <div class="route-card drop-card">
-                                    {% if e.routes %}
                                     <div class="route-title">DROPS</div>
                                     {% for r in e.routes %}
                                     <span class="route-chip">
                                         {{ r.destination }}
-                                        {% if r.destination_pin %}
                                         [ {{ r.destination_pin }} ]
-                                        {% endif %}
                                     </span>
                                     {% endfor %}
                                     {% endif %}
-
                                 </div>
+                                {% endif %}
+
 
                             </div>
                             {% else %}
