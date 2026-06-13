@@ -174,9 +174,9 @@
 
                                 <!-- DROPS -->
                                 <div class="route-card drop-card">
+                                    {% if e.routes %}
                                     <div class="route-title">DROPS</div>
                                     {% for r in e.routes %}
-                                    {% if r.routes %}
                                     <span class="route-chip">
                                         {{ r.destination }}
                                         [ {{ r.de1stination_pin }} ]
