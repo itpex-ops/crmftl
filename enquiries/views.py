@@ -491,8 +491,9 @@ def update_enquiry_status(request, id, action):
     enquiry = get_object_or_404(Enquiry, id=id)
     if request.method == "POST":
         if action == "confirm":
-            enquiry.status = "confirmed"
+            enquiry.status = "pitch1" or "pitch2" or 'pitch3'
             enquiry.approval_rate = (request.POST.get("approve_rate") or 0)
+            
             enquiry.save()
             order, created = Order.objects.get_or_create(
                 enquiry=enquiry,
@@ -793,7 +794,7 @@ def update_pitch(request, id):
             send_notification(
                 enquiry.created_by,
                 enquiry,
-                f"Pitch 2 updated for enquiry {enquiry.enquiry_no}"
+                f"Pitch 2 updated for enquiry {enquiry.enquiry_no} by {enquiry.created_by}"
             )
 
     # =====================================
