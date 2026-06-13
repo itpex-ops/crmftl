@@ -18,7 +18,7 @@
         <div class="row g-3 align-items-stretch">
 
             <!-- LEFT start  -->
-            {% if enquiry.status == "confirmed" or enquiry.approval_rate %}
+            {% if enquiry.approval_rate %}
 
             <div class="col-lg-6 d-flex">
 
@@ -84,8 +84,7 @@
 
             {% endif %}
             <!-- Left end -->
-            <!-- RIGHT  start-->
-            {% if enquiry.status == "confirmed" %}
+            {% if enquiry.approval_rate %}
 
             <div class="col-lg-6 d-flex">
 

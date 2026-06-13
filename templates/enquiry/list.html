@@ -175,16 +175,13 @@
                                 <!-- DROPS -->
                                 <div class="route-card drop-card">
                                     <div class="route-title">DROPS</div>
-
                                     {% for r in e.routes %}
+                                    {% if r.routes %}
                                     <span class="route-chip">
-                                        {% if r.destination %}
                                         {{ r.destination }}
-                                        {% endif %}
-                                        {% if r.destivation_pin %}
                                         [ {{ r.de1stination_pin }} ]
-                                        {% endif %}
                                     </span>
+                                    {% endif %}
                                     {% endfor %}
                                 </div>
 
@@ -217,8 +214,12 @@
                         <!-- STATUS -->
                         <td>
                             <span class="status-pill
-                                {% if e.status == 'confirmed' %}
+                                {% if e.status == 'pitch3' %}
                                     success
+                                {% elif 'pitch2' in e.status %}
+                                    info
+                                {% elif 'pitch1' in e.status %}
+                                    secondary
                                 {% elif 'waiting for rate approval' in e.status %}
                                     warning
                                 {% else %}
@@ -351,10 +352,10 @@
                     <button type="submit" name="is_approved" value="false" class="btn btn-success btn-sm">
                         Rate Revision
                     </button>
-                    <span class="text-muted small">OR</span>
+                    <!-- <span class="text-muted small">OR</span>
                     <button type="submit" name="is_approved" value="true" class="btn btn-primary btn-sm">
                         Confirm
-                    </button>
+                    </button> -->
                 </div>
             </form>
         </div>

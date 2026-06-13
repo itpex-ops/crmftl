@@ -95,21 +95,13 @@ def edit_enquiry(request, id):
         ) or None
         enquiry.volume = request.POST.get('volume') or None
         enquiry.volumetric_weight = request.POST.get('volumetric_weight') or None
-        enquiry.expected_rate = request.POST.get(
-            'expected_rate'
-        ) or None
+        enquiry.expected_rate = request.POST.get('expected_rate') or None
 
         enquiry.approval_rate = request.POST.get(
             'approval_rate'
         ) or None
 
-        # enquiry.gstbill = request.POST.get(
-        #     'gstbill'
-        # ) or None
-
-        enquiry.status = request.POST.get(
-            'status'
-        )
+        enquiry.status = request.POST.get('status')
 
         enquiry.pitch1 = request.POST.get(
             'pitch1'
@@ -456,7 +448,6 @@ def enquiry_list(request):
                 'pending_pitch1',
                 'pending_pitch2',
                 'pending_pitch3',
-                'confirmed',
             ]
     )
     total_count = base_qs.count()
@@ -497,41 +488,23 @@ def update_status(request, id, status):
 
 @login_required
 def update_enquiry_status(request, id, action):
-
     enquiry = get_object_or_404(Enquiry, id=id)
-
     if request.method == "POST":
-
-        # =====================================
-        # CONFIRM
-        # =====================================
-
         if action == "confirm":
-
             enquiry.status = "confirmed"
-
-            enquiry.approval_rate = (
-                request.POST.get("approve_rate") or 0
-            )
-
+            enquiry.approval_rate = (request.POST.get("approve_rate") or 0)
             enquiry.save()
-
             order, created = Order.objects.get_or_create(
-
                 enquiry=enquiry,
-
                 defaults={
-
                     "finalized_rate": enquiry.approval_rate,
                     "customer_name": enquiry.customer_name,
                     "customer_contact": enquiry.customer_contact,
                     "routes": enquiry.routes,
                     "vehicle_type": enquiry.vehicle_type,
                     "created_by": request.user,
-
                 }
             )
-
             if not created:
 
                 order.finalized_rate = enquiry.approval_rate
@@ -787,7 +760,7 @@ def update_pitch(request, id):
 
         enquiry.pitch1 = pitch_rate
         enquiry.pitch1_remarks = remarks
-        enquiry.approval_rate = pitch_rate
+        enquiry.expected_rate = pitch_rate
         enquiry.status = "pending_pitch1"
 
         enquiry.save()
@@ -809,7 +782,7 @@ def update_pitch(request, id):
 
         enquiry.pitch2 = pitch_rate
         enquiry.pitch2_remarks = remarks
-        enquiry.approval_rate = pitch_rate
+        enquiry.expected_rate = pitch_rate
         enquiry.status = "pending_pitch2"
 
         enquiry.save()
