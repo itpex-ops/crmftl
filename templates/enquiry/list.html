@@ -166,7 +166,7 @@
                                 </div>
 
                                 <!-- DROPS -->
-                                {% if e.routes or  r.destination_pin %}
+                                {% if e.routes or r.destination_pin or r.destination_pin %}
                                 <div class="route-card drop-card">
                                     <div class="route-title">DROPS</div>
                                     {% for r in e.routes %}
@@ -175,7 +175,6 @@
                                         [ {{ r.destination_pin }} ]
                                     </span>
                                     {% endfor %}
-                                    {% endif %}
                                 </div>
                                 {% endif %}
 
