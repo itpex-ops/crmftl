@@ -174,7 +174,12 @@
                                     {% for r in e.routes %}
                                     {% if r.destination or r.destination_pin %}
                                     <span class="route-chip">
-                                        {{ r.destination }} [{{ r.destination_pin }}]
+                                        {if r.destination %}
+                                        {{ r.destination }}
+                                        {% endif %} 
+                                        {% if r.destination_pin %}
+                                        [{{ r.destination_pin }}]
+                                        {% endif %}
                                     </span>
                                     {% endif %}
                                     {% endfor %}
