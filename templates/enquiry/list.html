@@ -153,21 +153,14 @@
                         </td>
                         <!-- Routes -->
                         <td>
-                            {% if e.routes %}
                             <div class="route-modern">
-
                                 <!-- PICKUPS -->
                                 <div class="route-card pickup-card">
                                     <div class="route-title">PICKUPS</div>
-
                                     {% for r in e.routes %}
                                     <span class="route-chip">
-
                                         {{ r.origin }}
-                                        {% endif %}
-                                        {% if r.origin_pin %}
                                         [ {{ r.origin_pin }} ]
-                                        {% endif %}
                                     </span>
                                     {% endfor %}
                                 </div>
