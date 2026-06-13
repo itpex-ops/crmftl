@@ -83,6 +83,7 @@ LOGIN_URL = 'auth'
 LOGIN_REDIRECT_URL = 'user_dashboard'
 LOGOUT_REDIRECT_URL = 'auth'
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -173,7 +174,7 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/media/tracking_docs/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type

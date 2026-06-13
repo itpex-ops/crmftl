@@ -8,38 +8,31 @@
     <!-- ========================= -->
 
     <div class="summary-card mb-4">
-
         <div class="row g-0 align-items-center">
-
             <div class="col-lg-2 col-md-4 summary-item border-end">
                 <div class="summary-label">
                     Order Status
                 </div>
-
                 <div class="summary-value text-primary">
                     Assign Vehicle
                 </div>
-
                 <div class="summary-sub">
                     Pending
                 </div>
             </div>
 
             <div class="col-lg-2 col-md-4 summary-item border-end">
-
                 <div class="summary-label">
                     Selling Rate
                 </div>
 
                 <div class="summary-value">
-
-                    ₹
                     {% if order.total_rate %}
+                     ₹
                     {{ order.total_rate }}
                     {% endif %}
 
                 </div>
-
             </div>
 
             <div class="col-lg-2 col-md-4 summary-item border-end">
@@ -58,7 +51,6 @@
                         25%
                     </span>
                 </small>
-
             </div>
 
             <div class="col-lg-2 col-md-4 summary-item border-end">
@@ -70,7 +62,6 @@
                 <div class="summary-value text-danger" id="finalFreightView">
                     ₹ 0
                 </div>
-
             </div>
 
             <div class="col-lg-4 col-md-8 summary-item">
@@ -100,9 +91,7 @@
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
     <!-- ========================= -->
@@ -442,9 +431,6 @@
                                 <input type="text" name="upi_id" class="form-control form-input">
                                 <label class="form-label">UPI Number</label>
                                 <input type="text" name="upi_number" class="form-control form-input">
-
-
-
                             </div>
 
                         </div>
@@ -571,13 +557,8 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
-        // =========================
-        // SOURCE
-        // =========================
         const sourceSelect = document.getElementById("source_select");
         const sourceOther = document.getElementById("source_other");
-
         if (sourceSelect && sourceOther) {
             sourceSelect.addEventListener("change", function () {
                 sourceOther.style.display =
@@ -588,10 +569,6 @@
                 }
             });
         }
-
-        // =========================
-        // ELEMENTS
-        // =========================
         const freight = document.getElementById("freight_amount");
         const halting = document.getElementById("halting");
         const loading = document.getElementById("loading_unloading");

@@ -270,13 +270,8 @@ class Tracking(models.Model):
     # =========================
 
     def __str__(self):
-
         if self.order:
             return f"Tracking - {self.order.order_no}"
-
-        if self.manual_order:
-            return f"Tracking - {self.manual_order.order_no}"
-
         return "Tracking"
 
 class TrackingDocument(models.Model):

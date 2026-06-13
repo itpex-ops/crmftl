@@ -328,7 +328,6 @@ def edit_vehicle(request, vehicle_id):
         'vehicle': vehicle
     })
 
-
 # All vehicles
 def all_assigned_vehicles(request):
     vehicles = Vehicle.objects.select_related('order').order_by('-created_at')
@@ -369,7 +368,6 @@ def tracking_page(request, vehicle_id):
         tracking.lr_no_b = 'lr_no_b' in request.POST
         tracking.invoice_eway = 'invoice_eway' in request.POST
         tracking.advance_to_fleet = "advance_to_fleet" in request.POST
-        tracking.advance_to_fleet = 'advance_to_fleet' in request.POST
         tracking.fleet_departed = 'fleet_departed' in request.POST
         tracking.balance_trans_fleet = 'balance_trans_fleet' in request.POST
         tracking.arrived = 'arrived' in request.POST
@@ -437,19 +435,15 @@ def tracking_page(request, vehicle_id):
         # DOCUMENT UPLOAD
         # =========================
         files = request.FILES.getlist('documents')
-
         for file in files:
-
             TrackingDocument.objects.create(
                 tracking=tracking,
                 file=file
             )
-
         messages.success(
             request,
             "Tracking updated successfully."
         )
-
         return redirect("all_assigned_vehicles")
 
     return render(

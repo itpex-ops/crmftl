@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid mt-3">
+<div class="container-fluid mt-1">
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
@@ -14,7 +14,7 @@
     </div>
 
     <!-- STATS -->
-    <div class="row g-3 mb-4">
+    <div class="row g-1 mb-1">
 
         <div class="col-md-3">
 
@@ -65,8 +65,7 @@
     </div>
 
     <!-- SEARCH -->
-    <div class="card premium-card p-3 mb-4">
-
+    <div class="card premium-card p-1 mb-1">
         <input type="text" id="searchInput" class="form-control search-box"
             placeholder="🔍 Search order / customer / route">
 
@@ -77,21 +76,16 @@
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead class="custom-table-head">
-
                     <tr class="main-head-row">
-
-                        <th width="60">Date</th>
-                        <th width="80">Order No</th>
-                        <th width="80">Customer</th>
-                        <th width="100">Route</th>
-                        <th width="90">Vehicle</th>
-                        <th width="80">Rate ₹</th>
-                        <th width="90">Status</th>
-                        <th width="90">Actions</th>
-
-
+                        <th >Date</th>
+                        <th >Order No</th>
+                        <th >Customer</th>
+                        <th>Route</th>
+                        <th>Vehicle</th>
+                        <th>Selling Rate ₹</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
-
                 </thead>
 
                 <tbody id="tableBody">
@@ -147,23 +141,29 @@
                         <td>
                             {% if order.routes %}
                             <div class="route-modern">
-                                <div class="mb-1">
-                                    <small class="fw-bold text-primary">Pickups:</small>
-                                    <span class="route-side origin-side">
-                                        {% for r in order.routes %}
-                                        {{ r.origin }} ( {{ r.origin_pin }} ){% if not forloop.last %} + {% endif %}
-                                        {% endfor %}
+
+                                <!-- PICKUPS -->
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+
+                                    {% for r in order.routes %}
+                                    <span class="route-chip">
+                                        {{ r.origin }} [ {{ r.origin_pin }} ]
                                     </span>
+                                    {% endfor %}
                                 </div>
 
-                                <div>
-                                    <small class="fw-bold text-success">Drops:</small>
-                                    <span class="route-side destination-side">
-                                        {% for r in order.routes %}
-                                        {{ r.destination }} ( {{ r.destination_pin }} ){% if not forloop.last %} + {% endif %}
-                                        {% endfor %}
+                                <!-- DROPS -->
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+
+                                    {% for r in order.routes %}
+                                    <span class="route-chip">
+                                        {{ r.destination }} [ {{ r.destination_pin }} ]
                                     </span>
+                                    {% endfor %}
                                 </div>
+
                             </div>
                             {% else %}
                             <span class="text-muted">-</span>
@@ -227,7 +227,7 @@
 
                             {% elif order.tracking.fleet_departed %}
                             <span class="badge bg-warning text-dark">
-                                In Transit
+                                Fleet Departed
                             </span>
 
                             {% elif order.tracking.invoice_eway %}
@@ -236,9 +236,16 @@
                             </span>
 
                             {% elif order.tracking.lr_no %}
-                            <span class="badge bg-secondary">
+                            <span class="badge bg-secondary d-inline-flex align-items-center">
+                                <i class="bi bi-receipt me-1"></i>
                                 LR Generated
+                                <span class="ms-2 px-2 py-1 bg-white text-dark rounded">
+                                    {{ order.tracking.lr_no }}
+                                </span>
                             </span>
+                            
+
+
 
                             {% elif order.tracking.vehicle_document %}
                             <span class="badge bg-info">
@@ -297,7 +304,11 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
+<style>
+   
+</style>
 
 <script>
 

@@ -697,67 +697,9 @@ tbody td {
     min-width: 30px;
 }
 
-/* ROUTE CARD */
 
-.route-modern {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
 
-    width: 100%;
-    min-width: 10px;
 
-    padding: 6px 6px;
-
-    background: whitesmoke;
-    border: 1px solid #dbe2ea;
-    border-radius: 18px;
-
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-/* ROW */
-
-.route-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-
-    width: 100%;
-}
-
-/* LABEL */
-
-.route-label {
-    min-width: 70px;
-
-    font-size: 13px;
-    font-weight: 500;
-    color: #0f172a;
-
-    white-space: nowrap;
-}
-
-/* VALUE */
-
-.route-value {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.5;
-
-    word-break: break-word;
-}
-
-/* COLORS */
-
-.origin-side {
-    color: #2563eb;
-}
-
-.destination-side {
-    color: #16a34a;
-}
 
 /* =========================
        ACTION BUTTON
@@ -1034,14 +976,6 @@ tbody td {
         min-width: 200px;
     }
 
-
-    .route-modern {
-        width: 100%;
-
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
     .route-arrow {
         transform: rotate(90deg);
     }
@@ -1093,9 +1027,7 @@ tbody td {
     }
 }
 
-.route-modern {
-    min-width: 100px;
-}
+
 
 .route-card {
     border-radius: 16px;
@@ -1126,24 +1058,74 @@ tbody td {
     color: #0d6efd;
 }
 
-.drop-card .route-title {
-    color: #198754;
-}
+/*route card */
 
-.route-chip {
-    display: inline-block;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 6px 14px;
-    margin: 3px;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
-}
+ .route-modern {
+        max-width: 180px;
+        min-height: 80px;
+    }
 
-.route-plus {
-    display: inline-block;
-    margin: 0 4px;
-    font-weight: 700;
-    color: #444;
-}
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
+    }
+
+    .pickup-card {
+        background: #eef3fa;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .drop-card {
+        background: #eef7f1;
+        border-left: 4px solid #198754;
+    }
+
+    .route-title {
+        font-size: 9px;
+        font-weight: 700;
+        margin-bottom: 2x;
+        text-transform: uppercase;
+    }
+
+    .pickup-card .route-title {
+        color: #0d6efd;
+    }
+
+    .drop-card .route-title {
+        color: #198754;
+    }
+
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    @media (max-width:768px) {
+
+        .route-modern {
+            min-width: auto;
+            max-width: 100%;
+        }
+
+        .route-card {
+            padding: 6px;
+        }
+
+        .route-title {
+            font-size: 6px;
+            margin-bottom: 4px;
+        }
+
+        .route-chip {
+            font-size: 9px;
+            padding: 2px 6px;
+            margin: 1px;
+        }
+    }
