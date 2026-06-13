@@ -352,6 +352,7 @@ def create_enquiry(request):
         origin_pins = request.POST.getlist("origin_pin[]")
         destinations = request.POST.getlist("destination[]")
         destination_pins = request.POST.getlist("destination_pin[]")
+        print("origins",origins,origin_pins,destinations,destination_pins)
         routes = []
         max_rows = max(
             len(origins),
@@ -366,13 +367,14 @@ def create_enquiry(request):
                 "destination": destinations[i] if i < len(destinations) else "",
                 "destination_pin": destination_pins[i] if i < len(destination_pins) else "",
             }
-        if (
-            route["origin"] or
-            route["origin_pin"] or
-            route["destination"] or
-            route["destination_pin"]
-        ):
-            routes.append(route)
+            if (
+                route["origin"] or
+                route["origin_pin"] or
+                route["destination"] or
+                route["destination_pin"]
+            ):
+                routes.append(route)
+                print("routes",routes)
         enquiry = Enquiry.objects.create(
 
             customer_name=customer_name,
