@@ -148,7 +148,10 @@
 
                                     {% for r in order.routes %}
                                     <span class="route-chip">
-                                        {{ r.origin }} [ {{ r.origin_pin }} ]
+                                        {{ r.origin }}
+                                         {% if r.origin_pin %}
+                                        [ {{ r.origin_pin }} ]
+                                        {% endif %}
                                     </span>
                                     {% endfor %}
                                 </div>
@@ -159,7 +162,13 @@
 
                                     {% for r in order.routes %}
                                     <span class="route-chip">
-                                        {{ r.destination }} [ {{ r.destination_pin }} ]
+                                        {% if r.destivation %}
+
+                                        {{ r.destination }}
+                                        {% endif %}
+                                        {% if r.destination_pin %}
+                                        [ {{ r.destination_pin }} ]
+                                        {% endif %}
                                     </span>
                                     {% endfor %}
                                 </div>
