@@ -180,7 +180,7 @@
                                     <span class="route-chip">
                                         {{ r.destination }}
                                         {% if r.destination_pin %}
-                                        [ {{ r.de1stination_pin }} ]
+                                        [{% endif %} {{ r.de1stination_pin }}{% if r.destination_pin %} ]
                                         {% endif %}
                                     </span>
                                     {% endfor %}
