@@ -93,11 +93,10 @@
                         <th rowspan="2" class="main-th">
                             Status
                         </th>
-                        {% if is_admin or is_superadmin %}
+                       
                         <th rowspan="2" class="main-th">
                             Action
                         </th>
-                        {% endif %}
                     </tr>
 
                     <!-- SUB HEADER -->
@@ -174,7 +173,7 @@
                                     {% for r in e.routes %}
                                     {% if r.destination or r.destination_pin %}
                                     <span class="route-chip">
-                                        {% if r.destination %}{{ r.destination }} {% endif %} 
+                                        {% if r.destination %}{{ r.destination }} {% endif %}
                                         {% if r.destination_pin %} [{{ r.destination_pin }}] {% endif %}
                                     </span>
                                     {% endif %}
@@ -231,7 +230,7 @@
                         </td>
                         <!-- ACTION -->
                         <td class="text-end">
-
+                             {% if is_admin or is_superadmin %}
                             <div class="d-flex justify-content-end gap-1 flex-wrap">
                                 <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
                                     data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
@@ -240,7 +239,8 @@
                                     data-status="{{ e.status }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-
+                                {% endif %}
+                                {% if request.user.role == 'sales' %}
                                 <!-- Confirm -->
                                 <button type="button" class="icon-btn text-success action-btn" data-id="{{ e.id }}"
                                     data-rate="{{ e.approval_rate|default_if_none:'' }}" data-action="confirm">
@@ -262,7 +262,7 @@
                                     ❌
 
                                 </button>
-
+                                {% endif %}
 
                             </div>
 
@@ -359,77 +359,7 @@
 </div>
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
-<style>
-    .route-modern {
-        max-width: 180px;
-        min-height: 80px;
-    }
 
-    .route-card {
-        padding: 3px 4px;
-        margin-bottom: 3px;
-    }
-
-    .pickup-card {
-        background: #eef3fa;
-        border-left: 4px solid #0d6efd;
-    }
-
-    .drop-card {
-        background: #eef7f1;
-        border-left: 4px solid #198754;
-    }
-
-    .route-title {
-        font-size: 9px;
-        font-weight: 700;
-        margin-bottom: 2x;
-        text-transform: uppercase;
-    }
-
-    .pickup-card .route-title {
-        color: #0d6efd;
-    }
-
-    .drop-card .route-title {
-        color: #198754;
-    }
-
-    .route-chip {
-        display: inline-block;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 15px;
-        padding: 2px 8px;
-        margin: 2px;
-        font-size: 9px;
-        font-weight: 600;
-        line-height: 1.4;
-    }
-
-    @media (max-width:768px) {
-
-        .route-modern {
-            min-width: auto;
-            max-width: 100%;
-        }
-
-        .route-card {
-            padding: 6px;
-        }
-
-        .route-title {
-            font-size: 6px;
-            margin-bottom: 4px;
-        }
-
-        .route-chip {
-            font-size: 9px;
-            padding: 2px 6px;
-            margin: 1px;
-        }
-    }
-</style>
 
 <!-- SEARCH -->
 <script>
