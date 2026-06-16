@@ -42,7 +42,7 @@
     </div>
     <form method="POST">
         {% csrf_token %}
-        {% if customers %}
+        {% if customerss %}
         <input type="hidden" name="customer_id" value="{{ customer.id }}">
         {% endif %}
         <div class="row">
@@ -58,30 +58,30 @@
                             <label class="form-label">Customer Name
                                 <span class="text-danger fw-bold">*</span> </label>
                             <input type="text" id="customer_name" name="customer_name" class="form-control"
-                                value="{{ customer.name|default:'' }}" {% if customer %}readonly{% endif %} required>
+                                value="{{ customer.name|default:'' }}" {% if customers %}readonly{% endif %} required>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
                             <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
                                 maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
-                                value="{{ customer.phone1|default:'' }}" {% if customer %}readonly{% endif %} required>
+                                value="{{ customer.phone1|default:'' }}" {% if customers %}readonly{% endif %} required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Email</label>
                             <input type="email" id="email" name="email" class="form-control"
-                                value="{{ customer.email|default:'' }}" {% if customer %}readonly{% endif %}>
+                                value="{{ customer.email|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
 
-                        {% if customers %}
+                        {% if customerss %}
                         <div class="col-md-4">
                             <label class="form-label">GST Number
                                 <span class="text-danger fw-bold">*</span>
                             </label>
                             <input type="text" id="gst_number" name="gst_number" class="form-control"
-                                value="{{ customer.gst_number|default:'' }}" {% if customer %}readonly{% endif %}>
+                                value="{{ customer.gst_number|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
 
                         <div class="col-md-4">
@@ -89,21 +89,21 @@
                                 <span class="text-danger fw-bold">*</span>
                             </label>
                             <input type="text" id="city" name="city" class="form-control"
-                                value="{{ customer.city|default:'' }}" {% if customer %}readonly{% endif %}>
+                                value="{{ customer.city|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">State
                                 <span class="text-danger fw-bold">*</span>
                             </label>
                             <input type="text" id="state" name="state" class="form-control"
-                                value="{{ customer.state|default:'' }}" {% if customer %}readonly{% endif %}>
+                                value="{{ customer.state|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Pincode
                                 <span class="text-danger fw-bold">*</span>
                             </label>
                             <input type="text" id="pincode" name="pincode" class="form-control"
-                                value="{{ customer.pincode|default:'' }}" {% if customer %}readonly{% endif %}>
+                                value="{{ customer.pincode|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
                         {% endif %}
                         <div class="col-md-3">
