@@ -244,18 +244,19 @@ def confirm_enquiry(request, enquiry_id):
 
 @login_required
 def create_enquiry(request):
-    customer = None
-    search_value = request.GET.get("customer_code", "").strip()
-    if search_value:
-        customer = ExCustomer.objects.filter(
-            Q(customer_code__iexact=search_value) |
-            Q(phone1__icontains=search_value) |
-            Q(phone2__icontains=search_value) |
-            Q(name__icontains=search_value) |
-            Q(gst_number__icontains=search_value) |
-            Q(pan_number__icontains=search_value)
-        ).first()
-    
+    # search_value = request.GET.get("customer_code", "").strip()
+    # if search_value:
+    #     customers = ExCustomer.objects.filter(
+    #         Q(customer_code__iexact=search_value) |
+    #         Q(phone1__icontains=search_value) |
+    #         Q(phone2__icontains=search_value) |
+    #         Q(name__icontains=search_value) |
+    #         Q(gst_number__icontains=search_value) |
+    #         Q(pan_number__icontains=search_value)
+    #     ).first()
+    customers = ExCustomer.objects.all().order_by("customer_code")
+
+    print("customers",customers)
     vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
     if request.method == "POST":
         customer_name = request.POST.get("customer_name") or None
@@ -419,8 +420,8 @@ def create_enquiry(request):
         "enquiry/create.html",
         {
             "vehicle_types": vehicle_types,
-            "search_value": search_value,
-            "customer": customer,
+            #"search_value": search_value,
+            "customers": customers,
         }
     )
 

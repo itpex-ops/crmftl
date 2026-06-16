@@ -1,63 +1,48 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
 <div class="container-fluid">
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body">
-            <form method="GET">
-
-                <div class="row">
-
-                    <div class="col">
-
-                        <div class="section-title">
-                            Search Customer
-                        </div>
-
-                        <input type="text" name="customer_code" class="form-control"
-                            placeholder="Customer Code / Mobile / Name / GST / PAN" value="{{ search_value }}">
-
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end">
-
-                        <button class="btn btn-primary w-100">
-                            Search
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </form>
-        </div>
+    <div class="col-md-4">
+        <label class="form-label">
+            Search Customer
+        </label>
     </div>
-    {% if search_value %}
-    {% if customer %}
-    <div class="alert alert-success">
+    <div class="col-md-4">
+        <select id="customerSelect" name="customer_id" class="form-select" >
+            <option value="">
+                Select Customer
+            </option>
+            {% for c in customers %}
+            <option value="{{ c.id }}" data-name="{{ c.name }}" data-phone="{{ c.phone1 }}" data-email="{{ c.email }}"
+                data-gst="{{ c.gst_number }}" data-city="{{ c.city }}" data-state="{{ c.state }}">
+                {{ c.customer_code }} - {{ c.name }} - {{ c.phone1 }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    </div>
+    <div id="customerFoundMsg" class="alert alert-success d-none">
         <h6 class="mb-0">
             ✅ Customer Found
         </h6>
     </div>
-    {% else %}
-    <div class="alert alert-warning d-flex align-items-center">
+
+    <div id="customerNotFoundMsg" class="alert alert-warning d-none">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <span>Customer not found. Please refer to the Customer List.</span>
     </div>
-    {% endif %}
-    {% endif %}
-
 
     <!-- HEADER -->
-    <div class="page-header">
+    <div class="page-header mt-3">
         <h4>🚚 Create Enquiry</h4>
         <small>Fill all required details</small>
     </div>
-
     <form method="POST">
         {% csrf_token %}
-        {% if customer %}
+        {% if customers %}
         <input type="hidden" name="customer_id" value="{{ customer.id }}">
         {% endif %}
         <div class="row">
@@ -72,29 +57,30 @@
                         <div class="col-md-4">
                             <label class="form-label">Customer Name
                                 <span class="text-danger fw-bold">*</span> </label>
-                            <input type="text" name="customer_name" class="form-control"
+                            <input type="text" id="customer_name" name="customer_name" class="form-control"
                                 value="{{ customer.name|default:'' }}" {% if customer %}readonly{% endif %} required>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
-                            <input type="tel" name="customer_contact" class="form-control" maxlength="10"
-                                pattern="[0-9]{10}" inputmode="numeric" value="{{ customer.phone1|default:'' }}" {% if customer %}readonly{% endif %} required>
+                            <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
+                                maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                                value="{{ customer.phone1|default:'' }}" {% if customer %}readonly{% endif %} required>
                             <small class="text-muted">Enter 10 digit mobile number</small>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control"
+                            <input type="email" id="email" name="email" class="form-control"
                                 value="{{ customer.email|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
 
-                        {% if customer %}
+                        {% if customers %}
                         <div class="col-md-4">
                             <label class="form-label">GST Number
                                 <span class="text-danger fw-bold">*</span>
                             </label>
-                            <input type="text" name="gst_number" class="form-control"
+                            <input type="text" id="gst_number" name="gst_number" class="form-control"
                                 value="{{ customer.gst_number|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
 
@@ -102,15 +88,21 @@
                             <label class="form-label">City
                                 <span class="text-danger fw-bold">*</span>
                             </label>
-                            <input type="text" name="city" class="form-control" value="{{ customer.city|default:'' }}"
-                                {% if customer %}readonly{% endif %}>
+                            <input type="text" id="city" name="city" class="form-control"
+                                value="{{ customer.city|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
-
+                        <div class="col-md-4">
+                            <label class="form-label">State
+                                <span class="text-danger fw-bold">*</span>
+                            </label>
+                            <input type="text" id="state" name="state" class="form-control"
+                                value="{{ customer.state|default:'' }}" {% if customer %}readonly{% endif %}>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label">Pincode
                                 <span class="text-danger fw-bold">*</span>
                             </label>
-                            <input type="text" name="pincode" class="form-control"
+                            <input type="text" id="pincode" name="pincode" class="form-control"
                                 value="{{ customer.pincode|default:'' }}" {% if customer %}readonly{% endif %}>
                         </div>
                         {% endif %}
@@ -152,14 +144,14 @@
                         </div>
 
                         <div id="destination-container" class="col-md-3">
-                            <label class="form-label">Delivery PIN Code<span class="text-danger fw-bold">*</span></label>
+                            <label class="form-label">Delivery PIN Code<span
+                                    class="text-danger fw-bold">*</span></label>
                             <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
                                 pattern="[0-9]{6}" inputmode="numeric" required>
                         </div>
 
                     </div>
                 </div>
-
                 <!-- ROUTE & VEHICLE -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">📍 Route & Vehicle</div>
@@ -200,7 +192,8 @@
                         </script>
 
                         <div class="col-md-4">
-                            <label class="form-label">Vehicle Description<span class="text-danger fw-bold">*</span></label>
+                            <label class="form-label">Vehicle Description<span
+                                    class="text-danger fw-bold">*</span></label>
                             <input type="text" name="vehicle_description" class="form-control">
                         </div>
 
@@ -341,9 +334,70 @@
         </div>
     </form>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let selected = $(this).val();
+
+        if (selected) {
+
+            $('#customerFoundMsg').removeClass('d-none');
+            $('#customerNotFoundMsg').addClass('d-none');
+
+        } else {
+
+            $('#customerFoundMsg').addClass('d-none');
+            $('#customerNotFoundMsg').removeClass('d-none');
+        }
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#customerSelect').select2({
+            placeholder: "Search by Customer Code / Name / Mobile",
+            allowClear: true,
+            width: '100%'
+        });
+
+    });
+</script>
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let option = $(this).find(':selected');
+
+        $('#customer_name').val(
+            option.data('name') || ''
+        );
+
+        $('#customer_contact').val(
+            option.data('phone') || ''
+        );
+
+        $('#email').val(
+            option.data('email') || ''
+        );
+
+        $('#gst_number').val(
+            option.data('gst') || ''
+        );
+
+        $('#city').val(
+            option.data('city') || ''
+        );
+         $('#state').val(
+            option.data('state') || ''
+        );
+
+    });
+</script>
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
