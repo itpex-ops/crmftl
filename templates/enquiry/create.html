@@ -42,7 +42,7 @@
     </div>
     <form method="POST">
         {% csrf_token %}
-        {% if customerss %}
+        {% if customers %}
         <input type="hidden" name="customer_id" value="{{ customer.id }}">
         {% endif %}
         <div class="row">
@@ -75,7 +75,7 @@
                                 value="{{ customer.email|default:'' }}" {% if customers %}readonly{% endif %}>
                         </div>
 
-                        {% if customerss %}
+                        {% if customers %}
                         <div class="col-md-4">
                             <label class="form-label">GST Number
                                 <span class="text-danger fw-bold">*</span>
