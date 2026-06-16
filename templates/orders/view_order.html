@@ -159,16 +159,46 @@
                             <td>{{ order.enquiry.vehicle_type }}</td>
                         </tr>
                         <tr>
-                            <th>Pickup</th>
-                            <td>{{ order.enquiry.pickups }}</td>
+                          
+                                <th>Distance ( Kms )</th>
+                                <td>{{ order.enquriry.kms }}</td>
+                         
                         </tr>
                         <tr>
-                            <th>Delivery</th>
-                            <td>{{ order.enquiry.deliveries }}</td>
+                            <th>Pickups</th>
+                                <td>{{ order.enquiry.pickups }}
+                                                ->
+                                    {% for r in order.enquiry.routes %}
+                                    {% if r.origin or r.origin_pin %}
+                                    <span class="route-chip">
+                                    {% if r.origin %} {{ r.origin }} {% endif %} 
+                                    {% if r.origin_pin %} [ {{ r.origin_pin }} ] {% endif %}
+                                    </span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
+                        </tr>
+                        <tr>
+                            <th>Drops</th>
+                            <td>{{ order.enquiry.deliveries }}
+                                 ->
+                                {% for r in order.enquiry.routes %}
+                                {% if r.destination or r.destination_pin %}
+                                <span class="route-chip">
+                                    {% if r.destination %}  {{ r.destination }} {% endif %}
+                                    {% if r.destination_pin %} [ {{ r.destination_pin }} ] {% endif %}
+                                </span>
+                                {% endif %}
+                                {% endfor %}
+                                </td>
                         </tr>
                         <tr>
                             <th>Remarks</th>
                             <td>{{ order.enquiry.remarks }}</td>
+                        </tr>
+                        <tr>
+                            <th>Lead By</th>
+                            <td>{{ order.enquiry.created_by }}</td>
                         </tr>
                     </table>
                     {% else %}
@@ -202,42 +232,37 @@
                             <th>Order No</th>
                             <td>{{ order.order_no }}</td>
                         </tr>
+                        
                         <tr>
-                            <th>Customer</th>
-                            <td>{{ order.customer_name }}</td>
+                            <th>Selling Rate </th>
+                            <td>₹ {{ order.finalized_rate }}</td>
                         </tr>
                         <tr>
-                            <th>Contact</th>
-                            <td>{{ order.customer_contact }}</td>
+                            <th>Loading / Unloading </th>
+                            <td> {{ order.loading_charges}}</td>
                         </tr>
                         <tr>
-                            <th>Vehicle Type</th>
-                            <td>{{ order.vehicle_type }}</td>
+                            <th>Halting</th>
+                            <td>{{ order.halting_charges }}</td>
                         </tr>
                         <tr>
-                            <th>KiloMetres</th>
-                            <td>{{ order.kms }}</td>
+                            <th>GST</th>
+                            <td>{{ order.gst_percent }}</td>
                         </tr>
                         <tr>
-                            <th>Total Freight</th>
-                            <td>₹ {{ order.total_rate }}</td>
+                            <th>Total Selling Rate</th>
+                            <td>{{ order.total_rate }}</td>
                         </tr>
                         <tr>
-                            <th>Created By</th>
-                            <td>{{ order.created_by }}</td>
+                            <th>Vehicle Assigned Date</th>
+                            <td>{{ order.vehicle_place_date}}</td>
                         </tr>
 
                         <tr>
-                            <th>Routes</th>
-                            <td>
-                                {% for r in order.routes %}
-                                <span class="route-pill">
-                                    {{ r.origin }} → {{ r.destination }}
-                                </span>
-                                {% empty %}
-                                No Route
-                                {% endfor %}
-                            </td>
+                            <th>Order Created By</th>
+                            <td>{{ order.created_by }}</td>
+                        </tr>
+                        <tr>
                         </tr>
 
                     </table>

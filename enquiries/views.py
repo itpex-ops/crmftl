@@ -230,10 +230,10 @@ def confirm_enquiry(request, enquiry_id):
     # ------------------------------
 
     # Replace created_by with your actual field name
-    if enquiry.created_by:
+    if enquiry.request.user:
 
         send_notification(
-            enquiry.created_by,
+            enquiry.request.user,
             enquiry,
             f"Your enquiry {enquiry.enquiry_no} was confirmed by Admin"
         )
@@ -459,6 +459,7 @@ def enquiry_list(request):
             'pending_pitch3'
         ]).count()
     cancelled_count = base_qs.filter(status='cancelled').count()
+    #pitch_remarks =  base_qs.filter()
     enquiries = base_qs.order_by('-id')
     return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
@@ -469,31 +470,21 @@ def enquiry_list(request):
         'is_admin': is_admin,
         'is_sales': is_sales,
         'is_superadmin': is_superadmin,
+        #"pitch_remarks":pitch_remarks
     })
-
-@login_required
-def update_status(request, id, status):
-    if request.method == "POST":
-        data = json.loads(request.body)
-
-        enquiry = Enquiry.objects.get(id=id)
-
-        if status == "confirmed":
-            enquiry.status = "confirmed"
-            enquiry.approval_rate = data.get("approval_rate")
-
-        enquiry.save()
-
-        return JsonResponse({"success": True})
 
 @login_required
 def update_enquiry_status(request, id, action):
     enquiry = get_object_or_404(Enquiry, id=id)
     if request.method == "POST":
+        # =====================================
+        # CONFIRM
+        # =====================================
         if action == "confirm":
-            enquiry.status = "pitch1" or "pitch2" or 'pitch3'
-            enquiry.approval_rate = (request.POST.get("approve_rate") or 0)
-            
+            enquiry.status = "pitch3"
+            enquiry.approval_rate = request.POST.get(
+                "approve_rate"
+            ) or 0
             enquiry.save()
             order, created = Order.objects.get_or_create(
                 enquiry=enquiry,
@@ -506,23 +497,15 @@ def update_enquiry_status(request, id, action):
                     "created_by": request.user,
                 }
             )
-            if not created:
 
+            if not created:
                 order.finalized_rate = enquiry.approval_rate
                 order.save()
 
-            # ---------------------------------
-            # NOTIFICATION TO SALES USER
-            # ---------------------------------
-
             if enquiry.created_by:
-
                 Notification.objects.create(
-
                     user=enquiry.created_by,
-
                     enquiry=enquiry,
-
                     message=(
                         f"Your enquiry "
                         f"{enquiry.enquiry_no} "
@@ -543,75 +526,57 @@ def update_enquiry_status(request, id, action):
         # =====================================
         # DISAGREE
         # =====================================
-
         elif action == "disagree":
 
-            enquiry.status = "disagree"
-
-            enquiry.disagree_reason = (
-                request.POST.get(
-                    "disagree_reason",
-                    ""
-                )
+            enquiry.disagree_rate = request.POST.get(
+                "disagree_rate"
             )
+
+            enquiry.disagree_reason = request.POST.get(
+                "disagree_reason",
+                ""
+            )
+
+            #enquiry.status = "waiting for rate approval"
 
             enquiry.save()
 
-            # ---------------------------------
-            # NOTIFICATION TO SALES USER
-            # ---------------------------------
-
             if enquiry.created_by:
-
                 Notification.objects.create(
-
                     user=enquiry.created_by,
-
                     enquiry=enquiry,
-
                     message=(
-                        f"Your enquiry "
-                        f"{enquiry.enquiry_no} "
-                        f"was marked as disagree"
+                        f"Disagreement raised for "
+                        f"{enquiry.enquiry_no}. "
+                        f"Expected Rate ₹{enquiry.expected_rate} | "
+                        f"Disagree Rate ₹{enquiry.disagree_rate}"
                     )
                 )
 
             messages.warning(
                 request,
-                "Enquiry marked as disagree."
+                "Disagreement submitted successfully."
             )
-
             return redirect("enquiry_list")
 
         # =====================================
         # CANCEL
         # =====================================
-
         elif action == "cancel":
 
             enquiry.status = "cancelled"
 
-            enquiry.cancel_reason = (
-                request.POST.get(
-                    "cancel_reason",
-                    ""
-                )
+            enquiry.cancel_reason = request.POST.get(
+                "cancel_reason",
+                ""
             )
 
             enquiry.save()
 
-            # ---------------------------------
-            # NOTIFICATION TO SALES USER
-            # ---------------------------------
-
             if enquiry.created_by:
-
                 Notification.objects.create(
-
                     user=enquiry.created_by,
-
                     enquiry=enquiry,
-
                     message=(
                         f"Your enquiry "
                         f"{enquiry.enquiry_no} "
@@ -627,32 +592,24 @@ def update_enquiry_status(request, id, action):
             return redirect("enquiry_list")
 
     return redirect("enquiry_list")
-
 # =====================================
 # UPDATE STATUS
 # =====================================
 
 @login_required
 def update_status(request, id, status):
-
     if request.method == "POST":
 
         data = json.loads(request.body)
 
         enquiry = get_object_or_404(Enquiry, id=id)
 
-        if status == "confirmed":
+        if status == "pending_pitch3":
 
             enquiry.status = "confirmed"
             enquiry.approval_rate = data.get("approval_rate")
 
             enquiry.save()
-
-            # --------------------------------
-            # NOTIFICATION TO SALES USER
-            # --------------------------------
-
-            # Replace created_by with your field
             if enquiry.created_by:
 
                 send_notification(
@@ -660,9 +617,7 @@ def update_status(request, id, status):
                     enquiry,
                     f"Enquiry {enquiry.enquiry_no} was confirmed by Admin"
                 )
-
         return JsonResponse({"success": True})
-
     return JsonResponse({
         "success": False
     })
@@ -693,19 +648,17 @@ def update_pitch(request, id):
     pitch_rate = request.POST.get("pitch_rate")
     is_approved = request.POST.get("is_approved") == "true"
 
-    if not pitch_rate:
+    pitch_rate = request.POST.get("pitch_rate")
 
+    if not pitch_rate:
         return JsonResponse({
             "success": False,
             "msg": "Pitch rate required"
         })
 
     try:
-
         pitch_rate = Decimal(pitch_rate)
-
     except:
-
         return JsonResponse({
             "success": False,
             "msg": "Invalid rate"
@@ -729,16 +682,21 @@ def update_pitch(request, id):
     if is_approved:
 
         if not can_approve:
-
             return HttpResponseForbidden(
-                "Only admin/manager can approve"
+                "Only Super Admin can approve"
             )
 
+        latest_rate = (
+            enquiry.pitch3 or
+            enquiry.pitch2 or
+            enquiry.pitch1 or
+            enquiry.expected_rate
+        )
+
         enquiry.status = "confirmed"
-        enquiry.approval_rate = pitch_rate
+        enquiry.approval_rate = latest_rate
 
         enquiry.save()
-
         # --------------------------------
         # NOTIFICATION TO SALES USER
         # --------------------------------
@@ -748,7 +706,7 @@ def update_pitch(request, id):
             send_notification(
                 enquiry.created_by,
                 enquiry,
-                f"Your enquiry {enquiry.enquiry_no} was approved by Admin"
+                f"Your enquiry {enquiry.enquiry_no} was approved by Super Admin"
             )
 
         return redirect("enquiry_list")
@@ -761,9 +719,9 @@ def update_pitch(request, id):
 
         enquiry.pitch1 = pitch_rate
         enquiry.pitch1_remarks = remarks
-        enquiry.expected_rate = pitch_rate
+        #enquiry.expected_rate = pitch_rate
+        enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch1"
-
         enquiry.save()
 
         # Notification
@@ -783,7 +741,8 @@ def update_pitch(request, id):
 
         enquiry.pitch2 = pitch_rate
         enquiry.pitch2_remarks = remarks
-        enquiry.expected_rate = pitch_rate
+        #enquiry.expected_rate = pitch_rate
+        enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch2"
 
         enquiry.save()
@@ -806,7 +765,7 @@ def update_pitch(request, id):
         enquiry.pitch3 = pitch_rate
         enquiry.pitch3_remarks = remarks
         enquiry.approval_rate = pitch_rate
-        enquiry.status = "confirmed"
+        enquiry.status = "Pending_pitch3"
 
         enquiry.save()
 

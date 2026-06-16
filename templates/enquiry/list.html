@@ -93,7 +93,7 @@
                         <th rowspan="2" class="main-th">
                             Status
                         </th>
-                       
+
                         <th rowspan="2" class="main-th">
                             Action
                         </th>
@@ -126,18 +126,14 @@
                     <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
                         <td>
                             <a href="{% url 'edit_enquiry' e.id %}" class="btn btn-primary btn-sm">
-
                                 <i class="bi bi-pencil-square me-1"></i>
-
                                 <strong>
                                     {{ e.enquiry_no }}
                                 </strong>
-
                             </a><br>
                             <small class="text-muted date-nowrap">
                                 {{ e.created_at|date:"d M Y h:i a" }}
                             </small>
-
                         </td>
 
                         <!-- CUSTOMER -->
@@ -145,7 +141,6 @@
                             <div class="fw-semibold">
                                 {{ e.customer_name }}
                             </div>
-
                             <small class="text-muted">
                                 {{ e.customer_contact }}
                             </small>
@@ -185,20 +180,37 @@
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
-                        <!-- VEHICLE -->
+                        <!-- VEHICLE Types -->
                         <td>
                             {{ e.vehicle_type }}
                         </td>
+                        <!-- Vehicle Desc-->
                         <td>
                             {{e.vehicle_description}}
+
                         </td>
+                        <!-- kms -->
                         <td>
                             {{ e.kms }}
                         </td>
 
-                        <!-- EXPECTED -->
+                        <!-- EXPECTED and disagree rate -->
                         <td class="text-warning fw-semibold">
-                            {{ e.expected_rate|default_if_none:"" }}
+                            <div class="fw-bold text-warning">
+                                ₹ {{ e.expected_rate }}
+                            </div>
+
+                            {% if e.disagree_rate %}
+                            <div class="mt-1">
+                                <span class="badge bg-danger">
+                                    Exp.Rate ₹ {{ e.disagree_rate }}
+                                </span>
+                            </div>
+
+                            <small class="text-muted">
+                                Disagree : {{ e.disagree_reason }}
+                            </small>
+                            {% endif %}
                         </td>
 
                         <!-- APPROVAL -->
@@ -227,10 +239,11 @@
                                 {{ e.status|capfirst }}
                                 {% endif %}
                             </span>
+
                         </td>
                         <!-- ACTION -->
-                        <td class="text-end">
-                             {% if is_admin or is_superadmin %}
+                        <td>
+                            {% if is_admin or is_superadmin %}
                             <div class="d-flex justify-content-end gap-1 flex-wrap">
                                 <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
                                     data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
@@ -239,81 +252,92 @@
                                     data-status="{{ e.status }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                {% endif %}
-                                {% if request.user.role == 'sales' %}
-                                <!-- Confirm -->
-                                <button type="button" class="icon-btn text-success action-btn" data-id="{{ e.id }}"
-                                    data-rate="{{ e.approval_rate|default_if_none:'' }}" data-action="confirm">
+                            </div>
+                            {% endif %}
 
-                                    ✔️
-
-                                </button>
+                            {% if is_sales %}
+                            <div class="d-flex gap-2 justify-content-center">
                                 <!-- Disagree -->
-                                <button type="button" class="icon-btn text-warning action-btn" data-id="{{ e.id }}"
+                                <button type="button" class="btn btn-warning btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="disagree">
-
-                                    ⚠️
-
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </button>
+                                {% if not e.status == 'waiting for rate approval' %}
+                                <!-- Confirm -->
+                                <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
+                                    data-action="confirm" data-rate="{{ e.approval_rate }}">
+                                    <i class="bi bi-check-lg"></i>
                                 </button>
                                 <!-- Cancel -->
-                                <button type="button" class="icon-btn text-danger action-btn" data-id="{{ e.id }}"
+                                <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
-
-                                    ❌
-
+                                    <i class="bi bi-x-lg"></i>
                                 </button>
                                 {% endif %}
-
                             </div>
 
-                            <!-- FORMS -->
-                            <div class="mt-2">
-                                <!-- CONFIRM -->
-                                <div class="inline-box" id="confirm-box-{{ e.id }}" style="display:none;">
-                                    <form method="POST" action="{% url 'update_enquiry_status' e.id 'confirm' %}">
-                                        {% csrf_token %}
-                                        <input type="number" name="approve_rate" class="form-control mb-2"
-                                            placeholder="Approval Rate" required>
-                                        <button type="submit" class="btn btn-success btn-sm w-100">
-                                            Confirm
-                                        </button>
-                                    </form>
+
+                            {% endif %}
+                            <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1">
+
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
+
+                                            {% csrf_token %}
+
+                                            <div class="modal-header">
+                                                <h5>Disagree Rate</h5>
+                                            </div>
+
+                                            <div class="modal-body">
+
+                                                <input type="number" name="disagree_rate" class="form-control mb-2"
+                                                    placeholder="Disagree Rate" required>
+
+                                                <textarea name="disagree_reason" class="form-control"
+                                                    placeholder="Reason" required></textarea>
+
+                                            </div>
+
+                                            <div class="modal-footer">
+
+                                                <button type="submit" class="btn btn-warning">
+                                                    Submit
+                                                </button>
+
+                                            </div>
+
+                                        </form>
+
+                                    </div>
                                 </div>
 
-                                <!-- DISAGREE -->
-                                <div class="inline-box" id="disagree-box-{{ e.id }}" style="display:none;">
-
-                                    <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
-
-                                        {% csrf_token %}
-
-                                        <textarea name="disagree_reason" class="form-control mb-2"
-                                            placeholder="Disagree Reason" required></textarea>
-
-                                        <button type="submit" class="btn btn-warning btn-sm w-100">
-
-                                            Disagree
-
-                                        </button>
-
-                                    </form>
-
-                                </div>
-                                <!-- CANCEL -->
-                                <div class="inline-box" id="cancel-box-{{ e.id }}" style="display:none;">
-                                    <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
-                                        {% csrf_token %}
-                                        <textarea name="cancel_reason" class="form-control mb-2"
-                                            placeholder="Cancel Reason" required></textarea>
-                                        <button type="submit" class="btn btn-danger btn-sm w-100">
-                                            Cancel
-                                        </button>
-                                    </form>
-                                </div>
                             </div>
+                            <div id="confirm-box-{{ e.id }}" style="display:none;">
+                                <form method="POST" action="{% url 'update_enquiry_status' e.id 'confirm' %}">
+                                    {% csrf_token %}
+                                    <input type="number" name="approve_rate" class="form-control mb-2">
+                                    <button class="btn btn-success btn-sm">
+                                        Confirm
+                                    </button>
+                                </form>
+                            </div>
+                            <div id="cancel-box-{{ e.id }}" style="display:none;">
+                                <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
+                                    {% csrf_token %}
+                                    <textarea name="cancel_reason" class="form-control mb-2"
+                                        placeholder="Cancel reason"></textarea>
+
+                                    <button class="btn btn-danger btn-sm">
+                                        Cancel
+                                    </button>
+                                </form>
+                            </div>
+
                         </td>
-                    </tr>
-                    {% empty %}
+                        {% empty %}
                     <tr>
                         <td colspan="8" class="text-center text-muted py-4">
                             No enquiries found
@@ -328,38 +352,54 @@
 
 <!-- PITCH MODAL -->
 <div class="modal fade" id="pitchModal" tabindex="-1">
-
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content p-3">
 
-            <h5 class="fw-bold mb-3">
-                Pitch History
-            </h5>
+            <h5 class="fw-bold mb-3">Pitch History</h5>
 
-            <div id="pitchHistory" class="mb-3"></div>
+            <!-- History will be inserted here -->
+            <div id="pitchHistoryList" class="mb-3"></div>
 
             <form method="POST" id="pitchForm">
                 {% csrf_token %}
-                <input type="text" name="remarks" id="remarks" class="form-control mb-2" placeholder="Remarks" required>
-                <input type="number" name="pitch_rate" id="pitch_rate" class="form-control mb-3"
-                    placeholder="Enter Rate" required>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="submit" name="is_approved" value="false" class="btn btn-success btn-sm">
-                        Rate Revision
-                    </button>
-                    <!-- <span class="text-muted small">OR</span>
-                    <button type="submit" name="is_approved" value="true" class="btn btn-primary btn-sm">
-                        Confirm
-                    </button> -->
+
+                <div class="row g-2 align-items-end">
+
+
+                    <div class="col-md-5">
+                        <label class="form-label small">Remarks</label>
+                        <input type="text" name="remarks" id="remarks" class="form-control" placeholder="Remarks"
+                            required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small">Rate</label>
+                        <input type="number" name="pitch_rate" id="pitch_rate" class="form-control"
+                            placeholder="Enter Rate" required>
+                    </div>
+                    {% if is_admin %}
+                    <div class="col-md-2">
+                        <button type="submit" name="is_approved" value="false" class="btn btn-success w-100">
+                            Rate Revision
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    {% if is_superadmin %}
+                    <div class="col-md-2">
+                        <button type="submit" name="is_approved" value="true" class="btn btn-primary w-100">
+                            Confirm
+                        </button>
+                    </div>
+                    {% endif %}
+
                 </div>
             </form>
+
         </div>
     </div>
 </div>
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
-
-
 
 <!-- SEARCH -->
 <script>
@@ -403,12 +443,22 @@
                 if (!rate && !remarks) return "";
 
                 return `
-                <div class="border rounded p-2 mb-2 ${active ? 'bg-light border-primary' : ''}">
-                    <strong>${label}</strong><br>
-                    Rate: ${rate || '-'}<br>
-                    <small>${remarks || ''}</small>
+                <div class="card mb-2 ${active ? 'border-primary' : ''}">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>${label}</strong>
+                            <span class="badge bg-secondary">
+                                ₹ ${rate || '-'}
+                            </span>
+                        </div>
+
+                        ${remarks ?
+                        `<small class="text-muted">${remarks}</small>`
+                        : ''
+                    }
+                    </div>
                 </div>
-            `;
+                `;
             }
 
             html += row("Pitch 1", p1, p1r, status === "pending_pitch1");
@@ -419,10 +469,13 @@
                 html = "<small class='text-muted'>No previous pitches</small>";
             }
 
-            document.getElementById("pitchHistory").innerHTML = html;
+            document.getElementById("pitchHistoryList").innerHTML = html;
 
-            document.getElementById("remarks").value = "";
-            document.getElementById("pitch_rate").value = "";
+            const remarks = document.getElementById("remarks");
+            const pitchRate = document.getElementById("pitch_rate");
+
+            if (remarks) remarks.value = "";
+            if (pitchRate) pitchRate.value = "";
 
             new bootstrap.Modal(
                 document.getElementById("pitchModal")
@@ -445,15 +498,15 @@
             }
 
             if (
-                (el.tagName === "INPUT" || el.tagName === "TEXTAREA")
-                && el.value === "None"
+                (el.tagName === "INPUT" || el.tagName === "TEXTAREA") &&
+                el.value === "None"
             ) {
                 el.value = "";
             }
 
         });
 
-        // TOGGLE ACTION BOXES
+        // ACTION BUTTONS
         document.querySelectorAll(".action-btn").forEach(btn => {
 
             btn.addEventListener("click", function () {
@@ -462,10 +515,11 @@
                 const action = this.dataset.action;
                 const rate = this.dataset.rate;
 
-                // HIDE ALL
+                // Hide all boxes
                 ["confirm", "disagree", "cancel"].forEach(type => {
 
-                    const el = document.getElementById(`${type}-box-${id}`);
+                    const el =
+                        document.getElementById(`${type}-box-${id}`);
 
                     if (el) {
                         el.style.display = "none";
@@ -473,7 +527,20 @@
 
                 });
 
-                // ACTIVE BOX
+                // Disagree Modal
+                if (action === "disagree") {
+
+                    const modalEl =
+                        document.getElementById(`disagree-box-${id}`);
+
+                    if (modalEl) {
+                        new bootstrap.Modal(modalEl).show();
+                    }
+
+                    return;
+                }
+
+                // Confirm / Cancel Inline Box
                 const activeBox =
                     document.getElementById(`${action}-box-${id}`);
 
@@ -484,16 +551,18 @@
                             ? "none"
                             : "block";
 
-                    // AUTO FILL APPROVAL RATE
-                    if (action === "confirm") {
+                }
 
-                        const input =
-                            activeBox.querySelector("input[name='approve_rate']");
+                // Auto-fill approval rate
+                if (action === "confirm" && activeBox) {
 
-                        if (input && rate) {
-                            input.value = rate;
-                        }
+                    const input =
+                        activeBox.querySelector(
+                            "input[name='approve_rate']"
+                        );
 
+                    if (input && rate) {
+                        input.value = rate;
                     }
 
                 }
@@ -502,7 +571,7 @@
 
         });
 
-        // DISABLE BUTTONS
+        // DISABLE SUBMIT BUTTONS
         document.querySelectorAll("form").forEach(form => {
 
             form.addEventListener("submit", function () {
@@ -513,7 +582,8 @@
                 if (btn) {
 
                     btn.disabled = true;
-                    btn.innerText = "Processing...";
+                    btn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm"></span> Processing...';
 
                 }
 

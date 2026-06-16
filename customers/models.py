@@ -47,12 +47,6 @@ class ExCustomer(models.Model):
         null=True
     )
 
-    state_code = models.CharField(
-        max_length=5,
-        blank=True,
-        null=True
-    )
-
     # Address
     address = models.TextField()
 

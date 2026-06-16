@@ -124,13 +124,27 @@ class Enquiry(models.Model):
     pitch2 = models.CharField(max_length=200, blank=True, null=True)
     pitch3 = models.CharField(max_length=200, blank=True, null=True)
 
+    pitch1_remarks = models.CharField(max_length=100,blank=True,null=True)
+    pitch2_remarks = models.CharField(max_length=100,blank=True,null=True)
+    pitch3_remarks = models.CharField(max_length=100 ,blank=True,null=True)
+    
     cancel_reason = models.CharField(max_length=200, blank=True, null=True)
+    disagree_rate = models.DecimalField(
+    max_digits=12,
+    decimal_places=2,
+    null=True,
+    blank=True
+)
 
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+    disagree_reason = models.TextField(
+        blank=True,
         null=True
     )
+    created_by = models.ForeignKey(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.SET_NULL,
+            null=True
+        )
 
     is_converted_to_order = models.BooleanField(
         default=False,
