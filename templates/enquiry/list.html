@@ -147,38 +147,50 @@
                         </td>
                         <!-- Routes -->
                         <td>
-    {% if e.pickups or e.drops %}
-    <div class="route-modern">
+                            {% if e.routes %}
+                            <div class="route-modern">
 
-        {% if e.pickups %}
-        <div class="route-card pickup-card">
-            <div class="route-title">PICKUPS</div>
-            {% for r in e.pickups %}
-            <span class="route-chip">
-                {{ r.origin }}
-                {% if r.origin_pin %}[ {{ r.origin_pin }} ]{% endif %}
-            </span>
-            {% endfor %}
-        </div>
-        {% endif %}
+                                <!-- PICKUPS -->
+                                {% for r in e.routes %}
+                                {% if r.origin or r.origin_pin %}
+                                {% if forloop.first %}
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+                                    {% endif %}
 
-        {% if e.drops %}
-        <div class="route-card drop-card">
-            <div class="route-title">DROPS</div>
-            {% for r in e.drops %}
-            <span class="route-chip">
-                {{ r.destination }}
-                {% if r.destination_pin %}[ {{ r.destination_pin }} ]{% endif %}
-            </span>
-            {% endfor %}
-        </div>
-        {% endif %}
+                                    <span class="route-chip">
+                                        {{ r.origin }}
+                                        {% if r.origin_pin %}[ {{ r.origin_pin }} ]{% endif %}
+                                    </span>
 
-    </div>
-    {% else %}
-    <span class="text-muted">-</span>
-    {% endif %}
-</td>
+                                    {% if forloop.last %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                <!-- DROPS -->
+                                {% for r in e.routes %}
+                                {% if r.destination or r.destination_pin %}
+                                {% if forloop.first %}
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+                                    {% endif %}
+
+                                    <span class="route-chip">
+                                        {{ r.destination }}
+                                        {% if r.destination_pin %}[ {{ r.destination_pin }} ]{% endif %}
+                                    </span>
+
+                                    {% if forloop.last %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                            </div>
+                            {% endif %}
+                        </td>
                         <!-- VEHICLE Types -->
                         <td>
                             {{ e.vehicle_type }}
