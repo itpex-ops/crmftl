@@ -272,7 +272,7 @@
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
-                                {% if not e.status == 'waiting for rate approval' %}
+                                {% if e.status == 'waiting for rate approval' %}
                                 <!-- Confirm -->
                                 <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="confirm" data-rate="{{ e.approval_rate }}">
