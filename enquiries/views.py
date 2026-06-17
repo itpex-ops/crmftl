@@ -365,6 +365,7 @@ def create_enquiry(request):
                 route["destination_pin"]
             ):
                 routes.append(route)
+        approval_rate = request.POST.get('approval_rate') or None
         enquiry = Enquiry.objects.create(
 
             customer_name=customer_name,
@@ -399,6 +400,7 @@ def create_enquiry(request):
             volumetric_weight=volumetric_weight,
 
             expected_rate=float(expected_rate) if expected_rate else None,
+            approval_rate = float(approval_rate) if approval_rate else None,
 
             status='waiting for rate approval',
 
@@ -411,6 +413,13 @@ def create_enquiry(request):
             request,
             f"{enquiry.enquiry_no} created successfully!"
         )
+        if approval_rate :
+             return redirect(
+                "pricing_page",
+                enquiry_id=enquiry.id
+            )
+
+
         return redirect("create_enquiry")
         
     return render(
@@ -546,11 +555,8 @@ def update_enquiry_status(request, id, action):
                 "disagree_reason",
                 ""
             )
-
             #enquiry.status = "waiting for rate approval"
-
             enquiry.save()
-
             if enquiry.created_by:
                 Notification.objects.create(
                     user=enquiry.created_by,

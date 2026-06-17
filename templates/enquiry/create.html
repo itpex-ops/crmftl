@@ -53,21 +53,21 @@
                         <label class="form-label">Customer Name
                             <span class="text-danger fw-bold">*</span> </label>
                         <input type="text" id="customer_name" name="customer_name" class="form-control"
-                            value="{{ customer.name|default:'' }}" {% if customers %}readonly{% endif %} required>
+                            value="{{ customer.name|default:'' }}">
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
                         <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
                             maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
-                            value="{{ customer.phone1|default:'' }}" {% if customers %}readonly{% endif %} required>
+                            value="{{ customer.phone1|default:'' }}">
                         <small class="text-muted">Enter 10 digit mobile number</small>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label">Email</label>
                         <input type="email" id="email" name="email" class="form-control"
-                            value="{{ customer.email|default:'' }}" {% if customers %}readonly{% endif %}>
+                            value="{{ customer.email|default:'' }}">
                     </div>
 
                     <div id="customerExtraInfo" class="row g-3 d-none">
