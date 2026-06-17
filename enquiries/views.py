@@ -412,6 +412,7 @@ def create_enquiry(request):
             f"{enquiry.enquiry_no} created successfully!"
         )
         return redirect("create_enquiry")
+        
     return render(
         request,
         "enquiry/create.html",
