@@ -266,12 +266,14 @@
                             {% endif %}
 
                             {% if is_sales %}
+                            {% if not e.status == 'waiting for rate approval' %}
                             <div class="d-flex gap-2 justify-content-center">
                                 <!-- Disagree -->
                                 <button type="button" class="btn btn-warning btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
+                                {% endif %}
                                 {% if e.status == 'waiting for rate approval' %}
                                 <!-- Confirm -->
                                 <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
