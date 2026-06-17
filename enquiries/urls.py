@@ -10,6 +10,7 @@ urlpatterns = [
     #path('dashboard/',views.enquiry_dashboard,name='enquiry_dashboard'),
     path('notifications/',notifications,name='notifications'),
     path('list/edit/<int:id>/',edit_enquiry,name='edit_enquiry'),
+    path("dashboard/",views.enquiry_dashboard,name="enquiry_dashboard")
 ]
 
 websocket_urlpatterns = [

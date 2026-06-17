@@ -953,3 +953,64 @@ def profit_loss(request):
         "expense": expense,
         "profit": income - expense
     })
+
+# accounts/views.py
+
+from django.shortcuts import render
+from django.db.models import Sum
+from accounts.models import (
+    CustomerTransaction,
+    VehicleTransaction,
+    BankTransaction,
+    Expense
+)
+
+def accounts_dashboard(request):
+
+    customer_collection = CustomerTransaction.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    transporter_paid = VehicleTransaction.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    bank_credit = BankTransaction.objects.filter(
+        txn_type='credit'
+    ).aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    bank_debit = BankTransaction.objects.filter(
+        txn_type='debit'
+    ).aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    expenses = Expense.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    context = {
+
+        "customer_collection": customer_collection,
+        "transporter_paid": transporter_paid,
+        "bank_credit": bank_credit,
+        "bank_debit": bank_debit,
+        "expenses": expenses,
+
+        "recent_customer_txns":
+            CustomerTransaction.objects.order_by('-id')[:10],
+
+        "recent_vehicle_txns":
+            VehicleTransaction.objects.order_by('-id')[:10],
+
+        "recent_expenses":
+            Expense.objects.order_by('-id')[:10],
+    }
+
+    return render(
+        request,
+        "dashboards/accounts_dashboard.html",
+        context
+    )

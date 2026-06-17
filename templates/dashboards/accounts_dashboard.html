@@ -1,0 +1,170 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="page-header mb-4">
+        <h3>💰 Accounts Dashboard</h3>
+        <small class="text-muted">
+            Finance & Transaction Overview
+        </small>
+    </div>
+
+    <!-- KPI -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted">
+                        Customer Collection
+                    </div>
+                    <h3>
+                        ₹{{ customer_collection|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted">
+                        Transporter Payments
+                    </div>
+                    <h3>
+                        ₹{{ transporter_paid|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted">
+                        Bank Credits
+                    </div>
+                    <h3>
+                        ₹{{ bank_credit|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted">
+                        Expenses
+                    </div>
+                    <h3>
+                        ₹{{ expenses|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Customer Collections -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            Recent Customer Collections
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for t in recent_customer_txns %}
+                    <tr>
+                        <td>
+                            {{ t.enquiry.customer_name }}
+                        </td>
+                        <td>
+                            ₹{{ t.amount }}
+                        </td>
+                        <td>
+                            {{ t.payment_mode }}
+                        </td>
+                        <td>
+                            {{ t.created_at|date:"d M Y" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- Vehicle Payments -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            Recent Vehicle Payments
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>Vehicle</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for t in recent_vehicle_txns %}
+                    <tr>
+                        <td>
+                            {{ t.vehicle.vehicle_number }}
+                        </td>
+                        <td>
+                            {{ t.transaction_type }}
+                        </td>
+                        <td>
+                            ₹{{ t.amount }}
+                        </td>
+                        <td>
+                            {{ t.status }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

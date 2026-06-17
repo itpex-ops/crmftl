@@ -88,56 +88,56 @@ def tracking_view(request):
     })
 
 
-def vehicles_dashboard(request):
+# def vehicles_dashboard(request):
 
-    total_vehicles = Vehicle.objects.count()
+#     total_vehicles = Vehicle.objects.count()
 
-    direct_vehicles = Vehicle.objects.filter(
-        source='direct'
-    ).count()
+#     direct_vehicles = Vehicle.objects.filter(
+#         source='direct'
+#     ).count()
 
-    broker_vehicles = Vehicle.objects.filter(
-        source='brokers'
-    ).count()
+#     broker_vehicles = Vehicle.objects.filter(
+#         source='brokers'
+#     ).count()
 
-    transporter_vehicles = Vehicle.objects.filter(
-        source='transporters'
-    ).count()
+#     transporter_vehicles = Vehicle.objects.filter(
+#         source='transporters'
+#     ).count()
 
-    settled_vehicles = Tracking.objects.filter(
-        settled=True
-    ).count()
+#     settled_vehicles = Tracking.objects.filter(
+#         settled=True
+#     ).count()
 
-    pending_vehicles = Tracking.objects.filter(
-        settled=False
-    ).count()
+#     pending_vehicles = Tracking.objects.filter(
+#         settled=False
+#     ).count()
 
-    total_freight = Vehicle.objects.aggregate(
-        total=Sum('total_freight')
-    )['total'] or 0
+#     total_freight = Vehicle.objects.aggregate(
+#         total=Sum('total_freight')
+#     )['total'] or 0
 
-    recent_vehicles = Vehicle.objects.order_by('-created_at')[:10]
+#     recent_vehicles = Vehicle.objects.order_by('-created_at')[:10]
 
-    source_stats = (
-        Vehicle.objects
-        .values('source')
-        .annotate(total=Count('id'))
-        .order_by('-total')
-    )
+#     source_stats = (
+#         Vehicle.objects
+#         .values('source')
+#         .annotate(total=Count('id'))
+#         .order_by('-total')
+#     )
 
-    context = {
-        'total_vehicles': total_vehicles,
-        'direct_vehicles': direct_vehicles,
-        'broker_vehicles': broker_vehicles,
-        'transporter_vehicles': transporter_vehicles,
-        'settled_vehicles': settled_vehicles,
-        'pending_vehicles': pending_vehicles,
-        'total_freight': total_freight,
-        'recent_vehicles': recent_vehicles,
-        'source_stats': source_stats,
-    }
+#     context = {
+#         'total_vehicles': total_vehicles,
+#         'direct_vehicles': direct_vehicles,
+#         'broker_vehicles': broker_vehicles,
+#         'transporter_vehicles': transporter_vehicles,
+#         'settled_vehicles': settled_vehicles,
+#         'pending_vehicles': pending_vehicles,
+#         'total_freight': total_freight,
+#         'recent_vehicles': recent_vehicles,
+#         'source_stats': source_stats,
+#     }
 
-    return render(request, 'dashboards/vehicles_dashboard.html', context)
+#     return render(request, 'dashboards/vehicles_dashboard.html', context)
 
 @require_POST
 def upload_tracking_docs(request, id):
@@ -537,3 +537,73 @@ def update_vehicle_inline(request):
 
         return JsonResponse({"success": True, "balance_html": balance_html, "total_freight": vehicle.total_freight})
     return JsonResponse({"success": False})
+
+# vehicles/views.py
+
+from django.shortcuts import render
+from vehicles.models import Vehicle, Tracking
+
+def vehicle_dashboard(request):
+
+    vehicles = Vehicle.objects.select_related(
+        "order"
+    )
+
+    tracking = Tracking.objects.all()
+
+    context = {
+
+        "total_vehicles":
+            vehicles.count(),
+
+        "direct_vehicles":
+            vehicles.filter(
+                source="direct"
+            ).count(),
+
+        "broker_vehicles":
+            vehicles.filter(
+                source="brokers"
+            ).count(),
+
+        "transporter_vehicles":
+            vehicles.filter(
+                source="transporters"
+            ).count(),
+
+        "vehicle_placed":
+            tracking.filter(
+                vehicle_placed=True
+            ).count(),
+
+        "in_transit":
+            tracking.filter(
+                fleet_departed=True,
+                delivered=False
+            ).count(),
+
+        "delivered":
+            tracking.filter(
+                delivered=True
+            ).count(),
+
+        "pod_pending":
+            tracking.filter(
+                delivered=True,
+                pod_received=False
+            ).count(),
+
+        "settled":
+            tracking.filter(
+                settled=True
+            ).count(),
+
+        "recent_vehicles":
+            vehicles.order_by("-id")[:15]
+    }
+
+    return render(
+        request,
+        "dashboards/vehicle_dashboard.html",
+        context
+    )

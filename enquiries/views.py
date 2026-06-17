@@ -256,7 +256,6 @@ def create_enquiry(request):
     #     ).first()
     customers = ExCustomer.objects.all().order_by("customer_code")
 
-    print("customers",customers)
     vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
     if request.method == "POST":
         customer_name = request.POST.get("customer_name") or None
@@ -345,7 +344,6 @@ def create_enquiry(request):
         origin_pins = request.POST.getlist("origin_pin[]")
         destinations = request.POST.getlist("destination[]")
         destination_pins = request.POST.getlist("destination_pin[]")
-        print("origins",origins,origin_pins,destinations,destination_pins)
         routes = []
         max_rows = max(
             len(origins),
@@ -367,7 +365,6 @@ def create_enquiry(request):
                 route["destination_pin"]
             ):
                 routes.append(route)
-                print("routes",routes)
         enquiry = Enquiry.objects.create(
 
             customer_name=customer_name,
@@ -798,3 +795,81 @@ def update_pitch(request, id):
         })
 
     return redirect("enquiry_list")
+
+def enquiry_dashboard(request):
+
+    today = timezone.now().date()
+
+    enquiries = Enquiry.objects.all()
+
+    context = {
+
+        "total_enquiries": enquiries.count(),
+
+        "today_enquiries":
+            enquiries.filter(
+                created_at__date=today
+            ).count(),
+
+        "converted_orders":
+            enquiries.filter(
+                is_converted_to_order=True
+            ).count(),
+
+        "existing_customers":
+            enquiries.filter(
+                customer__isnull=False
+            ).count(),
+
+        "new_customers":
+            enquiries.filter(
+                customer__isnull=True
+            ).count(),
+
+        "rate_approval":
+            enquiries.filter(
+                status__icontains="approval"
+            ).count(),
+
+        "confirmed":
+            enquiries.filter(
+                status="confirmed"
+            ).count(),
+
+        "cancelled":
+            enquiries.exclude(
+                cancel_reason__isnull=True
+            ).exclude(
+                cancel_reason=""
+            ).count(),
+
+        "pitch1":
+            enquiries.exclude(
+                pitch1__isnull=True
+            ).exclude(
+                pitch1=""
+            ).count(),
+
+        "pitch2":
+            enquiries.exclude(
+                pitch2__isnull=True
+            ).exclude(
+                pitch2=""
+            ).count(),
+
+        "pitch3":
+            enquiries.exclude(
+                pitch3__isnull=True
+            ).exclude(
+                pitch3=""
+            ).count(),
+
+        "recent_enquiries":
+            enquiries.order_by("-id")[:15]
+    }
+
+    return render(
+        request,
+        "dashboards/enquiry_dashboard.html",
+        context
+    )

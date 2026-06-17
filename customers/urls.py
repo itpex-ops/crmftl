@@ -11,4 +11,6 @@ urlpatterns = [
 
     path("delete/<int:pk>/", views.customer_delete, name="customer_delete"),
 
+    path('dashboard/',views.customer_dashboard,name='customer_dashboard'),
+
 ]

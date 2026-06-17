@@ -1,0 +1,222 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="page-header mb-4">
+        <h3>🚛 Vehicle Dashboard</h3>
+        <small class="text-muted">
+            Fleet Operations & Tracking Overview
+        </small>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">Total Fleet</div>
+                    <h2>{{ total_vehicles }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">Direct</div>
+                    <h2>{{ direct_vehicles }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">Transporters</div>
+                    <h2>{{ transporter_vehicles }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">Brokers</div>
+                    <h2>{{ broker_vehicles }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">In Transit</div>
+                    <h2>{{ in_transit }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="text-muted">Delivered</div>
+                    <h2>{{ delivered }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tracking Status -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-start border-success border-4 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">
+                        Vehicle Placed
+                    </h6>
+                    <h2>
+                        {{ vehicle_placed }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-start border-warning border-4 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">
+                        POD Pending
+                    </h6>
+                    <h2>
+                        {{ pod_pending }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-start border-primary border-4 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">
+                        Settled Trips
+                    </h6>
+                    <h2>
+                        {{ settled }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Vehicles -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Recent Vehicle Assignments
+            </h5>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>FTL No</th>
+                        <th>Order No</th>
+                        <th>Vehicle No</th>
+                        <th>Driver</th>
+                        <th>Source</th>
+                        <th>Total Freight</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for v in recent_vehicles %}
+                    <tr>
+
+                        <td>
+                            {{ v.ftl_no }}
+                        </td>
+
+                        <td>
+                            {{ v.order.order_no }}
+                        </td>
+
+                        <td>
+                            {{ v.vehicle_number }}
+                        </td>
+
+                        <td>
+                            {{ v.driver_number }}
+                        </td>
+
+                        <td>
+                            {{ v.get_source_display|default:"-" }}
+                        </td>
+
+                        <td>
+                            ₹{{ v.total_freight }}
+                        </td>
+
+                        <td>
+                            ₹{{ v.remaining_balance_amount }}
+                        </td>
+
+                        <td>
+
+                            {% if v.is_locked %}
+                            <span class="badge bg-success">
+                                Settled
+                            </span>
+
+                            {% elif v.is_trip_completed %}
+                            <span class="badge bg-info">
+                                Delivered
+                            </span>
+
+                            {% else %}
+                            <span class="badge bg-warning text-dark">
+                                Running
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No vehicles found
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

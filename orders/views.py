@@ -506,3 +506,57 @@ def create_order_from_enquiry(request, enquiry_id):
     enquiry.is_converted_to_order = True
     enquiry.save()
     return redirect('order_detail', id=order.id)
+
+# orders/views.py
+
+from django.shortcuts import render
+from django.utils import timezone
+from orders.models import Order
+
+def order_dashboard(request):
+
+    today = timezone.now().date()
+
+    orders = Order.objects.select_related(
+        "enquiry"
+    )
+
+    context = {
+
+        "total_orders":
+            orders.count(),
+
+        "today_orders":
+            orders.filter(
+                created_at__date=today
+            ).count(),
+
+        "vehicle_pending":
+            orders.filter(
+                vehicle_place_date__isnull=True
+            ).count(),
+
+        "vehicle_placed":
+            orders.filter(
+                vehicle_place_date__isnull=False
+            ).count(),
+
+        "advance_pending":
+            orders.filter(
+                advance__isnull=True
+            ).count(),
+
+        "credit_orders":
+            orders.exclude(
+                credit__isnull=True
+            ).count(),
+
+        "recent_orders":
+            orders.order_by("-id")[:15]
+    }
+
+    return render(
+        request,
+        "dashboards/order_dashboard.html",
+        context
+    )

@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
 
     # 📊 Accounts Dashboard
-    #path('', views.accounts_dashboard, name='accounts_dashboard'),
+    path('accounts_dashboard', views.accounts_dashboard, name='accounts_dashboard'),
 
     # 👤 CUSTOMER ACCOUNTS (summary)
     path('customer/', views.customer_accounts, name='customer_accounts'),

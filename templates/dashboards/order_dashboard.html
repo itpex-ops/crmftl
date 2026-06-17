@@ -1,0 +1,160 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="page-header mb-4">
+        <h3>🚚 Order Dashboard</h3>
+        <small class="text-muted">
+            Operations & Order Management
+        </small>
+    </div>
+
+    <!-- KPI -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Total Orders</h6>
+                    <h2>{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Today's Orders</h6>
+                    <h2>{{ today_orders }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Vehicle Pending</h6>
+                    <h2>{{ vehicle_pending }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Vehicle Placed</h6>
+                    <h2>{{ vehicle_placed }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Advance Pending</h6>
+                    <h2>{{ advance_pending }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6>Credit Orders</h6>
+                    <h2>{{ credit_orders }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RECENT ORDERS -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Recent Orders
+            </h5>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Order No</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Rate</th>
+                        <th>Vehicle Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for o in recent_orders %}
+                    <tr>
+
+                        <td>
+                            {{ o.order_no }}
+                        </td>
+
+                        <td>
+                            {{ o.customer_name }}
+                        </td>
+
+                        <td>
+                            {{ o.vehicle_type }}
+                        </td>
+
+                        <td>
+                            ₹{{ o.total_rate|default:"0" }}
+                        </td>
+
+                        <td>
+
+                            {% if o.vehicle_place_date %}
+                            <span class="badge bg-success">
+                                Vehicle Placed
+                            </span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ o.created_at|date:"d M Y" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No orders found
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
