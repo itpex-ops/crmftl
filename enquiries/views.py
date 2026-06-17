@@ -462,6 +462,18 @@ def enquiry_list(request):
     cancelled_count = base_qs.filter(status='cancelled').count()
     #pitch_remarks =  base_qs.filter()
     enquiries = base_qs.order_by('-id')
+    enquiries = base_qs.order_by('-id')
+
+    for e in enquiries:
+        e.pickups = [
+            r for r in e.routes
+            if r.origin or r.origin_pin
+        ]
+
+        e.drops = [
+            r for r in e.routes
+            if r.destination or r.destination_pin
+        ]
     return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
         'total_count': total_count,
