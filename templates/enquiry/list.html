@@ -151,29 +151,32 @@
                             <div class="route-modern">
 
                                 <!-- PICKUPS -->
+                                 {% if r.origin or r.origin_pin %}
                                 <div class="route-card pickup-card">
                                     <div class="route-title">PICKUPS</div>
                                     {% for r in e.routes %}
                                     {% if r.origin or r.origin_pin %}
                                     <span class="route-chip">
-                                        {{ r.origin }} [{{ r.origin_pin }}]
+                                        {{ r.origin }} [ {{ r.origin_pin }} ]
                                     </span>
                                     {% endif %}
                                     {% endfor %}
                                 </div>
+                                {% endif %}
 
                                 <!-- DROPS -->
+                                 {% if r.destination or r.destination_pin %}
                                 <div class="route-card drop-card">
                                     <div class="route-title">DROPS</div>
                                     {% for r in e.routes %}
                                     {% if r.destination or r.destination_pin %}
                                     <span class="route-chip">
-                                        {% if r.destination %}{{ r.destination }} {% endif %}
-                                        {% if r.destination_pin %} [{{ r.destination_pin }}] {% endif %}
+                                        {{ r.destination }} [ {{ r.destination_pin }} ] 
                                     </span>
                                     {% endif %}
                                     {% endfor %}
                                 </div>
+                                {% endif %}
 
                             </div>
                             {% else %}
