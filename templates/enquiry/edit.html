@@ -180,14 +180,14 @@
                         Pricing Details
                     </div>
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <label>
                                 Expected Rate
                             </label>
                             <input type="number" step="0.01" name="expected_rate" class="form-control"
                                 value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <label>
                                 Approval Rate
                             </label>
@@ -202,14 +202,14 @@
                     <div class="section-title">
                         Pitch Status
                     </div>
-                    <div class="mb-3">
+                    <div class="col-mb-3">
                         <label>
                             Status
                         </label>
                         <input type="text" name="status" class="form-control"
                             value="{{ enquiry.status|default_if_none:'' }}">
                     </div>
-                    <div class="mb-3">
+                    <div class="col-mb-3">
                         <label>
                             Cancel Reason
                         </label>
