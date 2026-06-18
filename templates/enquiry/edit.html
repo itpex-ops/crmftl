@@ -191,51 +191,13 @@
                             </label>
                             <input type="number" name="dimension_unit" class="form-control"
                                 value="{{ enquiry.dimension_unit|default_if_none:'' }}" readonly>
-
-                            <!-- <select name="dimension_unit" class="form-select" id="dimensionUnit">
-                                <option value="">
-                                    Select
-                                </option>
-                                <option value="cm" {% if enquiry.dimension_unit == 'cm' %}selected{% endif %}>
-                                    CM
-                                </option>
-                                <option value="inch" {% if enquiry.dimension_unit == 'inch' %}selected{% endif %}>
-                                    INCH
-                                </option>
-                                <option value="feet" {% if enquiry.dimension_unit == 'feet' %}selected{% endif %}>
-                                    FEET
-                                </option>
-                                <option value="meter" {% if enquiry.dimension_unit == 'meter' %}selected{% endif %}>
-                                    METER
-                                </option>
-                            </select> -->
-                        </div>
-                        <div class="col-md-3">
-                            <label>
-                                Length
-                            </label>
-                            <input type="number" step="0.01" name="length" id="lengthInput" class="form-control"
-                                value="{{ enquiry.length|default_if_none:'' }}" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label>
-                                Breadth
-                            </label>
-                            <input type="number" step="0.01" name="breadth" id="breadthInput" class="form-control"
-                                value="{{ enquiry.breadth|default_if_none:'' }}" readonly>
                         </div>
 
-                        <div class="col-md-3">
-                            <label>
-                                Height
-                            </label>
-                            <input type="number" step="0.01" name="height" id="heightInput" class="form-control"
-                                value="{{ enquiry.height|default_if_none:'' }}" readonly>
-                        </div>
+                        <input type="hidden" name="volume" id="volumeInput"
+                            value="{{ enquiry.volume|default_if_none:'' }}">
+                        <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
+                            value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
                     </div>
-                    <input type="hidden" name="volume" id="volumeInput" value="{{ enquiry.volume|default_if_none:'' }}">
-                    <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
-                        value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
                 </div>
             </div>
             <div class="col-md-5">
