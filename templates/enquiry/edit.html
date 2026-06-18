@@ -86,176 +86,188 @@
                         <div class="section-title">
                             Vehicle Information
                         </div>
+
                         <div class="row g-2">
+
                             <div class="col-md-3">
                                 <label>Vehicle Type</label>
                                 <input type="text" name="vehicle_type" class="form-control"
                                     value="{{ enquiry.vehicle_type|default_if_none:'' }}" readonly>
                             </div>
+
                             <div class="col-md-3">
                                 <label>Vehicle Description</label>
                                 <textarea name="vehicle_description" class="form-control"
                                     readonly>{{ enquiry.vehicle_description|default_if_none:'' }}</textarea>
                             </div>
+
                             <div class="col-md-2">
                                 <label>KMS</label>
                                 <input type="text" name="kms" class="form-control"
                                     value="{{ enquiry.kms|default_if_none:'' }}" readonly>
                             </div>
+
                             <div class="col-md-2">
                                 <label>Pickups</label>
                                 <input type="number" name="pickups" class="form-control"
                                     value="{{ enquiry.pickups|default_if_none:'' }}" readonly>
                             </div>
+
                             <div class="col-md-2">
                                 <label>Deliveries</label>
                                 <input type="number" name="deliveries" class="form-control"
                                     value="{{ enquiry.deliveries|default_if_none:'' }}" readonly>
                             </div>
 
+                        </div>
 
-                            {% if enquiry.routes %}
-                            <div class="route-modern">
-                                <!-- PICKUPS -->
-                                {% for r in enquiry.routes %}
-                                {% if r.origin or r.origin_pin %}
-                                {% if forloop.first %}
+                        {% if enquiry.routes %}
+                        <div class="row mt-3">
+
+                            <!-- PICKUPS -->
+                            <div class="col-md-6">
                                 <div class="route-card pickup-card">
-                                    <div class="route-title">PICKUPS</div>
-                                    {% endif %}
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>
+                                        PICKUPS
+                                    </div>
 
+                                    {% for r in enquiry.routes %}
+                                    {% if r.origin or r.origin_pin %}
                                     <span class="route-chip">
                                         {{ r.origin }}
-                                        {% if r.origin_pin %}[ {{ r.origin_pin }} ]{% endif %}
+                                        {% if r.origin_pin %}
+                                        [{{ r.origin_pin }}]
+                                        {% endif %}
                                     </span>
-
-                                    {% if forloop.last %}
-                                </div>
-                                {% endif %}
-                                {% endif %}
-                                {% endfor %}
-
-                                <!-- DROPS -->
-                                {% for r in enquiry.routes %}
-                                {% if r.destination or r.destination_pin %}
-                                {% if forloop.first %}
-                                <div class="route-card drop-card">
-                                    <div class="route-title">DROPS</div>
                                     {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
 
+                            <!-- DROPS -->
+                            <div class="col-md-6">
+                                <div class="route-card drop-card">
+                                    <div class="route-title">
+                                        <i class="bi bi-flag-fill me-1"></i>
+                                        DROPS
+                                    </div>
+
+                                    {% for r in enquiry.routes %}
+                                    {% if r.destination or r.destination_pin %}
                                     <span class="route-chip">
                                         {{ r.destination }}
-                                        {% if r.destination_pin %}[ {{ r.destination_pin }} ]{% endif %}
+                                        {% if r.destination_pin %}
+                                        [{{ r.destination_pin }}]
+                                        {% endif %}
                                     </span>
-
-                                    {% if forloop.last %}
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
-                                {% endif %}
-                                {% endif %}
-                                {% endfor %}
-
                             </div>
-                            {% endif %}
+
                         </div>
+                        {% endif %}
                     </div>
-                    <!-- Material Details -->
+                </div>
+                <!-- Material Details -->
+                <div class="card-box">
+                    <div class="section-title">
+                        Material Details
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label>Material</label>
+                            <input type="text" name="material" class="form-control"
+                                value="{{ enquiry.material|default_if_none:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Pieces</label>
+                            <input type="number" name="pieces" class="form-control"
+                                value="{{ enquiry.pieces|default_if_none:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tonnage</label>
+                            <input type="number" step="0.01" name="tonnage" class="form-control"
+                                value="{{ enquiry.tonnage|default_if_none:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>KG</label>
+                            <input type="number" step="0.01" name="kg" class="form-control"
+                                value="{{ enquiry.kg|default_if_none:'' }}">
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- RIGHT SECTION -->
+            <div class="col-lg-4">
+                <div class="sticky-panel">
+                    <!-- Pitch Status -->
                     <div class="card-box">
                         <div class="section-title">
-                            Material Details
+                            Pitch Status
                         </div>
+                        <div class="mb-3">
+                            <label>Status</label>
+                            <input type="text" name="status" class="form-control"
+                                value="{{ enquiry.status|default_if_none:'' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label>Cancel Reason</label>
+                            <textarea name="cancel_reason" rows="3"
+                                class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+                        </div>
+                    </div>
+                    <!-- Pricing -->
+                    <div class="card-box">
+                        <div class="section-title">
+                            Pricing Details
+                        </div>
+
                         <div class="row g-2">
-                            <div class="col-md-3">
-                                <label>Material</label>
-                                <input type="text" name="material" class="form-control"
-                                    value="{{ enquiry.material|default_if_none:'' }}">
+                            <div class="col-6">
+                                <label>Expected Rate</label>
+                                <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                    value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
                             </div>
 
-                            <div class="col-md-3">
-                                <label>Pieces</label>
-                                <input type="number" name="pieces" class="form-control"
-                                    value="{{ enquiry.pieces|default_if_none:'' }}">
+                            <div class="col-6">
+                                <label>Approval Rate</label>
+                                <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                    value="{{ enquiry.approval_rate|default_if_none:'' }}">
                             </div>
-
-                            <div class="col-md-3">
-                                <label>Tonnage</label>
-                                <input type="number" step="0.01" name="tonnage" class="form-control"
-                                    value="{{ enquiry.tonnage|default_if_none:'' }}">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label>KG</label>
-                                <input type="number" step="0.01" name="kg" class="form-control"
-                                    value="{{ enquiry.kg|default_if_none:'' }}">
-                            </div>
-
                         </div>
                     </div>
 
-                </div>
-                <!-- RIGHT SECTION -->
-                <div class="col-lg-4">
-                    <div class="sticky-panel">
-                        <!-- Pitch Status -->
-                        <div class="card-box">
-                            <div class="section-title">
-                                Pitch Status
-                            </div>
-                            <div class="mb-3">
-                                <label>Status</label>
-                                <input type="text" name="status" class="form-control"
-                                    value="{{ enquiry.status|default_if_none:'' }}">
-                            </div>
-                            <div class="mb-3">
-                                <label>Cancel Reason</label>
-                                <textarea name="cancel_reason" rows="3"
-                                    class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
-                            </div>
+                    <!-- Buttons -->
+                    <div class="card-box">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-save">
+                                <i class="bi bi-save me-1"></i>
+                                Update Enquiry
+                            </button>
+
+                            <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
                         </div>
-                        <!-- Pricing -->
-                        <div class="card-box">
-                            <div class="section-title">
-                                Pricing Details
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label>Expected Rate</label>
-                                    <input type="number" step="0.01" name="expected_rate" class="form-control"
-                                        value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
-                                </div>
-
-                                <div class="col-6">
-                                    <label>Approval Rate</label>
-                                    <input type="number" step="0.01" name="approval_rate" class="form-control"
-                                        value="{{ enquiry.approval_rate|default_if_none:'' }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="card-box">
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-save">
-                                    <i class="bi bi-save me-1"></i>
-                                    Update Enquiry
-                                </button>
-
-                                <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
-                            </div>
-                        </div>
-
                     </div>
 
                 </div>
 
             </div>
 
+</div>
 
-        </form>
 
-    </form>
+</form>
+
+</form>
 </div>
 <style>
     :root {
