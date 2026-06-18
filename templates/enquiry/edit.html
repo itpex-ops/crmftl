@@ -200,64 +200,65 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- RIGHT SECTION -->
-            <div class="col-lg-4">
-                <div class="sticky-panel">
-                    <!-- Pitch Status -->
-                    <div class="card-box">
-                        <div class="section-title">
-                            Pitch Status
-                        </div>
-                        <div class="mb-3">
-                            <label>Status</label>
-                            <input type="text" name="status" class="form-control"
-                                value="{{ enquiry.status|default_if_none:'' }}">
-                        </div>
-                        <div class="mb-3">
-                            <label>Cancel Reason</label>
-                            <textarea name="cancel_reason" rows="3"
-                                class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
-                        </div>
-                    </div>
-                    <!-- Pricing -->
-                    <div class="card-box">
-                        <div class="section-title">
-                            Pricing Details
-                        </div>
-
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label>Expected Rate</label>
-                                <input type="number" step="0.01" name="expected_rate" class="form-control"
-                                    value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
+                <!-- RIGHT SECTION -->
+                <div class="col-lg-4">
+                    <div class="sticky-panel">
+                        <!-- Pitch Status -->
+                        <div class="card-box">
+                            <div class="section-title">
+                                Pitch Status
                             </div>
-
-                            <div class="col-6">
-                                <label>Approval Rate</label>
-                                <input type="number" step="0.01" name="approval_rate" class="form-control"
-                                    value="{{ enquiry.approval_rate|default_if_none:'' }}">
+                            <div class="mb-3">
+                                <label>Status</label>
+                                <input type="text" name="status" class="form-control"
+                                    value="{{ enquiry.status|default_if_none:'' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>Cancel Reason</label>
+                                <textarea name="cancel_reason" rows="3"
+                                    class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
                             </div>
                         </div>
-                    </div>
+                        <!-- Pricing -->
+                        <div class="card-box">
+                            <div class="section-title">
+                                Pricing Details
+                            </div>
 
-                    <!-- Buttons -->
-                    <div class="card-box">
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-save">
-                                <i class="bi bi-save me-1"></i>
-                                Update Enquiry
-                            </button>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label>Expected Rate</label>
+                                    <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                        value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
+                                </div>
 
-                            <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
-                                Cancel
-                            </a>
+                                <div class="col-6">
+                                    <label>Approval Rate</label>
+                                    <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                        value="{{ enquiry.approval_rate|default_if_none:'' }}">
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Buttons -->
+                        <div class="card-box">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-save">
+                                    <i class="bi bi-save me-1"></i>
+                                    Update Enquiry
+                                </button>
+
+                                <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
-
             </div>
+
 </div>
 </form>
 </form>
