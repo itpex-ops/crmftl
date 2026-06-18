@@ -1,71 +1,80 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 {% load static %}
-<!-- =========================
-PAGE STYLES
-========================= -->
-
-
-<div class="container-fluid mt-3">
-
-    <!-- =========================
-    HEADER
-    ========================= -->
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<div class="container-fluid mt-1">
     <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-            <h4>
-                <i class="bi bi-pencil-square me-1"></i>Edit Enquiry
-            </h4>
-            <div class="small">
-                {{ enquiry.enquiry_no }}
-            </div>
+        {% if messages %}
+        {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} alert-dismissible fade show shadow-sm" role="alert">
+            {% if m.tags == 'success' %}
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {% elif m.tags == 'error' %}
+            <i class="bi bi-x-circle-fill me-2"></i>
+            {% elif m.tags == 'warning' %}
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {% elif m.tags == 'info' %}
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {% endif %}
+            {{ m }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+        {% endfor %}
+        {% endif %}
+        <div>
+    <h4 class="mb-1">
+        <i class="bi bi-pencil-square me-2 text-primary"></i>
+        Edit Enquiry
+    </h4>
+
+    <span class="badge bg-light text-dark border">
+        {{ enquiry.enquiry_no }}
+    </span>
+</div>
         <div>
             <span class="status-badge">
                 {{ enquiry.status|default:"Pending" }}
             </span>
         </div>
     </div>
-
     <form method="POST">
         {% csrf_token %}
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <div class="card-box">
                     <div class="section-title">
                         Customer Information
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                    <div class="row g-2">
+                        <div class="col-md-3">
                             <label>
                                 Customer Name
                             </label>
                             <input type="text" name="customer_name" class="form-control"
                                 value="{{ enquiry.customer_name|default_if_none:'' }}" disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>
                                 Customer Contact
                             </label>
                             <input type="text" name="customer_contact" class="form-control"
                                 value="{{ enquiry.customer_contact|default_if_none:'' }}" disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label>
                                 Email
                             </label>
                             <input type="email" name="email" class="form-control"
                                 value="{{ enquiry.email|default_if_none:'' }}" disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-sm-2">
                             <label>
                                 Lead Source
                             </label>
                             <input type="text" name="lead_source" class="form-control"
                                 value="{{ enquiry.lead_source|default_if_none:'' }}" disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-sm-2">
                             <label>
                                 Reference Name
                             </label>
@@ -78,36 +87,36 @@ PAGE STYLES
                     <div class="section-title">
                         Vehicle Information
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                    <div class="row g-2">
+                        <div class="col-md-3">
                             <label>
                                 Vehicle Type
                             </label>
                             <input type="text" name="vehicle_type" class="form-control"
                                 value="{{ enquiry.vehicle_type|default_if_none:'' }}" readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label>
                                 Vehicle Description
                             </label>
                             <textarea name="vehicle_description"
                                 class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }} </textarea>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>
                                 Pickups
                             </label>
                             <input type="number" name="pickups" class="form-control"
                                 value="{{ enquiry.pickups|default_if_none:'' }}" readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>
                                 Deliveries
                             </label>
                             <input type="number" name="deliveries" class="form-control"
                                 value="{{ enquiry.deliveries|default_if_none:'' }}" readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>
                                 KMS
                             </label>
@@ -122,9 +131,9 @@ PAGE STYLES
                         Material Details
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-2">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label>
                                 Material
@@ -135,7 +144,7 @@ PAGE STYLES
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label>
                                 Pieces
@@ -146,7 +155,7 @@ PAGE STYLES
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label>
                                 Tonnage
@@ -157,7 +166,7 @@ PAGE STYLES
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label>
                                 KG
@@ -175,7 +184,7 @@ PAGE STYLES
                     <div class="section-title">
                         Dimension Details
                     </div>
-                    <div class="row g-3">
+                    <div class="row g-2">
                         <div class="col-md-3">
                             <label>
                                 Dimension Unit
@@ -225,8 +234,8 @@ PAGE STYLES
                         </div>
                     </div>
 
-                    <div class="row mt-4">
-                        <!-- <div class="col-md-4 d-none" id="dimensionBox">
+                    <div class="row mt-1">
+                        <!-- <div class="col-md-3 d-none" id="dimensionBox">
                             <div class="dimension-result-box">
                                 <div class="result-title">
                                     📐 Dimension Calculation
@@ -270,187 +279,119 @@ PAGE STYLES
                             </div>
 
                         </div> -->
-
                     </div>
-
-                    <!-- HIDDEN SAVE FIELDS -->
-
                     <input type="hidden" name="volume" id="volumeInput" value="{{ enquiry.volume|default_if_none:'' }}">
-
                     <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
                         value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
-
                 </div>
-
-                <!-- =========================
-                ROUTES
-                ========================= -->
-                <div class="col-lg-4">
-                    <div class="sticky-panel">
-                        <div class="card-box">
-                            <div class="section-title d-flex justify-content-between align-items-center">
-                                <span>
-                                    Routes
-                                </span>
-                                <button type="button" class="btn btn-primary btn-sm" id="addRoute">
-                                    + Add Route
-                                </button>
-                            </div>
-                            <div id="routeContainer">
-
-                                {% for route in enquiry.routes %}
-
-                                <div class="route-box route-row">
-
-                                    <div class="row">
-
-                                        <div class="col-md-4 mb-2">
-
-                                            <label>
-                                                Origin
-                                            </label>
-
-                                            <input type="text" name="origin[]" class="form-control"
-                                                value="{{ route.origin }}">
-                                            <label>
-                                                Pincode
-                                            </label>
-                                            <input type="number" name="origin_pin[]" class="form-control"
-                                                value="{{ route.origin_pin }}">
-
-                                        </div>
-
-                                        <div class="col-md-4 mb-2">
-
-                                            <label>
-                                                Destination
-                                            </label>
-
-                                            <input type="text" name="destination[]" class="form-control"
-                                                value="{{ route.destination }}">
-                                            <label>
-                                                Pincode
-                                            </label>
-                                            <input type="number" name="destination_pin[]" class="form-control"
-                                                value="{{  route.destination_pin }}">
-                                        </div>
-
-                                        <div class="col-md-4">
-
-                                            <button type="button" class="btn btn-outline-danger w-100 removeRoute">
-
-                                                Remove
-
-                                            </button>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                {% endfor %}
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-title">
-                        Pricing Details
-                    </div>
-
-                    <div class="row g-8">
-
-                        <div class="col-md-6">
-
-                            <label>
-                                Expected Rate
-                            </label>
-
-                            <input type="number" step="0.01" name="expected_rate" class="form-control"
-                                value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <label>
-                                Approval Rate
-                            </label>
-
-                            <input type="number" step="0.01" name="approval_rate" class="form-control"
-                                value="{{ enquiry.approval_rate|default_if_none:'' }}">
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
-
-            <!-- =========================
-            RIGHT SIDE
-            ========================= -->
-
-            <div class="col-lg-4">
+            <div class="col-md-5">
                 <div class="sticky-panel">
+                    <div class="col-md-8">
+                        <div class="sticky-panel">
+                            <div class="card-box">
+                                <div class="section-title">
+                                    <span>
+                                        Routes
+                                    </span>
+                                    <div id="routeContainer">
+                                        {% for route in enquiry.routes %}
+                                        <div class="route-box route-row">
 
-                    <div class="card-box">
+                                            <div class="col-md-5">
 
+                                                <div class="col-md-3 mb-2">
+
+                                                    <label>
+                                                        Origin
+                                                    </label>
+
+                                                    <input type="text" name="origin[]" class="form-control"
+                                                        value="{{ route.origin }}">
+                                                    <label>
+                                                        Pincode
+                                                    </label>
+                                                    <input type="number" name="origin_pin[]" class="form-control"
+                                                        value="{{ route.origin_pin }}">
+
+                                                </div>
+
+                                                <div class="col-md-3 mb-2">
+
+                                                    <label>
+                                                        Destination
+                                                    </label>
+
+                                                    <input type="text" name="destination[]" class="form-control"
+                                                        value="{{ route.destination }}">
+                                                    <label>
+                                                        Pincode
+                                                    </label>
+                                                    <input type="number" name="destination_pin[]" class="form-control"
+                                                        value="{{  route.destination_pin }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                         <div class="section-title">
-                            Status
+                            Pricing Details
                         </div>
-
-                        <div class="mb-3">
-
-                            <label>
-                                Status
-                            </label>
-
-                            <input type="text" name="status" class="form-control"
-                                value="{{ enquiry.status|default_if_none:'' }}">
-
+                        <div class="row g-8">
+                            <div class="col-md-6">
+                                <label>
+                                    Expected Rate
+                                </label>
+                                <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                    value="{{ enquiry.expected_rate|default_if_none:'' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label>
+                                    Approval Rate
+                                </label>
+                                <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                    value="{{ enquiry.approval_rate|default_if_none:'' }}">
+                            </div>
                         </div>
-
-                        <div class="mb-3">
-
-                            <label>
-                                Cancel Reason
-                            </label>
-
-                            <textarea name="cancel_reason"
-                                class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
-
-                        </div>
-
                     </div>
-
-                    <div class="card-box">
-
-                        <div class="d-grid gap-2">
-
-                            <button type="submit" class="btn btn-primary btn-save">
-
-                                💾 Update Enquiry
-
-                            </button>
-
-                            <a href="{% url 'enquiry_list' %}" class="btn btn-light">
-
-                                Cancel
-
-                            </a>
-
+                    <div class="row g-8">
+                        <div class="card-box">
+                            <div class="section-title">
+                                Pitch Status
+                            </div>
+                            <div class="mb-3">
+                                <label>
+                                    Status
+                                </label>
+                                <input type="text" name="status" class="form-control"
+                                    value="{{ enquiry.status|default_if_none:'' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>
+                                    Cancel Reason
+                                </label>
+                                <textarea name="cancel_reason"
+                                    class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+                            </div>
                         </div>
-
+                        <div class="card-box">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-save">
+                                    💾 Update Enquiry
+                                </button>
+                                <a href="{% url 'enquiry_list' %}" class="btn btn-light">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
+        </div>
     </form>
-
 </div>
 <style>
     :root {
@@ -475,6 +416,9 @@ PAGE STYLES
     .page-header h4 {
         margin: 0;
         font-weight: 700;
+        color: black;
+    }
+    .small{
         color : black;
     }
 
@@ -491,7 +435,7 @@ PAGE STYLES
     .card-box {
         background: #fff;
         border-radius: 12px;
-        padding: 15px;
+        padding: 7px;
         margin-bottom: 20px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
         border: none;
@@ -502,7 +446,7 @@ PAGE STYLES
         font-weight: 700;
         color: #0d6efd;
         border-bottom: 1px solid #edf2f7;
-        padding-bottom: 10px;
+        padding-bottom: 7px;
         margin-bottom: 18px;
     }
 
@@ -517,7 +461,7 @@ PAGE STYLES
     .form-select {
         border-radius: 8px;
         min-height: 28px;
-         font-size: 13px;
+        font-size: 13px;
     }
 
     .form-control:focus,
@@ -573,203 +517,4 @@ PAGE STYLES
         }
     }
 </style>
-
-<script>
-    document.getElementById("addRoute").addEventListener("click", function () {
-
-        let html = `
-    <div class="route-box route-row border rounded p-3 mb-3">
-
-        <div class="row g-2 align-items-end">
-
-            <div class="col-md-4">
-                <label class="form-label">Origin</label>
-                <input type="text"
-                       name="origin[]"
-                       class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Origin Pin</label>
-                <input type="text"
-                       name="origin_pin[]"
-                       class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Destination</label>
-                <input type="text"
-                       name="destination[]"
-                       class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Destination Pin</label>
-                <input type="text"
-                       name="destination_pin[]"
-                       class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <button type="button"
-                        class="btn btn-outline-danger w-100 removeRoute">
-                    Remove
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-    `;
-
-        document
-            .getElementById("routeContainer")
-            .insertAdjacentHTML("beforeend", html);
-
-    });
-
-    document.addEventListener("click", function (e) {
-
-        if (e.target.classList.contains("removeRoute")) {
-            e.target.closest(".route-row").remove();
-        }
-
-    });
-</script>
-
-<!-- =========================
-DIMENSION JS
-========================= -->
-
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const lengthInput =
-            document.getElementById("lengthInput");
-
-        const breadthInput =
-            document.getElementById("breadthInput");
-
-        const heightInput =
-            document.getElementById("heightInput");
-
-        const unitInput =
-            document.getElementById("dimensionUnit");
-
-        const dimensionBox =
-            document.getElementById("dimensionBox");
-
-        function calculateDimension() {
-
-            const unit = unitInput.value;
-
-            if (unit !== "") {
-
-                dimensionBox.classList.remove("d-none");
-
-            } else {
-
-                dimensionBox.classList.add("d-none");
-
-                return;
-            }
-
-            let length =
-                parseFloat(lengthInput.value) || 0;
-
-            let breadth =
-                parseFloat(breadthInput.value) || 0;
-
-            let height =
-                parseFloat(heightInput.value) || 0;
-
-            // CONVERT TO CM
-
-            if (unit === "inch") {
-
-                length *= 2.54;
-                breadth *= 2.54;
-                height *= 2.54;
-            }
-
-            else if (unit === "feet") {
-
-                length *= 30.48;
-                breadth *= 30.48;
-                height *= 30.48;
-            }
-
-            else if (unit === "meter") {
-
-                length *= 100;
-                breadth *= 100;
-                height *= 100;
-            }
-
-            // CALCULATE
-
-            const volume =
-                length * breadth * height;
-
-            const volumetric =
-                volume / 4500;
-
-            // DISPLAY
-
-            document
-                .getElementById("convertedDimension")
-                .innerText =
-                `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} CM`;
-
-            document
-                .getElementById("volumeResult")
-                .innerText =
-                volume.toFixed(2);
-
-            document
-                .getElementById("volumetricWeight")
-                .innerText =
-                volumetric.toFixed(2) + " KG";
-
-            // SAVE TO HIDDEN INPUTS
-
-            document
-                .getElementById("volumeInput")
-                .value =
-                volume.toFixed(2);
-
-            document
-                .getElementById("volumetricWeightInput")
-                .value =
-                volumetric.toFixed(2);
-
-        }
-
-        unitInput.addEventListener(
-            "change",
-            calculateDimension
-        );
-
-        lengthInput.addEventListener(
-            "input",
-            calculateDimension
-        );
-
-        breadthInput.addEventListener(
-            "input",
-            calculateDimension
-        );
-
-        heightInput.addEventListener(
-            "input",
-            calculateDimension
-        );
-
-        calculateDimension();
-
-    });
-
-</script>
-
 {% endblock %}

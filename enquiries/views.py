@@ -21,150 +21,25 @@ def edit_enquiry(request, id):
         id=id
     )
     if request.method == 'POST':
-
-        enquiry.customer_name = request.POST.get(
-            'customer_name'
-        )
-
-        enquiry.customer_contact = request.POST.get(
-            'customer_contact'
-        )
-
-        enquiry.email = request.POST.get(
-            'email'
-        )
-
-        enquiry.lead_source = request.POST.get(
-            'lead_source'
-        )
-
-        enquiry.reference_name = request.POST.get(
-            'reference_name'
-        )
-
-        enquiry.pickups = request.POST.get(
-            'pickups'
-        ) or 1                      
-
-        enquiry.deliveries = request.POST.get(
-            'deliveries'
-        ) or 1
-
-        enquiry.vehicle_type = request.POST.get(
-            'vehicle_type'
-        )
-
-        enquiry.vehicle_description = request.POST.get(
-            'vehicle_description'
-        )
-
-        enquiry.kms = request.POST.get(
-            'kms'
-        )
-
-        enquiry.material = request.POST.get(
-            'material'
-        )
-
-        enquiry.pieces = request.POST.get(
-            'pieces'
-        ) or None
-
-        enquiry.tonnage = request.POST.get(
-            'tonnage'
-        ) or None
-
-        enquiry.kg = request.POST.get(
-            'kg'
-        ) or None
-
-        enquiry.dimension_unit = request.POST.get(
-            'dimension_unit'
-        )
-
-        enquiry.length = request.POST.get(
-            'length'
-        ) or None
-
-        enquiry.breadth = request.POST.get(
-            'breadth'
-        ) or None
-
-        enquiry.height = request.POST.get(
-            'height'
-        ) or None
-        enquiry.volume = request.POST.get('volume') or None
-        enquiry.volumetric_weight = request.POST.get('volumetric_weight') or None
         enquiry.expected_rate = request.POST.get('expected_rate') or None
-
-        enquiry.approval_rate = request.POST.get(
-            'approval_rate'
-        ) or None
-
+        enquiry.approval_rate = request.POST.get('approval_rate') or None
         enquiry.status = request.POST.get('status')
-
-        enquiry.pitch1 = request.POST.get(
-            'pitch1'
-        )
-
-        enquiry.pitch2 = request.POST.get(
-            'pitch2'
-        )
-
-        enquiry.pitch3 = request.POST.get(
-            'pitch3'
-        )
-
-        enquiry.cancel_reason = request.POST.get(
-            'cancel_reason'
-        )
-
-       # ROUTES
-        origins = request.POST.getlist("origin[]")
-        origin_pins = request.POST.getlist("origin_pin[]")
-        destinations = request.POST.getlist("destination[]")
-        destination_pins = request.POST.getlist("destination_pin[]")
-
-        routes = []
-
-        max_rows = max(
-            len(origins),
-            len(origin_pins),
-            len(destinations),
-            len(destination_pins),
-        )
-
-        for i in range(max_rows):
-            route = {
-                "origin": origins[i].strip() if i < len(origins) else "",
-                "origin_pin": origin_pins[i].strip() if i < len(origin_pins) else "",
-                "destination": destinations[i].strip() if i < len(destinations) else "",
-                "destination_pin": destination_pins[i].strip() if i < len(destination_pins) else "",
-            }
-
-            if any(route.values()):
-                routes.append(route)
-
-        enquiry.routes = routes
+        enquiry.pitch1 = request.POST.get('pitch1')
+        enquiry.pitch2 = request.POST.get('pitch2')
+        enquiry.pitch3 = request.POST.get('pitch3')
+        enquiry.cancel_reason = request.POST.get('cancel_reason')
         enquiry.save()
-        messages.success(
-            request,
-            'Enquiry updated successfully'
-        )
-
+        messages.success(request,'Enquiry updated successfully')
+        if enquiry.approval_rate :
+            messages.success(request,'Rendering to Pricing Page')
+            return redirect("pricing_page",enquiry_id=enquiry.id)
         return redirect('enquiry_list')
-
     context = {
         'enquiry': enquiry,
-        'vehicle_types': VEHICLE_TYPES,
-        'is_admin': request.user.is_superuser
+        'is_superadmin': request.user.is_superuser,
     }
-
     return render(
-        request,
-        'enquiry/edit.html',
-        context
-    )
+        request,'enquiry/edit.html',context)
 
 def send_notification(user, enquiry, message):
 

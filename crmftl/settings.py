@@ -104,7 +104,6 @@ TEMPLATES = [
 ]
 TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 
-
 WSGI_APPLICATION = 'crmftl.wsgi.application'
 
 ASGI_APPLICATION = "crmftl.asgi.application"
