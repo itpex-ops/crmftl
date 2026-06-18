@@ -100,7 +100,7 @@
                                 Vehicle Description
                             </label>
                             <textarea name="vehicle_description"
-                                class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }} </textarea>
+                                class="form-control">{{ enquiry.vehicle_description|default_if_none:'' }} readonly> </textarea>
                         </div>
                         <div class="col-md-2">
                             <label>
@@ -126,7 +126,6 @@
                     </div>
                 </div>
                 <div class="card-box">
-
                     <div class="section-title">
                         Material Details
                     </div>
@@ -175,12 +174,12 @@
                     </div>
                 </div> -->
             </div>
-            <div class="col-md-5">
+            <div class="col-sm-5">
                 <div class="sticky-panel">
                     <div class="section-title">
                         Pricing Details
                     </div>
-                    <div class="row g-8">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <label>
                                 Expected Rate
