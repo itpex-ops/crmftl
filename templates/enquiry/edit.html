@@ -186,17 +186,11 @@
                     </div>
                     <div class="row g-2">
                         <div class="col-md-3">
-                            <label>
-                                Dimension Unit
-                            </label>
-                            <input type="number" name="dimension_unit" class="form-control"
-                                value="{{ enquiry.dimension_unit|default_if_none:'' }}" readonly>
-                        </div>
-
                         <input type="hidden" name="volume" id="volumeInput"
                             value="{{ enquiry.volume|default_if_none:'' }}">
                         <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
                             value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -223,7 +217,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <div class="card-box">
                     <div class="section-title">
                         Pitch Status
