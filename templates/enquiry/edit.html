@@ -130,57 +130,38 @@
                     <div class="section-title">
                         Material Details
                     </div>
-
                     <div class="row g-2">
-
                         <div class="col-md-3">
-
                             <label>
                                 Material
                             </label>
-
                             <input type="text" name="material" class="form-control"
                                 value="{{ enquiry.material|default_if_none:'' }}">
-
                         </div>
-
                         <div class="col-md-3">
-
                             <label>
                                 Pieces
-                            </label>
-
-                            <input type="number" name="pieces" class="form-control"
+                            </label>                            
+                        <input type="number" name="pieces" class="form-control"
                                 value="{{ enquiry.pieces|default_if_none:'' }}">
-
                         </div>
-
                         <div class="col-md-3">
-
                             <label>
                                 Tonnage
                             </label>
-
                             <input type="number" step="0.01" name="tonnage" class="form-control"
                                 value="{{ enquiry.tonnage|default_if_none:'' }}">
-
                         </div>
-
                         <div class="col-md-3">
-
                             <label>
                                 KG
                             </label>
-
                             <input type="number" step="0.01" name="kg" class="form-control"
                                 value="{{ enquiry.kg|default_if_none:'' }}">
-
                         </div>
-
                     </div>
-
                 </div>
-                <div class="card-box">
+                <!-- <div class="card-box">
                     <div class="section-title">
                         Dimension Details
                     </div>
@@ -192,7 +173,7 @@
                             value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-md-5">
                 <div class="sticky-panel">
