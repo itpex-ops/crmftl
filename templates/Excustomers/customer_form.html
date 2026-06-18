@@ -36,41 +36,41 @@
 
                         <div class="row">
 
-                            <div class="col-md-4">
+                            <div class="col-sm-4">
                                 <label class="form-label">Customer Code</label>
                                 <input type="text" class="form-control readonly-box" value="{{ next_customer_code }}"
                                     readonly>
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <label class="form-label">Customer Name *</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">Mobile Number 1 *</label>
                                 <input type="tel" name="phone1" class="form-control" maxlength="10" pattern="[0-9]{10}" 
                                 inputmode="numeric" required>
                                 <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">Mobile Number 2</label>
                                 <input type="tel" name="phone2" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
                                 <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" class="form-control">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">PAN Number</label>
                                 <input type="text" name="pan_number" class="form-control" maxlength="10"
                                     style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">GST Number</label>
                                 <input type="text" name="gst_number" class="form-control">
                             </div>
@@ -80,27 +80,27 @@
                                 <input type="text" name="state" class="form-control" required>
                             </div>
 
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">State Code *</label>
                                 <input type="text" name="state_code" class="form-control" required>
-                            </div>
+                            </div> -->
 
-                            <div class="col-12">
+                            <div class="col-md-8">
                                 <label class="form-label">Address *</label>
                                 <textarea name="address" rows="2" class="form-control" required></textarea>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label">City *</label>
                                 <input type="text" name="city" class="form-control" required>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-4">
                                 <label class="form-label"> Pincode *</label>
                                 <input type="text" name="pincode" maxlength="6" class="form-control" required>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-sm-4">
                                 <label class="form-label">Status *</label>
 
                                 <select name="is_active" class="form-select" required>
@@ -116,7 +116,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 ms-auto d-flex align-items-end">
+                            <div class="col-sm-4 ms-auto d-flex align-items-end">
                                 <button type="submit" class="btn btn-success w-100 btn-save">
                                     💾 Save Customer
                                 </button>

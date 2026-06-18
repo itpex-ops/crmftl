@@ -287,56 +287,6 @@
             </div>
             <div class="col-md-5">
                 <div class="sticky-panel">
-                    <div class="col-md-8">
-                        <div class="sticky-panel">
-                            <div class="card-box">
-                                <div class="section-title">
-                                    <span>
-                                        Routes
-                                    </span>
-                                    <div id="routeContainer">
-                                        {% for route in enquiry.routes %}
-                                        <div class="route-box route-row">
-
-                                            <div class="col-md-5">
-
-                                                <div class="col-md-3 mb-2">
-
-                                                    <label>
-                                                        Origin
-                                                    </label>
-
-                                                    <input type="text" name="origin[]" class="form-control"
-                                                        value="{{ route.origin }}">
-                                                    <label>
-                                                        Pincode
-                                                    </label>
-                                                    <input type="number" name="origin_pin[]" class="form-control"
-                                                        value="{{ route.origin_pin }}">
-
-                                                </div>
-
-                                                <div class="col-md-3 mb-2">
-
-                                                    <label>
-                                                        Destination
-                                                    </label>
-
-                                                    <input type="text" name="destination[]" class="form-control"
-                                                        value="{{ route.destination }}">
-                                                    <label>
-                                                        Pincode
-                                                    </label>
-                                                    <input type="number" name="destination_pin[]" class="form-control"
-                                                        value="{{  route.destination_pin }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
                         <div class="section-title">
                             Pricing Details
                         </div>
