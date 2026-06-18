@@ -233,53 +233,6 @@
                                 value="{{ enquiry.height|default_if_none:'' }}" readonly>
                         </div>
                     </div>
-
-                    <div class="row mt-1">
-                        <!-- <div class="col-md-3 d-none" id="dimensionBox">
-                            <div class="dimension-result-box">
-                                <div class="result-title">
-                                    📐 Dimension Calculation
-                                </div>
-                                <div class="result-row">
-
-                                    <span>
-                                        Converted Size
-                                    </span>
-
-                                    <strong id="convertedDimension">
-                                        0 × 0 × 0 CM
-                                    </strong>
-
-                                </div>
-
-                                <div class="result-row">
-
-                                    <span>
-                                        Volume
-                                    </span>
-
-                                    <strong id="volumeResult">
-                                        0
-                                    </strong>
-
-                                </div>
-
-                                <div class="result-row">
-
-                                    <span>
-                                        Volumetric Weight
-                                    </span>
-
-                                    <strong id="volumetricWeight">
-                                        0 KG
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div> -->
-                    </div>
                     <input type="hidden" name="volume" id="volumeInput" value="{{ enquiry.volume|default_if_none:'' }}">
                     <input type="hidden" name="volumetric_weight" id="volumetricWeightInput"
                         value="{{ enquiry.volumetric_weight|default_if_none:'' }}">
