@@ -216,7 +216,6 @@ def customer_accounts(request):
             "data": data
         }
     )
-
 # End Customer Payments #
 
 def make_payment(request, vehicle_id):

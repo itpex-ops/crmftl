@@ -189,7 +189,6 @@
                 <div class="stat-value text-danger" id="sumBalance">₹0</div>
             </div>
         </div>
-
     </div>
 
     <!-- TABLE -->
@@ -223,20 +222,20 @@
                         <!-- <td>{{ v.order_no|default_if_none:"" }}</td> -->
 
                         <td class="amount freight">₹{{ v.freight|default:0 }}</td>
-                        <td class="amount advance text-success">₹{{ v.advance }}</td>
-                        <td class="amount balance text-danger">₹{{ v.balance }}</td>
+                        <td class="amount advance text-success">₹{{ v.total_advance_paid|default:0 }}</td>
+                        <td class="amount balance text-danger">₹{{ v.remaining_balance_amount|default:0 }}</td>
 
                         <!-- FULL PROCESS -->
                         <td class="timeline">
 
-                            {% if v.balance|default:0 == 0 %}
+                            {% if v.is_payment_completed %}
 
                             ✔ Advance Released<br>
                             ✔ Delivered<br>
                             ✔ Documents Cleared<br>
                             ✔ Final Balance Paid
 
-                            {% elif v.advance|default:0 > 0 %}
+                            {% elif v.total_advance_paid > 0 %}
 
                             ✔ Advance Released<br>
                             ⏳ Awaiting Delivery<br>
@@ -258,7 +257,7 @@
 
                             <span class="badge-soft badge-paid">Completed</span>
 
-                            {% elif v.advance|default:0 > 0 %}
+                            {% elif v.total_advance_paid  > 0 %}
 
                             <span class="badge-soft badge-partial">Running</span>
 
