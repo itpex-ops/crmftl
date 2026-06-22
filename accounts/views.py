@@ -194,7 +194,7 @@ def customer_accounts(request):
             total=Sum("amount")
         )["total"] or 0
 
-        total_freight = enquiry.approval_rate or 0
+        total_freight = float(enquiry.approval_rate) or 0
 
         pending_amount = total_freight - total_received
 
