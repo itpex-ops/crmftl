@@ -195,7 +195,7 @@ def customer_accounts(request):
         )["total"] or 0
 
         total_freight = float(enquiry.approval_rate) if enquiry.approval_rate is not None else 0.0
-        pending_amount = float(total_freight) - total_received
+        pending_amount = float(total_freight) - float(total_received)
 
         data.append({
             "enquiry_id": enquiry.id,
