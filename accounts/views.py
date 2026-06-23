@@ -876,7 +876,6 @@ from django.shortcuts import get_object_or_404, render
 from decimal import Decimal
 
 def vehicle_ledger(request, vehicle_id):
-
     vehicle = get_object_or_404(
         Vehicle.objects.select_related('order'),
         id=vehicle_id
@@ -924,7 +923,7 @@ def vehicle_ledger(request, vehicle_id):
         amount = Decimal(t.amount or 0)
 
         # Payment received by vehicle owner => Credit
-        balance -= amount
+        current_balance = ledger[-1]['balance'] if ledger else 0
 
         ledger.append({
             "date": t.date,
@@ -943,7 +942,7 @@ def vehicle_ledger(request, vehicle_id):
         {
             "vehicle": vehicle,
             "ledger": ledger,
-            "balance": balance,
+            'current_balance': current_balance,
             "transactions": transactions,
         }
     )
