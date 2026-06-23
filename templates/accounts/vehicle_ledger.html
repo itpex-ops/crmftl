@@ -1,77 +1,31 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="mb-0">
-                <i class="bi bi-truck me-2"></i>Vehicle Ledger
-            </h4>
-            <small>{{ vehicle.vehicle_number }}</small>
-        </div>
-    </div>
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>FTL No</th>
+                    <th class="text-end">Freight</th>
+                    <th class="text-end">Credit</th>
+                    <th class="text-end">Balance</th>
+                </tr>
+            </thead>
 
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="text-end">Date</th>
-                        <th class="text-end">FTL No</th>
-                        <th class="text-end" style="width:20%">Freight</th>
-                        <th class="text-end" style="width:20%">Credit</th>
-                        <th class="text-end" style="width:25%">Balance</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for row in ledger %}
-                    <tr>
-                        <td>{{ row.date|date:"d-M-Y" }}</td>
-
-                        <td>
-                            <span class="badge bg-secondary">
-                                {{ row.ftlno }}
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-                            ₹{{ row.debit|floatformat:2 }}
-                        </td>
-
-                        <td class="text-end text-success fw-semibold">
-                            ₹{{ row.credit|floatformat:2 }}
-                        </td>
-
-                        <td class="text-end">
-                            <span class="fw-bold {% if row.balance > 0 %}text-danger{% else %}text-success{% endif %}">
-                                ₹{{ row.balance|floatformat:2 }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">
-                            No ledger entries found.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-                {% if ledger %}
-                <tfoot class="table-light">
-                    <tr>
-                        <th colspan="4" class="text-end">
-                            Current Balance
-                        </th>
-                        <th class="text-end text-primary">
-                            ₹{{ current_balance|floatformat:2 }}
-                        </th>
-                    </tr>
-                </tfoot>
-                {% endif %}
-            </table>
-        </div>
+            <tbody>
+                {% for row in ledger %}
+                <tr>
+                    <td>{{ row.date|date:"d-M-Y" }}</td>
+                    <td>{{ row.ftlno }}</td>
+                    <td class="amount">₹{{ row.debit|floatformat:2 }}</td>
+                    <td class="amount">₹{{ row.credit|floatformat:2 }}</td>
+                    <td class="balance">₹{{ row.balance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -145,4 +99,65 @@
     </div>
 
 </div>
+<style>
+    /* =========================
+   COMMON TABLE STYLE
+========================= */
+
+.table-modern {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table-modern thead th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 14px;
+    white-space: nowrap;
+}
+
+.table-modern tbody td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    border-color: #f1f5f9;
+}
+
+.table-modern tbody tr:hover {
+    background: #f8fafc;
+}
+
+.table-modern tfoot th,
+.table-modern tfoot td {
+    background: #f8fafc;
+    font-weight: 600;
+    border-top: 1px solid #e5e7eb;
+    padding: 12px 14px;
+}
+
+.table-modern .amount {
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.table-modern .balance {
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.table-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+</style>
 {% endblock %}
