@@ -1,31 +1,79 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 
-<h4>Vehicle Ledger - {{ vehicle.vehicle_number }}</h4>
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-truck me-2"></i>Vehicle Ledger
+            </h4>
+            <small>{{ vehicle.vehicle_number }}</small>
+        </div>
+    </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>FTL No</th>
-            <th>Freight</th>
-            <th>Credit</th>
-            <th>Balance</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in ledger %}
-        <tr>
-            <td>{{ row.date }}</td>
-            <td>{{ row.ftlno }}</td>
-            <td>₹{{ row.debit }}</td>
-            <td>₹{{ row.credit }}</td>
-            <td><b>₹{{ row.balance }}</b></td>
-        </tr>
-        {% endfor %}
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:15%">Date</th>
+                        <th style="width:20%">FTL No</th>
+                        <th class="text-end" style="width:20%">Freight</th>
+                        <th class="text-end" style="width:20%">Credit</th>
+                        <th class="text-end" style="width:25%">Balance</th>
+                    </tr>
+                </thead>
 
-    </tbody>
-</table>
+                <tbody>
+                    {% for row in ledger %}
+                    <tr>
+                        <td>{{ row.date|date:"d-M-Y" }}</td>
+
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ row.ftlno }}
+                            </span>
+                        </td>
+
+                        <td class="text-end">
+                            ₹{{ row.debit|floatformat:2 }}
+                        </td>
+
+                        <td class="text-end text-success fw-semibold">
+                            ₹{{ row.credit|floatformat:2 }}
+                        </td>
+
+                        <td class="text-end">
+                            <span class="fw-bold {% if row.balance > 0 %}text-danger{% else %}text-success{% endif %}">
+                                ₹{{ row.balance|floatformat:2 }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No ledger entries found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                {% if ledger %}
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="4" class="text-end">
+                            Current Balance
+                        </th>
+                        <th class="text-end text-primary">
+                            ₹{{ ledger|last.balance|floatformat:2 }}
+                        </th>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
 
 <div class="col-lg-6">
     <div class="card">
