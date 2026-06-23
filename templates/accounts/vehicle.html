@@ -203,8 +203,8 @@
                         <th>Freight</th>
                         <th>Advance</th>
                         <th>Balance</th>
-                        <th>Process</th>
-                        <th>Status</th>
+                        <th>Vehicle Status</th>
+                        <th>Payment Status</th>
                         <th width="240">Actions</th>
                     </tr>
                 </thead>
@@ -226,25 +226,49 @@
                         <td class="amount balance text-danger">₹{{ v.remaining_balance_amount|default:0 }}</td>
 
                         <!-- FULL PROCESS -->
-                        <td class="timeline">
+                         <td>
 
-                            {% if v.is_payment_completed %}
+                            {% if v.tracking %}
 
-                            ✔ Advance Released<br>
-                            ✔ Delivered<br>
-                            ✔ Documents Cleared<br>
-                            ✔ Final Balance Paid
+                            {% if v.tracking.settled %}
+                            <span class="badge bg-dark">Settled</span>
 
-                            {% elif v.total_advance_paid > 0 %}
+                            {% elif v.tracking.pod_received %}
+                            <span class="badge bg-primary">POD Received</span>
 
-                            ✔ Advance Released<br>
-                            ⏳ Awaiting Delivery<br>
-                            ⏳ Awaiting Documents
+                            {% elif v.tracking.delivered %}
+                            <span class="badge bg-success">Delivered</span>
+
+                            {% elif v.tracking.arrived %}
+                            <span class="badge bg-info">Arrived</span>
+
+                            {% elif v.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">Fleet Departed</span>
+
+                            {% elif v.tracking.invoice_eway %}
+                            <span class="badge bg-secondary">Invoice / Eway</span>
+
+                            {% elif v.tracking.lr_no_b %}
+                            <span class="badge bg-secondary">LR Generated</span>
+
+                            {% elif v.tracking.vehicle_document %}
+                            <span class="badge bg-info">Vehicle Document</span>
+
+                            {% elif v.tracking.vehicle_placed %}
+                            <span class="badge bg-primary">Vehicle Placed</span>
+
+                            {% elif v.tracking.advance_received %}
+                            <span class="badge bg-success">Advance Received</span>
+
+                            {% else %}
+                            <span class="badge bg-secondary">Tracking Started</span>
+                            {% endif %}
 
                             {% else %}
 
-                            ⏳ Advance Pending<br>
-                            ⏳ Dispatch Pending
+                            <span class="badge bg-secondary">
+                                Vehicle Assigned
+                            </span>
 
                             {% endif %}
 
