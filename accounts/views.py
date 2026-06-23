@@ -872,49 +872,81 @@ def customer_ledger(request, enquiry_id):
         "ledger": ledger
     })
 
-# 📒 VEHICLE LEDGER
+from django.shortcuts import get_object_or_404, render
+from decimal import Decimal
+
 def vehicle_ledger(request, vehicle_id):
-    v = Vehicle.objects.select_related('order').get(id=vehicle_id)
+
+    vehicle = get_object_or_404(
+        Vehicle.objects.select_related('order'),
+        id=vehicle_id
+    )
+
     ledger = []
-    balance = 0
-    debit = float(v.freight_amount or 0)
-    credit = float(v.advance or 0)
-    balance += debit - credit
+    balance = Decimal('0.00')
+
+    # Initial Freight Entry
+    freight = Decimal(vehicle.freight_amount or 0)
+    advance = Decimal(vehicle.advance or 0)
+
+    balance += freight - advance
+
     ledger.append({
-        "date": v.created_at,
-        "ftlno": v.ftl_no,
-        "debit": debit,
-        "credit": credit,
-        "balance": balance
-    })
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
-    transactions = VehicleTransaction.objects.filter(
-        vehicle=vehicle
-    ).order_by("id")
-    adv = 0
-    bal = 0
-    oth = 0
-    for t in transactions:
-        if t.transaction_type == "advance":
-            adv += 1
-            t.label = f"Advance {adv}"
-            t.row_class = "row-advance"
-        elif t.transaction_type == "balance":
-            bal += 1
-            t.label = f"Balance {bal}"
-            t.row_class = "row-balance"
-        else:
-            oth += 1
-            t.label = f"OtherS {oth}"
-            t.row_class = "row-other"
-    return render(request, "accounts/vehicle_ledger.html", {
-        "vehicle": v,
-        "ledger": ledger,
+        "date": vehicle.created_at,
+        "ftlno": vehicle.ftl_no,
+        "particular": "Freight Entry",
+        "debit": freight,
+        "credit": advance,
         "balance": balance,
-          "vehicle": vehicle,
-        "transactions": transactions,
     })
 
+    # Payment Entries
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).order_by("date", "id")
+
+    adv = bal = oth = 0
+
+    for t in transactions:
+
+        if t.transaction_type == "advance":
+            adv += 1
+            label = f"Advance {adv}"
+
+        elif t.transaction_type == "balance":
+            bal += 1
+            label = f"Balance {bal}"
+
+        else:
+            oth += 1
+            label = f"Others {oth}"
+
+        amount = Decimal(t.amount or 0)
+
+        # Payment received by vehicle owner => Credit
+        balance -= amount
+
+        ledger.append({
+            "date": t.date,
+            "ftlno": vehicle.ftl_no,
+            "particular": label,
+            "debit": 0,
+            "credit": amount,
+            "balance": balance,
+        })
+
+        t.label = label
+
+    return render(
+        request,
+        "accounts/vehicle_ledger.html",
+        {
+            "vehicle": vehicle,
+            "ledger": ledger,
+            "balance": balance,
+            "transactions": transactions,
+        }
+    )
 def dashboard(request):
 
     income = LedgerEntry.objects.filter(

@@ -5,99 +5,86 @@
 
 <table class="table table-bordered">
 
-<thead>
-<tr>
-<th>Date</th>
-<th>FTL No</th>
-<th>Freight</th>
-<th>Credit</th>
-<th>Balance</th>
-</tr>
-</thead>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>FTL No</th>
+            <th>Freight</th>
+            <th>Credit</th>
+            <th>Balance</th>
+        </tr>
+    </thead>
 
-<tbody>
+    <tbody>
 
-{% for row in ledger %}
-<tr>
-<td>{{ row.date }}</td>
-<td>{{ row.ftlno }}</td>
-<td>₹{{ row.debit }}</td>
-<td>₹{{ row.credit }}</td>
-<td><b>₹{{ row.balance }}</b></td>
-</tr>
-{% endfor %}
+        {% for row in ledger %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.ftlno }}</td>
+            <td>₹{{ row.debit }}</td>
+            <td>₹{{ row.credit }}</td>
+            <td><b>₹{{ row.balance }}</b></td>
+        </tr>
+        {% endfor %}
 
-</tbody>
+    </tbody>
 
 </table>
-  <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
-                    <i class="bi bi-clock-history me-2"></i>
-                    Payment History
-                </div>
-                <div class="card-body p-0">
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-header text-white" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0)">
+            <i class="bi bi-clock-history me-2"></i>
+            Payment History
+        </div>
+        <div class="card-body p-0">
 
-                    <div class="table-responsive">
-                        <table class="table mb-0 table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                    <th>Mode</th>
-                                    <th>Txn</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for p in transactions %}
-                                <tr class="{{ p.row_class }}">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
 
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ p.date|date:"d-m-Y" }}</td>
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>FTL No</th>
+                            <th>Particular</th>
+                            <th>Debit</th>
+                            <th>Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
 
-                                    <td>
+                    <tbody>
 
-                                        {% if p.transaction_type == 'advance' %}
-                                        <span class="badge bg-primary">
-                                            Advance
-                                        </span>
+                        {% for row in ledger %}
+                        <tr>
+                            <td>{{ row.date|date:"d-m-Y" }}</td>
+                            <td>{{ row.ftlno }}</td>
+                            <td>{{ row.particular }}</td>
+                            <td>₹{{ row.debit|floatformat:2 }}</td>
+                            <td>₹{{ row.credit|floatformat:2 }}</td>
+                            <td>
+                                <strong>₹{{ row.balance|floatformat:2 }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
 
-                                        {% elif p.transaction_type == 'balance' %}
-                                        <span class="badge bg-success">
-                                            Balance
-                                        </span>
+                    </tbody>
 
-                                        {% else %}
-                                        <span class="badge bg-secondary">
-                                            {{ p.get_transaction_type_display }}
-                                        </span>
-                                        {% endif %}
+                    <tfoot>
+                        <tr class="table-warning">
+                            <th colspan="5" class="text-end">
+                                Final Balance
+                            </th>
+                            <th>
+                                ₹{{ balance|floatformat:2 }}
+                            </th>
+                        </tr>
+                    </tfoot>
 
-                                    </td>
-
-                                    <td>₹{{ p.amount|floatformat:2 }}</td>
-                                    <td>{{ p.payment_mode|upper }}</td>
-                                    <td>{{ p.transaction_no|default:"-" }}</td>
-                                    <td>{{ p.remarks|default:"-" }}</td>
-
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        No payment history
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-
-                        </table>
-                    </div>
-
-                </div>
+                </table>
             </div>
 
         </div>
+    </div>
+
+</div>
 {% endblock %}
