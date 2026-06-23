@@ -111,20 +111,3 @@ def customer_delete(request, pk):
         "customer": customer
     })
 
-def customer_dashboard(request):
-    today = timezone.now()
-    context = {
-        "total_customers": ExCustomer.objects.count(),
-        "active_customers": ExCustomer.objects.filter(is_active=True).count(),
-        "inactive_customers": ExCustomer.objects.filter(is_active=False).count(),
-        "new_this_month": ExCustomer.objects.filter(
-            created_at__month=today.month,
-            created_at__year=today.year
-        ).count(),
-        "recent_customers": ExCustomer.objects.order_by('-id')[:10]
-    }
-    return render(
-        request,
-        "dashboards/customer_dashboard.html",
-        context
-    )

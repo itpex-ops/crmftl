@@ -228,6 +228,7 @@ def make_payment(request, vehicle_id):
         "accounts/make_payment.html",
          context
     )
+
 def clean(self):
 
     if self.transaction_type == "advance":
@@ -291,39 +292,30 @@ def create_vehicle_payment(
 
 @login_required
 def vehicle_payments(request, vehicle_id):
-
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
-
     transactions = VehicleTransaction.objects.filter(
         vehicle=vehicle
     ).order_by("id")
-
     adv = 0
     bal = 0
     oth = 0
-
     for t in transactions:
-
         if t.transaction_type == "advance":
             adv += 1
             t.label = f"Advance {adv}"
             t.row_class = "row-advance"
-
         elif t.transaction_type == "balance":
             bal += 1
             t.label = f"Balance {bal}"
             t.row_class = "row-balance"
-
         else:
             oth += 1
             t.label = f"OtherS {oth}"
             t.row_class = "row-other"
-
     context = {
         "vehicle": vehicle,
         "transactions": transactions,
     }
-
     return render(request, "accounts/vehicle_payments.html", context)
 
 def pay_vehicle_advance(request, vehicle_id):
@@ -882,18 +874,12 @@ def customer_ledger(request, enquiry_id):
 
 # 📒 VEHICLE LEDGER
 def vehicle_ledger(request, vehicle_id):
-
     v = Vehicle.objects.select_related('order').get(id=vehicle_id)
-
     ledger = []
-
     balance = 0
-
     debit = float(v.freight_amount or 0)
     credit = float(v.advance or 0)
-
     balance += debit - credit
-
     ledger.append({
         "date": v.created_at,
         "ftlno": v.ftl_no,
@@ -901,11 +887,32 @@ def vehicle_ledger(request, vehicle_id):
         "credit": credit,
         "balance": balance
     })
-
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    transactions = VehicleTransaction.objects.filter(
+        vehicle=vehicle
+    ).order_by("id")
+    adv = 0
+    bal = 0
+    oth = 0
+    for t in transactions:
+        if t.transaction_type == "advance":
+            adv += 1
+            t.label = f"Advance {adv}"
+            t.row_class = "row-advance"
+        elif t.transaction_type == "balance":
+            bal += 1
+            t.label = f"Balance {bal}"
+            t.row_class = "row-balance"
+        else:
+            oth += 1
+            t.label = f"OtherS {oth}"
+            t.row_class = "row-other"
     return render(request, "accounts/vehicle_ledger.html", {
         "vehicle": v,
         "ledger": ledger,
-        "balance": balance
+        "balance": balance,
+          "vehicle": vehicle,
+        "transactions": transactions,
     })
 
 def dashboard(request):

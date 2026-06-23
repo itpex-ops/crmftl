@@ -37,16 +37,16 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_placed" 
-                                {% if tracking.vehicle_placed %}checked{% endif %}>
+                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed %}checked{%
+                                    endif %}>
                                 Vehicle Placed
                             </label>
                         </div>
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_document" 
-                                {% if tracking.vehicle_document %}checked{% endif %}>
+                                <input type="checkbox" name="vehicle_document" {% if tracking.vehicle_document
+                                    %}checked{% endif %}>
                                 Vehicle Document Collected
                             </label>
                         </div>
@@ -55,12 +55,13 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="lrCheck" name="lr_no_b" 
-                                {% if tracking.lr_no_b %}checked{% endif %}>
+                                <input type="checkbox" id="lrCheck" name="lr_no_b" {% if tracking.lr_no_b %}checked{%
+                                    endif %}>
                                 LR Generated
                             </label>
 
-                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;"  {% endif %}>
+                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;" {% endif
+                                %}>
                                 <input type="text" name="lr_no" value="{{ tracking.lr_no }}" class="form-control"
                                     placeholder="Enter LR Number">
                             </div>
@@ -69,21 +70,23 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked{% endif%}>
+                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked{%
+                                    endif%}>
                                 Invoice / E-Way
                             </label>
                         </div>
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="fleet_departed" {% if tracking.advance_to_fleet %}checked{%endif %}>
+                                <input type="checkbox" name="fleet_departed" {% if tracking.advance_to_fleet
+                                    %}checked{%endif %}>
                                 Advance Paid To Fleet
                             </label>
                         </div>
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="fleet_departed"
-                                 {% if tracking.fleet_departed %}checked{% endif %}>
+                                <input type="checkbox" name="fleet_departed" {% if tracking.fleet_departed %}checked{%
+                                    endif %}>
                                 Fleet Departed
                             </label>
                         </div>
@@ -122,96 +125,92 @@
                         <!-- POD -->
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="podCheck" name="pod_received"
-                                 {% if tracking.pod_received %}checked{% endif %}>
+                                <input type="checkbox" id="podCheck" name="pod_received" {% if tracking.pod_received
+                                    %}checked{% endif %}>
                                 POD Received
                             </label>
-                             <div id="podBox" style="display:none;">
-    <input type="file" name="documents" multiple class="form-control">
-</div>
-                            <div class="mt-2">
-    {% for doc in tracking.documents.all %}
-    <button type="button"
-            onclick="showPOD('{{ doc.file.url }}')"
-            class="btn btn-success btn-sm">
-        👁 View POD
-    </button>
-    {% endfor %}
-</div>
+                            <div id="podBox" style="display:none;">
+                                <input type="file" name="documents" multiple class="form-control">
+                            </div>
+                            <!-- <div class="mt-2">
+                                {% for doc in tracking.documents.all %}
+                                <button type="button" onclick="showPOD('{{ doc.file.url }}')"
+                                    class="btn btn-success btn-sm">
+                                    👁 View POD
+                                </button>
+                                {% endfor %}
+                            </div> -->
 
-                            <div id="podViewer" style="display:none;">
-    <iframe id="podFrame"
-            width="100%"
-            height="600"
-            style="border:1px solid #ddd;">
-    </iframe>
-</div>
+                            <!-- <div id="podViewer" style="display:none;">
+                                <iframe id="podFrame" width="100%" height="600" style="border:1px solid #ddd;">
+                                </iframe>
+                            </div>
 
-<script>
-function showPOD(url){
-    document.getElementById("podFrame").src = url;
-    document.getElementById("podViewer").style.display = "block";
-}
-</script>
+                            <script>
+                                function showPOD(url) {
+                                    document.getElementById("podFrame").src = url;
+                                    document.getElementById("podViewer").style.display = "block";
+                                }
+                            </script> -->
 
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="balance_trans_fleet" 
-                                {% if tracking.balance_trans_fleet %}checked{% endif %}>
-                                Balance Transfer To Fleet
-                            </label>
+                            <div class="track-item">
+                                <label class="track-label">
+                                    <input type="checkbox" name="balance_trans_fleet" {% if tracking.balance_trans_fleet
+                                        %}checked{% endif %}>
+                                    Balance Transfer To Fleet
+                                </label>
+                            </div>
+
+                            <div class="track-item">
+                                <label class="track-label">
+                                    <input type="checkbox" name="settled" {% if tracking.settled %}checked{% endif %}>
+                                    Settled
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- REMARKS -->
+
+                    <div class="card shadow-sm border-0 mt-3">
+
+                        <div class="card-header bg-secondary text-white fw-bold">
+                            📝 Remarks
                         </div>
 
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="settled" {% if tracking.settled %}checked{% endif %}>
-                                Settled
-                            </label>
+                        <div class="card-body">
+
+                            <textarea name="remarks" rows="4" class="form-control"
+                                placeholder="Enter remarks...">{{ tracking.remarks }}</textarea>
+
                         </div>
 
                     </div>
-                </div>
 
-                <!-- REMARKS -->
+                    <!-- ACTION -->
 
-                <div class="card shadow-sm border-0 mt-3">
+                    <div class="mt-3 text-end">
 
-                    <div class="card-header bg-secondary text-white fw-bold">
-                        📝 Remarks
+                        {% if tracking.settled %}
+
+                        <button class="btn btn-success" disabled>
+                            🔒 Trip Settled
+                        </button>
+
+                        {% else %}
+
+                        <button type="submit" class="btn btn-primary px-4">
+                            💾 Save Tracking
+                        </button>
+
+                        {% endif %}
+
                     </div>
-
-                    <div class="card-body">
-
-                        <textarea name="remarks" rows="4" class="form-control"
-                            placeholder="Enter remarks...">{{ tracking.remarks }}</textarea>
-
-                    </div>
-
-                </div>
-
-                <!-- ACTION -->
-
-                <div class="mt-3 text-end">
-
-                    {% if tracking.settled %}
-
-                    <button class="btn btn-success" disabled>
-                        🔒 Trip Settled
-                    </button>
-
-                    {% else %}
-
-                    <button type="submit" class="btn btn-primary px-4">
-                        💾 Save Tracking
-                    </button>
-
-                    {% endif %}
 
                 </div>
 
             </div>
-
-        </div>
 
     </form>
 
@@ -265,39 +264,39 @@ function showPOD(url){
 
 </script>
 <script>
-function showPOD(url) {
+    function showPOD(url) {
 
-    let ext = url.split('.').pop().toLowerCase();
+        let ext = url.split('.').pop().toLowerCase();
 
-    let html = "";
+        let html = "";
 
-    if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
 
-        html = `
+            html = `
             <img src="${url}"
                  class="img-fluid rounded border"
                  style="max-height:600px;">
         `;
 
-    } else if (ext === 'pdf') {
+        } else if (ext === 'pdf') {
 
-        // Open PDF in browser tab
-        window.open(url, '_blank');
-        return;
+            // Open PDF in browser tab
+            window.open(url, '_blank');
+            return;
 
-    } else {
+        } else {
 
-        html = `
+            html = `
             <a href="${url}" target="_blank"
                class="btn btn-primary">
                Open File
             </a>
         `;
-    }
+        }
 
-    document.getElementById("viewerContent").innerHTML = html;
-    document.getElementById("podViewer").style.display = "block";
-}
+        document.getElementById("viewerContent").innerHTML = html;
+        document.getElementById("podViewer").style.display = "block";
+    }
 </script>
 
 <script>
