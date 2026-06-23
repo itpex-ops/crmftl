@@ -34,45 +34,67 @@
             Payment History
         </div>
         <div class="card-body p-0">
+
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
+                <table class="table mb-0 table-hover">
+                    <thead>
                         <tr>
+                            <th>#</th>
                             <th>Date</th>
-                            <th>FTL No</th>
-                            <th>Particular</th>
-                            <th>Debit</th>
-                            <th>Credit</th>
-                            <th>Balance</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Mode</th>
+                            <th>Txn</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in transactions %}
-                        <tr>
-                            <td>{{ row.date|date:"d-m-Y" }}</td>
-                            <td>{{ row.ftlno }}</td>
-                            <td>{{ row.particular }}</td>
-                            <td>₹{{ row.debit|floatformat:2 }}</td>
-                            <td>₹{{ row.credit|floatformat:2 }}</td>
+                        {% for p in transactions %}
+                        <tr class="{{ p.row_class }}">
+
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ p.date|date:"d-m-Y" }}</td>
+
                             <td>
-                                <strong>₹{{ row.balance|floatformat:2 }}</strong>
+
+                                {% if p.transaction_type == 'advance' %}
+                                <span class="badge bg-primary">
+                                    Advance
+                                </span>
+
+                                {% elif p.transaction_type == 'balance' %}
+                                <span class="badge bg-success">
+                                    Balance
+                                </span>
+
+                                {% else %}
+                                <span class="badge bg-secondary">
+                                    {{ p.get_transaction_type_display }}
+                                </span>
+                                {% endif %}
+
+                            </td>
+
+                            <td>₹{{ p.amount|floatformat:2 }}</td>
+                            <td>{{ p.payment_mode|upper }}</td>
+                            <td>{{ p.transaction_no|default:"-" }}</td>
+                            <td>{{ p.remarks|default:"-" }}</td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No payment history
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                    <tfoot>
-                        <tr class="table-warning">
-                            <th colspan="5" class="text-end">
-                                Final Balance
-                            </th>
-                            <th>
-                                ₹{{ balance|floatformat:2 }}
-                            </th>
-                        </tr>
-                    </tfoot>
+
                 </table>
             </div>
+
         </div>
     </div>
+
 </div>
 {% endblock %}

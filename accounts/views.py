@@ -947,6 +947,8 @@ def vehicle_ledger(request, vehicle_id):
             "transactions": transactions,
         }
     )
+
+
 def dashboard(request):
 
     income = LedgerEntry.objects.filter(
