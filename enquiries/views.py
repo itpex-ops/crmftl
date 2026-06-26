@@ -425,12 +425,11 @@ def update_enquiry_status(request, id, action):
             enquiry.disagree_rate = request.POST.get(
                 "disagree_rate"
             )
-
             enquiry.disagree_reason = request.POST.get(
                 "disagree_reason",
                 ""
             )
-            #enquiry.status = "waiting for rate approval"
+            enquiry.status = "disagree"
             enquiry.save()
             if enquiry.created_by:
                 Notification.objects.create(
