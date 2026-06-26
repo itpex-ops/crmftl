@@ -273,6 +273,7 @@
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
+
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
@@ -281,51 +282,43 @@
                             </div>
                             {% endif %}
                             {% endif %}
+                            <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1">
 
-                         <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
 
-            <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
-                {% csrf_token %}
+                                        <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
 
-                <div class="modal-header">
-                    <h5 class="modal-title">Disagree Rate</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                                            {% csrf_token %}
 
-                <div class="modal-body">
+                                            <div class="modal-header">
+                                                <h5>Disagree Rate</h5>
+                                            </div>
 
-                    <input type="number"
-                           name="disagree_rate"
-                           class="form-control mb-3"
-                           placeholder="Disagree Rate"
-                           required>
+                                            <div class="modal-body">
 
-                    <textarea name="disagree_reason"
-                              class="form-control"
-                              rows="4"
-                              placeholder="Reason"></textarea>
+                                                <input type="number" name="disagree_rate" class="form-control mb-2"
+                                                    placeholder="Disagree Rate" required>
 
-                </div>
+                                                <textarea name="disagree_reason" class="form-control"
+                                                    placeholder="Reason"></textarea>
 
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Close
-                    </button>
+                                            </div>
 
-                    <button type="submit" class="btn btn-warning">
-                        Submit
-                    </button>
-                </div>
+                                            <div class="modal-footer">
 
-            </form>
+                                                <button type="submit" class="btn btn-warning">
+                                                    Submit
+                                                </button>
 
-        </div>
-    </div>
-</div>
+                                            </div>
+
+                                        </form>
+
+                                    </div>
+                                </div>
+
+                    
                             <div id="cancel-box-{{ e.id }}" style="display:none;">
                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
                                     {% csrf_token %}
