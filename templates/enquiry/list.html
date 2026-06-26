@@ -273,7 +273,11 @@
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
-
+                                <!-- Confirm 
+                                <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
+                                    data-action="confirm" data-rate="{{ e.approval_rate }}">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>-->
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
@@ -301,7 +305,7 @@
                                                     placeholder="Disagree Rate" required>
 
                                                 <textarea name="disagree_reason" class="form-control"
-                                                    placeholder="Reason"></textarea>
+                                                    placeholder="Reason" required></textarea>
 
                                             </div>
 
@@ -318,7 +322,16 @@
                                     </div>
                                 </div>
 
-                    
+                            </div>
+                            <!-- <div id="confirm-box-{{ e.id }}" style="display:none;">
+                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'confirm' %}">
+                                    {% csrf_token %}
+                                    <input type="number" name="approve_rate" class="form-control mb-2">
+                                    <button class="btn btn-success btn-sm">
+                                        Confirm
+                                    </button>
+                                </form> 
+                            </div> -->
                             <div id="cancel-box-{{ e.id }}" style="display:none;">
                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
                                     {% csrf_token %}
@@ -514,38 +527,55 @@
         position: sticky;
         top: 15px;
     }
-.route-modern {
-    max-width: 180px;
-    min-height: 80px;
-    text-align: left;          /* Left align everything */
-}
 
-.route-card {
-    padding: 3px 4px;
-    margin-bottom: 3px;
-    text-align: left;          /* Left align content */
-}
+    .route-modern {
+        max-width: 180px;
+        min-height: 80px;
+    }
 
-.route-title {
-    font-size: 9px;
-    font-weight: 700;
-    margin-bottom: 2px;        /* Fix typo: 2x -> 2px */
-    text-transform: uppercase;
-    text-align: left;
-}
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
 
-.route-chip {
-    display: inline-block;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 15px;
-    padding: 2px 8px;
-    margin: 2px;
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1.4;
-    text-align: left;
-}
+    }
+
+    .pickup-card {
+        background: #eef3fa;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .drop-card {
+        background: #eef7f1;
+        border-left: 4px solid #198754;
+    }
+
+    .route-title {
+        font-size: 9px;
+        font-weight: 700;
+        margin-bottom: 2x;
+        text-transform: uppercase;
+    }
+
+    .pickup-card .route-title {
+        color: #0d6efd;
+    }
+
+    .drop-card .route-title {
+        color: #198754;
+    }
+
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
     @media (max-width:768px) {
 
         .route-modern {
