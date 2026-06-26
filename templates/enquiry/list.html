@@ -236,6 +236,8 @@
                                 {% elif 'pitch2' in e.status %}
                                     info
                                 {% elif 'pitch1' in e.status %}
+                                    warning
+                                {% elif 'disagree' in e.status %}
                                     secondary
                                 {% elif 'waiting for rate approval' in e.status %}
                                     warning
@@ -273,11 +275,6 @@
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
-                                <!-- Confirm 
-                                <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
-                                    data-action="confirm" data-rate="{{ e.approval_rate }}">
-                                    <i class="bi bi-check-lg"></i>
-                                </button>-->
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
@@ -286,52 +283,51 @@
                             </div>
                             {% endif %}
                             {% endif %}
-                            <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1">
 
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
+                         <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
 
-                                        <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
+            <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
+                {% csrf_token %}
 
-                                            {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Disagree Rate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
 
-                                            <div class="modal-header">
-                                                <h5>Disagree Rate</h5>
-                                            </div>
+                <div class="modal-body">
 
-                                            <div class="modal-body">
+                    <input type="number"
+                           name="disagree_rate"
+                           class="form-control mb-3"
+                           placeholder="Disagree Rate"
+                           required>
 
-                                                <input type="number" name="disagree_rate" class="form-control mb-2"
-                                                    placeholder="Disagree Rate" required>
+                    <textarea name="disagree_reason"
+                              class="form-control"
+                              rows="2"
+                              placeholder="Reason"></textarea>
 
-                                                <textarea name="disagree_reason" class="form-control"
-                                                    placeholder="Reason" required></textarea>
+                </div>
 
-                                            </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
 
-                                            <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">
+                        Submit
+                    </button>
+                </div>
 
-                                                <button type="submit" class="btn btn-warning">
-                                                    Submit
-                                                </button>
+            </form>
 
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                            <!-- <div id="confirm-box-{{ e.id }}" style="display:none;">
-                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'confirm' %}">
-                                    {% csrf_token %}
-                                    <input type="number" name="approve_rate" class="form-control mb-2">
-                                    <button class="btn btn-success btn-sm">
-                                        Confirm
-                                    </button>
-                                </form> 
-                            </div> -->
+        </div>
+    </div>
+</div>
                             <div id="cancel-box-{{ e.id }}" style="display:none;">
                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
                                     {% csrf_token %}
@@ -527,55 +523,38 @@
         position: sticky;
         top: 15px;
     }
+.route-modern {
+    max-width: 180px;
+    min-height: 80px;
+    text-align: left;          /* Left align everything */
+}
 
-    .route-modern {
-        max-width: 180px;
-        min-height: 80px;
-    }
+.route-card {
+    padding: 3px 4px;
+    margin-bottom: 3px;
+    text-align: left;          /* Left align content */
+}
 
-    .route-card {
-        padding: 3px 4px;
-        margin-bottom: 3px;
+.route-title {
+    font-size: 9px;
+    font-weight: 700;
+    margin-bottom: 2px;        /* Fix typo: 2x -> 2px */
+    text-transform: uppercase;
+    text-align: left;
+}
 
-    }
-
-    .pickup-card {
-        background: #eef3fa;
-        border-left: 4px solid #0d6efd;
-    }
-
-    .drop-card {
-        background: #eef7f1;
-        border-left: 4px solid #198754;
-    }
-
-    .route-title {
-        font-size: 9px;
-        font-weight: 700;
-        margin-bottom: 2x;
-        text-transform: uppercase;
-    }
-
-    .pickup-card .route-title {
-        color: #0d6efd;
-    }
-
-    .drop-card .route-title {
-        color: #198754;
-    }
-
-    .route-chip {
-        display: inline-block;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 15px;
-        padding: 2px 8px;
-        margin: 2px;
-        font-size: 9px;
-        font-weight: 600;
-        line-height: 1.4;
-    }
-
+.route-chip {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    padding: 2px 8px;
+    margin: 2px;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: left;
+}
     @media (max-width:768px) {
 
         .route-modern {
