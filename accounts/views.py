@@ -629,6 +629,34 @@ def advance_success(
 
 @login_required
 def vehicle_accounts(request):
+    orders = Order.objects.select_related('tracking', 'vehicles')
+    data = []
+    for o in orders:
+        status = "Pending"
+        if hasattr(o, 'tracking') and o.tracking:
+            if o.tracking.settled:
+                status = "Settled"
+            elif o.tracking.transporter_paid:
+                status = "Transporter Paid"
+            elif o.tracking.customer_paid:
+                status = "Customer Paid"
+            elif o.tracking.delivered:
+                status = "Delivered"
+            elif o.tracking.fleet_departed:
+                status = "In Transit"
+            elif o.tracking.invoice_eway:
+                status = "Invoice / Eway"
+            elif o.tracking.lr_no_b:
+                status = "LR Created"
+            elif o.tracking.advance_to_fleet:
+                status = "Fleet Advance"
+            elif o.tracking.vehicle_document:
+                status = "Documents Collected"
+            elif o.tracking.vehicle_placed:
+                status = "Vehicle Placed"
+            else:
+                status = "Pending Dispatch"
+
     vehicles = Vehicle.objects.select_related(
         "order",
         "order__tracking"
