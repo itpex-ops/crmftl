@@ -273,11 +273,6 @@
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
-                                <!-- Confirm 
-                                <button type="button" class="btn btn-success btn-sm action-btn" data-id="{{ e.id }}"
-                                    data-action="confirm" data-rate="{{ e.approval_rate }}">
-                                    <i class="bi bi-check-lg"></i>
-                                </button>-->
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
@@ -305,7 +300,7 @@
                                                     placeholder="Disagree Rate" required>
 
                                                 <textarea name="disagree_reason" class="form-control"
-                                                    placeholder="Reason" required></textarea>
+                                                    placeholder="Reason"></textarea>
 
                                             </div>
 
@@ -322,16 +317,7 @@
                                     </div>
                                 </div>
 
-                            </div>
-                            <!-- <div id="confirm-box-{{ e.id }}" style="display:none;">
-                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'confirm' %}">
-                                    {% csrf_token %}
-                                    <input type="number" name="approve_rate" class="form-control mb-2">
-                                    <button class="btn btn-success btn-sm">
-                                        Confirm
-                                    </button>
-                                </form> 
-                            </div> -->
+                    
                             <div id="cancel-box-{{ e.id }}" style="display:none;">
                                 <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
                                     {% csrf_token %}
