@@ -87,7 +87,7 @@ def confirm_enquiry(request, enquiry_id):
     enquiry = get_object_or_404(Enquiry, id=enquiry_id)
 
     # Update status
-    enquiry.status = 'confirmed'
+    enquiry.status = 'pending_pitch3'
     enquiry.save()
 
     # ------------------------------
@@ -97,7 +97,7 @@ def confirm_enquiry(request, enquiry_id):
     send_notification(
         request.user,
         enquiry,
-        f"You confirmed enquiry {enquiry.enquiry_no}"
+        f"You pending_pitch3 enquiry {enquiry.enquiry_no}"
     )
 
     # ------------------------------
@@ -110,10 +110,10 @@ def confirm_enquiry(request, enquiry_id):
         send_notification(
             enquiry.request.user,
             enquiry,
-            f"Your enquiry {enquiry.enquiry_no} was confirmed by Admin"
+            f"Your enquiry {enquiry.enquiry_no} was pending_pitch3 by Admin"
         )
 
-    messages.success(request, 'Enquiry confirmed successfully.')
+    messages.success(request, 'Enquiry pending_pitch3 successfully.')
 
     return redirect('enquiry_list', enquiry_id=enquiry.id)
 
@@ -403,13 +403,13 @@ def update_enquiry_status(request, id, action):
                     message=(
                         f"Your enquiry "
                         f"{enquiry.enquiry_no} "
-                        f"has been confirmed"
+                        f"has been pending_pitch3"
                     )
                 )
 
             messages.success(
                 request,
-                "Enquiry confirmed successfully."
+                "Enquiry pending_pitch3 successfully."
             )
 
             return redirect(
@@ -518,20 +518,16 @@ def update_status(request, id, status):
 
 @login_required
 def update_pitch(request, id):
-
     if request.method != "POST":
-
         return JsonResponse({
             "success": False,
             "msg": "Invalid request method"
         })
-
     enquiry = get_object_or_404(Enquiry, id=id)
-
-    if enquiry.status == "confirmed":
+    if enquiry.status == "pending_pitch3":
 
         return HttpResponseForbidden(
-            "Already confirmed. Cannot modify."
+            "Already pending_pitch3. Cannot modify."
         )
 
     remarks = request.POST.get("remarks", "").strip()
@@ -583,7 +579,7 @@ def update_pitch(request, id):
             enquiry.expected_rate
         )
 
-        enquiry.status = "confirmed"
+        enquiry.status = "pending_pitch3"
         enquiry.approval_rate = latest_rate
 
         enquiry.save()
@@ -665,7 +661,7 @@ def update_pitch(request, id):
             send_notification(
                 enquiry.created_by,
                 enquiry,
-                f"Your enquiry {enquiry.enquiry_no} has been confirmed"
+                f"Your enquiry {enquiry.enquiry_no} has been pending_pitch3"
             )
 
     else:
@@ -712,9 +708,9 @@ def enquiry_dashboard(request):
                 status__icontains="approval"
             ).count(),
 
-        "confirmed":
+        "pending_pitch3":
             enquiries.filter(
-                status="confirmed"
+                status="pending_pitch3"
             ).count(),
 
         "cancelled":
