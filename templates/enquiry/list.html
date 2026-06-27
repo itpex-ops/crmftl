@@ -204,25 +204,26 @@
                             {{ e.kms }}
                         </td>
 
-                        <!-- EXPECTED and disagree rate -->
-                        {% if e.expected_rate %}
-                        <td class="text-warning fw-semibold">
+                        <td>
+                            {% if e.expected_rate %}
                             <div class="fw-bold text-warning">
                                 ₹ {{ e.expected_rate }}
                             </div>
+
                             {% elif e.disagree_rate %}
-                            <div class="mt-1">
+                            <div>
                                 <span class="badge bg-danger">
-                                    Exp.Rate ₹ {{ e.disagree_rate }}
+                                    Exp. Rate ₹ {{ e.disagree_rate }}
                                 </span>
                             </div>
+
                             {% if e.disagree_reason %}
                             <small class="text-muted">
-                                Disagree : {{ e.disagree_reason }}
+                                Disagree: {{ e.disagree_reason }}
                             </small>
                             {% endif %}
+                            {% endif %}
                         </td>
-                        {% endif %}
 
 
                         <!-- APPROVAL -->
