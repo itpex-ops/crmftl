@@ -28,7 +28,7 @@
 
                 <div class="summary-value">
                     {% if order.total_rate %}
-                     ₹
+                    ₹
                     {{ order.total_rate }}
                     {% endif %}
 
@@ -173,9 +173,7 @@
                 <div class="saas-card">
 
                     <div class="card-title-bar">
-
-                        🚚 Vehicle Details
-
+                        🚚 Vehicle & Freight Details
                     </div>
 
                     <div class="card-body p-4">
@@ -385,9 +383,7 @@
                 <div class="saas-card">
 
                     <div class="card-title-bar info-bar">
-
-                        💳 UPI Details
-
+                        💳 Payment Details
                     </div>
 
                     <div class="card-body p-4">
@@ -605,7 +601,7 @@
             const a = getValue(advance);
 
             const totalFreight = f + h + l + b;
-            const balanceAmount = totalFreight - a - b - l - h ;
+            const balanceAmount = totalFreight - a - b - l - h;
 
             const profit = sellingRate - totalFreight;
 
