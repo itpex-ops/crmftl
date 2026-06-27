@@ -133,16 +133,14 @@
                     <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
                         <td>
                             <a href="{% url 'edit_enquiry' e.id %}" class="btn
-       {% if e.status == 'waiting for rate approval' or e.status == 'disagree' %}
-           btn-warning
-       {% elif e.status == 'pending_pitch1' or e.status == 'pending_pitch2' or e.status == 'pending_pitch3' %}
-           btn-success
-       {% else %}
-           btn-primary
-       {% endif %}
-       btn-sm">
-
-                                <i class="bi bi-eye me-1"></i>
+       {% if not e.status or e.status == 'disagree' %}
+    btn-warning
+{% elif e.status == 'pending_pitch1' or e.status == 'pending_pitch2' or e.status == 'pending_pitch3' %}
+    btn-success
+{% else %}
+    btn-primary
+{% endif %}
+                                <i class=" bi bi-eye me-1"></i>
                                 <strong>{{ e.enquiry_no }}</strong>
                             </a>
                             <br>
