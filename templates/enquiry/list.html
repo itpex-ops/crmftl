@@ -271,7 +271,7 @@
                         </td>
                         <!-- ACTION -->
                         <td>
-                            {% if is_admin or is_superadmin and e.status != 'pending_pitch3' %}
+                            {% if is_admin or is_superadmin and e.status != 'pending_pitch2' %}
                             <div class="d-flex justify-content-end gap-1 flex-wrap">
                                 <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
                                     data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
