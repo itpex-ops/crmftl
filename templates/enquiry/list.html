@@ -270,12 +270,12 @@
                             {% if not e.status == 'waiting for rate approval' %}
                             <div class="d-flex gap-2 justify-content-center">
                                 <!-- Disagree -->
-                                 {% if e.status != 'disagree' %}
+                               
                                 <button type="button" class="btn btn-warning btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
-                                {% endif %}
+                               
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
