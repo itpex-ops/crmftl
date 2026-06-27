@@ -321,6 +321,7 @@ def enquiry_list(request):
                 'pending_pitch1',
                 'pending_pitch2',
                 'pending_pitch3',
+                "disagree",
                 
             ])
     else:
