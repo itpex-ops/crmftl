@@ -532,9 +532,7 @@ def update_pitch(request, id):
 
     # Prevent further modification after Pitch 3
     if enquiry.status == "pending_pitch3":
-        return HttpResponseForbidden(
-            "Already in Pending Pitch 3. Cannot modify."
-        )
+         return redirect("enquiry_list")
 
     remarks = request.POST.get("remarks", "").strip()
     pitch_rate = request.POST.get("pitch_rate")
