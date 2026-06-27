@@ -132,12 +132,20 @@
                     {% for e in enquiries %}
                     <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
                         <td>
-                            <a href="{% url 'edit_enquiry' e.id %}" class="btn btn-primary btn-sm">
+                            <a href="{% url 'edit_enquiry' e.id %}" class="btn
+       {% if e.status == 'waiting for rate approval' or e.status == 'disagree' %}
+           btn-warning
+       {% elif e.status == 'pending_pitch1' or e.status == 'pending_pitch2' or e.status == 'pending_pitch3' %}
+           btn-success
+       {% else %}
+           btn-primary
+       {% endif %}
+       btn-sm">
+
                                 <i class="bi bi-eye me-1"></i>
-                                <strong>
-                                    {{ e.enquiry_no }}
-                                </strong>
-                            </a><br>
+                                <strong>{{ e.enquiry_no }}</strong>
+                            </a>
+                            <br>
                             <small class="text-muted date-nowrap">
                                 {{ e.created_at|date:"d M Y h:i a" }}
                             </small>
@@ -265,7 +273,7 @@
                         </td>
                         <!-- ACTION -->
                         <td>
-                            {% if is_admin or is_superadmin %}
+                            {% if is_admin or is_superadmin and e.status != 'pending_pitch3' %}
                             <div class="d-flex justify-content-end gap-1 flex-wrap">
                                 <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
                                     data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
