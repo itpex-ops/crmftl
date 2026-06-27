@@ -53,7 +53,7 @@
                         <label class="form-label">Customer Name
                             <span class="text-danger fw-bold">*</span> </label>
                         <input type="text" id="customer_name" name="customer_name" class="form-control"
-                            value="{{ customer.name|default:'' }}">
+                            value="{{ customer.name|default:'' }}" required>
                     </div>
 
                     <div class="col-md-4">
@@ -114,7 +114,7 @@
                     <div class="col-md-3">
                         <label class="form-label">No. of Pickups<span class="text-danger fw-bold">*</span></label>
                         <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10"
-                            value="1">
+                            value="1" required>
                     </div>
 
                     <div class="col-md-3">
@@ -122,7 +122,7 @@
                             <span class="text-danger fw-bold">*</span>
                         </label>
                         <input type="number" name="deliveries" id="deliveries" class="form-control" min="1" max="10"
-                            value="1">
+                            value="1" required>
                     </div>
 
                     <div id="origin-container" class="col-md-3">
@@ -140,12 +140,12 @@
                 </div>
                 <!-- ROUTE & VEHICLE -->
                 <div class="card mb-3 section-card">
-                    <div class="section-title">📍 Route & Vehicle</div>
+                    <div class="section-title">📍 Route | Vehicle | Load Details</div>
                     <div class="card-body row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Vehicle Type<span class="text-danger fw-bold">*</span></label>
 
-                            <select name="vehicle_type" class="form-select vehicle-select">
+                            <select name="vehicle_type" class="form-select vehicle-select" required>
                                 <option value="">Select Vehicle</option>
                                 {% for value, label in vehicle_types %}
                                 <option value="{{ value }}">{{ label }}</option>
@@ -179,32 +179,28 @@
                         <div class="col-md-4">
                             <label class="form-label">Vehicle Description<span
                                     class="text-danger fw-bold">*</span></label>
-                            <input type="text" name="vehicle_description" class="form-control">
+                            <input type="text" name="vehicle_description" class="form-control" required>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">KMs</label>
-                            <input type="number" step="any" name="kms" class="form-control">
+                            <input type="number" step="any" name="kms" class="form-control" required>
                         </div>
 
 
                         <div class="col-md-4">
                             <label class="form-label">Material<span class="text-danger fw-bold">*</span></label>
-                            <input type="text" name="material" class="form-control">
+                            <input type="text" name="material" class="form-control" required>
                         </div>
 
                     </div>
-                </div>
 
-                <!-- LOAD DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📦 Load Details</div>
 
                     <div class="card-body row g-3">
 
                         <div class="col-md-3">
                             <label class="form-label">Pieces</label>
-                            <input type="number" step="any" name="pieces" class="form-control">
+                            <input type="number" step="any" name="pieces" class="form-control" required>
                         </div>
 
                         <div class="col-md-3">
@@ -273,9 +269,6 @@
                                         0 KG
                                     </strong>
                                 </div>
-
-                                <!-- Volume -->
-
                                 <div class="result-row small-volume">
                                     <span>
                                         Volume
@@ -300,6 +293,8 @@
                                 <input type="number" step="any" name="approval_rate" class="form-control">
                             </div>
                         </div>
+                    </div>
+                </div>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-save" data-action="confirm">
                                 <i class="bi bi-save me-1"></i>
