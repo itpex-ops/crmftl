@@ -205,18 +205,19 @@
                         </td>
 
                         <!-- EXPECTED and disagree rate -->
+                        {% if e.expected_rate %}
                         <td class="text-warning fw-semibold">
                             <div class="fw-bold text-warning">
                                 ₹ {{ e.expected_rate }}
                             </div>
-
-                            {% if e.disagree_rate %}
+                            {% elif e.disagree_rate %}
                             <div class="mt-1">
                                 <span class="badge bg-danger">
                                     Exp.Rate ₹ {{ e.disagree_rate }}
                                 </span>
                             </div>
-
+                            {% endif %}
+                            {% if e.disagree_reason %}
                             <small class="text-muted">
                                 Disagree : {{ e.disagree_reason }}
                             </small>
