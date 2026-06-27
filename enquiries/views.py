@@ -516,6 +516,10 @@ def update_status(request, id, status):
 # UPDATE PITCH
 # =====================================
 
+from decimal import Decimal, InvalidOperation
+from django.http import JsonResponse, HttpResponseForbidden
+
+
 @login_required
 def update_pitch(request, id):
     if request.method != "POST":
@@ -523,36 +527,32 @@ def update_pitch(request, id):
             "success": False,
             "msg": "Invalid request method"
         })
-    enquiry = get_object_or_404(Enquiry, id=id)
-    if enquiry.status == "pending_pitch3":
 
+    enquiry = get_object_or_404(Enquiry, id=id)
+
+    # Prevent further modification after Pitch 3
+    if enquiry.status == "pending_pitch3":
         return HttpResponseForbidden(
-            "Already pending_pitch3. Cannot modify."
+            "Already in Pending Pitch 3. Cannot modify."
         )
 
     remarks = request.POST.get("remarks", "").strip()
     pitch_rate = request.POST.get("pitch_rate")
     is_approved = request.POST.get("is_approved") == "true"
 
-    pitch_rate = request.POST.get("pitch_rate")
-
     if not pitch_rate:
         return JsonResponse({
             "success": False,
-            "msg": "Pitch rate required"
+            "msg": "Pitch rate is required."
         })
 
     try:
         pitch_rate = Decimal(pitch_rate)
-    except:
+    except (InvalidOperation, ValueError):
         return JsonResponse({
             "success": False,
-            "msg": "Invalid rate"
+            "msg": "Invalid pitch rate."
         })
-
-    # --------------------------------
-    # ADMIN CHECK
-    # --------------------------------
 
     can_approve = (
         request.user.is_superuser or
@@ -562,37 +562,30 @@ def update_pitch(request, id):
     current_status = (enquiry.status or "").lower()
 
     # =====================================
-    # APPROVE DIRECTLY
+    # DIRECT APPROVAL (Admin)
     # =====================================
-
     if is_approved:
-
         if not can_approve:
             return HttpResponseForbidden(
-                "Only Super Admin can approve"
+                "Only Admin/Super Admin can approve."
             )
 
         latest_rate = (
-            enquiry.pitch3 or
-            enquiry.pitch2 or
-            enquiry.pitch1 or
-            enquiry.expected_rate
+            enquiry.pitch3
+            or enquiry.pitch2
+            or enquiry.pitch1
+            or enquiry.expected_rate
         )
 
-        enquiry.status = "pending_pitch3"
         enquiry.approval_rate = latest_rate
-
+        enquiry.status = "pending_pitch3"
         enquiry.save()
-        # --------------------------------
-        # NOTIFICATION TO SALES USER
-        # --------------------------------
 
         if enquiry.created_by:
-
             send_notification(
                 enquiry.created_by,
                 enquiry,
-                f"Your enquiry {enquiry.enquiry_no} was approved by Super Admin"
+                f"Your enquiry {enquiry.enquiry_no} has been approved."
             )
 
         return redirect("enquiry_list")
@@ -600,79 +593,52 @@ def update_pitch(request, id):
     # =====================================
     # PITCH 1
     # =====================================
-
     if current_status in ["", "waiting for rate approval"]:
-
         enquiry.pitch1 = pitch_rate
         enquiry.pitch1_remarks = remarks
-        #enquiry.expected_rate = pitch_rate
         enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch1"
-        enquiry.save()
 
-        # Notification
-        if enquiry.created_by:
-
-            send_notification(
-                enquiry.created_by,
-                enquiry,
-                f"Pitch 1 updated for enquiry {enquiry.enquiry_no}"
-            )
+        message = f"Pitch 1 updated for enquiry {enquiry.enquiry_no}"
 
     # =====================================
     # PITCH 2
     # =====================================
-
     elif current_status == "pending_pitch1":
-
         enquiry.pitch2 = pitch_rate
         enquiry.pitch2_remarks = remarks
-        #enquiry.expected_rate = pitch_rate
         enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch2"
 
-        enquiry.save()
-
-        # Notification
-        if enquiry.created_by:
-
-            send_notification(
-                enquiry.created_by,
-                enquiry,
-                f"Pitch 2 updated for enquiry {enquiry.enquiry_no} by {enquiry.created_by}"
-            )
+        message = f"Pitch 2 updated for enquiry {enquiry.enquiry_no}"
 
     # =====================================
-    # FINAL CONFIRM
+    # PITCH 3
     # =====================================
-
     elif current_status == "pending_pitch2":
-
         enquiry.pitch3 = pitch_rate
         enquiry.pitch3_remarks = remarks
         enquiry.approval_rate = pitch_rate
         enquiry.status = "pending_pitch3"
 
-        enquiry.save()
-
-        # Notification
-        if enquiry.created_by:
-
-            send_notification(
-                enquiry.created_by,
-                enquiry,
-                f"Your enquiry {enquiry.enquiry_no} has been pending_pitch3"
-            )
+        message = f"Pitch 3 completed for enquiry {enquiry.enquiry_no}"
 
     else:
-
         return JsonResponse({
             "success": False,
-            "msg": "Maximum pitch attempts completed"
+            "msg": "Maximum pitch attempts completed."
         })
 
-    return redirect("enquiry_list")
+    enquiry.save()
 
+    if enquiry.created_by:
+        send_notification(
+            enquiry.created_by,
+            enquiry,
+            message
+        )
+
+    return redirect("enquiry_list")
 def enquiry_dashboard(request):
 
     today = timezone.now().date()
