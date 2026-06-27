@@ -251,7 +251,6 @@
                                 {{ e.status|capfirst }}
                                 {% endif %}
                             </span>
-
                         </td>
                         <!-- ACTION -->
                         <td>
@@ -271,10 +270,12 @@
                             {% if not e.status == 'waiting for rate approval' %}
                             <div class="d-flex gap-2 justify-content-center">
                                 <!-- Disagree -->
+                                 {% if e.status != 'disagree' %}
                                 <button type="button" class="btn btn-warning btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="disagree">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                 </button>
+                                {% endif %}
                                 <!-- Cancel -->
                                 <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
                                     data-action="cancel">
@@ -287,7 +288,6 @@
                          <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-
             <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
                 {% csrf_token %}
 
@@ -317,7 +317,6 @@
                             data-bs-dismiss="modal">
                         Close
                     </button>
-
                     <button type="submit" class="btn btn-warning">
                         Submit
                     </button>
