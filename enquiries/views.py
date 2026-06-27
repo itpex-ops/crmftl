@@ -332,10 +332,11 @@ def enquiry_list(request):
                 'pending_pitch1',
                 'pending_pitch2',
                 'pending_pitch3',
+                "disagree",
             ]
     )
     total_count = base_qs.count()
-    confirmed_count = base_qs.filter(status='confirmed').count()
+    disagree_count = base_qs.filter(status='disagree').count()
     pending_count = base_qs.filter(
         status__in=[
             'pending_pitch1',
@@ -343,7 +344,6 @@ def enquiry_list(request):
             'pending_pitch3'
         ]).count()
     cancelled_count = base_qs.filter(status='cancelled').count()
-    #pitch_remarks =  base_qs.filter()
     enquiries = base_qs.order_by('-id')
 
     for e in enquiries:
@@ -359,13 +359,12 @@ def enquiry_list(request):
     return render(request, 'enquiry/list.html', {
         'enquiries': enquiries,
         'total_count': total_count,
-        'confirmed_count': confirmed_count,
+        'disagree_count': disagree_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
         'is_admin': is_admin,
         'is_sales': is_sales,
         'is_superadmin': is_superadmin,
-        #"pitch_remarks":pitch_remarks
     })
 
 @login_required
@@ -431,6 +430,7 @@ def update_enquiry_status(request, id, action):
                 ""
             )
             enquiry.status = "disagree"
+            print(f"Disagree Rate: {enquiry.disagree_rate}, Reason: {enquiry.disagree_reason}")  # Debugging line
             enquiry.save()
             if enquiry.created_by:
                 Notification.objects.create(
