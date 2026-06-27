@@ -17,7 +17,7 @@
     </div>
     <!-- KPI -->
     {% if messages %}
-    <div class="position-fixed top-0 end-0 p-3" style="z-index:1080; min-width:350px;">
+    <div class="toast-container-custom">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-lg rounded-3 border-0 custom-alert"
             role="alert">
@@ -632,6 +632,16 @@
 
     .progress-time {
         animation: progress 5s linear forwards;
+    }
+
+    .toast-container-custom {
+        position: fixed;
+        top: 80px;
+        /* Below navbar */
+        right: 20px;
+        z-index: 9999;
+        min-width: 350px;
+        max-width: 450px;
     }
 
     @keyframes slideIn {
