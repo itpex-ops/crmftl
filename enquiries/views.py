@@ -520,6 +520,13 @@ from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse, HttpResponseForbidden
 
 
+from decimal import Decimal, InvalidOperation
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect
+
+
 @login_required
 def update_pitch(request, id):
     if request.method != "POST":
@@ -530,37 +537,38 @@ def update_pitch(request, id):
 
     enquiry = get_object_or_404(Enquiry, id=id)
 
-    # Prevent further modification after Pitch 3
-    if enquiry.status == "pending_pitch3":
-         return redirect("enquiry_list")
+    # Normalize status
+    current_status = (enquiry.status or "").strip().lower()
+
+    # Stop pitching after Pitch 3
+    if current_status == "pending_pitch3":
+        messages.warning(
+            request,
+            "Pitching is already completed. Further modifications are not allowed."
+        )
+        return redirect("enquiry_list")
 
     remarks = request.POST.get("remarks", "").strip()
     pitch_rate = request.POST.get("pitch_rate")
     is_approved = request.POST.get("is_approved") == "true"
 
     if not pitch_rate:
-        return JsonResponse({
-            "success": False,
-            "msg": "Pitch rate is required."
-        })
+        messages.error(request, "Pitch rate is required.")
+        return redirect("enquiry_list")
 
     try:
         pitch_rate = Decimal(pitch_rate)
     except (InvalidOperation, ValueError):
-        return JsonResponse({
-            "success": False,
-            "msg": "Invalid pitch rate."
-        })
+        messages.error(request, "Invalid pitch rate.")
+        return redirect("enquiry_list")
 
     can_approve = (
         request.user.is_superuser or
         getattr(request.user, "role", "") == "admin"
     )
 
-    current_status = (enquiry.status or "").lower()
-
     # =====================================
-    # DIRECT APPROVAL (Admin)
+    # DIRECT APPROVAL
     # =====================================
     if is_approved:
         if not can_approve:
@@ -586,6 +594,7 @@ def update_pitch(request, id):
                 f"Your enquiry {enquiry.enquiry_no} has been approved."
             )
 
+        messages.success(request, "Enquiry approved successfully.")
         return redirect("enquiry_list")
 
     # =====================================
@@ -622,10 +631,11 @@ def update_pitch(request, id):
         message = f"Pitch 3 completed for enquiry {enquiry.enquiry_no}"
 
     else:
-        return JsonResponse({
-            "success": False,
-            "msg": "Maximum pitch attempts completed."
-        })
+        messages.warning(
+            request,
+            "Pitching is already completed. No further changes are allowed."
+        )
+        return redirect("enquiry_list")
 
     enquiry.save()
 
@@ -636,7 +646,9 @@ def update_pitch(request, id):
             message
         )
 
+    messages.success(request, message)
     return redirect("enquiry_list")
+
 def enquiry_dashboard(request):
 
     today = timezone.now().date()
