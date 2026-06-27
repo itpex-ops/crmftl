@@ -430,7 +430,6 @@ def update_enquiry_status(request, id, action):
                 ""
             )
             enquiry.status = "disagree"
-            print(f"Disagree Rate: {enquiry.disagree_rate}, Reason: {enquiry.disagree_reason}")  # Debugging line
             enquiry.save()
             if enquiry.created_by:
                 Notification.objects.create(
@@ -497,7 +496,7 @@ def update_status(request, id, status):
 
         if status == "pending_pitch3":
 
-            enquiry.status = "confirmed"
+            enquiry.status = "pending_pitch3"
             enquiry.approval_rate = data.get("approval_rate")
 
             enquiry.save()
@@ -506,7 +505,7 @@ def update_status(request, id, status):
                 send_notification(
                     enquiry.created_by,
                     enquiry,
-                    f"Enquiry {enquiry.enquiry_no} was confirmed by Admin"
+                    f"Enquiry {enquiry.enquiry_no} was in pending_pitch3 by Admin"
                 )
         return JsonResponse({"success": True})
     return JsonResponse({
@@ -656,7 +655,7 @@ def update_pitch(request, id):
         enquiry.pitch3 = pitch_rate
         enquiry.pitch3_remarks = remarks
         enquiry.approval_rate = pitch_rate
-        enquiry.status = "Pending_pitch3"
+        enquiry.status = "pending_pitch3"
 
         enquiry.save()
 
