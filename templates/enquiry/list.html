@@ -216,13 +216,14 @@
                                     Exp.Rate ₹ {{ e.disagree_rate }}
                                 </span>
                             </div>
-                            {% endif %}
                             {% if e.disagree_reason %}
                             <small class="text-muted">
                                 Disagree : {{ e.disagree_reason }}
                             </small>
                             {% endif %}
                         </td>
+                        {% endif %}
+
 
                         <!-- APPROVAL -->
                         <td class="text-success fw-semibold">
