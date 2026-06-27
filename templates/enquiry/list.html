@@ -322,7 +322,6 @@
                         Submit
                     </button>
                 </div>
-
             </form>
 
         </div>
@@ -337,6 +336,7 @@
                                         Cancel
                                     </button>
                                 </form>
+                                9p
                             </div>
                         </td>
                         {% empty %}
@@ -668,7 +668,13 @@
     });
 
 </script>
-
+<script>
+document.querySelector("form").addEventListener("submit", function () {
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    document.getElementById("btnText").textContent = "Confirm Order";
+});
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
