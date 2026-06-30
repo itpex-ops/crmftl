@@ -1,15 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
-
 <div class="container-fluid py-4">
-
-    <!-- ========================= -->
-    <!-- TOP SUMMARY -->
-    <!-- ========================= -->
-
     <div class="summary-card mb-4">
         <div class="row g-0 align-items-center">
-            <div class="col-lg-2 col-md-3 summary-item border-end">
+            <div class="col-lg-2 col-sm-4 summary-item border-end">
                 <div class="summary-label">
                     Order Status
                 </div>
@@ -21,7 +15,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-2 col-md-3 summary-item border-end">
+            <div class="col-lg-2 col-sm-4 summary-item border-end">
                 <div class="summary-label">
                     Selling Rate
                 </div>
@@ -35,16 +29,13 @@
                 </div>
             </div>
 
-            <div class="col-lg-2 col-md-3 summary-item border-end">
-
+            <div class="col-lg-2 col-sm-4 summary-item border-end">
                 <div class="summary-label">
                     Expected Freight
                 </div>
-
                 <div class="summary-value text-warning" id="expectedFreight">
                     ₹ 0
                 </div>
-
                 <small class="summary-small">
                     Margin :
                     <span id="expectedMargin">
@@ -53,23 +44,19 @@
                 </small>
             </div>
 
-            <div class="col-lg-2 col-md-3 summary-item border-end">
-
+            <div class="col-lg-2 col-sm-4 summary-item border-end">
                 <div class="summary-label">
                     Final Freight
                 </div>
-
                 <div class="summary-value text-danger" id="finalFreightView">
                     ₹ 0
                 </div>
             </div>
 
             <div class="col-lg-4 col-md-8 summary-item">
-
                 <div class="summary-label">
                     Margin Percentage
                 </div>
-
                 <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
 
                     <span class="badge rounded-pill bg-danger" id="minMargin">
@@ -82,9 +69,9 @@
 
                 </div>
 
-                <div class="profit-box" id="profitAmount">
+                <!-- <div class="profit-box" id="profitAmount">
                     Profit ₹ 0
-                </div>
+                </div> -->
 
                 <div id="marginText" class="mt-2 small text-muted fw-semibold">
                     Waiting for freight calculation...
@@ -93,100 +80,56 @@
             </div>
         </div>
     </div>
-
-    <!-- ========================= -->
-    <!-- FORM -->
-    <!-- ========================= -->
-
     <form method="POST" autocomplete="off">
         {% csrf_token %}
-
-        <!-- HIDDEN -->
         <input type="text" style="display:none">
         <input type="password" style="display:none">
-
-        <!-- ========================= -->
-        <!-- APPROVAL -->
-        <!-- ========================= -->
-
         <div class="card border-0 shadow-sm mb-4 approval-card" id="approvalSection" style="display:none;">
-
             <div class="card-header approval-header">
-
                 🔒 Manager Approval Required
-
             </div>
-
             <div class="card-body">
-
-                <div class="row g-3">
-
+                <div class="row g-1">
                     <div class="col-md-6">
-
                         <label class="form-label">
                             Manager Name
                         </label>
-
                         <input type="text" name="approval_name" id="approvalName" class="form-control form-input"
                             placeholder="Enter manager name">
-
                     </div>
-
                     <div class="col-md-6">
-
                         <label class="form-label">
                             Reason
                         </label>
-
                         <input type="text" name="approval_reason" class="form-control form-input"
                             placeholder="Enter approval reason">
-
                     </div>
-
                     <div class="col-12">
-
                         <small id="approvalError" class="text-danger fw-semibold">
                         </small>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
         <div class="erp-grid">
             <div class="erp-left">
-
-                <!-- VEHICLE -->
                 <div class="saas-card">
-
                     <div class="card-title-bar">
                         🚚 Vehicle & Freight Details
                     </div>
-
                     <div class="card-body p-3">
-
-                        <div class="row g-3">
-
-                            <div class="col-md-3">
-
+                        <div class="row g-1">
+                            <div class="col-sm-4">
                                 <label class="form-label">
                                     Vehicle Number
                                 </label>
-
                                 <input type="text" name="vehicle_number" class="form-control form-input" required>
-
                             </div>
-
-                            <div class="col-md-3">
-
+                            <div class="col-sm-4">
                                 <label class="form-label">
                                     Driver Number
                                 </label>
-
                                 <div class="input-group">
-
                                     <input type="text" name="driver_number" id="driver_number" maxlength="10"
                                         class="form-control form-input" required>
 
@@ -202,7 +145,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-4">
 
                                 <label class="form-label">
                                     Owner Number
@@ -212,12 +155,10 @@
 
                             </div>
 
-                            <div class="col-md-3">
-
+                            <div class="col-sm-4">
                                 <label class="form-label">
                                     Source
                                 </label>
-
                                 <select name="source" id="source_select" class="form-select form-input">
 
                                     <option value="">
@@ -245,7 +186,6 @@
                                     </option>
 
                                 </select>
-
                             </div>
 
                             <div class="col-md-8">
@@ -265,9 +205,9 @@
 
                     <div class="card-body  p-3">
 
-                        <div class="row g-3">
+                        <div class="row g-1">
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Freight
@@ -278,7 +218,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Halting
@@ -289,7 +229,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Loading / Unloading
@@ -300,7 +240,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Brokerage
@@ -311,7 +251,7 @@
 
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Total Freight
@@ -322,7 +262,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Advance
@@ -333,7 +273,7 @@
 
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
 
                                 <label class="form-label">
                                     Balance
@@ -350,11 +290,6 @@
                 </div>
 
             </div>
-
-            <!-- ========================= -->
-            <!-- RIGHT -->
-            <!-- ========================= -->
-
             <div class="erp-right">
 
                 <!-- UPI -->
@@ -366,7 +301,7 @@
 
                     <div class="card-body  p-3">
 
-                        <div class="row g-3">
+                        <div class="row g-1">
 
                             <div class="col-md-6">
 
@@ -413,7 +348,7 @@
 
                     <div class="card-body  p-3">
 
-                        <div class="row g-3">
+                        <div class="row g-1">
 
                             <div class="col-md-6">
 
@@ -568,7 +503,7 @@
             const a = getValue(advance);
 
             const totalFreight = f + h + l + b;
-            const balanceAmount = totalFreight - a - b - l - h;
+            const balanceAmount = totalFreight - a;
 
             const profit = sellingRate - totalFreight;
 
@@ -578,7 +513,7 @@
 
             // totals
             if (total) total.value = totalFreight.toFixed(2);
-            if (balance) balance.value = balanceAmount.toFixed(2);
+            if (totalFreight) balance.value = balanceAmount.toFixed(2);
 
             if (finalFreightView)
                 finalFreightView.innerHTML = `₹ ${totalFreight.toFixed(2)}`;
@@ -590,15 +525,15 @@
                 currentMargin.innerHTML = `${margin.toFixed(2)}%`;
 
             // profit/loss
-            if (profitBox) {
-                if (profit >= 0) {
-                    profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
-                    profitBox.className = "profit-box text-success";
-                } else {
-                    profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
-                    profitBox.className = "profit-box text-danger";
-                }
-            }
+            //if (profitBox) {
+            //   if (profit >= 0) {
+            //     profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
+            //   profitBox.className = "profit-box text-success";
+            //} else {
+            //profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
+            //profitBox.className = "profit-box text-danger";
+            //}
+            //}
 
             // approval
             if (profit < 0) {
@@ -663,10 +598,6 @@
         background: #f4f7fb;
     }
 
-    /* =========================
-       SUMMARY
-    ========================= */
-
     .summary-card {
         background: #fff;
         border-radius: 20px;
@@ -708,26 +639,18 @@
         margin-top: 10px;
     }
 
-    /* =========================
-       GRID
-    ========================= */
-
     .erp-grid {
         display: grid;
         grid-template-columns: 1.3fr .7fr;
-        gap: 24px;
+        gap: 18px;
     }
 
     .erp-left,
     .erp-right {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 18px;
     }
-
-    /* =========================
-       CARD
-    ========================= */
 
     .saas-card {
         background: #fff;
@@ -757,10 +680,6 @@
         background: linear-gradient(90deg, #b45309, #f59e0b);
     }
 
-    /* =========================
-       FORM
-    ========================= */
-
     .form-label {
         font-size: 12px;
         font-weight: 700;
@@ -768,21 +687,23 @@
         margin-bottom: 8px;
     }
 
-    .form-input #sendOtpBtn {
+    .input-group #sendOtpBtn {
+        height: 27px;
+        font-size: 12px;
+        padding: 0 8px;
+    }
+
+    .form-input {
         height: 26px;
         border-radius: 10px;
         border: 1px solid #cbd5e1;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .form-input:focus {
         border-color: #2563eb;
         box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
     }
-
-    /* =========================
-       APPROVAL
-    ========================= */
 
     .approval-card {
         border-radius: 18px;
@@ -796,10 +717,6 @@
         padding: 16px 20px;
     }
 
-    /* =========================
-       ACTION
-    ========================= */
-
     .action-bar {
         position: sticky;
         bottom: 0;
@@ -812,10 +729,6 @@
         align-items: center;
         box-shadow: 0 4px 20px rgba(15, 23, 42, .06);
     }
-
-    /* =========================
-       MOBILE
-    ========================= */
 
     @media(max-width:991px) {
 
