@@ -629,7 +629,7 @@ def advance_success(
 
 @login_required
 def vehicle_accounts(request):
-    orders = Order.objects.select_related('tracking', 'vehicles')
+    orders = Vehicle.objects.select_related('order').all()
     data = []
     for o in orders:
         status = "Pending"
