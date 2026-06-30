@@ -101,14 +101,14 @@
 
         <div class="col-md-3">
             <div class="card-box">
-                <small class="text-muted">Advance Received</small>
+                <small class="text-muted">Total Received</small>
                 <h5 class="mb-0 text-success" id="sumAdvance">₹ 0</h5>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card-box">
-                <small class="text-muted">Pending</small>
+                <small class="text-muted">Outstanding Amount</small>
                 <h5 class="mb-0 text-warning" id="overDueCount">0</h5>
             </div>
         </div>
@@ -127,7 +127,7 @@
                         <th>Enquiry No</th>
                         <th>Customer</th>
                         <th>Contact</th>
-                        <th>Freight</th>
+                        <th>Selling Rate</th>
                         <th>Received</th>
                         <th>Advance</th>
                         <th>Balance</th>
@@ -186,7 +186,7 @@
 
                             <a href="{% url 'customer_payment' row.enquiry_id %}" class="btn btn-sm btn-success">
 
-                                Payment
+                                Receipt
 
                             </a>
 

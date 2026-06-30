@@ -1,8 +1,8 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="summary-card mb-4">
-        <div class="row g-0 align-items-center">
+<div class="container-fluid py-1">
+    <div class="summary-card mb-1">
+        <div class="row g-0 align-items-left">
             <div class="col-lg-2 col-sm-4 summary-item border-end">
                 <div class="summary-label">
                     Order Status
@@ -82,35 +82,7 @@
     </div>
     <form method="POST" autocomplete="off">
         {% csrf_token %}
-        <input type="text" style="display:none">
-        <input type="password" style="display:none">
-        <div class="card border-0 shadow-sm mb-4 approval-card" id="approvalSection" style="display:none;">
-            <div class="card-header approval-header">
-                🔒 Manager Approval Required
-            </div>
-            <div class="card-body">
-                <div class="row g-1">
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Manager Name
-                        </label>
-                        <input type="text" name="approval_name" id="approvalName" class="form-control form-input"
-                            placeholder="Enter manager name">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Reason
-                        </label>
-                        <input type="text" name="approval_reason" class="form-control form-input"
-                            placeholder="Enter approval reason">
-                    </div>
-                    <div class="col-12">
-                        <small id="approvalError" class="text-danger fw-semibold">
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
+
         <div class="erp-grid">
             <div class="erp-left">
                 <div class="saas-card">
@@ -261,7 +233,36 @@
                                     class="form-control form-input bg-light">
 
                             </div>
-
+                            <input type="text" style="display:none">
+                            <input type="password" style="display:none">
+                            <div class="card border-0 shadow-sm mb-4 approval-card" id="approvalSection"
+                                style="display:none;">
+                                <div class="card-header approval-header">
+                                    🔒 Manager Approval Required
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-1">
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Manager Name
+                                            </label>
+                                            <input type="text" name="approval_name" id="approvalName"
+                                                class="form-control form-input" placeholder="Enter manager name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Reason
+                                            </label>
+                                            <input type="text" name="approval_reason" class="form-control form-input"
+                                                placeholder="Enter approval reason">
+                                        </div>
+                                        <div class="col-12">
+                                            <small id="approvalError" class="text-danger fw-semibold">
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-sm-3">
 
                                 <label class="form-label">
@@ -517,7 +518,7 @@
             //}
 
             // approval
-            if (profit < 0) {
+            if (profit < 13) {
 
                 if (approvalSection)
                     approvalSection.style.display = "block";
