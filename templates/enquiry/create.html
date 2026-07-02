@@ -60,7 +60,8 @@
                         <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
                         <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
                             maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
-                            value="{{ customer.phone1|default:'' }}" placeholder="Enter 10 digit mobile number" required>
+                            value="{{ customer.phone1|default:'' }}" placeholder="Enter 10 digit mobile number"
+                            required>
                         <!-- <small class="text-muted">Enter 10 digit mobile number</small> -->
                     </div>
 
@@ -106,8 +107,8 @@
 
                     <div class="col-md-3">
                         <label class="form-label">No. of Pickups<span class="text-danger fw-bold">*</span></label>
-                        <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10"
-                            value="1" required>
+                        <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10" value="1"
+                            required>
                     </div>
 
                     <div class="col-md-3">
@@ -192,14 +193,11 @@
                 <!-- LOAD DETAILS -->
                 <div class="card mb-3 section-card">
                     <div class="section-title">📦 Load Details</div>
-
                     <div class="card-body row g-3">
-
                         <div class="col-md-3">
                             <label class="form-label">Pieces</label>
                             <input type="number" step="any" name="pieces" class="form-control">
                         </div>
-
                         <div class="col-md-3">
                             <label class="form-label">Tonnage</label>
                             <input type="number" step="any" name="tonnage" class="form-control">
@@ -219,70 +217,52 @@
                                 <option value="meter">meter</option>
                             </select>
                         </div>
-
                         <div class="col-md-3">
                             <label class="form-label">Length</label>
                             <input type="number" step="any" name="length" class="form-control">
                         </div>
-
                         <div class="col-md-3">
                             <label class="form-label">Breadth</label>
                             <input type="number" step="any" name="breadth" class="form-control">
                         </div>
-
                         <div class="col-md-3">
                             <label class="form-label">Height</label>
                             <input type="number" step="any" name="height" class="form-control">
                         </div>
-
                         <div class="col-md-6 d-none" id="dimensionBox">
-
                             <div class="dimension-result-box">
-
                                 <div class="result-title">
                                     📐 Dimension Calculation
                                 </div>
-
                                 <!-- Converted Size -->
-
                                 <div class="result-row">
                                     <span>
                                         Converted Size
                                     </span>
-
                                     <strong id="convertedDimension">
                                         0 × 0 × 0 CM
                                     </strong>
                                 </div>
-
                                 <!-- Volumetric Weight -->
-
                                 <div class="result-row volumetric-highlight">
                                     <span>
                                         Volumetric Weight
                                     </span>
-
                                     <strong id="volumetric_weight">
                                         0 KG
                                     </strong>
                                 </div>
-
                                 <!-- Volume -->
-
                                 <div class="result-row small-volume">
                                     <span>
                                         Volume
                                     </span>
-
                                     <small id="volumeResult">
                                         0 CM³
                                     </small>
                                 </div>
-
                             </div>
-
                         </div>
-
                         <div class="row">
                             <div class="col-md-3">
                                 <label class="form-label">Expected Rate ₹</label>
@@ -292,13 +272,14 @@
                                 <label class="form-label">Approval Rate ₹</label>
                                 <input type="number" step="any" name="approval_rate" class="form-control">
                             </div>
-                        <div class="d-grid gap-2">
-                           <div class="text-end">
-    <button type="submit" class="btn btn-primary btn-save" data-action="confirm">
-        <i class="bi bi-save me-1"></i>
-        <span id="btnText">Save Enquiry</span>
-    </button>
-</div>                        </div>
+                            <div class="d-grid gap-2">
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-save" data-action="confirm">
+                                        <i class="bi bi-save me-1"></i>
+                                        <span id="btnText">Save Enquiry</span>
+                                    </button>
+                                </div>
+                            </div>
 
                         </div>
                     </div>
@@ -349,10 +330,10 @@
         color: black;
     }
 
-   #search {
-    font-size: 16px;
-    font-weight: 600;
-}
+    #search {
+        font-size: 16px;
+        font-weight: 600;
+    }
 
     .small {
         color: black;
