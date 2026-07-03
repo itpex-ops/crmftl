@@ -99,32 +99,25 @@
 
             <div class="card-body">
                 <div class="customer-info">
-
                     <div class="customer-name">
                         {{ enquiry.customer_name }}
                     </div>
-
                     <div class="enquiry-no">
                         {% if vehicle %}
                         {{ vehicle.ftl_no }}
                         {% endif %}
                     </div>
-
                 </div>
-
                 <form method="post">
                     {% csrf_token %}
-
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Amount
                         </label>
-
                         <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
                             required>
                     </div>
-
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Date & Time
                         </label>
@@ -132,7 +125,7 @@
                         <input type="datetime-local" name="transaction_datetime" class="form-control" required>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Account
                         </label>
@@ -154,7 +147,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Payment Against
                         </label>
@@ -180,7 +173,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Payment Mode
                         </label>
@@ -214,7 +207,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">
                             Remarks
                         </label>
