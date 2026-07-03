@@ -486,7 +486,7 @@
 
             const profit = sellingRate - totalFreight;
 
-            const margin = sellingRate > 0
+            const margin = sellingRate < 13
                 ? (profit / sellingRate) * 100
                 : 0;
 
