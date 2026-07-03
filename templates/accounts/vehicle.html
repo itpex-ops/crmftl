@@ -223,10 +223,10 @@
 
                         <td class="amount freight">₹{{ v.freight|default:0 }}</td>
                         <td class="amount advance text-success">₹{{ v.total_advance_paid|default:0 }}</td>
-                        <td class="amount balance text-danger">₹{{ v.remaining_balance_amount|default:0 }}</td>
+                        <td class="amount balance text-danger">₹{{ v.balance|default:0 }}</td>
 
                         <!-- FULL PROCESS -->
-                         <td>
+                        <td>
 
                             {% if v.tracking %}
 
@@ -281,7 +281,7 @@
 
                             <span class="badge-soft badge-paid">Completed</span>
 
-                            {% elif v.total_advance_paid  > 0 %}
+                            {% elif v.total_advance_paid > 0 %}
 
                             <span class="badge-soft badge-partial">Running</span>
 
