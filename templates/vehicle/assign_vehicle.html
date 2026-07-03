@@ -504,18 +504,18 @@
                 currentMargin.innerHTML = `${margin.toFixed(2)}%`;
 
             // profit/loss
-            //if (profitBox) {
-            //   if (profit >= 0) {
-            //     profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
-            //   profitBox.className = "profit-box text-success";
-            //} else {
-            //profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
-            //profitBox.className = "profit-box text-danger";
-            //}
-            //}
+            if (profitBox) {
+                if (profit >= 0) {
+                    profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
+                    profitBox.className = "profit-box text-success";
+                } else {
+                    profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
+                    profitBox.className = "profit-box text-danger";
+                }
+            }
 
             // approval
-            if (margin) {
+            if (profit < 13) {
 
                 if (approvalSection)
                     approvalSection.style.display = "block";
