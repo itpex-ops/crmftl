@@ -70,16 +70,27 @@
 
     .pay-btn {
         width: 50%;
-        height: 32px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #EC32C1, #EADB34);
-        color: white;
+
         border: none;
+        border-radius: 10px;
+
+        background: linear-gradient(135deg, #EC32C1, #EADB34);
+        color: #fff;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        transition: all .3s ease;
+    }
+
+    .pay-btn:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        opacity: 0.95;
     }
 
     @media (max-width:576px) {
@@ -221,10 +232,12 @@
                             placeholder="Enter remarks (optional)"></textarea>
                     </div>
 
-                    <button type="submit" class="btn pay-btn">
-                        <i class="bi bi-arrow-right-circle me-1"></i>
-                        Continue
-                    </button>
+                    <div class="text-center">
+                        <button type="submit" class="btn pay-btn">
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+                            Continue
+                        </button>
+                    </div>
 
                 </form>
 
