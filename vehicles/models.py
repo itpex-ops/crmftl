@@ -132,6 +132,8 @@ class Vehicle(models.Model):
     def can_take_balance(self):
         return self.remaining_balance_amount == 0
     
+    
+
     def save(self, *args, **kwargs):
         self.total_freight = (
             Decimal(self.freight_amount or 0)

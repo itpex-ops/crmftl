@@ -166,21 +166,7 @@ class VehicleTransaction(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    def clean(self):
-
-        if self.transaction_type == "advance":
-
-            remaining = self.vehicle.remaining_balance_amount
-
-            if remaining <= 0:
-                raise ValidationError("Advance not allowed. Balance is zero.")
-
-            if self.amount > remaining:
-                raise ValidationError(
-                    f"Advance cannot exceed {remaining}"
-                )
-   
-   
+    
     def __str__(self):
         return f"{self.vehicle.vehicle_number} - {self.amount}"
 
