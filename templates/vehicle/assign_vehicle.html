@@ -53,28 +53,31 @@
                 </div>
             </div>
 
-            <!-- <div class="col-lg-4 col-md-8 summary-item">
+            <div class="col-lg-4 col-md-8 summary-item">
                 <div class="summary-label">
                     Margin Percentage
                 </div>
                 <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+
                     <span class="badge rounded-pill bg-danger" id="minMargin">
                         Min 13%
                     </span>
+
                     <span class="badge rounded-pill bg-success" id="currentMargin">
                         0%
                     </span>
+
                 </div>
 
-                <div class="profit-box" id="profitAmount">
+                <!-- <div class="profit-box" id="profitAmount">
                     Profit ₹ 0
-                </div>
+                </div> -->
 
                 <div id="marginText" class="mt-2 small text-muted fw-semibold">
                     Waiting for freight calculation...
                 </div>
 
-            </div> -->
+            </div>
         </div>
     </div>
     <form method="POST" autocomplete="off">
@@ -486,7 +489,7 @@
 
             const profit = sellingRate - totalFreight;
 
-            const margin = sellingRate > 13
+            const margin = sellingRate > 0
                 ? (profit / sellingRate) * 100
                 : 0;
 
@@ -504,15 +507,15 @@
                 currentMargin.innerHTML = `${margin.toFixed(2)}%`;
 
             // profit/loss
-            if (profitBox) {
-                if (profit >= 0) {
-                    profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
-                    profitBox.className = "profit-box text-success";
-                } else {
-                    profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
-                    profitBox.className = "profit-box text-danger";
-                }
-            }
+            //if (profitBox) {
+            //   if (profit >= 0) {
+            //     profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
+            //   profitBox.className = "profit-box text-success";
+            //} else {
+            //profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
+            //profitBox.className = "profit-box text-danger";
+            //}
+            //}
 
             // approval
             if (profit < 13) {
