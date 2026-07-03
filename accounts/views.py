@@ -167,19 +167,15 @@ def customer_payment_success(request, enquiry_id):
     )
 
 def customer_accounts(request):
-
     enquiries = Enquiry.objects.all().order_by("-id")
-
+    vehicle = Vehicle.objects.filter(enquiry=enquiry).first()
     data = []
-
     for enquiry in enquiries:
-
         total_received = CustomerTransaction.objects.filter(
             enquiry=enquiry
         ).aggregate(
             total=Sum("amount")
         )["total"] or 0
-
         advance_received = CustomerTransaction.objects.filter(
             enquiry=enquiry,
             payment_against="advance"
@@ -199,6 +195,7 @@ def customer_accounts(request):
 
         data.append({
             "enquiry_id": enquiry.id,
+            "ftl_no": vehicle.ftl_no if vehicle else "",
             "enquiry_no": enquiry.enquiry_no,
             "customer": enquiry.customer_name,
             "contact": enquiry.customer_contact,
@@ -216,6 +213,8 @@ def customer_accounts(request):
             "data": data
         }
     )
+
+
 # End Customer Payments #
 
 def make_payment(request, vehicle_id):

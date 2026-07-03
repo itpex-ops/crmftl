@@ -124,7 +124,7 @@
 
                 <thead>
                     <tr>
-                        <th>Enquiry No</th>
+                        <th>FTL No</th>
                         <th>Customer</th>
                         <th>Contact</th>
                         <th>Selling Rate</th>
@@ -141,7 +141,7 @@
                     {% if row.enquiry_no %}
                     <tr>
 
-                        <td>{{ row.enquiry_no }}</td>
+                        <td>{{ row.ftl_no }}</td>
 
                         <td>
                             {{ row.customer }}
@@ -181,17 +181,11 @@
                                 </span>
                                 {% endif %}
                         </td>
-
                         <td>
-
                             <a href="{% url 'customer_payment' row.enquiry_id %}" class="btn btn-sm btn-success">
-
                                 Receipt
-
                             </a>
-
                         </td>
-
                     </tr>
                     {% endif %}
                     {% endfor %}
@@ -205,7 +199,6 @@
     </div>
 
 </div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -284,5 +277,4 @@
 
     });
 </script>
-
 {% endblock %}
