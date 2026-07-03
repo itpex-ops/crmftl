@@ -670,7 +670,7 @@ def vehicle_accounts(request):
             "is_locked": v.is_locked,
             "is_overpaid": v.is_overpaid,
             "total_advance_paid" : v.total_advance_paid,
-            "remaining_balance_amount" : v.remaining_balance_amount
+            "remaining_balance_amount" : v.remaining
         })
 
     return render(
