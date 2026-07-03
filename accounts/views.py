@@ -168,9 +168,9 @@ def customer_payment_success(request, enquiry_id):
 
 def customer_accounts(request):
     enquiries = Enquiry.objects.all().order_by("-id")
-    vehicle = Vehicle.objects.filter(enquiry=enquiry).first()
     data = []
     for enquiry in enquiries:
+        vehicle = Vehicle.objects.filter(enquiry=enquiry).first()
         total_received = CustomerTransaction.objects.filter(
             enquiry=enquiry
         ).aggregate(
