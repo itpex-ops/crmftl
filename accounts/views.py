@@ -170,7 +170,7 @@ def customer_accounts(request):
     enquiries = Enquiry.objects.all().order_by("-id")
     data = []
     for enquiry in enquiries:
-        vehicle = Vehicle.objects.filter(enquiry=enquiry).first()
+        vehicle = CustomerTransaction.objects.filter(enquiry=enquiry).first()
         total_received = CustomerTransaction.objects.filter(
             enquiry=enquiry
         ).aggregate(
