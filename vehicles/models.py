@@ -15,7 +15,6 @@ class Vehicle(models.Model):
     blank=True,
     )
 
-
     ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
     vehicle_number = models.CharField(max_length=50)
     driver_number = models.CharField(max_length=15)
