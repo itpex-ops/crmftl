@@ -10,8 +10,11 @@ class Vehicle(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name='vehicles'
+        related_name='vehicles',
+        null=True,
+    blank=True,
     )
+
 
     ftl_no = models.CharField(max_length=20, unique=True, blank=True, null=True)
     vehicle_number = models.CharField(max_length=50)
