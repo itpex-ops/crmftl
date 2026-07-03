@@ -72,7 +72,7 @@ class CustomerTransaction(models.Model):
         null=True
     )
 
-    transaction_datetime = models.DateTimeField(blank=True,
+    transaction_datetime = models.DateField(blank=True,
         null=True)
 
     created_by = models.ForeignKey(
