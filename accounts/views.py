@@ -34,18 +34,15 @@ import random
  
 @login_required
 def customer_payment(request, enquiry_id):
-
     enquiry = get_object_or_404(
         Enquiry,
         id=enquiry_id
     )
-
+    vehicle = Vehicle.objects.filter(order__enquiry=enquiry).first()      
     transactions = CustomerTransaction.objects.filter(
         enquiry=enquiry
     ).order_by("-id")
-
     if request.method == "POST":
-
         request.session["customer_payment"] = {
             "amount": request.POST.get("amount"),
             "account_type": request.POST.get("account_type"),
@@ -56,17 +53,16 @@ def customer_payment(request, enquiry_id):
             ),
             "remarks": request.POST.get("remarks"),
         }
-
         return redirect(
             "confirm_customer_payment",
             enquiry.id
         )
-
     return render(
         request,
         "accounts/customers/customer_payment.html",
         {
             "enquiry": enquiry,
+            "vehicle": vehicle.ftl_no if vehicle else "",
             "transactions": transactions,
         }
     )
@@ -170,8 +166,7 @@ def customer_accounts(request):
     enquiries = Enquiry.objects.all().order_by("-id")
     data = []
     for enquiry in enquiries:
-        vehicle = Vehicle.objects.filter(
-            order__enquiry=enquiry).first()        
+        vehicle = Vehicle.objects.filter(order__enquiry=enquiry).first()      
         total_received = CustomerTransaction.objects.filter(
             enquiry=enquiry
         ).aggregate(
@@ -196,7 +191,7 @@ def customer_accounts(request):
 
         data.append({
             "enquiry_id": enquiry.id,
-            "ftl_no": vehicle.ftl_no if vehicle else "",
+            "vehicle": vehicle,
             "enquiry_no": enquiry.enquiry_no,
             "customer": enquiry.customer_name,
             "contact": enquiry.customer_contact,
@@ -214,7 +209,6 @@ def customer_accounts(request):
             "data": data
         }
     )
-
 
 # End Customer Payments #
 
@@ -731,7 +725,6 @@ def pay_vehicle_other(request, vehicle_id):
 
 @login_required
 def confirm_vehicle_other(request, vehicle_id):
-
     vehicle = get_object_or_404(
         Vehicle,
         id=vehicle_id
@@ -974,7 +967,6 @@ def vehicle_ledger(request, vehicle_id):
             "transactions": transactions,
         }
     )
-
 
 def dashboard(request):
 

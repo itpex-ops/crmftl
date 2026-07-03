@@ -89,7 +89,6 @@
 </style>
 
 <div class="container py-1">
-
     <div class="payment-wrapper">
 
         <div class="card payment-card">
@@ -99,7 +98,6 @@
             </div>
 
             <div class="card-body">
-
                 <div class="customer-info">
 
                     <div class="customer-name">
@@ -107,7 +105,9 @@
                     </div>
 
                     <div class="enquiry-no">
-                        {{ enquiry.enquiry_no }}
+                        {% if vehicle %}
+                        {{ vehicle.ftl_no }}
+                        {% endif %}
                     </div>
 
                 </div>
