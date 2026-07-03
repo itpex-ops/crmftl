@@ -62,7 +62,7 @@ def customer_payment(request, enquiry_id):
         "accounts/customers/customer_payment.html",
         {
             "enquiry": enquiry,
-            "vehicle": vehicle.ftl_no if vehicle else "",
+            "vehicle": vehicle,
             "transactions": transactions,
         }
     )
@@ -191,7 +191,7 @@ def customer_accounts(request):
 
         data.append({
             "enquiry_id": enquiry.id,
-            "vehicle": vehicle,
+            "ftl_no": vehicle.ftl_no if vehicle else "",
             "enquiry_no": enquiry.enquiry_no,
             "customer": enquiry.customer_name,
             "contact": enquiry.customer_contact,
