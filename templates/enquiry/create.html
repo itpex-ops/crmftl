@@ -4,303 +4,465 @@
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="container-fluid">
-    <!-- HEADER -->
-    <div class="page-header mt-1">
-        <h4>🚚 Create Enquiry</h4>
-        <small>Fill all required details</small>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label" id="search">
-            Search Customer
-        </label>
-    </div>
-    <div class="col-md-3 mt-0">
-        <select id="customerSelect" name="customer_id" class="form-select">
-            <option value="">
-                Select Customer
-            </option>
-            {% for c in customers %}
-            <option value="{{ c.id }}" data-name="{{ c.name }}" data-phone="{{ c.phone1 }}" data-email="{{ c.email }}"
-                data-gst="{{ c.gst_number }}" data-city="{{ c.city }}" data-state="{{ c.state }}"
-                data-pincode="{{ c.pincode }}">
-                {{ c.customer_code }} - {{ c.name }} - {{ c.phone1 }}
-            </option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
-<div id="customerFoundMsg" class="alert alert-success d-none">
-    <h6 class="mb-0">
-        ✅ Customer Found
-    </h6>
-</div>
-
-<div id="customerNotFoundMsg" class="alert alert-warning d-none">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    <span>Customer not found. Please refer to the Customer List.</span>
-</div>
-
-<form method="POST">
-    {% csrf_token %}
-    <div class="row mt-2">
-        <!-- LEFT SIDE -->
-        <div class="col-lg-8">
+    <form method="POST">
+        {% csrf_token %}
+        <!-- HEADER -->
+        <div class="page-header">
+            <h4>🚚 Create Enquiry</h4>
+            <small>Fill all required details</small>
+        </div>
+        <div class="row mt-2">
+            <!-- ================= LEFT SIDE ================= -->
             <!-- CUSTOMER DETAILS -->
-            <div class="card mb-3 section-card">
-                <div class="section-title">👤 Customer Details</div>
-                <div class="card-body row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Customer Name
-                            <span class="text-danger fw-bold">*</span> </label>
-                        <input type="text" id="customer_name" name="customer_name" class="form-control"
-                            value="{{ customer.name|default:'' }}" required>
-                    </div>
+            <div class="col-lg-6">
+                <div class="card mb-2 section-card">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <label class="form-label">
+                                Search Customer
+                            </label>
+                            <select id="customerSelect" name="customer_id" class="form-select">
+                                <option value="">
+                                    Select Customer
+                                </option>
+                                {% for c in customers %}
+                                <option value="{{ c.id }}" data-name="{{ c.name }}" data-phone="{{ c.phone1 }}"
+                                    data-email="{{ c.email }}" data-gst="{{ c.gst_number }}" data-city="{{ c.city }}"
+                                    data-state="{{ c.state }}" data-pincode="{{ c.pincode }}">
 
-                    <div class="col-md-4">
-                        <label class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
-                        <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
-                            maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
-                            value="{{ customer.phone1|default:'' }}" placeholder="Enter 10 digit mobile number"
-                            required>
-                        <!-- <small class="text-muted">Enter 10 digit mobile number</small> -->
-                    </div>
+                                    {{ c.customer_code }} -
+                                    {{ c.name }} -
+                                    {{ c.phone1 }}
 
-                    <div class="col-md-4">
-                        <label class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control"
-                            value="{{ customer.email|default:'' }}">
-                    </div>
-                    <div id="customerExtraInfo" class="row g-3 d-none">
-
-                        <div class="col-md-3">
-                            <label class="form-label">GST Number</label>
-                            <input type="text" id="gst_number" name="gst_number" class="form-control" readonly>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">City</label>
-                            <input type="text" id="city" name="city" class="form-control" readonly>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">State</label>
-                            <input type="text" id="state" name="state" class="form-control" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-2">
-                        <label class="form-label">Lead Source<span class="text-danger fw-bold">*</span></label>
-                        <select name="lead_source" class="form-select">
-                            <option value="">Select</option>
-                            <option value="justdial">Just Dial</option>
-                            <option value="inbound">Inbound</option>
-                            <option value="outbound">Outbound</option>
-                            <option value="social media">Social Media</option>
-                            <option value="reference">Reference</option>
-                        </select>
-                    </div>
-
-                    <div class="col-sm-2">
-                        <label class="form-label">Reference/SocialMedia</label>
-                        <input type="text" name="reference_name" class="form-control">
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">No. of Pickups<span class="text-danger fw-bold">*</span></label>
-                        <input type="number" name="pickups" id="pickups" class="form-control" min="1" max="10" value="1"
-                            required>
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">No. of Deliveries
-                            <span class="text-danger fw-bold">*</span>
-                        </label>
-                        <input type="number" name="deliveries" id="deliveries" class="form-control" min="1" max="10"
-                            value="1" required>
-                    </div>
-
-                    <div id="origin-container" class="col-md-3">
-                        <label class="form-label">Pickup PIN Code<span class="text-danger fw-bold">*</span></label>
-                        <input type="tel" name="origin_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
-                            inputmode="numeric" required>
-                    </div>
-
-                    <div id="destination-container" class="col-md-3">
-                        <label class="form-label">Delivery PIN Code<span class="text-danger fw-bold">*</span></label>
-                        <input type="tel" name="destination_pin[]" class="form-control" maxlength="6" pattern="[0-9]{6}"
-                            inputmode="numeric" required>
-                    </div>
-
-                </div>
-                <!-- ROUTE & VEHICLE -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📍 Route & Vehicle</div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Vehicle Type<span class="text-danger fw-bold">*</span></label>
-
-                            <select name="vehicle_type" class="form-select vehicle-select" required>
-                                <option value="">Select Vehicle</option>
-                                {% for value, label in vehicle_types %}
-                                <option value="{{ value }}">{{ label }}</option>
+                                </option>
                                 {% endfor %}
                             </select>
                         </div>
+                    </div>
 
-                        <!-- Tom Select CSS -->
-                        <link rel="stylesheet"
-                            href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+                    <div id="customerFoundMsg" class="alert alert-success mt-3 d-none">
+                        <strong>✓ Customer Found</strong>
+                    </div>
+                    <div id="customerNotFoundMsg" class="alert alert-warning mt-3 d-none">
+                        Customer not found. Please refer Customer List.
+                    </div>
+                    <br>
+                    <div class="card-header">
+                        👤 Customer Details
+                    </div>
 
-                        <!-- Tom Select JS -->
-                        <script
-                            src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+                    <div class="card-body">
 
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
+                        <div class="row g-3">
 
-                                new TomSelect(".vehicle-select", {
-                                    create: false,
-                                    sortField: {
-                                        field: "text",
-                                        direction: "asc"
-                                    },
-                                    placeholder: "Search Vehicle Type..."
-                                });
+                            <div class="col-sm-6">
 
-                            });
-                        </script>
+                                <label class="form-label">
+                                    Customer Name
+                                    <span class="text-danger">*</span>
+                                </label>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Vehicle Description<span
-                                    class="text-danger fw-bold">*</span></label>
-                            <input type="text" name="vehicle_description" class="form-control" required>
+                                <input type="text" id="customer_name" name="customer_name" class="form-control"
+                                    value="{{ customer.name|default:'' }}" required>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Mobile Number
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
+                                    maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                                    value="{{ customer.phone1|default:'' }}" required>
+
+                            </div>
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Email
+                                </label>
+
+                                <input type="email" id="email" name="email" class="form-control"
+                                    value="{{ customer.email|default:'' }}">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Lead Source
+                                </label>
+                                <select name="lead_source" class="form-select">
+
+                                    <option value="">Select</option>
+                                    <option value="justdial">Just Dial</option>
+                                    <option value="inbound">Inbound</option>
+                                    <option value="outbound">Outbound</option>
+                                    <option value="social media">Social Media</option>
+                                    <option value="reference">Reference</option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Reference / Social Media
+                                </label>
+                                <input type="text" name="reference_name" class="form-control">
+                            </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">KMs</label>
-                            <input type="number" step="any" name="kms" class="form-control" required>
-                        </div>
+                        <div id="customerExtraInfo" class="row g-3 mt-2 d-none">
 
+                            <div class="col-md-4">
 
-                        <div class="col-md-4">
-                            <label class="form-label">Material<span class="text-danger fw-bold">*</span></label>
-                            <input type="text" name="material" class="form-control">
+                                <label class="form-label">
+                                    GST Number
+                                </label>
+
+                                <input type="text" id="gst_number" name="gst_number" class="form-control" readonly>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    City
+                                </label>
+
+                                <input type="text" id="city" name="city" class="form-control" readonly>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    State
+                                </label>
+
+                                <input type="text" id="state" name="state" class="form-control" readonly>
+
+                            </div>
+
                         </div>
 
                     </div>
                 </div>
+                <!-- VEHICLE DETAILS -->
+                <div class="card mb-2 section-card">
+                    <div class="card-header">
+                        🚚 Vehicle 📍 Route Details
+                    </div>
+                    <div class="card-body">
 
-                <!-- LOAD DETAILS -->
-                <div class="card mb-3 section-card">
-                    <div class="section-title">📦 Load Details</div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Pieces</label>
-                            <input type="number" step="any" name="pieces" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Tonnage</label>
-                            <input type="number" step="any" name="tonnage" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">KG</label>
-                            <input type="number" step="any" name="kg" class="form-control">
+                        <div class="row g-3">
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Vehicle Type
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select name="vehicle_type" class="form-select vehicle-select" required>
+
+                                    <option value="">
+                                        Select Vehicle
+                                        </optform-labelion>
+
+                                        {% for value, label in vehicle_types %}
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Vehicle Description
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text" name="vehicle_description" class="form-control" required>
+
+                            </div>
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Distance (KMs)
+                                </label>
+
+                                <input type="number" step="any" name="kms" class="form-control" required>
+
+                            </div>
+
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Dimension Unit</label>
-                            <select name="dimension_unit" class="form-select">
-                                <option value="">Select</option>
-                                <option value="cm">cm</option>
-                                <option value="inch">inch</option>
-                                <option value="feet">feet</option>
-                                <option value="meter">meter</option>
-                            </select>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    No. of Pickups
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="number" id="pickups" name="pickups" class="form-control" min="1" max="10"
+                                    value="1" required>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    No. of Deliveries
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="number" id="deliveries" name="deliveries" class="form-control" min="1"
+                                    max="10" value="1" required>
+
+                            </div>
+
+                            <div id="origin-container" class="col-sm-6">
+
+                                <label class="form-label">
+                                    Pickup PIN Code
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" name="origin_pin[]" class="form-control" maxlength="6"
+                                    pattern="[0-9]{6}" inputmode="numeric" required>
+
+                            </div>
+
+                            <div id="destination-container" class="col-sm-6">
+
+                                <label class="form-label">
+                                    Delivery PIN Code
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
+                                    pattern="[0-9]{6}" inputmode="numeric" required>
+
+                            </div>
+
+
+
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Length</label>
-                            <input type="number" step="any" name="length" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Breadth</label>
-                            <input type="number" step="any" name="breadth" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Height</label>
-                            <input type="number" step="any" name="height" class="form-control">
-                        </div>
-                        <div class="col-md-6 d-none" id="dimensionBox">
-                            <div class="dimension-result-box">
-                                <div class="result-title">
-                                    📐 Dimension Calculation
-                                </div>
-                                <!-- Converted Size -->
-                                <div class="result-row">
-                                    <span>
-                                        Converted Size
-                                    </span>
-                                    <strong id="convertedDimension">
-                                        0 × 0 × 0 CM
-                                    </strong>
-                                </div>
-                                <!-- Volumetric Weight -->
-                                <div class="result-row volumetric-highlight">
-                                    <span>
-                                        Volumetric Weight
-                                    </span>
-                                    <strong id="volumetric_weight">
-                                        0 KG
-                                    </strong>
-                                </div>
-                                <!-- Volume -->
-                                <div class="result-row small-volume">
-                                    <span>
-                                        Volume
-                                    </span>
-                                    <small id="volumeResult">
-                                        0 CM³
-                                    </small>
-                                </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <!-- ================= LOAD DETAILS ================= -->
+                <div class="card mb-2 section-card">
+                    <div class="card-header">
+                        📦 Load Details
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">
+                                    Material
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="material" class="form-control" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Pieces
+                                </label>
+                                <input type="number" step="any" name="pieces" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Tonnage
+                                </label>
+                                <input type="number" step="any" name="tonnage" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    KG
+                                </label>
+                                <input type="number" step="any" name="kg" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Dimension Unit
+                                </label>
+
+                                <select name="dimension_unit" class="form-select">
+
+                                    <option value="">Select</option>
+                                    <option value="cm">CM</option>
+                                    <option value="inch">Inch</option>
+                                    <option value="feet">Feet</option>
+                                    <option value="meter">Meter</option>
+
+                                </select>
+
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Length
+                                </label>
+
+                                <input type="number" step="any" name="length" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Breadth
+                                </label>
+
+                                <input type="number" step="any" name="breadth" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Height
+                                </label>
+
+                                <input type="number" step="any" name="height" class="form-control">
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label class="form-label">Expected Rate ₹</label>
+                        <div class="row mt-3">
+
+                            <div class="col-md-12 d-none" id="dimensionBox">
+
+                                <div class="dimension-result-box">
+
+                                    <div class="result-title">
+                                        📐 Dimension Calculation
+                                    </div>
+
+                                    <div class="result-row">
+
+                                        <span>
+                                            Converted Size
+                                        </span>
+
+                                        <strong id="convertedDimension">
+                                            0 × 0 × 0 CM
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="result-row volumetric-highlight">
+
+                                        <span>
+                                            Volumetric Weight
+                                        </span>
+
+                                        <strong id="volumetric_weight">
+                                            0 KG
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="result-row">
+
+                                        <span>
+                                            Volume
+                                        </span>
+
+                                        <small id="volumeResult">
+                                            0 CM³
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= RATE DETAILS ================= -->
+                <div class="card mb-2 section-card">
+
+                    <div class="card-header">
+                        💰 Rate Details
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Expected Rate ₹
+                                </label>
+
                                 <input type="number" step="any" name="expected_rate" class="form-control">
+
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Approval Rate ₹</label>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Approval Rate ₹
+                                </label>
+
                                 <input type="number" step="any" name="approval_rate" class="form-control">
-                            </div>
-                            <div class="d-grid gap-2">
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary btn-save" data-action="confirm">
-                                        <i class="bi bi-save me-1"></i>
-                                        <span id="btnText">Save Enquiry</span>
-                                    </button>
-                                </div>
+
                             </div>
 
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- RIGHT SIDE -->
-        <div class="col-lg-4">
-            <div class="card mb-3 section-card">
-                <div class="section-title">👤 Enquiry Generated By</div>
-                <div class="card-body">
-                    <label class="form-label">User Name</label>
-                    <div class="form-control bg-light">
-                        <strong>{{ request.user.username }}</strong>
+
+                    <!-- ================= ENQUIRY GENERATED BY ================= -->
+
+                    <div class="card mb-2 section-card">
+
+                        <div class="card-header">
+                            👤 Enquiry Generated By
+                        </div>
+
+                        <div class="card-body">
+
+                            <label class="form-label">
+                                User Name
+                            </label>
+
+                            <div class="form-control bg-light">
+
+                                <strong>
+                                    {{ request.user.username }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ================= SAVE BUTTON ================= -->
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-outline-primary btn-save">
+                            <i class="bi bi-save me-2"></i>
+                            Save Enquiry
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+        <!-- End Right Column -->
+    </form>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
@@ -318,25 +480,39 @@
 
     .page-header {
         background: #fff;
-        padding: 12px 15px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
-        margin-bottom: 20px;
+        padding: 7px 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .05);
+        margin-bottom: 7px;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 30px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+        font-size: 14px;
+    }
+
+    .select2-results__option {
+        font-size: 14px;
+        padding: 4px 8px;
     }
 
     .page-header h4 {
+        padding: 0;
         margin: 0;
         font-weight: 700;
         color: black;
     }
 
-    #search {
-        font-size: 16px;
-        font-weight: 600;
+    .page-header small {
+        color: black;
     }
 
-    .small {
-        color: black;
+    #search {
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .status-badge {
@@ -349,36 +525,19 @@
         text-transform: capitalize;
     }
 
-    .card-box {
-        background: #fff;
-        border-radius: 12px;
-        padding: 7px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
-        border: none;
-    }
-
-    .section-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #0d6efd;
-        border-bottom: 1px solid #edf2f7;
-        padding-bottom: 7px;
-        margin-bottom: 18px;
-    }
-
-    label {
-        font-size: 12px;
+    .form-label {
+        font-size: 14px;
         font-weight: 600;
         color: #555;
-        margin-bottom: 5px;
+        margin-bottom: 3px;
     }
 
     .form-control,
     .form-select {
-        border-radius: 8px;
-        min-height: 28px;
+        border-radius: 3px;
+        height: 28px;
         font-size: 13px;
+        padding: 4px 10px;
     }
 
     .form-control:focus,
@@ -389,8 +548,16 @@
 
     .form-control[readonly],
     .form-control:disabled {
-        background: #f8fafc;
+        background-color: #f8fafc;
         color: #495057;
+    }
+
+    .card-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: #555;
+        padding: 5px 10px;
+        margin: 0;
     }
 
     .route-box {
@@ -402,30 +569,10 @@
     }
 
     .btn-save {
-        height: 48px;
+        width: 160px;
+        /* or 200px */
+        height: 38px;
         font-weight: 600;
-    }
-
-    .info-box {
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 9px;
-        margin-bottom: 15px;
-    }
-
-    .info-title {
-        font-size: 12px;
-        color: #6c757d;
-    }
-
-    .info-value {
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .sticky-panel {
-        position: sticky;
-        top: 15px;
     }
 
     .route-modern {
@@ -496,10 +643,6 @@
             padding: 2px 6px;
             margin: 1px;
         }
-
-        .sticky-panel {
-            position: static;
-        }
     }
 </style>
 <script>
@@ -526,7 +669,7 @@
         $('#customerSelect').select2({
             placeholder: "Search by Customer Code / Name / Mobile",
             allowClear: true,
-            width: '100%'
+            width: '90%'
         });
 
     });

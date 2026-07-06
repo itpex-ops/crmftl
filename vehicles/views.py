@@ -20,13 +20,9 @@ from django.core.exceptions import ValidationError
 
 @login_required
 def assign_vehicle(request, order_id):
-
     order = get_object_or_404(Order, id=order_id)
-
     if request.method == "POST":
-
         try:
-
             vehicle = Vehicle(
                 order=order,
                 vehicle_number=request.POST.get("vehicle_number"),

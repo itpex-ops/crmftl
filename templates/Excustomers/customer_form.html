@@ -51,7 +51,7 @@
     }
 
     .section-title {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
         color: #0d6efd;
         border-bottom: 1px solid #edf2f7;
@@ -59,18 +59,17 @@
         margin-bottom: 18px;
     }
 
-    label {
-        font-size: 12px;
+    .form-label {
+        font-size: 14px;
+        /* Increase to 16px or 17px if needed */
         font-weight: 600;
-        color: #555;
-        margin-bottom: 5px;
     }
 
     .form-control,
     .form-select {
         border-radius: 8px;
-        min-height: 28px;
-        font-size: 13px;
+        height: 16px;
+        font-size: 11px;
     }
 
     .form-control:focus,
@@ -241,14 +240,15 @@
 
                             <div class="col-sm-4">
                                 <label class="form-label">Mobile Number 1 *</label>
-                                <input type="tel" name="phone1" class="form-control" maxlength="10" pattern="[0-9]{10}" 
-                                inputmode="numeric" required>
+                                <input type="tel" name="phone1" class="form-control" maxlength="10" pattern="[0-9]{10}"
+                                    inputmode="numeric" required>
                                 <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
                             <div class="col-sm-4">
                                 <label class="form-label">Mobile Number 2</label>
-                                <input type="tel" name="phone2" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+                                <input type="tel" name="phone2" class="form-control" maxlength="10" pattern="[0-9]{10}"
+                                    inputmode="numeric">
                                 <small class="text-muted">Enter 10 digit mobile number</small>
                             </div>
 
@@ -260,7 +260,8 @@
                             <div class="col-sm-4">
                                 <label class="form-label">PAN Number</label>
                                 <input type="text" name="pan_number" class="form-control" maxlength="10"
-                                    style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
+                                    style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                    title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
                             </div>
                             <div class="col-sm-4">
                                 <label class="form-label">GST Number</label>
