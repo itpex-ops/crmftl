@@ -2,325 +2,326 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcelex</title>
-    <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Parcelex</title>
+        <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
-</head>
+    </head>
 
-<body>
-    <!-- ===== SIDEBAR ===== -->
-    <div class="sidebar" id="sidebar">
-        <div class="text-center mb-3">
-            <div class="logo-box">
-                <span class="logo-text">Parcelex</span>
+    <body>
+        <!-- ===== SIDEBAR ===== -->
+        <div class="sidebar" id="sidebar">
+            <div class="text-center mb-3">
+                <div class="logo-box">
+                    <span class="logo-text">Parcelex</span>
+                </div>
+                <div class="ftl-text">FTL</div>
             </div>
-            <div class="ftl-text">FTL</div>
-        </div>
-        <hr>
-        <!-- DASHBOARD -->
+            <hr>
+            <!-- DASHBOARD -->
 
-        <a href="{% url 'management_dashboard' %}">
-            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-        </a>
+            <a href="{% url 'management_dashboard' %}">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+            </a>
 
-        <a data-bs-toggle="collapse" href="#customerMenu" role="button">
-            <i class="bi bi-people me-2"></i>
-            Customers
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
-
-        <div class="collapse submenu
-            {% if 'customer' in request.resolver_match.url_name %}show{% endif %}" id="customerMenu">
-            <a href="{% url 'customer_dashboard' %}">
+            <a data-bs-toggle="collapse" href="#customerMenu" role="button">
                 <i class="bi bi-people me-2"></i>
-                Dashboard
+                Customers
+                <i class="bi bi-chevron-down float-end"></i>
             </a>
-            <a href="{% url 'customer_create' %}"
-                class="{% if request.resolver_match.url_name == 'customer_create' %}active{% endif %}">
-                <i class="bi bi-plus-circle me-2"></i>
-                Create
+
+            <div class="collapse submenu
+            {% if 'customer' in request.resolver_match.url_name %}show{% endif %}" id="customerMenu">
+                <a href="{% url 'customer_dashboard' %}">
+                    <i class="bi bi-people me-2"></i>
+                    Dashboard
+                </a>
+                <a href="{% url 'customer_create' %}"
+                    class="{% if request.resolver_match.url_name == 'customer_create' %}active{% endif %}">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Create
+                </a>
+                <a href="{% url 'customer_list' %}"
+                    class="{% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+                    <i class="bi bi-card-list me-2"></i>
+                    List
+                </a>
+            </div>
+
+            <!-- ENQUIRIES -->
+            {% if 'enquiry_create' in role_perms or 'enquiry_list' in role_perms %}
+            <a data-bs-toggle="collapse" href="#enquiryMenu">
+                <i class="bi bi-headset me-2"></i> Enquiries
+                <i class="bi bi-chevron-down float-end"></i>
             </a>
-            <a href="{% url 'customer_list' %}"
-                class="{% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
-                <i class="bi bi-card-list me-2"></i>
-                List
+
+            <div class="collapse submenu {% if 'enquiry_create' in request.path %}show{% endif %}" id="enquiryMenu">
+                <a href="{% url 'enquiry_dashboard' %}">
+                    <i class="bi bi-plus-circle me-2"></i> Dashboard
+                </a>
+                {% if 'enquiry_create' in role_perms %}
+                <a href="{% url 'create_enquiry' %}">
+                    <i class="bi bi-plus-circle me-2"></i> Create
+                </a>
+                {% endif %}
+
+                {% if 'enquiry_list' in role_perms %}
+                <a href="{% url 'enquiry_list' %}">
+                    <i class="bi bi-card-list me-2"></i> List
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+
+            <!-- ORDERS -->
+            {% if 'orders' in role_perms or 'orders_list' in role_perms or 'orders_manual' in role_perms %}
+            <a data-bs-toggle="collapse" href="#orderMenu">
+
+
+                <i class="bi bi-box-seam me-2"></i> Orders
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
+                {% if 'orders' in role_perms or 'orders_list' in role_perms %}
+
+                <a href="{% url 'order_dashboard' %}">
+                    <i class="bi bi-receipt me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'orders_management' %}">
+                    <i class="bi bi-receipt me-2"></i> List
+                </a>
+                {% endif %}
+
+            </div>
+            {% endif %}
+
+
+            <!-- VEHICLES -->
+            {% if 'vehicles_placement' in role_perms or 'vehicle_tracking' in role_perms %}
+            <a data-bs-toggle="collapse" href="#vehicleMenu">
+                <i class="bi bi-truck me-2"></i> Vehicles
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu {% if 'vehicles' in request.path %}show{% endif %}" id="vehicleMenu">
+
+                {% if 'vehicles_placement' in role_perms %}
+                <a href="{% url 'vehicle_dashboard' %}">
+                    <i class="bi bi-geo-alt me-2"></i> Dashboard
+                </a>
+
+                <a href="{% url 'all_assigned_vehicles' %}">
+                    <i class="bi bi-geo-alt me-2"></i> Placements
+                </a>
+                {% endif %}
+
+                {% if 'vehicle_tracking' in role_perms %}
+                <a href="{% url 'public_tracking' %}">
+                    <i class="bi bi-map me-2"></i> Tracking
+                </a>
+                {% endif %}
+
+            </div>
+            {% endif %}
+
+
+            <!-- ACCOUNTS -->
+            {% if 'accounts_vehicle' in role_perms or 'accounts_customer' in roles_perms %}
+            <a data-bs-toggle="collapse" href="#accountsMenu">
+                <i class="bi bi-wallet2 me-2"></i> Accounts
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
+
+                {% if 'accounts_customer' in role_perms %}
+
+                <a href="{% url 'accounts_dashboard' %}">
+                    <i class="bi bi-people-fill me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'customer_accounts' %}">
+                    <i class="bi bi-people-fill me-2"></i> Customer
+                </a>
+                {% endif %}
+
+                {% if 'accounts_vehicle' in role_perms %}
+                <a href="{% url 'vehicle_accounts' %}">
+                    <i class="bi bi-truck-flatbed me-2"></i> Vehicle
+                </a>
+                {% endif %}
+
+            </div>
+            {% endif %}
+            <!-- LOGOUT -->
+            <a href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
             </a>
         </div>
 
-        <!-- ENQUIRIES -->
-        {% if 'enquiry_create' in role_perms or 'enquiry_list' in role_perms %}
-        <a data-bs-toggle="collapse" href="#enquiryMenu">
-            <i class="bi bi-headset me-2"></i> Enquiries
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
+        <!-- ===== CONTENT ===== -->
+        <div class="content" id="content">
 
-        <div class="collapse submenu {% if 'enquiry_create' in request.path %}show{% endif %}" id="enquiryMenu">
-            <a href="{% url 'enquiry_dashboard' %}">
-                <i class="bi bi-plus-circle me-2"></i> Dashboard
-            </a>
-            {% if 'enquiry_create' in role_perms %}
-            <a href="{% url 'create_enquiry' %}">
-                <i class="bi bi-plus-circle me-2"></i> Create
-            </a>
-            {% endif %}
+            <!-- ===== NAVBAR ===== -->
+            <nav id="mainNavbar" class="navbar fixed-top px-4 d-flex justify-content-between align-items-center">
 
-            {% if 'enquiry_list' in role_perms %}
-            <a href="{% url 'enquiry_list' %}">
-                <i class="bi bi-card-list me-2"></i> List
-            </a>
-            {% endif %}
-        </div>
-        {% endif %}
+                <!-- LEFT (FIXED TOGGLE BUTTON) -->
+                <button class="btn btn-sm btn-light border" id="toggleBtn">
+                    <i class="bi bi-list"></i>
+                </button>
 
-
-        <!-- ORDERS -->
-        {% if 'orders' in role_perms or 'orders_list' in role_perms or 'orders_manual' in role_perms %}
-        <a data-bs-toggle="collapse" href="#orderMenu">
-
-
-            <i class="bi bi-box-seam me-2"></i> Orders
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
-
-        <div class="collapse submenu {% if 'orders' in request.path %}show{% endif %}" id="orderMenu">
-            {% if 'orders' in role_perms or 'orders_list' in role_perms %}
-
-            <a href="{% url 'order_dashboard' %}">
-                <i class="bi bi-receipt me-2"></i> Dashboard
-            </a>
-            <a href="{% url 'orders_management' %}">
-                <i class="bi bi-receipt me-2"></i> List
-            </a>
-            {% endif %}
-
-        </div>
-        {% endif %}
-
-
-        <!-- VEHICLES -->
-        {% if 'vehicles_placement' in role_perms or 'vehicle_tracking' in role_perms %}
-        <a data-bs-toggle="collapse" href="#vehicleMenu">
-            <i class="bi bi-truck me-2"></i> Vehicles
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
-
-        <div class="collapse submenu {% if 'vehicles' in request.path %}show{% endif %}" id="vehicleMenu">
-
-            {% if 'vehicles_placement' in role_perms %}
-            <a href="{% url 'vehicle_dashboard' %}">
-                <i class="bi bi-geo-alt me-2"></i> Dashboard
-            </a>
-
-            <a href="{% url 'all_assigned_vehicles' %}">
-                <i class="bi bi-geo-alt me-2"></i> Placements
-            </a>
-            {% endif %}
-
-            {% if 'vehicle_tracking' in role_perms %}
-            <a href="{% url 'public_tracking' %}">
-                <i class="bi bi-map me-2"></i> Tracking
-            </a>
-            {% endif %}
-
-        </div>
-        {% endif %}
-
-
-        <!-- ACCOUNTS -->
-        {% if 'accounts_vehicle' in role_perms or 'accounts_customer' in roles_perms %}
-        <a data-bs-toggle="collapse" href="#accountsMenu">
-            <i class="bi bi-wallet2 me-2"></i> Accounts
-            <i class="bi bi-chevron-down float-end"></i>
-        </a>
-
-        <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
-
-            {% if 'accounts_customer' in role_perms %}
-
-               <a href="{% url 'accounts_dashboard' %}">
-                <i class="bi bi-people-fill me-2"></i> Dashboard
-            </a>
-            <a href="{% url 'customer_accounts' %}">
-                <i class="bi bi-people-fill me-2"></i> Customer
-            </a>
-            {% endif %}
-
-            {% if 'accounts_vehicle' in role_perms %}
-            <a href="{% url 'vehicle_accounts' %}">
-                <i class="bi bi-truck-flatbed me-2"></i> Vehicle
-            </a>
-            {% endif %}
-
-        </div>
-        {% endif %}
-        <!-- LOGOUT -->
-        <a href="{% url 'logout' %}">
-            <i class="bi bi-box-arrow-right me-2"></i> Logout
-        </a>
-    </div>
-
-    <!-- ===== CONTENT ===== -->
-    <div class="content" id="content">
-
-        <!-- ===== NAVBAR ===== -->
-        <nav id="mainNavbar" class="navbar fixed-top px-4 d-flex justify-content-between align-items-center">
-
-            <!-- LEFT (FIXED TOGGLE BUTTON) -->
-            <button class="btn btn-sm btn-light border" id="toggleBtn">
-                <i class="bi bi-list"></i>
-            </button>
-
-            <!-- RIGHT -->
-            <div class="d-flex align-items-center gap-3">
-
-                <!-- 🔔 NOTIFICATION -->
                 <!-- RIGHT -->
                 <div class="d-flex align-items-center gap-3">
 
                     <!-- 🔔 NOTIFICATION -->
-                    <div class="dropdown">
+                    <!-- RIGHT -->
+                    <div class="d-flex align-items-center gap-3">
 
-                        <!-- BELL ICON -->
-                        <a href="#" class="position-relative text-dark text-decoration-none" data-bs-toggle="dropdown">
+                        <!-- 🔔 NOTIFICATION -->
+                        <div class="dropdown">
 
-                            <i class="bi bi-bell fs-5"></i>
+                            <!-- BELL ICON -->
+                            <a href="#" class="position-relative text-dark text-decoration-none"
+                                data-bs-toggle="dropdown">
 
-                            {% if notification_count > 0 %}
-                            <span class="badge bg-danger notif-badge">
-                                {{ notification_count }}
-                            </span>
-                            {% endif %}
+                                <i class="bi bi-bell fs-5"></i>
 
-                        </a>
+                                {% if notification_count > 0 %}
+                                <span class="badge bg-danger notif-badge">
+                                    {{ notification_count }}
+                                </span>
+                                {% endif %}
 
-                        <!-- DROPDOWN -->
-                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
-                            style="width: 360px; border-radius: 14px; overflow: hidden;">
+                            </a>
 
-                            <!-- HEADER -->
-                            <div class="p-3 border-bottom bg-light">
+                            <!-- DROPDOWN -->
+                            <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+                                style="width: 360px; border-radius: 14px; overflow: hidden;">
 
-                                <div class="d-flex justify-content-between align-items-center">
+                                <!-- HEADER -->
+                                <div class="p-3 border-bottom bg-light">
 
-                                    <div>
-                                        <h6 class="fw-bold mb-0">
-                                            <i class="bi bi-bell-fill text-warning me-1"></i>
-                                            Notifications
-                                        </h6>
+                                    <div class="d-flex justify-content-between align-items-center">
 
-                                        <small class="text-muted">
-                                            Recent alerts and updates
-                                        </small>
-                                    </div>
-
-                                    <span class="badge bg-primary rounded-pill">
-                                        {{ notification_count }}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                            <!-- BODY -->
-                            <div style="max-height: 400px; overflow-y: auto;">
-
-                                {% for n in notifications %}
-
-                                <a href="{% url 'notifications' %}" class="dropdown-item border-bottom p-3">
-
-                                    <div class="d-flex align-items-start">
-
-                                        <div class="notif-icon me-3">
-                                            <i class="bi bi-bell"></i>
-                                        </div>
-
-                                        <div class="flex-grow-1">
-
-                                            <div class="small fw-semibold text-dark">
-                                                {{ n.message }}
-                                            </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">
+                                                <i class="bi bi-bell-fill text-warning me-1"></i>
+                                                Notifications
+                                            </h6>
 
                                             <small class="text-muted">
-                                                <i class="bi bi-clock me-1"></i>
-                                                {{ n.created_at|date:"d M Y · h:i A" }}
+                                                Recent alerts and updates
                                             </small>
-
                                         </div>
 
-                                        {% if not n.is_read %}
-                                        <span class="badge bg-success rounded-pill ms-2">
-                                            New
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ notification_count }}
                                         </span>
-                                        {% endif %}
 
                                     </div>
-
-                                </a>
-
-                                {% empty %}
-
-                                <div class="text-center py-5">
-
-                                    <div class="empty-icon mb-3">
-                                        <i class="bi bi-bell-slash"></i>
-                                    </div>
-
-                                    <h6 class="fw-semibold">
-                                        No Notifications
-                                    </h6>
-
-                                    <p class="text-muted small mb-0">
-                                        You're all caught up.
-                                    </p>
 
                                 </div>
 
-                                {% endfor %}
+                                <!-- BODY -->
+                                <div style="max-height: 400px; overflow-y: auto;">
+
+                                    {% for n in notifications %}
+
+                                    <a href="{% url 'notifications' %}" class="dropdown-item border-bottom p-3">
+
+                                        <div class="d-flex align-items-start">
+
+                                            <div class="notif-icon me-3">
+                                                <i class="bi bi-bell"></i>
+                                            </div>
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="small fw-semibold text-dark">
+                                                    {{ n.message }}
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    {{ n.created_at|date:"d M Y · h:i A" }}
+                                                </small>
+
+                                            </div>
+
+                                            {% if not n.is_read %}
+                                            <span class="badge bg-success rounded-pill ms-2">
+                                                New
+                                            </span>
+                                            {% endif %}
+
+                                        </div>
+
+                                    </a>
+
+                                    {% empty %}
+
+                                    <div class="text-center py-5">
+
+                                        <div class="empty-icon mb-3">
+                                            <i class="bi bi-bell-slash"></i>
+                                        </div>
+
+                                        <h6 class="fw-semibold">
+                                            No Notifications
+                                        </h6>
+
+                                        <p class="text-muted small mb-0">
+                                            You're all caught up.
+                                        </p>
+
+                                    </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                                <!-- FOOTER -->
+                                <div class="p-2 border-top bg-light text-center">
+
+                                    <a href="{% url 'notifications' %}" class="small text-decoration-none fw-semibold">
+
+                                        View All Notifications
+
+                                    </a>
+
+                                </div>
 
                             </div>
 
-                            <!-- FOOTER -->
-                            <div class="p-2 border-top bg-light text-center">
+                        </div>
 
-                                <a href="{% url 'notifications' %}" class="small text-decoration-none fw-semibold">
+                        <!-- USER -->
+                        <div class="d-flex align-items-center gap-2">
 
-                                    View All Notifications
+                            <div class="user-avatar">
+                                {{ request.user.username|slice:":1"|upper }}
+                            </div>
 
-                                </a>
+                            <div class="d-none d-md-block">
+                                <div class="flex-wrap small">
+                                    {{ request.user.employee_code }}
+                                </div>
 
+                                <div class="text-muted small">
+                                    {{ request.user.role }}
+                                </div>
                             </div>
 
                         </div>
 
                     </div>
 
-                    <!-- USER -->
-                    <div class="d-flex align-items-center gap-2">
-
-                        <div class="user-avatar">
-                            {{ request.user.username|slice:":1"|upper }}
-                        </div>
-
-                        <div class="d-none d-md-block">
-                            <div class="flex-wrap small">
-                                {{ request.user.employee_code }}
-                            </div>
-
-                            <div class="text-muted small">
-                                {{ request.user.role }}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- USER
+                    <!-- USER
                 <div class="d-flex align-items-center gap-2">
                     <div class="user-avatar">
                         {{ request.user.username|slice:":1"|upper }}
@@ -331,65 +332,66 @@
                     </div>
                 </div> -->
 
-            </div>
+                </div>
 
-        </nav>
+            </nav>
 
-        {% block content %}
-        {% endblock %}
+            {% block content %}
+            {% endblock %}
 
-    </div>
+        </div>
 
-    <!-- ===== SCRIPTS ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        <!-- ===== SCRIPTS ===== -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
 
-            // Replace "None" text in tables, labels, spans, divs etc.
-            document.querySelectorAll("td, th, span, div, p, small, strong, label").forEach(el => {
-                if (el.innerText.trim() === "None") {
-                    el.innerText = "-";
+                // Replace "None" text in tables, labels, spans, divs etc.
+                document.querySelectorAll("td, th, span, div, p, small, strong, label").forEach(el => {
+                    if (el.innerText.trim() === "None") {
+                        el.innerText = "-";
+                    }
+                });
+
+                // Remove None from inputs
+                document.querySelectorAll("input").forEach(input => {
+                    if (input.value === "None") {
+                        input.value = "";
+                    }
+                });
+
+                // Remove None from textarea
+                document.querySelectorAll("textarea").forEach(textarea => {
+                    if (textarea.value === "None") {
+                        textarea.value = "";
+                    }
+                });
+
+                // Remove None from select options
+                document.querySelectorAll("select").forEach(select => {
+                    if (select.value === "None") {
+                        select.value = "";
+                    }
+                });
+
+            });
+        </script>
+
+        <script>
+            document.getElementById("toggleBtn").onclick = function () {
+                document.getElementById("sidebar").classList.toggle("hide");
+                document.getElementById("content").classList.toggle("full");
+            };
+
+            window.addEventListener("scroll", function () {
+                const nav = document.getElementById("mainNavbar");
+                if (window.scrollY > 10) {
+                    nav.classList.add("scrolled");
+                } else {
+                    nav.classList.remove("scrolled");
                 }
             });
+        </script>
+    </body>
 
-            // Remove None from inputs
-            document.querySelectorAll("input").forEach(input => {
-                if (input.value === "None") {
-                    input.value = "";
-                }
-            });
-
-            // Remove None from textarea
-            document.querySelectorAll("textarea").forEach(textarea => {
-                if (textarea.value === "None") {
-                    textarea.value = "";
-                }
-            });
-
-            // Remove None from select options
-            document.querySelectorAll("select").forEach(select => {
-                if (select.value === "None") {
-                    select.value = "";
-                }
-            });
-
-        });
-    </script>
-
-    <script>
-        document.getElementById("toggleBtn").onclick = function () {
-            document.getElementById("sidebar").classList.toggle("hide");
-            document.getElementById("content").classList.toggle("full");
-        };
-
-        window.addEventListener("scroll", function () {
-            const nav = document.getElementById("mainNavbar");
-            if (window.scrollY > 10) {
-                nav.classList.add("scrolled");
-            } else {
-                nav.classList.remove("scrolled");
-            }
-        });
-    </script>
-</body>
 </html>
