@@ -419,9 +419,9 @@ body {
 /* ===== SIDEBAR ===== */
 .sidebar {
     height: 100vh;
-    background: white;
+    background: #654321;
     /* better creamy */
-    color: #333;
+    color: #fff !important;
     position: fixed;
     width: 220px;
     transition: all .3s ease;
@@ -437,7 +437,7 @@ body {
 }
 
 .sidebar a {
-    color: #555;
+    color: white;
     display: block;
     padding: 10px 14px;
     border-radius: 10px;
@@ -448,11 +448,11 @@ body {
 
 .sidebar a:hover {
     background: #eef2ff;
-    color: #2563eb;
+    color: #616266;
 }
 
 .sidebar a.active {
-    background: #2563eb;
+    background: #FDB81B;
     color: white;
 }
 
@@ -476,15 +476,13 @@ body {
 #mainNavbar {
     height: 65px;
     backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.9);
+    background: #FDB81B;
     border-bottom: 1px solid #eee;
     z-index: 1100;
+    color: white;
 }
 
-#mainNavbar.scrolled {
-    background: white;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-}
+
 
 .notif-badge {
     position: absolute;
