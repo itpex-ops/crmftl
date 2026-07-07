@@ -17,20 +17,22 @@
 
     /* HEADER */
     .page-header {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #fff;
-        padding: 24px;
-        border-radius: 24px;
-        box-shadow: 0 10px 25px rgba(106, 27, 154, .20);
+        background: #fff;
+        padding: 18px 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        margin-bottom: 20px;
     }
 
     .page-header h4 {
-        font-weight: 700;
         margin: 0;
+        font-weight: 700;
+        color: rgb(101, 67, 33);
+
     }
 
     .page-header small {
-        opacity: .9;
+        color: #FDB81B;
     }
 
     /* CARDS */
@@ -316,35 +318,35 @@
 
     </div>
 
-   <!-- ================= TAB CONTENT ================= -->
-<div class="tab-bar">
+    <!-- ================= TAB CONTENT ================= -->
+    <div class="tab-bar">
 
-    {% if vehicle.can_take_advance %}
+        {% if vehicle.can_take_advance %}
         <a href="{% url 'pay_vehicle_advance' vehicle.id %}" class="tab-btn">
             Advance
         </a>
-    {% else %}
+        {% else %}
         <span class="tab-btn disabled">
             Advance (Closed)
         </span>
-    {% endif %}
+        {% endif %}
 
-    {% if vehicle.is_payment_completed %}
+        {% if vehicle.is_payment_completed %}
         <span class="tab-btn disabled">
             Balance (Closed)
         </span>
-    {% else %}
+        {% else %}
         <a href="{% url 'pay_vehicle_balance' vehicle.id %}" class="tab-btn">
             Balance
         </a>
-    {% endif %}
+        {% endif %}
 
-    <a href="{% url 'vehicle_other' vehicle.id %}"
-       class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
-        Other
-    </a>
+        <a href="{% url 'vehicle_other' vehicle.id %}"
+            class="tab-btn {% if request.resolver_match.url_name == 'vehicle_other' %}active{% endif %}">
+            Other
+        </a>
 
-</div>
+    </div>
 
     <!-- SKELETON -->
     <div id="skeleton-loader">
@@ -457,7 +459,7 @@
 
         </div>
     </div>
-        <!-- <div class="card mb-3">
+    <!-- <div class="card mb-3">
                 <div class="card-header bg-info text-white">
                     Payment Progress
                 </div>
@@ -492,25 +494,25 @@
                         </div>
                     </div>
                 </div>-->
-    </div>
-    <script>
-        function openTab(event, tabName) {
+</div>
+<script>
+    function openTab(event, tabName) {
 
-            document.querySelectorAll('.tab-content')
-                .forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-content')
+            .forEach(el => el.classList.remove('active'));
 
-            document.querySelectorAll('.tab-btn')
-                .forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn')
+            .forEach(el => el.classList.remove('active'));
 
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
 
-        window.addEventListener("load", function () {
-            setTimeout(() => {
-                const sk = document.getElementById("skeleton-loader");
-                if (sk) sk.style.display = "none";
-            }, 800);
-        });
-    </script>
-    {% endblock %}
+    window.addEventListener("load", function () {
+        setTimeout(() => {
+            const sk = document.getElementById("skeleton-loader");
+            if (sk) sk.style.display = "none";
+        }, 800);
+    });
+</script>
+{% endblock %}

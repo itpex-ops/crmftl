@@ -77,9 +77,9 @@
             <table class="table align-middle">
                 <thead class="custom-table-head">
                     <tr class="main-head-row">
-                        <th >Date</th>
-                        <th >Order No</th>
-                        <th >Customer</th>
+                        <th>Date</th>
+                        <th>Order No</th>
+                        <th>Customer</th>
                         <th>Route</th>
                         <th>Vehicle</th>
                         <th>Selling Rate ₹</th>
@@ -149,7 +149,7 @@
                                     {% for r in order.routes %}
                                     <span class="route-chip">
                                         {{ r.origin }}
-                                         {% if r.origin_pin %}
+                                        {% if r.origin_pin %}
                                         [ {{ r.origin_pin }} ]
                                         {% endif %}
                                     </span>
@@ -252,7 +252,7 @@
                                     {{ order.tracking.lr_no }}
                                 </span>
                             </span>
-                            
+
 
 
 
@@ -336,7 +336,12 @@
     .page-header h4 {
         margin: 0;
         font-weight: 700;
-        color: black;
+        color: rgb(101, 67, 33);
+
+    }
+
+    .page-header small {
+        color: #FDB81B;
     }
 
     .small {
@@ -433,37 +438,40 @@
     }
 
     route-modern {
-    max-width: 180px;
-    min-height: 80px;
-    text-align: left;          /* Left align everything */
-}
+        max-width: 180px;
+        min-height: 80px;
+        text-align: left;
+        /* Left align everything */
+    }
 
-.route-card {
-    padding: 3px 4px;
-    margin-bottom: 3px;
-    text-align: left;          /* Left align content */
-}
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
+        text-align: left;
+        /* Left align content */
+    }
 
-.route-title {
-    font-size: 9px;
-    font-weight: 700;
-    margin-bottom: 2px;        /* Fix typo: 2x -> 2px */
-    text-transform: uppercase;
-    text-align: left;
-}
+    .route-title {
+        font-size: 9px;
+        font-weight: 700;
+        margin-bottom: 2px;
+        /* Fix typo: 2x -> 2px */
+        text-transform: uppercase;
+        text-align: left;
+    }
 
-.route-chip {
-    display: inline-block;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 15px;
-    padding: 2px 8px;
-    margin: 2px;
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1.4;
-    text-align: left;
-}
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-align: left;
+    }
 
     @media (max-width:768px) {
 
@@ -493,7 +501,7 @@
     }
 </style>
 <style>
-   
+
 </style>
 
 <script>
