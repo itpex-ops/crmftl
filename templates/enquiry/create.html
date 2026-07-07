@@ -166,7 +166,8 @@
                                     <span class="text-danger">*</span>
                                 </label>
 
-                                <select name="vehicle_type" class="form-select vehicle-select" required>
+                                <select id="vehicle_type" name="vehicle_type" class="form-select vehicle-select"
+                                    required>
 
                                     <option value="">
                                         Select Vehicle
@@ -418,7 +419,6 @@
                                 <input type="number" step="any" name="approval_rate" class="form-control">
 
                             </div>
-
                         </div>
                     </div>
 
@@ -645,6 +645,7 @@
         }
     }
 </style>
+
 <script>
     $('#customerSelect').on('change', function () {
 
@@ -674,6 +675,18 @@
 
     });
 </script>
+<script>
+    $(document).ready(function () {
+
+        $('#vehicle_type').select2({
+            placeholder: "Select Vehicle Type",
+            allowClear: true,
+            width: '100%'
+        });
+
+    });
+</script>
+
 <script>
     $('#customerSelect').on('change', function () {
 

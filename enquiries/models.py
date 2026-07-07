@@ -45,12 +45,12 @@ VEHICLE_TYPES = [
     ('Dost 8 to 9 Ft','Dost 8 to 9 Ft'),
     ('BadaDost 10 Ft','BadaDost 10 Ft'),
 
-    # TORRES
-    ('Torres 6 Wheels', 'Torres 6 Wheels'),
-    ('Torres 10 Wheels', 'Torres 10 Wheels'),
-    ('Torres 12 Wheels', 'Torres 12 Wheels'),
-    ('Torres 14 Wheels', 'Torres 14 Wheels'),
-    ('Torres 16 Wheels', 'Torres 16 Wheels'),
+    # Taurus
+    ('Taurus 6 Wheels', 'Taurus 6 Wheels'),
+    ('Taurus 10 Wheels', 'Taurus 10 Wheels'),
+    ('Taurus 12 Wheels', 'Taurus 12 Wheels'),
+    ('Taurus 14 Wheels', 'Taurus 14 Wheels'),
+    ('Taurus 16 Wheels', 'Taurus 16 Wheels'),
 ]
 
 class Enquiry(models.Model):

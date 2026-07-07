@@ -52,7 +52,7 @@ body {
 }
 
 .card-box {
-    background: #fff;
+    background: #FDB81B;
     border-radius: 12px;
     padding: 7px;
     margin-bottom: 20px;
@@ -74,7 +74,6 @@ body {
     padding: 9px;
     margin-bottom: 15px;
 }
-
 
 .info-title {
     font-size: 12px;
@@ -107,6 +106,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
     margin-bottom: 8px;
+    background: #FDB81B;
 }
 
 .section-title {
