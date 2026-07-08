@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'channels',
     'customers',
     'dashboards',
+    'live_tracking'
    
 ]
 AUTH_USER_MODEL = 'authentications.User'
