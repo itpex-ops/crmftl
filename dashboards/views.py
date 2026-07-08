@@ -1,7 +1,7 @@
 # dashboards/views.py
 
 from django.shortcuts import render
-from django.db.models import Sum
+from django.db.models import Sum 
 from django.utils import timezone
 
 from customers.models import ExCustomer
@@ -15,7 +15,7 @@ from accounts.models import (
     BankTransaction,
     Expense
 )
-
+from live_tracking.models import TrackingSession, LiveLocation, TrackingSMS
 def management_dashboard(request):
 
     today = timezone.now().date()
