@@ -1,4 +1,7 @@
 {% extends 'layouts/base.html' %}
+{% block title %}Live Tracking{% endblock %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 {% block content %}
 
@@ -10,10 +13,9 @@
 
             <div class="card shadow-sm">
 
-                <div class="card-header">
-
-                    Vehicle Details
-
+                <div class="page-header">
+                    <h4>vehicle Details</h4>
+                    <small class="text-muted">Details of the vehicle being tracked</small>
                 </div>
 
                 <div class="card-body">

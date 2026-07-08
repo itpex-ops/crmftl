@@ -1,4 +1,6 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
 {% block content %}
 
@@ -6,14 +8,12 @@
 
     <div class="card shadow">
 
-        <div class="card-header">
-
-            Location History
-
+        <div class="page-header">
+            <h4><i class="bi bi-geo-alt-fill"></i> Location History</h4>
+            <small class="text-muted">View the location history of the selected vehicle</small>
         </div>
 
         <div class="card-body">
-
             <table class="table">
 
                 <thead>
