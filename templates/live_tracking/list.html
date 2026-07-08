@@ -5,239 +5,238 @@
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 {% block content %}
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-1">
 
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <div class="page-header">
-            <h4>
-                <i class="bi bi-broadcast-pin text-primary"></i>
-                Live Tracking
-            </h4>
-            <small class="text-muted">
-                Monitor all vehicles with SIM Tracking
-            </small>
-        </div>
 
-        <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
-            <i class="bi bi-speedometer2"></i>
-            Dashboard
-        </a>
-
+    <div class="page-header">
+        <h4>
+            <i class="bi bi-broadcast-pin text-primary"></i>
+            Live Tracking
+        </h4>
+        <small class="text-muted">
+            Monitor all vehicles with SIM Tracking
+        </small>
     </div>
 
+    <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
+        <i class="bi bi-speedometer2"></i>
+        Dashboard
+    </a>
 
-    <!-- Search -->
+</div>
 
-    <div class="card shadow-sm mb-3">
 
-        <div class="card-body">
+<!-- Search -->
 
-            <form method="get">
+<div class="card shadow-sm mb-3">
 
-                <div class="row">
+    <div class="card-body">
 
-                    <div class="col-md-4">
+        <form method="get">
 
-                        <input type="text" class="form-control" name="q" placeholder="Search FTL / Vehicle / Driver"
-                            value="{{ request.GET.q }}">
+            <div class="row">
 
-                    </div>
+                <div class="col-md-4">
 
-                    <div class="col-md-2">
-
-                        <button class="btn btn-primary w-100">
-
-                            <i class="bi bi-search"></i>
-
-                            Search
-
-                        </button>
-
-                    </div>
+                    <input type="text" class="form-control" name="q" placeholder="Search FTL / Vehicle / Driver"
+                        value="{{ request.GET.q }}">
 
                 </div>
 
-            </form>
+                <div class="col-md-2">
 
-        </div>
+                    <button class="btn btn-primary w-100">
+
+                        <i class="bi bi-search"></i>
+
+                        Search
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
 
     </div>
 
+</div>
 
 
-    <!-- Table -->
 
-    <div class="card shadow-sm">
+<!-- Table -->
 
-        <div class="card-body table-responsive">
+<div class="card shadow-sm">
 
-            <table class="table table-hover align-middle">
+    <div class="card-body table-responsive">
 
-                <thead class="table-light">
+        <table class="table table-hover align-middle">
 
-                    <tr>
+            <thead class="table-light">
 
-                        <th>#</th>
+                <tr>
 
-                        <th>FTL No</th>
+                    <th>#</th>
 
-                        <th>Vehicle</th>
+                    <th>FTL No</th>
 
-                        <th>Driver</th>
+                    <th>Vehicle</th>
 
-                        <th>Status</th>
+                    <th>Driver</th>
 
-                        <th>Current Location</th>
+                    <th>Status</th>
 
-                        <th>Last Updated</th>
+                    <th>Current Location</th>
 
-                        <th width="220">Action</th>
+                    <th>Last Updated</th>
 
-                    </tr>
+                    <th width="220">Action</th>
 
-                </thead>
+                </tr>
 
-                <tbody>
+            </thead>
 
-                    {% for session in tracking_list %}
+            <tbody>
 
-                    <tr>
+                {% for session in tracking_list %}
 
-                        <td>{{ forloop.counter }}</td>
+                <tr>
 
-                        <td>
+                    <td>{{ forloop.counter }}</td>
 
-                            <strong>
+                    <td>
 
-                                {{ session.vehicle.ftl_no }}
+                        <strong>
 
-                            </strong>
+                            {{ session.vehicle.ftl_no }}
 
-                        </td>
+                        </strong>
 
-                        <td>
+                    </td>
 
-                            {{ session.vehicle.vehicle_number }}
+                    <td>
 
-                        </td>
+                        {{ session.vehicle.vehicle_number }}
 
-                        <td>
+                    </td>
 
-                            {{ session.driver_mobile }}
+                    <td>
 
-                        </td>
+                        {{ session.driver_mobile }}
 
-                        <td>
+                    </td>
 
-                            {% if session.status == "active" %}
+                    <td>
 
-                            <span class="badge bg-success">
+                        {% if session.status == "active" %}
 
-                                Live
+                        <span class="badge bg-success">
 
-                            </span>
+                            Live
 
-                            {% elif session.status == "sms_sent" %}
+                        </span>
 
-                            <span class="badge bg-info">
+                        {% elif session.status == "sms_sent" %}
 
-                                SMS Sent
+                        <span class="badge bg-info">
 
-                            </span>
+                            SMS Sent
 
-                            {% elif session.status == "pending" %}
+                        </span>
 
-                            <span class="badge bg-warning">
+                        {% elif session.status == "pending" %}
 
-                                Pending
+                        <span class="badge bg-warning">
 
-                            </span>
+                            Pending
 
-                            {% else %}
+                        </span>
 
-                            <span class="badge bg-danger">
+                        {% else %}
 
-                                Stopped
+                        <span class="badge bg-danger">
 
-                            </span>
+                            Stopped
 
-                            {% endif %}
+                        </span>
 
-                        </td>
+                        {% endif %}
 
-                        <td>
+                    </td>
 
-                            {{ session.last_location|default:"--" }}
+                    <td>
 
-                        </td>
+                        {{ session.last_location|default:"--" }}
 
-                        <td>
+                    </td>
 
-                            {{ session.last_updated|date:"d-m-Y H:i" }}
+                    <td>
 
-                        </td>
+                        {{ session.last_updated|date:"d-m-Y H:i" }}
 
-                        <td>
+                    </td>
 
-                            {% if session.status == "pending" %}
+                    <td>
 
-                            <a href="{% url 'send_tracking_sms' session.vehicle.id %}" class="btn btn-sm btn-warning">
+                        {% if session.status == "pending" %}
 
-                                <i class="bi bi-send"></i>
+                        <a href="{% url 'send_tracking_sms' session.vehicle.id %}" class="btn btn-sm btn-warning">
 
-                                Send SMS
+                            <i class="bi bi-send"></i>
 
-                            </a>
+                            Send SMS
 
-                            {% endif %}
+                        </a>
 
-                            <a href="{% url 'vehicle_live' session.id %}" class="btn btn-sm btn-primary">
+                        {% endif %}
 
-                                <i class="bi bi-geo-alt-fill"></i>
+                        <a href="{% url 'vehicle_live' session.id %}" class="btn btn-sm btn-primary">
 
-                                View
+                            <i class="bi bi-geo-alt-fill"></i>
 
-                            </a>
+                            View
 
-                            <a href="{% url 'refresh_location' session.id %}" class="btn btn-sm btn-success">
+                        </a>
 
-                                <i class="bi bi-arrow-repeat"></i>
+                        <a href="{% url 'refresh_location' session.id %}" class="btn btn-sm btn-success">
 
-                                Refresh
+                            <i class="bi bi-arrow-repeat"></i>
 
-                            </a>
+                            Refresh
 
-                        </td>
+                        </a>
 
-                    </tr>
+                    </td>
 
-                    {% empty %}
+                </tr>
 
-                    <tr>
+                {% empty %}
 
-                        <td colspan="8" class="text-center text-muted py-5">
+                <tr>
 
-                            <i class="bi bi-broadcast-pin fs-1"></i>
+                    <td colspan="8" class="text-center text-muted py-5">
 
-                            <br><br>
+                        <i class="bi bi-broadcast-pin fs-1"></i>
 
-                            No Live Tracking Records Found.
+                        <br><br>
 
-                        </td>
+                        No Live Tracking Records Found.
 
-                    </tr>
+                    </td>
 
-                    {% endfor %}
+                </tr>
 
-                </tbody>
+                {% endfor %}
 
-            </table>
+            </tbody>
 
-        </div>
+        </table>
 
     </div>
+
 
 </div>
 
