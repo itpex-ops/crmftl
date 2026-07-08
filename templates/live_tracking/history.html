@@ -1,0 +1,79 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+
+            Location History
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Location</th>
+
+                        <th>Latitude</th>
+
+                        <th>Longitude</th>
+
+                        <th>Accuracy</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for location in locations %}
+
+                    <tr>
+
+                        <td>{{ location.received_at }}</td>
+
+                        <td>{{ location.location_name }}</td>
+
+                        <td>{{ location.latitude }}</td>
+
+                        <td>{{ location.longitude }}</td>
+
+                        <td>{{ location.accuracy }} m</td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="5" class="text-center">
+
+                            No location history found.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

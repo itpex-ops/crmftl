@@ -1,0 +1,99 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+                <i class="bi bi-geo-alt-fill"></i>
+                Live Vehicle Tracking
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>FTL No</th>
+                        <th>Vehicle</th>
+                        <th>Driver</th>
+                        <th>Status</th>
+                        <th>Current Location</th>
+                        <th></th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for track in tracking_list %}
+
+                    <tr>
+
+                        <td>{{ track.vehicle.ftl_no }}</td>
+
+                        <td>{{ track.vehicle.vehicle_number }}</td>
+
+                        <td>{{ track.driver_mobile }}</td>
+
+                        <td>
+
+                            {% if track.status == "active" %}
+
+                            <span class="badge bg-success">
+                                Active
+                            </span>
+
+                            {% elif track.status == "pending" %}
+
+                            <span class="badge bg-warning">
+                                Pending
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-danger">
+                                Stopped
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>{{ track.last_location }}</td>
+
+                        <td>
+
+                            <a href="{% url 'live_tracking:vehicle_live' track.pk %}" class="btn btn-primary btn-sm">
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

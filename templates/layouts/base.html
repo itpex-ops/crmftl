@@ -130,6 +130,35 @@
             </div>
             {% endif %}
 
+            <!-- LIVE TRACKING -->
+            {% if 'live_tracking_dashboard' in role_perms or 'live_tracking_list' in role_perms %}
+            <a data-bs-toggle="collapse" href="#liveTrackingMenu">
+                <i class="bi bi-broadcast-pin me-2"></i> Live Tracking
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu {% if 'live_tracking' in request.path %}show{% endif %}" id="liveTrackingMenu">
+
+                {% if 'live_tracking_dashboard' in role_perms %}
+                <a href="{% url 'live_tracking_dashboard' %}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+                {% endif %}
+
+                {% if 'live_tracking_list' in role_perms %}
+                <a href="{% url 'live_tracking_list' %}">
+                    <i class="bi bi-truck me-2"></i> Active Vehicles
+                </a>
+                {% endif %}
+
+                {% if 'live_tracking_history' in role_perms %}
+                <a href="{% url 'live_tracking_history' %}">
+                    <i class="bi bi-clock-history me-2"></i> History
+                </a>
+                {% endif %}
+
+            </div>
+            {% endif %}
 
             <!-- ACCOUNTS -->
             {% if 'accounts_vehicle' in role_perms or 'accounts_customer' in roles_perms %}

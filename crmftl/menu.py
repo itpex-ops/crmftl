@@ -1,10 +1,10 @@
 ROLE_MENUS = {
 
-    'superadmin': ['dashboard','enquiry_create','enquiry_list','orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
+    'superadmin': ['dashboard','enquiry_create','enquiry_list','orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
 
-    'admin': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
+    'admin': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
 
-    'fleet': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
+    'fleet': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
 
     'coordinators': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
 
@@ -12,6 +12,6 @@ ROLE_MENUS = {
 
     'accounts': ['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
 
-    'vigilance':['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank'],
+    'vigilance':['dashboard','enquiry_create','enquiry_list', 'orders_list','orders_manual','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
     
 } 

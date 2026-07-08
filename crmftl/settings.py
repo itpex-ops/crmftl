@@ -81,6 +81,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'crmftl.urls'
 
+TELENITY_API_KEY = "YOUR_API_KEY"
+
+TELENITY_SMS_URL = "https://api.telenity.com/sms"
+
+TELENITY_LOCATION_URL = "https://api.telenity.com/location"
+
 LOGIN_URL = 'auth'
 LOGIN_REDIRECT_URL = 'user_dashboard'
 LOGOUT_REDIRECT_URL = 'auth'
