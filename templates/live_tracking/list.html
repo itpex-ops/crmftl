@@ -18,13 +18,13 @@
         <small class="text-muted">
             Monitor all vehicles with SIM Tracking
         </small>
+
+
+        <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+        </a>
     </div>
-
-    <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
-        <i class="bi bi-speedometer2"></i>
-        Dashboard
-    </a>
-
 </div>
 
 
@@ -140,23 +140,14 @@
                         </span>
 
                         {% elif session.status == "sms_sent" %}
-
                         <span class="badge bg-info">
-
                             SMS Sent
-
                         </span>
-
                         {% elif session.status == "pending" %}
-
                         <span class="badge bg-warning">
-
                             Pending
-
                         </span>
-
                         {% else %}
-
                         <span class="badge bg-danger">
 
                             Stopped

@@ -447,7 +447,7 @@ body {
 
 .sidebar a:hover {
     background: #eef2ff;
-    color: #616266;
+    color: #654321;
 }
 
 .sidebar a.active {
@@ -458,7 +458,7 @@ body {
 .submenu a {
     font-size: 14px;
     padding-left: 35px;
-    color: #666;
+    color: #FDB81B;
 }
 
 .content {

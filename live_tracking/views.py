@@ -109,12 +109,10 @@ def live_tracking_history(request):
     )
 
 def send_tracking_sms(request, vehicle_id):
-
     vehicle = get_object_or_404(
         Vehicle,
         pk=vehicle_id
     )
-
     session, created = TrackingSession.objects.get_or_create(
         vehicle=vehicle,
         defaults={
@@ -122,7 +120,6 @@ def send_tracking_sms(request, vehicle_id):
             "tracking_reference": f"TRK{vehicle.id}",
         }
     )
-
     # try:
 
     #     api = TelenityService()
