@@ -18,7 +18,7 @@ urlpatterns = [
     # ALL history (sidebar)
     path(
         "history/",
-        views.tracking_history,
+        views.live_tracking_history,
         name="live_tracking_history"
     ),
 
@@ -30,12 +30,11 @@ urlpatterns = [
     ),
 
     # Single vehicle history
-#     path(
-#         "vehicle/<int:pk>/history/",
-#         views.tracking_history,
-# ,
-#         name="vehicle_history"
-#     ),
+    path(
+        "vehicle/<int:pk>/history/",
+        views.vehicle_history,
+        name="vehicle_history"
+    ),
 
     path(
         "send-sms/<int:vehicle_id>/",

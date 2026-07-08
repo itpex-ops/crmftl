@@ -73,7 +73,7 @@ def vehicle_live(request, pk):
     )
 
 
-def tracking_history(request, pk):
+def vehicle_history(request, pk):
 
     session = get_object_or_404(
         TrackingSession,
@@ -91,6 +91,22 @@ def tracking_history(request, pk):
         }
     )
 
+from .models import LiveLocation
+
+def live_tracking_history(request):
+
+    locations = LiveLocation.objects.select_related(
+        "session",
+        "session__vehicle"
+    ).order_by("-received_at")
+
+    return render(
+        request,
+        "live_tracking/history.html",
+        {
+            "locations": locations
+        }
+    )
 
 def send_tracking_sms(request, vehicle_id):
 
