@@ -64,4 +64,9 @@ path(
     name="send_consent",
 ),
 
+
+    path("test-auth/",
+        views.test_tracking_auth,
+        name="test_tracking_auth",
+    ),
 ]

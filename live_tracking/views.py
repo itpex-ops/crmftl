@@ -17,6 +17,11 @@ from .services.import_service import ImportService
 from .services.consent_service import ConsentService
 from .services.location_service import LocationService
 
+def test_tracking_auth(request):
+    result = TrackingAuthService.get_tracking_token()
+    return JsonResponse(result)
+
+
 def send_consent(request, session_id):
 
     session = get_object_or_404(
