@@ -26,8 +26,11 @@ class TrackingAuthService:
 
             return {
             "success": True,
-            "token": settings.TELENITY_TRACKING_KEY.strip()
+            "token": settings.TELENITY_TRACKING_KEY.strip(),
+            "token_type": "Tracking",
+            "source": "settings.py"
         }
+    
 
         except Exception as e:
 
