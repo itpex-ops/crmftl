@@ -1,5 +1,4 @@
 import requests
-
 from django.conf import settings
 
 
@@ -14,13 +13,27 @@ class TrackingAuthService:
             "Token": settings.TELENITY_TRACKING_KEY.strip()
         }
 
-        response = requests.get(
-            url,
-            headers=headers,
-            timeout=30
-        )
+        try:
 
-        print("Tracking Status :", response.status_code)
-        print("Tracking Response :", response.text)
+            response = requests.get(
+                url,
+                headers=headers,
+                timeout=30
+            )
 
-        return response
+            print("Tracking Status :", response.status_code)
+            print("Tracking Response :", response.text)
+
+            return {
+                "success": response.status_code == 200,
+                "status_code": response.status_code,
+                "response": response.text
+            }
+
+        except Exception as e:
+
+            return {
+                "success": False,
+                "status_code": 500,
+                "response": str(e)
+            }
