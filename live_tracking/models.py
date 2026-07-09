@@ -4,11 +4,12 @@ from vehicles.models import Vehicle
 class TrackingSession(models.Model):
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("sms_sent", "SMS Sent"),
-        ("active", "Active"),
-        ("stopped", "Stopped"),
-        ("failed", "Failed"),
+    ("pending", "Pending"),
+    ("consent_sent", "Consent Sent"),
+    ("consent_received", "Consent Received"),
+    ("tracking_active", "Tracking Active"),
+    ("tracking_stopped", "Tracking Stopped"),
+    ("failed", "Failed"),
     ]
 
     vehicle = models.OneToOneField(
@@ -60,6 +61,26 @@ class TrackingSession(models.Model):
         blank=True
     )
 
+    entity_id = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+    )
+
+    operator = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    consent_reference = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    tracking_enabled = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -67,6 +88,14 @@ class TrackingSession(models.Model):
     
 class LiveLocation(models.Model):
 
+    tracked = models.BooleanField(default=False)
+
+    location_status = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    address = models.TextField(blank=True)
     session = models.ForeignKey(
         TrackingSession,
         on_delete=models.CASCADE,
@@ -105,12 +134,13 @@ class SMSLog(models.Model):
         related_name="sms_logs"
     )
 
+    mobile = models.CharField(max_length=15)
+
     sms_reference = models.CharField(
         max_length=100,
-        blank=True
+        blank=True,
+        null=True
     )
-
-    mobile = models.CharField(max_length=15)
 
     message = models.TextField()
 
@@ -119,21 +149,60 @@ class SMSLog(models.Model):
         default="Pending"
     )
 
-    sent_at = models.DateTimeField(auto_now_add=True)
-
-class TrackingSMS(models.Model):
-
-    session = models.ForeignKey(
-        TrackingSession,
-        on_delete=models.CASCADE
+    api_response = models.JSONField(
+        blank=True,
+        null=True
     )
 
-    mobile = models.CharField(max_length=15)
-
-    sms_reference = models.CharField(max_length=100)
-
-    message = models.TextField()
-
-    status = models.CharField(max_length=20)
-
     sent_at = models.DateTimeField(auto_now_add=True)
+
+class ApiToken(models.Model):
+
+    TOKEN_TYPES = (
+        ("TRACKING", "Tracking"),
+        ("CONSENT", "Consent"),
+    )
+
+    token_type = models.CharField(
+        max_length=20,
+        choices=TOKEN_TYPES,
+        unique=True
+    )
+
+    access_token = models.TextField()
+
+    response_json = models.JSONField(
+    blank=True,
+    null=True
+)
+    last_used = models.DateTimeField(
+    null=True,
+    blank=True
+)
+
+    expires_at = models.DateTimeField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.token_type
+    
+class ApiLog(models.Model):
+
+    api_name = models.CharField(max_length=100)
+
+    request_url = models.TextField()
+
+    request_method = models.CharField(max_length=10)
+
+    request_headers = models.JSONField(blank=True, null=True)
+
+    request_body = models.JSONField(blank=True, null=True)
+
+    response_code = models.IntegerField()
+
+    response_body = models.JSONField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)

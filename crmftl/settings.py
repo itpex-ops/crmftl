@@ -81,11 +81,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'crmftl.urls'
 
-TELENITY_API_KEY = "YOUR_API_KEY"
+TELENITY_TRACKING_HOST = "https://smarttrail.telenity.com"
 
-TELENITY_SMS_URL = "https://api.telenity.com/sms"
+TELENITY_CONSENT_HOST = "https://india-agw.telenity.com"
 
-TELENITY_LOCATION_URL = "https://api.telenity.com/location"
+TELENITY_TRACKING_KEY = "cGFyY2VsZXg6OVZ3IXdSMUg="
+
+TELENITY_BASIC_TOKEN = "YzIwZjQ3ZTJlMWQyYzJkMjU4ZWZlN2ZmMTgyMGI3OWI5ODQ4NjExOTo2ZDdkYTU1ZjZjOTA5OWQyZDEwNWY2NzJiMjI5OWQyZDQwMDA3MTAy"
+
+TELENITY_TIMEOUT = 30
 
 LOGIN_URL = 'auth'
 LOGIN_REDIRECT_URL = 'user_dashboard'

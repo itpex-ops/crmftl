@@ -36,15 +36,32 @@ urlpatterns = [
         name="vehicle_history"
     ),
 
-    path(
-        "send-sms/<int:vehicle_id>/",
-        views.send_tracking_sms,
-        name="send_tracking_sms"
-    ),
+    # path(
+    #     "send-sms/<int:vehicle_id>/",
+    #     views.send_tracking_sms,
+    #     name="send_tracking_sms"
+    # ),
 
     path(
         "refresh/<int:pk>/",
         views.refresh_location,
         name="refresh_location"
     ),
+
+    path(
+    "api-status/",
+    views.api_token_status,
+    name="api_token_status"
+),
+path(
+    "import/<int:vehicle_id>/",
+    views.import_driver,
+    name="import_driver",
+),
+path(
+    "send-consent/<int:session_id>/",
+    views.send_consent,
+    name="send_consent",
+),
+
 ]

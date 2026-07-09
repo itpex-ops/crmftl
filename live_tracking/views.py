@@ -1,28 +1,60 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 from django.utils import timezone
 from vehicles.models import Vehicle
 from .models import TrackingSession, LiveLocation
-from .services import TelenityService
+from vehicles.models import Vehicle
+
+from .models import (
+    TrackingSession,
+    LiveLocation,
+)
+
+from .services.auth_service import TrackingAuthService
+from .services.consent_auth_service import ConsentAuthService
+from .services.import_service import ImportService
+from .services.consent_service import ConsentService
+from .services.location_service import LocationService
+
+def send_consent(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = ConsentService.send_consent(session)
+
+    if result["success"]:
+        messages.success(request, result["message"])
+    else:
+        messages.error(request, result["message"])
+
+    return redirect("live_tracking_list")
+def api_token_status(request):
+
+    tracking = TrackingAuthService.get_tracking_token()
+    consent = ConsentAuthService.get_tracking_token()
+
+    return JsonResponse({
+        "tracking": tracking,
+        "consent": consent,
+    })
+
 
 def live_tracking_dashboard(request):
 
-    total = TrackingSession.objects.count()
-    active = TrackingSession.objects.filter(status="active").count()
-    pending = TrackingSession.objects.filter(status="pending").count()
-    stopped = TrackingSession.objects.filter(status="stopped").count()
-
-    recent_locations = LiveLocation.objects.select_related(
-        "session",
-        "session__vehicle"
-    ).order_by("-received_at")[:10]
-
     context = {
-        "total": total,
-        "active": active,
-        "pending": pending,
-        "stopped": stopped,
-        "recent_locations": recent_locations,
+        "total": TrackingSession.objects.count(),
+        "active": TrackingSession.objects.filter(status="active").count(),
+        "pending": TrackingSession.objects.filter(status="pending").count(),
+        "stopped": TrackingSession.objects.filter(status="stopped").count(),
+        "recent_locations":
+            LiveLocation.objects.select_related(
+                "session",
+                "session__vehicle"
+            ).order_by("-received_at")[:10]
     }
 
     return render(
@@ -31,13 +63,9 @@ def live_tracking_dashboard(request):
         context
     )
 
-
 def live_tracking_list(request):
-    """
-    List all tracking sessions
-    """
 
-    tracking_list = TrackingSession.objects.select_related(
+    sessions = TrackingSession.objects.select_related(
         "vehicle",
         "vehicle__order"
     ).order_by("-created_at")
@@ -46,32 +74,25 @@ def live_tracking_list(request):
         request,
         "live_tracking/list.html",
         {
-            "tracking_list": tracking_list
+            "tracking_list": sessions
         }
     )
 
-
 def vehicle_live(request, pk):
-    """
-    Individual Vehicle Tracking
-    """
 
     session = get_object_or_404(
         TrackingSession,
         pk=pk
     )
 
-    locations = session.locations.all()[:20]
-
     return render(
         request,
         "live_tracking/vehicle_live.html",
         {
             "session": session,
-            "locations": locations,
+            "locations": session.locations.all()[:30]
         }
     )
-
 
 def vehicle_history(request, pk):
 
@@ -108,140 +129,77 @@ def live_tracking_history(request):
         }
     )
 
-def send_tracking_sms(request, vehicle_id):
+def import_driver(request, vehicle_id):
+
     vehicle = get_object_or_404(
         Vehicle,
         pk=vehicle_id
     )
-    session, created = TrackingSession.objects.get_or_create(
-        vehicle=vehicle,
-        defaults={
-            "driver_mobile": vehicle.driver_number,
-            "tracking_reference": f"TRK{vehicle.id}",
-        }
-    )
-    # try:
 
-    #     api = TelenityService()
+    result = ImportService.import_driver(vehicle)
 
-    #     response = api.send_tracking_sms(
-    #         vehicle.driver_number
-    #     )
-
-    #     session.status = "sms_sent"
-    #     session.save()
-
-    #     messages.success(
-    #         request,
-    #         "Tracking SMS sent successfully."
-    #     )
-
-    # except Exception as e:
-
-    #     messages.error(
-    #         request,
-    #         str(e)
-    #     )
-
-    try:
-        
-        api = TelenityService()
-
-        response = api.send_tracking_sms(vehicle.driver_number)
-
-        session.tracking_reference = response["tracking_reference"]
-
-        # Demo Mode (until Telenity API is available)
-        session.status = "active"
-        session.consent_received = True
-
-        session.save()
+    if result["success"]:
 
         messages.success(
             request,
-            "Tracking SMS sent successfully. (Demo Mode: Tracking Activated)"
+            "Driver imported successfully."
         )
-    except Exception as e:
+
+    else:
+
         messages.error(
             request,
-            str(e)
+            result["message"]
         )
-    
+
     return redirect("live_tracking_list")
 
-
-def refresh_location(request, pk):
+def send_consent(request, session_id):
 
     session = get_object_or_404(
         TrackingSession,
-        pk=pk
+        pk=session_id
     )
 
-    # try:
+    result = ConsentService.send_consent(session)
 
-    #     api = TelenityService()
+    if result["success"]:
 
-    #     data = api.get_location(
-    #         session.tracking_reference
-    #     )
-
-    #     session.last_latitude = data["latitude"]
-    #     session.last_longitude = data["longitude"]
-    #     session.last_accuracy = data["accuracy"]
-    #     session.last_location = data["location"]
-    #     session.last_updated = timezone.now()
-    #     session.status = "active"
-
-    #     session.save()
-
-    #     LiveLocation.objects.create(
-    #         session=session,
-    #         latitude=data["latitude"],
-    #         longitude=data["longitude"],
-    #         accuracy=data["accuracy"],
-    #         location_name=data["location"],
-    #         received_at=timezone.now(),
-    #     )
-
-    #     messages.success(
-    #         request,
-    #         "Location Updated."
-    #     )
-
-    # except Exception as e:
-
-    #     messages.error(
-    #         request,
-    #         str(e)
-    #     )
-    try:
-
-        api = TelenityService()
-
-        data = api.get_location(session.tracking_reference)
-
-        session.last_latitude = data["latitude"]
-        session.last_longitude = data["longitude"]
-        session.last_location = data["location"]
-        session.last_accuracy = data["accuracy"]
-        session.status = data["status"]
-        session.last_updated = timezone.now()
-
-        session.save()
-
-        LiveLocation.objects.create(
-            session=session,
-            latitude=data["latitude"],
-            longitude=data["longitude"],
-            accuracy=data["accuracy"],
-            location_name=data["location"],
-            received_at=timezone.now()
+        messages.success(
+            request,
+            "Consent SMS sent."
         )
-    except Exception as e:
+
+    else:
 
         messages.error(
             request,
-            str(e)
+            result["message"]
+        )
+
+    return redirect("live_tracking_list")
+
+def refresh_location(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = LocationService.fetch_location(session)
+
+    if result["success"]:
+
+        messages.success(
+            request,
+            "Location updated."
+        )
+
+    else:
+
+        messages.error(
+            request,
+            result["message"]
         )
 
     return redirect(

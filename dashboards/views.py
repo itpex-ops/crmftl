@@ -15,7 +15,6 @@ from accounts.models import (
     BankTransaction,
     Expense
 )
-from live_tracking.models import TrackingSession, LiveLocation, TrackingSMS
 def management_dashboard(request):
 
     today = timezone.now().date()

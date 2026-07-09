@@ -9,6 +9,7 @@ local_settings.py
 db.sqlite3
 media/
 staticfiles/
+Re_ API Test/
 
 # Environment variables
 .env

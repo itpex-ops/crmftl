@@ -199,6 +199,17 @@
                             Refresh
 
                         </a>
+                        <a href="{% url 'import_driver' item.vehicle.id %}" class="btn btn-primary btn-sm">
+
+                            Import Driver
+
+                        </a>
+                        <a href="{% url 'send_consent' item.id %}" class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-chat-dots"></i>
+                            Send Consent
+
+                        </a>
 
                     </td>
 
