@@ -25,10 +25,9 @@ class TrackingAuthService:
             print("Tracking Response :", response.text)
 
             return {
-                "success": response.status_code == 200,
-                "status_code": response.status_code,
-                "response": response.text
-            }
+            "success": True,
+            "token": settings.TELENITY_TRACKING_KEY.strip()
+        }
 
         except Exception as e:
 
