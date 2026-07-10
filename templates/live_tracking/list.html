@@ -98,118 +98,121 @@
                 </tr>
 
             </thead>
-
             <tbody>
 
-                {% for session in tracking_list %}
+                {% for vehicle in vehicles %}
 
                 <tr>
 
                     <td>{{ forloop.counter }}</td>
 
                     <td>
-
-                        <strong>
-
-                            {{ session.vehicle.ftl_no }}
-
-                        </strong>
-
+                        <strong>{{ vehicle.ftl_no }}</strong>
                     </td>
 
+                    <td>{{ vehicle.vehicle_number }}</td>
+
+                    <td>{{ vehicle.driver_number }}</td>
+
+                    <!-- STATUS -->
                     <td>
 
-                        {{ session.vehicle.vehicle_number }}
+                        {% if vehicle.tracking_session %}
 
-                    </td>
+                        {% if vehicle.tracking_session.status == "active" %}
+                        <span class="badge bg-success">Live</span>
 
-                    <td>
+                        {% elif vehicle.tracking_session.status == "sms_sent" %}
+                        <span class="badge bg-info">SMS Sent</span>
 
-                        {{ session.driver_mobile }}
+                        {% elif vehicle.tracking_session.status == "pending" %}
+                        <span class="badge bg-warning">Pending</span>
 
-                    </td>
+                        {% elif vehicle.tracking_session.status == "failed" %}
+                        <span class="badge bg-danger">Failed</span>
 
-                    <td>
-
-                        {% if session.status == "active" %}
-
-                        <span class="badge bg-success">
-
-                            Live
-
-                        </span>
-
-                        {% elif session.status == "sms_sent" %}
-                        <span class="badge bg-info">
-                            SMS Sent
-                        </span>
-                        {% elif session.status == "pending" %}
-                        <span class="badge bg-warning">
-                            Pending
-                        </span>
                         {% else %}
-                        <span class="badge bg-danger">
+                        <span class="badge bg-secondary">Stopped</span>
 
-                            Stopped
+                        {% endif %}
 
+                        {% else %}
+
+                        <span class="badge bg-dark">
+                            Not Enabled
                         </span>
 
                         {% endif %}
 
                     </td>
 
+                    <!-- LOCATION -->
                     <td>
 
-                        {{ session.last_location|default:"--" }}
-
-                    </td>
-
-                    <td>
-
-                        {{ session.last_updated|date:"d-m-Y H:i" }}
-
-                    </td>
-
-                    <td>
-
-                        {% if session.status == "pending" %}
-
-                        <a href="{% url 'send_tracking_sms' session.vehicle.id %}" class="btn btn-sm btn-warning">
-
-                            <i class="bi bi-send"></i>
-
-                            Send SMS
-
-                        </a>
-
+                        {% if vehicle.tracking_session %}
+                        {{ vehicle.tracking_session.last_location|default:"--" }}
+                        {% else %}
+                        --
                         {% endif %}
 
-                        <a href="{% url 'vehicle_live' session.id %}" class="btn btn-sm btn-primary">
+                    </td>
 
-                            <i class="bi bi-geo-alt-fill"></i>
+                    <!-- LAST UPDATED -->
+                    <td>
 
-                            View
+                        {% if vehicle.tracking_session %}
+                        {{ vehicle.tracking_session.last_updated|date:"d-m-Y H:i" }}
+                        {% else %}
+                        --
+                        {% endif %}
 
-                        </a>
+                    </td>
 
-                        <a href="{% url 'refresh_location' session.id %}" class="btn btn-sm btn-success">
+                    <!-- ACTION -->
+                    <td>
 
-                            <i class="bi bi-arrow-repeat"></i>
+                        {% if not vehicle.tracking_session %}
 
-                            Refresh
+                        <a href="{% url 'import_driver' vehicle.id %}" class="btn btn-primary btn-sm">
 
-                        </a>
-                        <a href="{% url 'import_driver' item.vehicle.id %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-cloud-upload"></i>
 
                             Import Driver
 
                         </a>
-                        <a href="{% url 'send_consent' item.id %}" class="btn btn-warning btn-sm">
 
-                            <i class="bi bi-chat-dots"></i>
-                            Send Consent
+                        {% else %}
+
+                        {% if vehicle.tracking_session %}
+
+                        <a href="{% url 'check_consent' vehicle.tracking_session.id %}" class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            Check Consent
 
                         </a>
+
+                        {% endif %}
+
+
+
+                        <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
+                            class="btn btn-success btn-sm">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Refresh
+
+                        </a>
+
+                        <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}" class="btn btn-info btn-sm">
+
+                            <i class="bi bi-geo-alt-fill"></i>
+
+                            View Live
+
+                        </a>
+
+                        {% endif %}
 
                     </td>
 
@@ -225,7 +228,7 @@
 
                         <br><br>
 
-                        No Live Tracking Records Found.
+                        No Assigned Vehicles Found.
 
                     </td>
 
@@ -234,12 +237,9 @@
                 {% endfor %}
 
             </tbody>
-
         </table>
 
     </div>
-
-
 </div>
 
 {% endblock %}

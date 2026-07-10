@@ -81,15 +81,22 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'crmftl.urls'
 
-TELENITY_TRACKING_HOST = "https://smarttrail.telenity.com"
+# ==========================
+# SMARTTRAIL TRACKING
+# ==========================
 
-TELENITY_CONSENT_HOST = "https://india-agw.telenity.com"
-
-TELENITY_TRACKING_KEY = "cGFyY2VsZXg6OVZ3IXdSMUg="
-
-TELENITY_BASIC_TOKEN = "YzIwZjQ3ZTJlMWQyYzJkMjU4ZWZlN2ZmMTgyMGI3OWI5ODQ4NjExOTo2ZDdkYTU1ZjZjOTA5OWQyZDEwNWY2NzJiMjI5OWQyZDQwMDA3MTAy"
-
-TELENITY_TIMEOUT = 30
+TELENITY_TRACKING_BASIC_TOKEN = "cGFyY2VsZXg6OVZ3IXdSMUg="
+TELENITY_TRACKING_AUTH_API = "https://smarttrail.telenity.com/trail-rest/login"
+TELENITY_IMPORT_API = "https://smarttrail.telenity.com/trail-rest/entities/import"
+TELENITY_SEARCH_API = "https://smarttrail.telenity.com/trail-rest/entities"
+TELENITY_LOCATION_API = "https://smarttrail.telenity.com/trail-rest/location/msisdnList"
+TELENITY_MODIFY_API = "https://smarttrail.telenity.com/trail-rest/entities/5804409"
+TELENITY_DELETE_API = "https://smarttrail.telenity.com/trail-rest/tracking/remove"
+TELENITY_CONSENT_BASIC_TOKEN = "YzIwZjQ3ZTJlMWQyYzJkMjU4ZWZlN2ZmMTgyMGI3OWI5ODQ4NjExOTo2ZDdkYTU1ZjZjOTA5OWQyZDEwNWY2NzJiMjI5OWQyZDQwMDA3MTAy"
+TELENITY_CONSENT_AUTH_API = "https://india-agw.telenity.com/oauth/token"
+TELENITY_CONSENT_API = "https://india-agw.telenity.com/apigw/NOFBconsent/v1/NOFBconsent"
+TELENITY_CONSENT_CHECK_API = "https://india-agw.telenity.com/apigw/NOFBconsent/v1/NOFBconsent"
+TELENITY_TIMEOUT = 60
 
 LOGIN_URL = 'auth'
 LOGIN_REDIRECT_URL = 'user_dashboard'

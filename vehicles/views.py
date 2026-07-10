@@ -33,7 +33,6 @@ def assign_vehicle(request, order_id):
                 halting=Decimal(request.POST.get("halting") or 0),
                 loading_unloading=Decimal(request.POST.get("loading_unloading") or 0),
                 brokerage=Decimal(request.POST.get("brokerage") or 0),
-                #advance=Decimal(request.POST.get("advance") or 0),
                 upi_app=request.POST.get("upi_app"),
                 upi_id=request.POST.get("upi_id"),
                 upi_number=request.POST.get("upi_number"),
@@ -43,22 +42,15 @@ def assign_vehicle(request, order_id):
                 ac_type=request.POST.get("ac_type"),
                 beneficiary_name=request.POST.get("beneficiary_name")
             )
-
-            # 🔥 SAFE VALIDATION
             vehicle.clean()
-
             vehicle.save()
-
         except ValidationError as e:
             messages.error(request, e.messages[0])
-            return redirect("assign_vehicle", order_id=order.id)
-
+            return redirect("assign_vehicle",order_id=order.id)
         Tracking.objects.get_or_create(order=order)
-
-        messages.success(request, "Vehicle assigned successfully.")
-        return redirect("orders_management")
-
-    return render(request, "vehicle/assign_vehicle.html", {"order": order})
+        messages.success(request,"Vehicle assigned successfully.")
+        return redirect("live_tracking_setup",vehicle_id=vehicle.id)
+    return render(request,"vehicle/assign_vehicle.html",{"order": order})
 
 def tracking_view(request):
     query = request.GET.get("q")
@@ -82,7 +74,6 @@ def tracking_view(request):
         "tracking": tracking,
         "vehicle": vehicle
     })
-
 
 # def vehicles_dashboard(request):
 

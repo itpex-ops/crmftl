@@ -17,13 +17,117 @@ from .services.import_service import ImportService
 from .services.consent_service import ConsentService
 from .services.location_service import LocationService
 
+from django.shortcuts import render, get_object_or_404
+from vehicles.models import Vehicle
+
+
+from vehicles.models import Vehicle
+
+from vehicles.models import Vehicle
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+from .models import TrackingSession
+from .services.consent_service import ConsentService
+
+def send_consent(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = ConsentService.check_consent(session)
+
+    if result["success"]:
+        messages.success(request, "Consent status checked successfully.")
+    else:
+        messages.error(request, str(result["message"]))
+
+    return redirect("live_tracking_list")
+
+def check_consent(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = ConsentService.check_consent(session)
+
+    if result["success"]:
+
+        messages.success(
+            request,
+            f"Consent Status : {result['status']}"
+        )
+
+    else:
+
+        messages.error(
+            request,
+            str(result["message"])
+        )
+
+    return redirect("live_tracking_list")
+from .services.location_service import LocationService
+
+def test_location(request, vehicle_id):
+
+    vehicle = Vehicle.objects.get(id=vehicle_id)
+
+    result = LocationService.get_location(
+        vehicle.driver_number
+    )
+
+    return JsonResponse(result)
+
+
+def live_tracking_list(request):
+
+    vehicles = Vehicle.objects.select_related(
+        "order"
+    ).order_by("-id")
+
+    return render(
+        request,
+        "live_tracking/list.html",
+        {
+            "vehicles": vehicles
+        }
+    )
+
+from .models import TrackingSession
+
+def live_tracking_setup(request, vehicle_id):
+
+    vehicle = get_object_or_404(Vehicle, pk=vehicle_id)
+
+    session = TrackingSession.objects.filter(
+        vehicle=vehicle
+    ).first()
+
+    return render(
+        request,
+        "live_tracking/setup.html",
+        {
+            "vehicle": vehicle,
+            "session": session,
+        }
+    )
+
+from .services.consent_auth_service import ConsentAuthService
+def test_consent_auth(request):
+
+    result = ConsentAuthService.get_consent_token()
+
+    return JsonResponse(result)
+
 def test_tracking_auth(request):
-
     result = TrackingAuthService.get_tracking_token()
-
     print(type(result))
     print(result)
-
     return JsonResponse(result, safe=False)
 
 def send_consent(request, session_id):
@@ -41,6 +145,7 @@ def send_consent(request, session_id):
         messages.error(request, result["message"])
 
     return redirect("live_tracking_list")
+
 def api_token_status(request):
 
     tracking = TrackingAuthService.get_tracking_token()
@@ -50,7 +155,6 @@ def api_token_status(request):
         "tracking": tracking,
         "consent": consent,
     })
-
 
 def live_tracking_dashboard(request):
 
@@ -70,21 +174,6 @@ def live_tracking_dashboard(request):
         request,
         "live_tracking/dashboard.html",
         context
-    )
-
-def live_tracking_list(request):
-
-    sessions = TrackingSession.objects.select_related(
-        "vehicle",
-        "vehicle__order"
-    ).order_by("-created_at")
-
-    return render(
-        request,
-        "live_tracking/list.html",
-        {
-            "tracking_list": sessions
-        }
     )
 
 def vehicle_live(request, pk):
@@ -138,6 +227,13 @@ def live_tracking_history(request):
         }
     )
 
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+from vehicles.models import Vehicle
+from .services.import_service import ImportService
+
+
 def import_driver(request, vehicle_id):
 
     vehicle = get_object_or_404(
@@ -147,46 +243,55 @@ def import_driver(request, vehicle_id):
 
     result = ImportService.import_driver(vehicle)
 
-    if result["success"]:
+    # ----------------------------------------
+    # SUCCESS
+    # ----------------------------------------
+
+    if result.get("success"):
 
         messages.success(
             request,
-            "Driver imported successfully."
+            "Driver imported successfully into SmartTrail."
         )
 
-    else:
-
-        messages.error(
-            request,
-            result["message"]
+        return redirect(
+            "live_tracking_setup",
+            vehicle_id=vehicle.id
         )
 
-    return redirect("live_tracking_list")
+    # ----------------------------------------
+    # FAILED
+    # ----------------------------------------
 
-def send_consent(request, session_id):
+    error_message = result.get("message", "Import failed.")
 
-    session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
+    if isinstance(error_message, dict):
+
+        if "errorMessage" in error_message:
+            error_message = error_message["errorMessage"]
+
+        elif "raw_response" in error_message:
+            error_message = error_message["raw_response"]
+
+        else:
+            error_message = str(error_message)
+
+    messages.error(
+        request,
+        error_message
     )
 
-    result = ConsentService.send_consent(session)
+    return redirect(
+        "live_tracking_setup",
+        vehicle_id=vehicle.id
+    )
 
-    if result["success"]:
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 
-        messages.success(
-            request,
-            "Consent SMS sent."
-        )
+from vehicles.models import Vehicle
+from live_tracking.services.import_service import ImportService
 
-    else:
-
-        messages.error(
-            request,
-            result["message"]
-        )
-
-    return redirect("live_tracking_list")
 
 def refresh_location(request, session_id):
 
@@ -198,18 +303,9 @@ def refresh_location(request, session_id):
     result = LocationService.fetch_location(session)
 
     if result["success"]:
-
-        messages.success(
-            request,
-            "Location updated."
-        )
-
+        messages.success(request, "Location updated.")
     else:
-
-        messages.error(
-            request,
-            result["message"]
-        )
+        messages.error(request, result["message"])
 
     return redirect(
         "vehicle_live",

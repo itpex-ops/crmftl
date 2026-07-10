@@ -42,31 +42,53 @@ urlpatterns = [
     #     name="send_tracking_sms"
     # ),
 
-    path(
-        "refresh/<int:pk>/",
-        views.refresh_location,
-        name="refresh_location"
-    ),
+   path(
+    "refresh/<int:session_id>/",
+    views.refresh_location,
+    name="refresh_location"
+),
 
     path(
     "api-status/",
     views.api_token_status,
     name="api_token_status"
-),
-path(
-    "import/<int:vehicle_id>/",
+    ),
+    path(
+    "import-driver/<int:vehicle_id>/",
     views.import_driver,
     name="import_driver",
 ),
-path(
-    "send-consent/<int:session_id>/",
-    views.send_consent,
-    name="send_consent",
-),
-
+    path(
+        "send-consent/<int:session_id>/",
+        views.send_consent,
+        name="send_consent",
+    ),
+    path(
+        "setup/<int:vehicle_id>/",
+        views.live_tracking_setup,
+        name="live_tracking_setup",
+    ),
 
     path("test-auth/",
         views.test_tracking_auth,
         name="test_tracking_auth",
     ),
+    path(
+    "test-consent-auth/",
+    views.test_consent_auth,
+    name="test_consent_auth"),
+    
+    path(
+        "check-consent/<int:session_id>/",
+        views.check_consent,
+        name="check_consent",
+    ),
+    path(
+    "test-location/<int:vehicle_id>/",
+    views.test_location,
+    name="test_location",
+),
+    
+
+
 ]

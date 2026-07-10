@@ -54,7 +54,7 @@
 
                         <br>
 
-                        {{ session.last_latitude }}
+                        {{ session.latitude }}
 
                     </p>
 
@@ -64,7 +64,7 @@
 
                         <br>
 
-                        {{ session.last_longitude }}
+                        {{ session.longitude }}
 
                     </p>
 
@@ -76,30 +76,41 @@
 
         <div class="col-lg-8">
 
-            <div class="card shadow-sm">
+    <div class="card shadow-sm">
 
-                <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
 
-                    Live Map
-                    <a href="{% url 'refresh_location' session.id %}" class="btn btn-success">
+            <span>Live Map</span>
 
-                        <i class="bi bi-arrow-clockwise"></i>
+            <a href="{% url 'refresh_location' session.id %}"
+               class="btn btn-success btn-sm">
 
-                        Refresh Location
+                <i class="bi bi-arrow-clockwise"></i>
 
-                    </a>
+                Refresh Location
+
+            </a>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if session.latitude and session.longitude %}
+
+                <div id="map" style="height:500px;width:100%;"></div>
+
+            {% else %}
+
+                <div class="alert alert-warning mb-0">
+
+                    <i class="bi bi-geo-alt"></i>
+
+                    Live location is not available yet.
+                    Please click <strong>Refresh Location</strong> after tracking becomes active.
 
                 </div>
 
-                <div class="card-body">
-
-                    <div id="map" style="height:500px;">
-
-                    </div>
-
-                </div>
-
-            </div>
+            {% endif %}
 
         </div>
 
@@ -107,4 +118,47 @@
 
 </div>
 
+    </div>
+
+</div>
+{% if session.latitude and session.longitude %}
+
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+
+<script>
+
+function initMap(){
+
+    const location = {
+
+        lat: parseFloat("{{ session.latitude }}"),
+
+        lng: parseFloat("{{ session.longitude }}")
+
+    };
+
+    const map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom: 16,
+            center: location
+        }
+    );
+
+    new google.maps.Marker({
+
+        position: location,
+
+        map: map,
+
+        title: "{{ session.vehicle.vehicle_number }}"
+
+    });
+
+}
+
+window.onload = initMap;
+
+</script>
+{% endif %}
 {% endblock %}
