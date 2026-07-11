@@ -25,200 +25,202 @@
             Dashboard
         </a>
     </div>
-</div>
 
 
-<!-- Search -->
 
-<div class="card shadow-sm mb-3">
+    <!-- Search -->
 
-    <div class="card-body">
+    <div class="card shadow-sm mb-3">
 
-        <form method="get">
+        <div class="card-body">
 
-            <div class="row">
+            <form method="get">
 
-                <div class="col-md-4">
+                <div class="row">
 
-                    <input type="text" class="form-control" name="q" placeholder="Search FTL / Vehicle / Driver"
-                        value="{{ request.GET.q }}">
+                    <div class="col-md-4">
+
+                        <input type="text" class="form-control" name="q" placeholder="Search FTL / Vehicle / Driver"
+                            value="{{ request.GET.q }}">
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <button class="btn btn-primary w-100">
+
+                            <i class="bi bi-search"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
 
                 </div>
 
-                <div class="col-md-2">
+            </form>
 
-                    <button class="btn btn-primary w-100">
-
-                        <i class="bi bi-search"></i>
-
-                        Search
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
+        </div>
 
     </div>
 
-</div>
 
 
+    <!-- Table -->
 
-<!-- Table -->
+    <div class="card shadow-sm">
 
-<div class="card shadow-sm">
+        <div class="card-body table-responsive">
 
-    <div class="card-body table-responsive">
+            <table class="table table-hover align-middle">
 
-        <table class="table table-hover align-middle">
+                <thead class="table-light">
 
-            <thead class="table-light">
+                    <tr>
 
-                <tr>
+                        <th>#</th>
 
-                    <th>#</th>
+                        <th>FTL No</th>
 
-                    <th>FTL No</th>
+                        <th>Vehicle</th>
 
-                    <th>Vehicle</th>
+                        <th>Driver</th>
 
-                    <th>Driver</th>
+                        <th>Status</th>
 
-                    <th>Status</th>
+                        <th>Current Location</th>
 
-                    <th>Current Location</th>
+                        <th>Last Updated</th>
 
-                    <th>Last Updated</th>
+                        <th width="220">Action</th>
 
-                    <th width="220">Action</th>
+                    </tr>
 
-                </tr>
+                </thead>
+                <tbody>
 
-            </thead>
-            <tbody>
+                    {% for vehicle in vehicles %}
 
-                {% for vehicle in vehicles %}
+                    <tr>
 
-                <tr>
+                        <td>{{ forloop.counter }}</td>
 
-                    <td>{{ forloop.counter }}</td>
+                        <td>
+                            <strong>{{ vehicle.ftl_no }}</strong>
+                        </td>
 
-                    <td>
-                        <strong>{{ vehicle.ftl_no }}</strong>
-                    </td>
+                        <td>{{ vehicle.vehicle_number }}</td>
 
-                    <td>{{ vehicle.vehicle_number }}</td>
+                        <td>{{ vehicle.driver_number }}</td>
 
-                    <td>{{ vehicle.driver_number }}</td>
+                        <!-- STATUS -->
+                        <td>
 
-                    <!-- STATUS -->
-                    <td>
+                            {% if vehicle.tracking_session %}
 
-                        {% if vehicle.tracking_session %}
+                            {% if vehicle.tracking_session.status == "active" %}
+                            <span class="badge bg-success">Live</span>
 
-                        {% if vehicle.tracking_session.status == "active" %}
-                        <span class="badge bg-success">Live</span>
+                            {% elif vehicle.tracking_session.status == "sms_sent" %}
+                            <span class="badge bg-info">SMS Sent</span>
 
-                        {% elif vehicle.tracking_session.status == "sms_sent" %}
-                        <span class="badge bg-info">SMS Sent</span>
+                            {% elif vehicle.tracking_session.status == "pending" %}
+                            <span class="badge bg-warning">Pending</span>
 
-                        {% elif vehicle.tracking_session.status == "pending" %}
-                        <span class="badge bg-warning">Pending</span>
+                            {% elif vehicle.tracking_session.status == "failed" %}
+                            <span class="badge bg-danger">Failed</span>
 
-                        {% elif vehicle.tracking_session.status == "failed" %}
-                        <span class="badge bg-danger">Failed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Stopped</span>
 
-                        {% else %}
-                        <span class="badge bg-secondary">Stopped</span>
+                            {% endif %}
 
-                        {% endif %}
+                            {% else %}
 
-                        {% else %}
+                            <span class="badge bg-dark">
+                                Not Enabled
+                            </span>
 
-                        <span class="badge bg-dark">
-                            Not Enabled
-                        </span>
+                            {% endif %}
 
-                        {% endif %}
+                        </td>
 
-                    </td>
+                        <!-- LOCATION -->
+                        <td>
 
-                    <!-- LOCATION -->
-                    <td>
+                            {% if vehicle.tracking_session %}
+                            {{ vehicle.tracking_session.last_location|default:"--" }}
+                            {% else %}
+                            --
+                            {% endif %}
 
-                        {% if vehicle.tracking_session %}
-                        {{ vehicle.tracking_session.last_location|default:"--" }}
-                        {% else %}
-                        --
-                        {% endif %}
+                        </td>
 
-                    </td>
+                        <!-- LAST UPDATED -->
+                        <td>
 
-                    <!-- LAST UPDATED -->
-                    <td>
+                            {% if vehicle.tracking_session %}
+                            {{ vehicle.tracking_session.last_updated|date:"d-m-Y H:i" }}
+                            {% else %}
+                            --
+                            {% endif %}
 
-                        {% if vehicle.tracking_session %}
-                        {{ vehicle.tracking_session.last_updated|date:"d-m-Y H:i" }}
-                        {% else %}
-                        --
-                        {% endif %}
+                        </td>
 
-                    </td>
+                        <!-- ACTION -->
+                        <td>
 
-                    <!-- ACTION -->
-                    <td>
+                            {% if not vehicle.tracking_session %}
 
-                        {% if not vehicle.tracking_session %}
+                            <a href="{% url 'import_driver' vehicle.id %}" class="btn btn-primary btn-sm"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Import Driver">
 
-                        <a href="{% url 'import_driver' vehicle.id %}" class="btn btn-primary btn-sm"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Import Driver">
+                                <i class="bi bi-cloud-upload"></i>
 
-                            <i class="bi bi-cloud-upload"></i>
+                            </a>
 
-                        </a>
+                            {% else %}
 
-                        {% else %}
+                            <a href="{% url 'check_consent' vehicle.tracking_session.id %}"
+                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Check Consent">
+                                <i class="bi bi-shield-check"></i>
 
-                        <a href="{% url 'check_consent' vehicle.tracking_session.id %}" class="btn btn-warning btn-sm"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Check Consent">
-                            <i class="bi bi-shield-check"></i>
+                            </a>
 
-                        </a>
+                            <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
+                                class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Refresh Location">
 
-                        <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
-                            class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Refresh Location">
+                                <i class="bi bi-arrow-repeat"></i>
 
-                            <i class="bi bi-arrow-repeat"></i>
+                            </a>
 
-                        </a>
+                            <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}" class="btn btn-info btn-sm"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="View Live Location">
 
-                        <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}" class="btn btn-info btn-sm"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="View Live Location">
+                                <i class="bi bi-geo-alt-fill"></i>
 
-                            <i class="bi bi-geo-alt-fill"></i>
+                            </a>
 
-                        </a>
+                            {% endif %}
 
-                        {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="bi bi-broadcast-pin fs-1"></i>
+                            <br><br>
+                            No Assigned Vehicles Found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="bi bi-broadcast-pin fs-1"></i>
-                        <br><br>
-                        No Assigned Vehicles Found.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+        </div>
     </div>
 </div>
 <style>
