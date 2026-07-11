@@ -83,43 +83,23 @@ class LocationService:
             "success": True,
             "response": response
         }
+
     @classmethod
     def get_location(cls, mobile):
-
-        # -----------------------------------------
-        # Get Tracking Token
-        # -----------------------------------------
-
         auth = TrackingAuthService.get_tracking_token()
-
         if not auth.get("success"):
             return auth
-
         token = auth["token"]
-
-        # -----------------------------------------
-        # Mobile Format
-        # -----------------------------------------
-
         mobile = str(mobile).strip()
-
         if mobile.startswith("+91"):
             mobile = mobile.replace("+91", "")
-
         if not mobile.startswith("91"):
             mobile = "91" + mobile
-
-        # -----------------------------------------
-        # URL
-        # -----------------------------------------
-
         url = f"{settings.TELENITY_LOCATION_API}/{mobile}?lastResult=True"
-
         headers = {
             "Token": token,
             "Content-Type": "application/json"
         }
-
         print("\n")
         print("=" * 80)
         print("LOCATION API REQUEST")

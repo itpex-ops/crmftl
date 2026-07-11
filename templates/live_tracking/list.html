@@ -173,73 +173,79 @@
 
                         {% if not vehicle.tracking_session %}
 
-                        <a href="{% url 'import_driver' vehicle.id %}" class="btn btn-primary btn-sm">
+                        <a href="{% url 'import_driver' vehicle.id %}" class="btn btn-primary btn-sm"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Import Driver">
 
                             <i class="bi bi-cloud-upload"></i>
-
-                            Import Driver
 
                         </a>
 
                         {% else %}
 
-                        {% if vehicle.tracking_session %}
-
-                        <a href="{% url 'check_consent' vehicle.tracking_session.id %}" class="btn btn-warning btn-sm">
-
+                        <a href="{% url 'check_consent' vehicle.tracking_session.id %}" class="btn btn-warning btn-sm"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Check Consent">
                             <i class="bi bi-shield-check"></i>
 
-                            Check Consent
-
                         </a>
-
-                        {% endif %}
-
-
 
                         <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
-                            class="btn btn-success btn-sm">
+                            class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Refresh Location">
+
                             <i class="bi bi-arrow-repeat"></i>
-                            Refresh
 
                         </a>
 
-                        <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}" class="btn btn-info btn-sm">
+                        <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}" class="btn btn-info btn-sm"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="View Live Location">
 
                             <i class="bi bi-geo-alt-fill"></i>
 
-                            View Live
-
                         </a>
 
                         {% endif %}
 
                     </td>
-
                 </tr>
-
                 {% empty %}
-
                 <tr>
-
                     <td colspan="8" class="text-center text-muted py-5">
-
                         <i class="bi bi-broadcast-pin fs-1"></i>
-
                         <br><br>
-
                         No Assigned Vehicles Found.
-
                     </td>
-
                 </tr>
-
                 {% endfor %}
-
             </tbody>
         </table>
 
     </div>
 </div>
+<style>
+    .tooltip {
+        font-size: 11px;
+    }
 
+    .tooltip-inner {
+        padding: 3px 8px;
+        max-width: 140px;
+        border-radius: 4px;
+        color: #654321;
+        background-color: #FDB81B;
+        font-weight: 600
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        );
+
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+    });
+</script>
 {% endblock %}

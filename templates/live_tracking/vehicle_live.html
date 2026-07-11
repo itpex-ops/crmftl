@@ -5,118 +5,111 @@
 
 {% block content %}
 
-<div class="container mt-4">
-
+<div class="container mt-0">
     <div class="row">
-
         <div class="col-lg-12">
-
             <div class="card shadow-sm">
-
                 <div class="page-header">
                     <h4>vehicle Details</h4>
                     <small class="text-muted">Details of the vehicle being tracked</small>
                 </div>
-
                 <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">FTL No</label>
+                            <div>{{ session.vehicle.ftl_no }}</div>
+                        </div>
 
-                    <p><b>FTL No</b><br>{{ session.vehicle.ftl_no }}</p>
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">Vehicle</label>
+                            <div>{{ session.vehicle.vehicle_number }}</div>
+                        </div>
 
-                    <p><b>Vehicle</b><br>{{ session.vehicle.vehicle_number }}</p>
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">Driver</label>
+                            <div>{{ session.driver_mobile }}</div>
+                        </div>
 
-                    <p><b>Driver</b><br>{{ session.driver_mobile }}</p>
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">Status</label>
+                            <div>
+                                {% if session.status == "active" %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif session.status == "pending" %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ session.status }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
 
-                    <p>
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">Latitude</label>
+                            <div>{{ session.latitude|default:"--" }}</div>
+                        </div>
 
-                        <b>Status</b><br>
+                        <div class="col-md-2">
+                            <label class="fw-semibold text-muted">Longitude</label>
+                            <div>{{ session.longitude|default:"--" }}</div>
+                        </div>
 
-                        <span class="badge bg-success">
-
-                            {{ session.status }}
-
-                        </span>
-
-                    </p>
-
-                    <p>
-
-                        <b>Current Location</b>
-
-                        <br>
-
-                        {{ session.last_location }}
-
-                    </p>
-
-                    <p>
-
-                        <b>Latitude</b>
-
-                        <br>
-
-                        {{ session.latitude }}
-
-                    </p>
-
-                    <p>
-
-                        <b>Longitude</b>
-
-                        <br>
-
-                        {{ session.longitude }}
-
-                    </p>
+                        <div class="col-12">
+                            <label class="fw-semibold text-muted">Current Location</label>
+                            <div>{{ session.last_location|default:"Location not available" }}</div>
+                        </div>
+                        <!-- <div id="locationToast" class="location-toast">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>New Location Received</span>
+                        </div> -->
+                    </div>
 
                 </div>
-
             </div>
 
         </div>
 
         <div class="col-lg-8">
 
-    <div class="card shadow-sm">
+            <div class="card shadow-sm">
 
-        <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center">
 
-            <span>Live Map</span>
+                    <span>Live Map</span>
 
-            <a href="{% url 'refresh_location' session.id %}"
-               class="btn btn-success btn-sm">
+                    <a href="{% url 'refresh_location' session.id %}" class="btn btn-success btn-sm">
 
-                <i class="bi bi-arrow-clockwise"></i>
+                        <i class="bi bi-arrow-clockwise"></i>
 
-                Refresh Location
+                        Refresh Location
 
-            </a>
-
-        </div>
-
-        <div class="card-body">
-
-            {% if session.latitude and session.longitude %}
-
-                <div id="map" style="height:500px;width:100%;"></div>
-
-            {% else %}
-
-                <div class="alert alert-warning mb-0">
-
-                    <i class="bi bi-geo-alt"></i>
-
-                    Live location is not available yet.
-                    Please click <strong>Refresh Location</strong> after tracking becomes active.
+                    </a>
 
                 </div>
 
-            {% endif %}
+                <div class="card-body">
+
+                    {% if session.latitude and session.longitude %}
+
+                    <div id="map" style="height:500px;width:100%;"></div>
+
+                    {% else %}
+
+                    <div class="alert alert-warning mb-0">
+
+                        <i class="bi bi-geo-alt"></i>
+
+                        Live location is not available yet.
+                        Please click <strong>Refresh Location</strong> after tracking becomes active.
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
 
         </div>
-
-    </div>
-
-</div>
 
     </div>
 
@@ -127,38 +120,117 @@
 
 <script>
 
-function initMap(){
+    function initMap() {
 
-    const location = {
+        const location = {
 
-        lat: parseFloat("{{ session.latitude }}"),
+            lat: parseFloat("{{ session.latitude }}"),
 
-        lng: parseFloat("{{ session.longitude }}")
+            lng: parseFloat("{{ session.longitude }}")
 
-    };
+        };
 
-    const map = new google.maps.Map(
-        document.getElementById("map"),
-        {
-            zoom: 16,
-            center: location
-        }
-    );
+        const map = new google.maps.Map(
+            document.getElementById("map"),
+            {
+                zoom: 16,
+                center: location
+            }
+        );
 
-    new google.maps.Marker({
+        new google.maps.Marker({
 
-        position: location,
+            position: location,
 
-        map: map,
+            map: map,
 
-        title: "{{ session.vehicle.vehicle_number }}"
+            title: "{{ session.vehicle.vehicle_number }}"
 
-    });
+        });
 
-}
+    }
 
-window.onload = initMap;
+    window.onload = initMap;
 
 </script>
+<script>
+    function showLocationNotification() {
+
+        const toast = document.getElementById("locationToast");
+
+        toast.classList.remove("show");
+
+        void toast.offsetWidth; // restart animation
+
+        toast.classList.add("show");
+    }
+</script>
+<style>
+    .location-toast {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #198754;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+        z-index: 9999;
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        opacity: 0;
+        transform: translateX(-250px);
+    }
+
+    .location-toast.show {
+        animation:
+            slideIn .4s ease forwards,
+            bounce 1.2s ease .4s 3,
+            stay 3s linear forwards;
+    }
+
+    @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(10px);
+        }
+
+        50% {
+            transform: translateX(-8px);
+        }
+
+        75% {
+            transform: translateX(6px);
+        }
+    }
+
+    @keyframes stay {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+            transform: translateX(-250px);
+        }
+    }
+</style>
 {% endif %}
 {% endblock %}

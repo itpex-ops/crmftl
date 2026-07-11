@@ -71,25 +71,18 @@ def check_consent(request, session_id):
         )
 
     return redirect("live_tracking_list")
-from .services.location_service import LocationService
 
 def test_location(request, vehicle_id):
-
     vehicle = Vehicle.objects.get(id=vehicle_id)
-
     result = LocationService.get_location(
         vehicle.driver_number
     )
-
     return JsonResponse(result)
 
-
 def live_tracking_list(request):
-
     vehicles = Vehicle.objects.select_related(
         "order"
     ).order_by("-id")
-
     return render(
         request,
         "live_tracking/list.html",
@@ -98,16 +91,11 @@ def live_tracking_list(request):
         }
     )
 
-from .models import TrackingSession
-
 def live_tracking_setup(request, vehicle_id):
-
     vehicle = get_object_or_404(Vehicle, pk=vehicle_id)
-
     session = TrackingSession.objects.filter(
         vehicle=vehicle
     ).first()
-
     return render(
         request,
         "live_tracking/setup.html",
@@ -117,7 +105,6 @@ def live_tracking_setup(request, vehicle_id):
         }
     )
 
-from .services.consent_auth_service import ConsentAuthService
 def test_consent_auth(request):
 
     result = ConsentAuthService.get_consent_token()
@@ -210,8 +197,6 @@ def vehicle_history(request, pk):
         }
     )
 
-from .models import LiveLocation
-
 def live_tracking_history(request):
 
     locations = LiveLocation.objects.select_related(
@@ -227,46 +212,23 @@ def live_tracking_history(request):
         }
     )
 
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-
-from vehicles.models import Vehicle
-from .services.import_service import ImportService
-
-
 def import_driver(request, vehicle_id):
-
     vehicle = get_object_or_404(
         Vehicle,
         pk=vehicle_id
     )
-
     result = ImportService.import_driver(vehicle)
-
-    # ----------------------------------------
-    # SUCCESS
-    # ----------------------------------------
-
     if result.get("success"):
-
         messages.success(
             request,
             "Driver imported successfully into SmartTrail."
         )
-
         return redirect(
             "live_tracking_setup",
             vehicle_id=vehicle.id
         )
-
-    # ----------------------------------------
-    # FAILED
-    # ----------------------------------------
-
     error_message = result.get("message", "Import failed.")
-
     if isinstance(error_message, dict):
-
         if "errorMessage" in error_message:
             error_message = error_message["errorMessage"]
 
