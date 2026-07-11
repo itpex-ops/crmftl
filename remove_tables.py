@@ -7,7 +7,8 @@ tables_to_delete = [
     "live_tracking_trackingsession",
     "live_tracking_livelocation",
     "live_tracking_smslog",
-    "live_tracking_trackingsms",
+    "live_tracking_apilog",
+    "live_tracking_apitoken"
 ]
 
 conn = sqlite3.connect(DB_NAME)
