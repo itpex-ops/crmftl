@@ -79,10 +79,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-AXIS_ENV = os.getenv("AXIS_ENV", "sandbox")
-AXIS_BASE_URL = os.getenv("AXIS_BASE_URL")
-AXIS_CLIENT_ID = os.getenv("AXIS_CLIENT_ID")
-AXIS_CLIENT_SECRET = os.getenv("AXIS_CLIENT_SECRET")
+# AXIS_ENV = os.getenv("AXIS_ENV", "sandbox")
+# AXIS_BASE_URL = os.getenv("AXIS_BASE_URL")
+# AXIS_CLIENT_ID = os.getenv("AXIS_CLIENT_ID")
+# AXIS_CLIENT_SECRET = os.getenv("AXIS_CLIENT_SECRET")
 
 ROOT_URLCONF = 'crmftl.urls'
 
