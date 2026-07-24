@@ -10,7 +10,7 @@
     --warning: #f59e0b;
 
     --bg: #f8fafc;
-    --card: #ffffff;
+    --card: #FFEBC6;
 
     --border: #e5e7eb;
     --text: #334155;
@@ -51,7 +51,7 @@ body {
 }
 
 .card-body {
-    background: #FDB81B;
+    background: #FFEBC6 !important;
     border-radius: 12px;
     padding: 7px;
     margin-bottom: 20px;
@@ -71,7 +71,6 @@ body {
 
 .form-label {
     font-size: 14px;
-    /* Increase to 16px or 17px if needed */
     font-weight: 600;
     color: rgb(101, 67, 33);
 
@@ -80,14 +79,8 @@ body {
 .form-control,
 .form-select {
     border-radius: 8px;
-    height: 16px;
+    height: 28px;
     font-size: 11px;
-}
-
-.form-control:focus,
-.form-select:focus {
-    box-shadow: none;
-    border-color: #0d6efd;
 }
 
 .form-control[readonly],
@@ -251,12 +244,9 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
     margin-bottom: 8px;
-    background: #FDB81B;
+    background: #FFEBC6;
 }
 
-.card-body {
-    padding: 10px !important;
-}
 
 /* ==========================================
    ROW SPACING
@@ -288,12 +278,6 @@ label {
    INPUTS
 ========================================== */
 
-.form-control,
-.form-select {
-    border-radius: 8px;
-    min-height: 28px;
-    font-size: 13px;
-}
 
 .form-control:focus,
 .form-select:focus {
@@ -528,6 +512,7 @@ textarea.form-control {
     .col-lg-4,
     .col-md-4,
     .col-md-3 {
+
         margin-top: 8px;
     }
 

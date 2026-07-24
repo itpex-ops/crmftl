@@ -27,7 +27,7 @@
 
                         <div class="col-md-2">
                             <label class="fw-semibold text-muted">Driver</label>
-                            <div>{{ session.driver_mobile }}</div>
+                            <div>{{ session.vehicle.driver_number }}</div>
                         </div>
 
                         <div class="col-md-2">
@@ -165,72 +165,6 @@
         toast.classList.add("show");
     }
 </script>
-<style>
-    .location-toast {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        background: #198754;
-        color: #fff;
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
-        z-index: 9999;
 
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        opacity: 0;
-        transform: translateX(-250px);
-    }
-
-    .location-toast.show {
-        animation:
-            slideIn .4s ease forwards,
-            bounce 1.2s ease .4s 3,
-            stay 3s linear forwards;
-    }
-
-    @keyframes slideIn {
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes bounce {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(10px);
-        }
-
-        50% {
-            transform: translateX(-8px);
-        }
-
-        75% {
-            transform: translateX(6px);
-        }
-    }
-
-    @keyframes stay {
-        from {
-            opacity: 1;
-        }
-
-        to {
-            opacity: 0;
-            transform: translateX(-250px);
-        }
-    }
-</style>
 {% endif %}
 {% endblock %}

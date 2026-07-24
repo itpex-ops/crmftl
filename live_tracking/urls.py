@@ -88,7 +88,11 @@ urlpatterns = [
     views.test_location,
     name="test_location",
 ),
-    
+path(
+    "delete/<int:session_id>/",
+    views.delete_tracking,
+    name="delete_tracking"
+),
 
 
 ]

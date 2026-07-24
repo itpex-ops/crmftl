@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'channels',
     'customers',
     'dashboards',
-    'live_tracking'
+    'live_tracking',
+    'banking.apps.BankingConfig'
    
 ]
 AUTH_USER_MODEL = 'authentications.User'
@@ -78,6 +79,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+AXIS_ENV = os.getenv("AXIS_ENV", "sandbox")
+AXIS_BASE_URL = os.getenv("AXIS_BASE_URL")
+AXIS_CLIENT_ID = os.getenv("AXIS_CLIENT_ID")
+AXIS_CLIENT_SECRET = os.getenv("AXIS_CLIENT_SECRET")
 
 ROOT_URLCONF = 'crmftl.urls'
 
@@ -134,23 +139,23 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT'),
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

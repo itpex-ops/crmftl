@@ -52,18 +52,11 @@ class TrackingSession(models.Model):
     blank=True
 )
     location_status = models.CharField(max_length=100, blank=True, null=True)
-
-    last_updated = models.DateTimeField(
-        null=True,
-        blank=True
-    )
-
     entity_id = models.BigIntegerField(
     null=True,
     blank=True,
     unique=True
 )
-
     operator = models.CharField(
         max_length=20,
         blank=True,

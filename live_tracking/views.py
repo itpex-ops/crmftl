@@ -31,6 +31,39 @@ from django.contrib import messages
 from .models import TrackingSession
 from .services.consent_service import ConsentService
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+
+from live_tracking.models import TrackingSession
+from live_tracking.services.delete_service import DeleteService
+
+
+def delete_tracking(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = DeleteService.delete_tracking(session)
+
+    if result.get("success"):
+
+        messages.success(
+            request,
+
+            f"{session.driver_mobile} removed successfully from SmartTrail."
+        )
+
+    else:
+
+        messages.error(
+            request,
+            result.get("message", "Unable to delete tracking.")
+        )
+
+    return redirect("live_tracking_list")
+
 def send_consent(request, session_id):
 
     session = get_object_or_404(
