@@ -31,34 +31,33 @@
                     <div class="card-body">
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed %}checked{%
-                                    endif %}>
+                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed
+                                    %}checked{%endif %}>
                                 Vehicle Placed
                             </label>
                         </div>
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_document" {% if tracking.vehicle_document
-                                    %}checked{% endif %}>
+                                <input type="checkbox" name="vehicle_document" {% if
+                                    tracking.vehicle_document%}checked{% endif %}>
                                 Vehicle Document Collected
                             </label>
                         </div>
                         <!-- LR -->
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked{%
-                                    endif%}>
+                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway
+                                    %}checked{%endif%}>
                                 Invoice / E-Way
                             </label>
                         </div>
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="lrCheck" name="lr_no_b" {% if tracking.lr_no_b %}checked{%
-                                    endif %}>
+                                <input type="checkbox" id="lrCheck" name="lr_no_b" {% if tracking.lr_no_b
+                                    %}checked{%endif %}>
                                 LR Generated
                             </label>
-                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;" {% endif
-                                %}>
+                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;" {% endif%}>
                                 <input type="text" name="lr_no" value="{{ tracking.lr_no }}" class="form-control"
                                     placeholder="Enter LR Number">
                             </div>
@@ -66,16 +65,16 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="advance_to_fleet" {% if tracking.advance_to_fleet
-                                    %}checked{%endif %}>
+                                <input type="checkbox" name="advance_to_fleet" {% if
+                                    tracking.advance_to_fleet%}checked{%endif %}>
                                 Advance Paid To Fleet
                             </label>
                         </div>
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="fleet_departed" {% if tracking.fleet_departed %}checked{%
-                                    endif %}>
+                                <input type="checkbox" name="fleet_departed" {% if tracking.fleet_departed
+                                    %}checked{%endif %}>
                                 Fleet Departed
                             </label>
                         </div>
@@ -107,8 +106,8 @@
                         <!-- POD -->
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="podCheck" name="pod_received" {% if tracking.pod_received
-                                    %}checked{% endif %}>
+                                <input type="checkbox" id="podCheck" name="pod_received" {% if
+                                    tracking.pod_received%}checked{% endif %}>
                                 POD Received
                             </label>
                             <div id="podBox" style="display:none;">
