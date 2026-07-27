@@ -6,29 +6,20 @@
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-
         <h5 class="fw-bold mb-0">
             📦 Orders Management
         </h5>
-
     </div>
 
     <!-- STATS -->
     <div class="row g-1 mb-1">
-
         <div class="col-md-3">
-
             <div class="kpi-card primary">
                 <small>Total Orders</small>
-
                 <h4>{{ total_orders }}</h4>
-
             </div>
-
         </div>
-
         <div class="col-md-3">
-
             <div class="kpi-card success">
 
                 <small>Assigned</small>
@@ -36,18 +27,13 @@
                 <h4>{{ assigned_count }}</h4>
 
             </div>
-
         </div>
 
         <div class="col-md-3">
             <div class="kpi-card info">
-
                 <small>Not Assigned</small>
-
                 <h4>{{ not_assigned_count }}</h4>
-
             </div>
-
         </div>
 
         <div class="col-md-3">
@@ -122,19 +108,16 @@
 
                         <!-- CUSTOMER -->
                         <td>
-
                             <div class="fw-semibold">
 
                                 {{ order.customer_name }}
 
                             </div>
-
                             <small class="text-muted">
 
                                 {{ order.customer_contact }}
 
                             </small>
-
                         </td>
 
                         <!-- ROUTE -->
@@ -451,20 +434,11 @@
         /* Left align content */
     }
 
-    .route-title {
-        font-size: 9px;
-        font-weight: 700;
-        margin-bottom: 2px;
-        /* Fix typo: 2x -> 2px */
-        text-transform: uppercase;
-        text-align: left;
-    }
 
     .route-chip {
         display: inline-block;
         background: #fff;
         border: 1px solid #ddd;
-        border-radius: 15px;
         padding: 2px 8px;
         margin: 2px;
         font-size: 9px;
