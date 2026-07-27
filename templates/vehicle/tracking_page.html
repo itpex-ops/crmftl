@@ -2,7 +2,6 @@
 {% block content %}
 
 <div class="container-fluid mt-1">
-
     <!-- Header -->
     <div class="card shadow-sm border-0 p-3 mb-2">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -19,7 +18,6 @@
             </a>
         </div>
     </div>
-
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="tracking-grid">
@@ -85,19 +83,13 @@
                 </div>
 
             </div>
-
             <!-- RIGHT SIDE -->
-
             <div>
-
                 <div class="card shadow-sm border-0">
-
                     <div class="card-header bg-success text-white fw-bold">
                         💰 Delivery & Settlement
                     </div>
-
                     <div class="card-body">
-
                         <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="arrived" {% if tracking.arrived %}checked{% endif %}>
@@ -140,8 +132,8 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="balance_trans_fleet" {% if tracking.balance_trans_fleet
-                                    %}checked{% endif %}>
+                                <input type="checkbox" name="balance_trans_fleet" {% if
+                                    tracking.balance_trans_fleet%}checked{% endif %}>
                                 Balance Transfer To Fleet
                             </label>
                         </div>
@@ -163,14 +155,10 @@
                     <div class="card-header bg-secondary text-white fw-bold">
                         📝 Remarks
                     </div>
-
                     <div class="card-body">
-
                         <textarea name="remarks" rows="4" class="form-control"
                             placeholder="Enter remarks...">{{ tracking.remarks }}</textarea>
-
                     </div>
-
                 </div>
 
                 <!-- ACTION -->
@@ -279,7 +267,6 @@
         document.getElementById("podViewer").style.display = "block";
     }
 </script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -405,5 +392,4 @@
 
     }
 </style>
-
 {% endblock %}
