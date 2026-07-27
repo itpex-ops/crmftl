@@ -137,12 +137,7 @@
                             </iframe>
                         </div>
 
-                        <script>
-                            function showPOD(url) {
-                                document.getElementById("podFrame").src = url;
-                                document.getElementById("podViewer").style.display = "block";
-                            }
-                        </script>
+
                         <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="balance_trans_fleet" {% if tracking.balance_trans_fleet
@@ -353,6 +348,12 @@
         updateCheckboxes();
 
     });
+</script>
+<script>
+    function showPOD(url) {
+        document.getElementById("podFrame").src = url;
+        document.getElementById("podViewer").style.display = "block";
+    }
 </script>
 <style>
     .tracking-grid {
