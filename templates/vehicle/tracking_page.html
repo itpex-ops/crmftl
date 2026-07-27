@@ -122,27 +122,27 @@
                             <div id="podBox" style="display:none;">
                                 <input type="file" name="documents" multiple class="form-control">
                             </div>
-                            <div class="mt-2">
-                                {% for doc in tracking.documents.all %}
-                                <button type="button" onclick="showPOD('{{ doc.file.url }}')"
-                                    class="btn btn-success btn-sm">
-                                    👁 View POD
-                                </button>
-                                {% endfor %}
-                            </div>
-
-                            <div id="podViewer" style="display:none;">
-                                <iframe id="podFrame" width="100%" height="600" style="border:1px solid #ddd;">
-                                </iframe>
-                            </div>
-
-                            <script>
-                                function showPOD(url) {
-                                    document.getElementById("podFrame").src = url;
-                                    document.getElementById("podViewer").style.display = "block";
-                                }
-                            </script>
                         </div>
+                        <div class="mt-2">
+                            {% for doc in tracking.documents.all %}
+                            <button type="button" onclick="showPOD('{{ doc.file.url }}')"
+                                class="btn btn-success btn-sm">
+                                👁 View POD
+                            </button>
+                            {% endfor %}
+                        </div>
+
+                        <div id="podViewer" style="display:none;">
+                            <iframe id="podFrame" width="100%" height="600" style="border:1px solid #ddd;">
+                            </iframe>
+                        </div>
+
+                        <script>
+                            function showPOD(url) {
+                                document.getElementById("podFrame").src = url;
+                                document.getElementById("podViewer").style.display = "block";
+                            }
+                        </script>
                         <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="balance_trans_fleet" {% if tracking.balance_trans_fleet
