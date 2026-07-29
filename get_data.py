@@ -29,10 +29,22 @@ def export_tables():
 
     with pd.ExcelWriter(OUTPUT_FILE, engine="openpyxl") as writer:
         for table in TABLES:
-            print(f"Exporting {table}...")
-            query = f'SELECT * FROM "{table}"'
-            df = pd.read_sql(query, conn)
-            df.to_excel(writer, sheet_name=table[:31], index=False)
+            print(f"Exporting {table}")
+
+            df = pd.read_sql(
+                f'SELECT * FROM "{table}"',
+                conn
+            )
+
+            # Remove timezone information from datetime columns
+            for col in df.select_dtypes(include=["datetime64[ns, UTC]", "datetimetz"]).columns:
+                df[col] = df[col].dt.tz_localize(None)
+
+            df.to_excel(
+                writer,
+                sheet_name=table[:31],
+                index=False
+            )
 
     conn.close()
     print(f"\nExport completed: {OUTPUT_FILE}")
