@@ -24,6 +24,7 @@ VEHICLE_TYPES = [
     ('Container 17 Ft', 'Container 17 Ft'),
     ('Container 19 Ft', 'Container 19 Ft'),
     ('Container 20 Ft', 'Container 20 Ft'),
+    ('Container 22 Ft', 'Container 22 Ft'),
     ('Container 24 Ft', 'Container 24 Ft'),
     ('Container 32 Ft', 'Container 32 Ft'),
 
