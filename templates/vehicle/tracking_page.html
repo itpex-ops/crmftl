@@ -28,33 +28,35 @@
                     <div class="card-body">
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed
-                                    %}checked{%endif %}>
+                                <input type="checkbox"
+                                 name="vehicle_placed"
+                                {% if tracking.vehicle_placed %}checked{% endif %}>
                                 Vehicle Placed
                             </label>
                         </div>
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_document" {% if
-                                    tracking.vehicle_document%}checked{% endif %}>
+                                <input type="checkbox" name="vehicle_document" 
+                                 {% if tracking.vehicle_document%}checked{% endif %}>
                                 Vehicle Document Collected
                             </label>
                         </div>
                         <!-- LR -->
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway
-                                    %}checked{%endif%}>
+                                <input type="checkbox" name="invoice_eway" 
+                                {% if tracking.invoice_eway %}checked{% endif  %}>
                                 Invoice / E-Way
                             </label>
                         </div>
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="lrCheck" name="lr_no_b" {% if tracking.lr_no_b
-                                    %}checked{%endif %}>
+                                <input type="checkbox" id="lrCheck" name="lr_no_b" 
+                                {% if tracking.lr_no_b %}checked{% endif %}>
                                 LR Generated
                             </label>
-                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;" {% endif%}>
+                            <div id="lrBox" class="mt-3" 
+                            {% if not tracking.lr_no_b %} style="display:none;" {% endif %}>
                                 <input type="text" name="lr_no" value="{{ tracking.lr_no }}" class="form-control"
                                     placeholder="Enter LR Number">
                             </div>
@@ -62,16 +64,16 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="advance_to_fleet" {% if
-                                    tracking.advance_to_fleet%}checked{%endif %}>
+                                <input type="checkbox" name="advance_to_fleet" 
+                                 {% if   tracking.advance_to_fleet%}checked{% endif %}>
                                 Advance Paid To Fleet
                             </label>
                         </div>
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="fleet_departed" {% if tracking.fleet_departed
-                                    %}checked{%endif %}>
+                                <input type="checkbox" name="fleet_departed"
+                                {% if tracking.fleet_departed %}checked{% endif %}>
                                 Fleet Departed
                             </label>
                         </div>
@@ -103,8 +105,8 @@
                         <!-- POD -->
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" id="podCheck" name="pod_received" {% if
-                                    tracking.pod_received%}checked{% endif %}>
+                                <input type="checkbox" id="podCheck" name="pod_received" 
+                                 {% if tracking.pod_received%}checked{% endif %}>
                                 POD Received
                             </label>
                             <div id="podBox" style="display:none;">
@@ -127,8 +129,8 @@
 
                         <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="balance_trans_fleet" {% if
-                                    tracking.balance_trans_fleet%}checked{% endif %}>
+                                <input type="checkbox" name="balance_trans_fleet"
+                                 {% if tracking.balance_trans_fleet%}checked{% endif %}>
                                 Balance Transfer To Fleet
                             </label>
                         </div>
@@ -226,107 +228,47 @@
 
 </script>
 <script>
-    function showPOD(url) {
-
-        let ext = url.split('.').pop().toLowerCase();
-
-        let html = "";
-
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
-
-            html = `
-            <img src="${url}"
-                 class="img-fluid rounded border"
-                 style="max-height:600px;">
-        `;
-
-        } else if (ext === 'pdf') {
-
-            // Open PDF in browser tab
-            window.open(url, '_blank');
-            return;
-
-        } else {
-
-            html = `
-            <a href="${url}" target="_blank"
-               class="btn btn-primary">
-               Open File
-            </a>
-        `;
-        }
-
-        document.getElementById("viewerContent").innerHTML = html;
-        document.getElementById("podViewer").style.display = "block";
-    }
-</script>
-<script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        const checkboxes = [
-            document.querySelector('input[name="vehicle_placed"]'),
-            document.querySelector('input[name="vehicle_document"]'),
-            document.querySelector('input[name="lr_no_b"]'),
-            document.querySelector('input[name="invoice_eway"]'),
-            document.querySelector('input[name="advance_to_fleet"]'),
-            document.querySelector('input[name="fleet_departed"]'),
-            document.querySelector('input[name="arrived"]'),
-            document.querySelector('input[name="delivered"]'),
-            document.querySelector('input[name="pod_received"]'),
-            document.querySelector('input[name="balance_trans_fleet"]'),
-            document.querySelector('input[name="settled"]')
-        ].filter(Boolean);
-
-        function updateCheckboxes() {
-
-            let checkedIndex = -1;
-
-            checkboxes.forEach((box, index) => {
-                if (box.checked) {
-                    checkedIndex = index;
-                }
-            });
-
-            checkboxes.forEach((box, index) => {
-
-                if (checkedIndex === -1) {
-
-                    box.disabled = index !== 0;
-
-                } else {
-
-                    box.disabled = index > checkedIndex + 1;
-
-                }
-
-            });
-
+        function toggle(checkId, boxId) {
+            const c = document.getElementById(checkId);
+            const b = document.getElementById(boxId);
+            if (!c || !b) return;
+            function update() { b.style.display = c.checked ? "block" : "none"; }
+            c.addEventListener("change", update);
+            update();
         }
 
-        checkboxes.forEach((box, index) => {
+        toggle("lrCheck", "lrBox");
+        toggle("podCheck", "podBox");
 
-            box.addEventListener("change", function () {
+        window.showPOD = function (url) {
+            document.getElementById("podFrame").src = url;
+            document.getElementById("podViewer").style.display = "block";
+        };
 
-                if (this.checked) {
+        const names = [
+            "vehicle_placed", "vehicle_document", "invoice_eway", "lr_no_b",
+            "advance_to_fleet", "fleet_departed", "arrived", "delivered",
+            "pod_received", "balance_trans_fleet", "settled"
+        ];
 
-                    checkboxes.forEach((other, i) => {
+        const boxes = names.map(n => document.querySelector(`[name="${n}"]`)).filter(Boolean);
 
-                        if (i !== index) {
-                            other.checked = false;
-                        }
-
-                    });
-
-                }
-
-                updateCheckboxes();
-
+        function updateWorkflow() {
+            let firstUnchecked = boxes.findIndex(b => !b.checked);
+            boxes.forEach((b, i) => {
+                b.disabled = (firstUnchecked !== -1 && i > firstUnchecked);
             });
+        }
 
-        });
+        boxes.forEach(b => b.addEventListener("change", updateWorkflow));
+        updateWorkflow();
 
-        updateCheckboxes();
-
+        const settled = "{{ tracking.settled|yesno:'true,false' }}" === "true";
+        if (settled) {
+            document.querySelectorAll("input,textarea,select,button").forEach(el => el.disabled = true);
+        }
     });
 </script>
 
@@ -334,50 +276,20 @@
     .tracking-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
+        gap: 24px
     }
 
     .track-item {
         border: 1px solid #e5e7eb;
         border-radius: 10px;
         padding: 8px 12px;
-        margin-bottom: 8px;
-        background: #fff;
-    }
-
-    .track-item:hover {
-        background: #f8fafc;
-    }
-
-    .track-label {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .track-label input {
-        width: 18px;
-        height: 18px;
-    }
-
-    .card {
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    .card-header {
-        padding: 14px 18px;
+        margin-bottom: 8px
     }
 
     @media(max-width:991px) {
-
         .tracking-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr
         }
-
     }
 </style>
 {% endblock %}
