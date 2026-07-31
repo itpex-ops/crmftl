@@ -37,26 +37,30 @@ from django.shortcuts import get_object_or_404, redirect
 from live_tracking.models import TrackingSession
 from live_tracking.services.delete_service import DeleteService
 
-
 def delete_tracking(request, session_id):
+
+    print("=" * 50)
+    print("DELETE CLICKED")
+    print("Session ID:", session_id)
 
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
 
+    print("Entity ID:", session.entity_id)
+    print("Reference:", session.tracking_reference)
+
     result = DeleteService.delete_tracking(session)
 
-    if result.get("success"):
+    print("Delete Result:", result)
 
+    if result.get("success"):
         messages.success(
             request,
-
             f"{session.driver_mobile} removed successfully from SmartTrail."
         )
-
     else:
-
         messages.error(
             request,
             result.get("message", "Unable to delete tracking.")
@@ -150,22 +154,6 @@ def test_tracking_auth(request):
     print(result)
     return JsonResponse(result, safe=False)
 
-def send_consent(request, session_id):
-
-    session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
-    )
-
-    result = ConsentService.send_consent(session)
-
-    if result["success"]:
-        messages.success(request, result["message"])
-    else:
-        messages.error(request, result["message"])
-
-    return redirect("live_tracking_list")
-
 def api_token_status(request):
 
     tracking = TrackingAuthService.get_tracking_token()
@@ -250,24 +238,34 @@ def import_driver(request, vehicle_id):
         Vehicle,
         pk=vehicle_id
     )
+
     result = ImportService.import_driver(vehicle)
+
     if result.get("success"):
-        messages.success(
-            request,
-            "Driver imported successfully into SmartTrail."
-        )
+
+        if result.get("already_exists"):
+            messages.info(
+                request,
+                "Driver is already registered in Telenity. Using the existing tracking profile."
+            )
+        else:
+            messages.success(
+                request,
+                "Driver imported successfully into Telenity."
+            )
+
         return redirect(
             "live_tracking_setup",
             vehicle_id=vehicle.id
         )
+
     error_message = result.get("message", "Import failed.")
+
     if isinstance(error_message, dict):
         if "errorMessage" in error_message:
             error_message = error_message["errorMessage"]
-
         elif "raw_response" in error_message:
             error_message = error_message["raw_response"]
-
         else:
             error_message = str(error_message)
 
@@ -280,13 +278,6 @@ def import_driver(request, vehicle_id):
         "live_tracking_setup",
         vehicle_id=vehicle.id
     )
-
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-
-from vehicles.models import Vehicle
-from live_tracking.services.import_service import ImportService
-
 
 def refresh_location(request, session_id):
 
