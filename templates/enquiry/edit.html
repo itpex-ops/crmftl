@@ -2,6 +2,8 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <div class="container-fluid mt-1">
     <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
         {% if messages %}
@@ -282,6 +284,36 @@ document.querySelector("form").addEventListener("submit", function () {
 </div>
 </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let selected = $(this).val();
+
+        if (selected) {
+
+            $('#customerFoundMsg').removeClass('d-none');
+            $('#customerNotFoundMsg').addClass('d-none');
+
+        } else {
+
+            $('#customerFoundMsg').addClass('d-none');
+            $('#customerNotFoundMsg').removeClass('d-none');
+        }
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#vehicle_type').select2({
+            placeholder: "Select Vehicle Type",
+            allowClear: true,
+            width: '100%'
+        });
+
+    });
+</script>
 <style>
     :root {
         --primary: #0d6efd;
