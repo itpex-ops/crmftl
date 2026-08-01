@@ -20,6 +20,7 @@ def edit_enquiry(request, id):
         Enquiry,
         id=id
     )
+    vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
     if request.method == 'POST':
         enquiry.expected_rate = request.POST.get('expected_rate') or None
         enquiry.approval_rate = request.POST.get('approval_rate') or None
@@ -37,7 +38,9 @@ def edit_enquiry(request, id):
     context = {
         'enquiry': enquiry,
         'is_superadmin': request.user.is_superuser,
+        'vehicle_types': vehicle_types
     }
+
     return render(
         request,'enquiry/edit.html',context)
 
