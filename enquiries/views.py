@@ -22,6 +22,15 @@ def edit_enquiry(request, id):
     )
     vehicle_types = Enquiry._meta.get_field("vehicle_type").choices
     if request.method == 'POST':
+        enquiry.pickups = request.POST.get("pickups") or 1
+        enquiry.deliveries = request.POST.get("deliveries") or 1
+        enquiry.vehicle_type = request.POST.get("vehicle_type") or None
+        enquiry.vehicle_description = request.POST.get("vehicle_description") or None
+        enquiry.kms = request.POST.get("kms") or None
+        enquiry.material = request.POST.get("material") or None
+        enquiry.pieces = request.POST.get("pieces") or None
+        enquiry.tonnage = request.POST.get("tonnage") or None
+        enquiry.kg = request.POST.get("kg") or None
         enquiry.expected_rate = request.POST.get('expected_rate') or None
         enquiry.approval_rate = request.POST.get('approval_rate') or None
         enquiry.status = request.POST.get('status')
@@ -141,6 +150,7 @@ def create_enquiry(request):
         email = request.POST.get("email") or None
         lead_source = request.POST.get("lead_source") or None
         reference_name = request.POST.get("reference_name") or None
+
 
         # =========================
         # VEHICLE
