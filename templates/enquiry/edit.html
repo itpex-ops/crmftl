@@ -90,8 +90,21 @@
 
                             <div class="col-md-3">
                                 <label>Vehicle Type</label>
-                                <input type="text" name="vehicle_type" class="form-control"
-                                    value="{{ enquiry.vehicle_type|default_if_none:'' }}">
+                               
+                                <select id="vehicle_type" name="vehicle_type" class="form-select vehicle-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Vehicle
+                                        </optform-labelion>
+
+                                        {% for value, label in vehicle_types %}
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+
+                                </select>
                             </div>
 
                             <div class="col-md-3">
