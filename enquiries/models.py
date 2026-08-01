@@ -13,6 +13,7 @@ VEHICLE_TYPES = [
     ('Open Body 17 Ft', 'Open Body 17 Ft'),
     ('Open Body 19 Ft', 'Open Body 19 Ft'),
     ('Open Body 20 Ft', 'Open Body 20 Ft'),
+    ('Open Body 22 Ft', 'Open Body 22 Ft'),
     ('Open Body 24 Ft', 'Open Body 24 Ft'),
 
     # CONTAINER

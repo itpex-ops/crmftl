@@ -1,18 +1,14 @@
 from django.db import models
 from django.conf import settings
-
 from orders.models import Order
 from vehicles.models import Vehicle
 from django.conf import settings
 from django.db import models
-
-from orders.models import Order
-from vehicles.models import Vehicle
-
 from .choices import (
     PAYMENT_TYPE_CHOICES,
     PAYMENT_MODE_CHOICES,
     PAYMENT_STATUS_CHOICES,
+    UPI_STATUS_CHOICES
 )
 
 class BankConfiguration(models.Model):
@@ -30,9 +26,6 @@ class BankConfiguration(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-
-from django.db import models
-
 
 class ApiLog(models.Model):
     api_name = models.CharField(max_length=100)
@@ -75,12 +68,6 @@ class ApiLog(models.Model):
 
     def __str__(self):
         return f"{self.api_name} ({self.status_code})"
-
-from django.conf import settings
-from django.db import models
-
-from orders.models import Order
-from vehicles.models import Vehicle
 
 class Payment(models.Model):
     payment_no = models.CharField(
@@ -182,10 +169,6 @@ class Payment(models.Model):
 
     def __str__(self):
         return self.payment_no
-
-
-from .choices import UPI_STATUS_CHOICES
-
 
 class UPITransaction(models.Model):
     upi_reference = models.CharField(
