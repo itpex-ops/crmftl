@@ -1,0 +1,177 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+<div class="container-fluid">
+
+    <div class="page-header">
+        <h5>✏️ Edit Customer</h5>
+        <small>Update customer information</small>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+
+            <!-- LEFT -->
+            <div class="col-lg-8">
+
+                <div class="card section-card">
+
+                    <div class="section-title">
+                        Customer Information
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label class="form-label">Customer Code</label>
+                                <input type="text"
+                                       class="form-control readonly-box"
+                                       value="{{ customer.customer_code }}"
+                                       >
+                            </div>
+ <div class="col-md-3">
+     <label class="form-label">Customer Name</label>
+                           <input type="text"
+       name="name"
+       class="form-control"
+       value="{{ customer.name }}">
+</div>
+ <div class="col-md-3">
+     <label class="form-label">Customer Phone1</label>
+<input type="text"
+       name="phone1"
+       class="form-control"
+       value="{{ customer.phone1 }}">
+ </div>
+  <div class="col-md-3">
+     <label class="form-label">Customer Phone2</label>
+<input type="text"
+       name="phone2"
+       class="form-control"
+       value="{{ customer.phone2|default:'' }}">
+</div>
+ <div class="col-md-3">
+     <label class="form-label">Customer Email</label>
+<input type="email"
+       name="email"
+       class="form-control"
+       value="{{ customer.email|default:'' }}">
+ </div>
+  <div class="col-md-3">
+     <label class="form-label">GST</label>
+<input type="text"
+       name="gst_number"
+       class="form-control"
+       value="{{ customer.gst_number|default:'' }}">
+  </div>
+   <div class="col-md-3">
+     <label class="form-label">PAN NUMBER</label>
+<input type="text"
+       name="pan_number"
+       class="form-control"
+       value="{{ customer.pan_number|default:'' }}">
+   </div>
+ <div class="col-md-3">
+     <label class="form-label">STATE</label>
+<input type="text"
+       name="state"
+       class="form-control"
+       value="{{ customer.state|default:'' }}">
+ </div>
+<div class="col-md-3">
+    <label class="form-label">Address</label>
+    <textarea name="address"
+              class="form-control"
+              rows="1"
+              style="resize: none;">{{ customer.address }}</textarea>
+</div>
+   <div class="col-md-3">
+     <label class="form-label">City</label>
+<input type="text"
+       name="city"
+       class="form-control"
+       value="{{ customer.city|default:'' }}">
+   </div>
+    <div class="col-md-3">
+     <label class="form-label">Pincode</label>
+<input type="text"
+       name="pincode"
+       class="form-control"
+       value="{{ customer.pincode|default:'' }}">
+    </div>
+
+                            <div class="col-md-4">
+                               <select name="is_active" class="form-select">
+
+    <option value="True"
+        {% if customer.is_active %}selected{% endif %}>
+        ACTIVE
+    </option>
+
+    <option value="False"
+        {% if not customer.is_active %}selected{% endif %}>
+        INACTIVE
+    </option>
+</select>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+           
+
+                        
+
+                        <div class="user-box">
+                            {{ form.instance.created_at|date:"d-m-Y h:i A" }}
+                        </div>
+
+                        <hr>
+
+                        <label class="form-label">
+                            Last Updated
+                        </label>
+
+                        <div class="user-box">
+                            {{ form.instance.updated_at|date:"d-m-Y h:i A" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="d-grid mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        💾 Update Customer
+                    </button>
+                </div>
+
+                <div class="d-grid mt-2">
+                    <a href="{% url 'customer_list' %}" class="btn btn-secondary">
+                        ← Back to List
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

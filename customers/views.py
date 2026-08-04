@@ -56,7 +56,6 @@ def customer_create(request):
                 pan_number=(request.POST.get("pan_number") or "").upper(),
                 gst_number=request.POST.get("gst_number"),
                 state=request.POST.get("state"),
-                #state_code=request.POST.get("state_code"),
                 address=request.POST.get("address"),
                 city=request.POST.get("city"),
                 pincode=request.POST.get("pincode"),
@@ -85,20 +84,42 @@ def customer_create(request):
     )
 
 def customer_update(request, pk):
+
     customer = get_object_or_404(ExCustomer, pk=pk)
 
     if request.method == "POST":
-        form = ExCustomerForm(request.POST, instance=customer)
-        if form.is_valid():
-            form.save()
-            return redirect("customer_list")
-    else:
-        form = ExCustomerForm(instance=customer)
 
-    return render(request, "Excustomers/customer_form.html", {
-        "form": form,
-        "title": "Edit Customer"
-    })
+        customer.name = request.POST.get("name")
+        customer.phone1 = request.POST.get("phone1")
+        customer.phone2 = request.POST.get("phone2")
+        customer.email = request.POST.get("email")
+
+        customer.gst_number = request.POST.get("gst_number")
+        customer.pan_number = request.POST.get("pan_number")
+        customer.state = request.POST.get("state")
+
+        customer.address = request.POST.get("address")
+        customer.city = request.POST.get("city")
+        customer.pincode = request.POST.get("pincode")
+
+        customer.is_active = (
+            request.POST.get("is_active") == "True"
+        )
+
+        customer.save()
+
+        messages.success(request, "Customer updated successfully.")
+        return redirect("customer_list")
+
+    return render(
+        request,
+        "Excustomers/customer_edit.html",
+        {
+            "customer": customer,
+            "title": "Edit Customer",
+        },
+    )
+
 
 def customer_delete(request, pk):
     customer = get_object_or_404(ExCustomer, pk=pk)
