@@ -120,7 +120,6 @@ def customer_update(request, pk):
         },
     )
 
-
 def customer_delete(request, pk):
     customer = get_object_or_404(ExCustomer, pk=pk)
 
