@@ -56,7 +56,7 @@ def customer_create(request):
                 pan_number=(request.POST.get("pan_number") or "").upper(),
                 gst_number=request.POST.get("gst_number"),
                 state=request.POST.get("state"),
-                state_code=request.POST.get("state_code"),
+                #state_code=request.POST.get("state_code"),
                 address=request.POST.get("address"),
                 city=request.POST.get("city"),
                 pincode=request.POST.get("pincode"),
