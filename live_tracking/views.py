@@ -159,10 +159,8 @@ def test_tracking_auth(request):
     return JsonResponse(result, safe=False)
 
 def api_token_status(request):
-
     tracking = TrackingAuthService.get_tracking_token()
     consent = ConsentAuthService.get_tracking_token()
-
     return JsonResponse({
         "tracking": tracking,
         "consent": consent,

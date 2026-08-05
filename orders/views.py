@@ -1,22 +1,14 @@
 from django.shortcuts import render, redirect
-#from .forms import OrderForm
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required ,user_passes_test
-import uuid
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from enquiries.models import Enquiry
 from .models import Order
 from vehicles.models import Vehicle , Tracking
-from authentications.decorators import allowed_roles
-from django.db.models import Count
 from datetime import datetime
 # def is_fleet(user):
 #     return user.is_authenticated and (user.role in ['fleet','admin'])
-
-from django.contrib.admin.views.decorators import staff_member_required
-from orders.models import Order
-
+from django.utils import timezone
 
 # @staff_member_required
 # def delete_order(request, order_id):
@@ -27,28 +19,8 @@ from orders.models import Order
 
 def is_sales(user):
       return user.is_authenticated and (user.role in ['sales'])
-from datetime import datetime
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-
-# views.py
-
-from datetime import datetime
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-
-from enquiries.models import Enquiry
-from .models import Order
-from itertools import chain
-from operator import attrgetter
-
-
-from django.shortcuts import render
-from orders.models import Order
 
 def orders_management(request):
-
     orders = (
         Order.objects
         .select_related('enquiry')
@@ -78,22 +50,17 @@ def to_float(value):
     except (TypeError, ValueError):
         return 0.0
 
-
 def parse_datetime(value):
     try:
         return datetime.strptime(value.strip(), "%Y-%m-%d %H:%M")
     except:
         return None
 
-
 def parse_date(value):
     try:
         return datetime.strptime(value.strip(), "%Y-%m-%d").date()
     except:
         return None
-
-from django.utils import timezone
-from django.utils.dateparse import parse_datetime, parse_date
 
 def save_order_data(order, request):
 
@@ -187,6 +154,7 @@ def save_order_data(order, request):
     order.save()
 
     return order
+
 @login_required
 def pricing_page(request, enquiry_id):
 
@@ -259,11 +227,6 @@ def pricing_page(request, enquiry_id):
         context
     )
 
-
-# =====================================================
-# ORDER DETAIL / UPDATE
-# =====================================================
-
 @login_required
 def order_detail(request, id):
 
@@ -313,6 +276,7 @@ def order_detail(request, id):
         "orders/order_detail.html",
         context
     )
+
 @login_required
 def convert_to_order1(request, enquiry_id):
 
@@ -404,7 +368,6 @@ def order_list(request):
         
     })
 
-
 @login_required
 def assign_vehicle(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -474,8 +437,6 @@ def profit(self):
     vehicle_cost = sum(v.total_freight for v in self.vehicle.all())
     return (self.total_rate or 0) - vehicle_cost
 
-# views.py
-
 @login_required
 def view_order(request, order_id):
 
@@ -506,12 +467,6 @@ def create_order_from_enquiry(request, enquiry_id):
     enquiry.is_converted_to_order = True
     enquiry.save()
     return redirect('order_detail', id=order.id)
-
-# orders/views.py
-
-from django.shortcuts import render
-from django.utils import timezone
-from orders.models import Order
 
 def order_dashboard(request):
 
