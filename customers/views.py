@@ -8,8 +8,10 @@ from customers.models import ExCustomer
 from django.utils import timezone
 from datetime import timedelta
 
+
+@login_required
 def customer_list(request):
-    query = request.GET.get("q", "")
+    query = request.GET.get("q", "").strip()
 
     customers = ExCustomer.objects.all()
 
@@ -24,9 +26,15 @@ def customer_list(request):
 
     context = {
         "customers": customers,
-        "query": query
+        "query": query,
     }
-    return render(request, "Excustomers/customer_list.html", context)
+
+    return render(
+        request,
+        "Excustomers/customer_list.html",
+        context
+    )
+
 import re
 from django.core.exceptions import ValidationError
 

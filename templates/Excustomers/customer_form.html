@@ -118,9 +118,9 @@
                             </div>
 
                             <div class="col-sm-4 ms-auto d-flex align-items-end">
-                                <button type="submit" class="btn btn-outline- w-80 btn-save">
-                                    💾 Save Customer
-                                </button>
+                               <button type="submit" class="btn btn-save">
+    💾 Save Customer
+</button>
                             </div>
 
                         </div>
@@ -191,5 +191,25 @@
         this.value = this.value.toUpperCase();
     });
 </script>
+<script>
+document.getElementById("customerForm").addEventListener("submit", function () {
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.innerHTML = "⏳ Saving...";
+});
+</script>
+<style>
+.btn-save {
+    background-color: #FDB81B;
+    border-color: #FDB81B;
+    color: #212529;
+    font-weight: 600;
+}
 
+.btn-save:hover {
+    background-color: #e5a600;
+    border-color: #e5a600;
+    color: #fff;
+}
+</style>
 {% endblock %}

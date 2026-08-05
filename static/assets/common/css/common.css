@@ -97,10 +97,6 @@ body {
     background: #fafafa;
 }
 
-.btn-save {
-    height: 38px;
-    font-weight: 600;
-}
 
 .info-box {
     background: #f8fafc;
@@ -332,6 +328,7 @@ textarea.form-control {
 .btn-primary {
     height: 32px;
     font-weight: 600;
+    background: #2563eb;
 }
 
 .btn-primary {
