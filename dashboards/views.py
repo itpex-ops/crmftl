@@ -134,7 +134,7 @@ def customer_dashboard(request):
             created_at__month=today.month,
             created_at__year=today.year
         ).count(),
-        "recent_customers": ExCustomer.objects.order_by('-id')[:10]
+        "recent_customers": ExCustomer.objects.order_by('-id')
     }
     return render(
         request,
