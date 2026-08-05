@@ -22,7 +22,7 @@ def customer_list(request):
             Q(phone1__icontains=query) |
             Q(phone2__icontains=query) |
             Q(gst_number__icontains=query)
-        )
+        ).order_by("-id")
 
     context = {
         "customers": customers,
