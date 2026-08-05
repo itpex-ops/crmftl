@@ -13,7 +13,6 @@ class ExCustomer(models.Model):
 
     phone1 = models.CharField(
         max_length=15,
-        unique=True
     )
 
     phone2 = models.CharField(
