@@ -71,16 +71,5 @@ class ExCustomer(models.Model):
     class Meta:
         ordering = ["name"]
 
-    def save(self, *args, **kwargs):
-        creating = self.pk is None
-
-        super().save(*args, **kwargs)
-
-        if creating:
-            self.customer_code = f"C{self.pk:05d}"
-            ExCustomer.objects.filter(pk=self.pk).update(
-                customer_code=self.customer_code
-        )
-
     def __str__(self):
         return f"{self.customer_code} - {self.name}"

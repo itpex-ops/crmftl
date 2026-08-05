@@ -35,46 +35,86 @@ def validate_pan(pan):
     if not re.match(pattern, pan):
         raise ValidationError("Invalid PAN format")
 
-from django.db.models import Max
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import redirect, render
+
+from .models import ExCustomer
+
 
 @login_required
 def customer_create(request):
-    last_id = ExCustomer.objects.aggregate(
-        max_id=Max("id")
-    )["max_id"] or 0
-    next_customer_code = f"C{last_id + 1:05d}"
+    # Display only
+    last_customer = (
+        ExCustomer.objects
+        .exclude(customer_code__isnull=True)
+        .exclude(customer_code="")
+        .order_by("-customer_code")
+        .first()
+    )
+
+    if last_customer:
+        last_no = int(last_customer.customer_code[1:])
+        next_customer_code = f"C{last_no + 1:05d}"
+    else:
+        next_customer_code = "C00001"
+
     if request.method == "POST":
         try:
-            customer = ExCustomer.objects.create(
-                name=request.POST.get("name"),
-                phone1=request.POST.get("phone1"),
-                phone2=request.POST.get("phone2"),
-                email=request.POST.get("email"),
-                pan_number=(request.POST.get("pan_number") or "").upper(),
-                gst_number=request.POST.get("gst_number"),
-                state=request.POST.get("state"),
-                address=request.POST.get("address"),
-                city=request.POST.get("city"),
-                pincode=request.POST.get("pincode"),
-                is_active=request.POST.get("is_active") == "True",
-                created_by=request.user.username
-            )
+            with transaction.atomic():
+
+                # Generate again while saving (safe)
+                last_customer = (
+                    ExCustomer.objects
+                    .select_for_update()
+                    .exclude(customer_code__isnull=True)
+                    .exclude(customer_code="")
+                    .order_by("-customer_code")
+                    .first()
+                )
+
+                if last_customer:
+                    last_no = int(last_customer.customer_code[1:])
+                    customer_code = f"C{last_no + 1:05d}"
+                else:
+                    customer_code = "C00001"
+
+                customer = ExCustomer.objects.create(
+                    customer_code=customer_code,
+                    name=request.POST.get("name"),
+                    phone1=request.POST.get("phone1"),
+                    phone2=request.POST.get("phone2"),
+                    email=request.POST.get("email"),
+                    pan_number=(request.POST.get("pan_number") or "").upper(),
+                    gst_number=request.POST.get("gst_number"),
+                    state=request.POST.get("state"),
+                    address=request.POST.get("address"),
+                    city=request.POST.get("city"),
+                    pincode=request.POST.get("pincode"),
+                    is_active=request.POST.get("is_active") == "True",
+                    created_by=request.user.username,
+                )
+
             messages.success(
                 request,
                 f"Customer created successfully! Code: {customer.customer_code}"
             )
             return redirect("customer_create")
+
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
+
     context = {
-        "next_customer_code": next_customer_code
+        "next_customer_code": next_customer_code,
     }
 
     return render(
         request,
         "Excustomers/customer_form.html",
-        context
+        context,
     )
+
 
 def customer_update(request, pk):
 
