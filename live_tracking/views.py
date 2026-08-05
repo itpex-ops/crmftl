@@ -39,31 +39,35 @@ from live_tracking.services.delete_service import DeleteService
 
 def delete_tracking(request, session_id):
 
-    print("=" * 50)
-    print("DELETE CLICKED")
-    print("Session ID:", session_id)
-
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
 
-    print("Entity ID:", session.entity_id)
-    print("Reference:", session.tracking_reference)
-
     result = DeleteService.delete_tracking(session)
 
-    print("Delete Result:", result)
+    print("=" * 80)
+    print("DELETE RESULT")
+    print(result)
+    print("=" * 80)
 
     if result.get("success"):
+
         messages.success(
             request,
             f"{session.driver_mobile} removed successfully from SmartTrail."
         )
+
     else:
+
+        message = result.get("message", "Unable to delete tracking.")
+
+        if isinstance(message, dict):
+            message = str(message)
+
         messages.error(
             request,
-            result.get("message", "Unable to delete tracking.")
+            message
         )
 
     return redirect("live_tracking_list")

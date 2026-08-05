@@ -3,13 +3,12 @@ from django.db import models
 
 class ExCustomer(models.Model):
 
-    # Basic Information
+
     customer_code = models.CharField(
         max_length=20,
         unique=True,
         blank=True
     )
-
     name = models.CharField(max_length=150)
 
     phone1 = models.CharField(
@@ -73,11 +72,15 @@ class ExCustomer(models.Model):
         ordering = ["name"]
 
     def save(self, *args, **kwargs):
+        creating = self.pk is None
+
         super().save(*args, **kwargs)
 
-        if not self.customer_code:
-            self.customer_code = f"C{self.id:05d}"
-            super().save(update_fields=["customer_code"])
+        if creating:
+            self.customer_code = f"C{self.pk:05d}"
+            ExCustomer.objects.filter(pk=self.pk).update(
+                customer_code=self.customer_code
+        )
 
     def __str__(self):
         return f"{self.customer_code} - {self.name}"

@@ -39,13 +39,10 @@ from django.db.models import Max
 
 @login_required
 def customer_create(request):
-
     last_id = ExCustomer.objects.aggregate(
         max_id=Max("id")
     )["max_id"] or 0
-
     next_customer_code = f"C{last_id + 1:05d}"
-
     if request.method == "POST":
         try:
             customer = ExCustomer.objects.create(
@@ -62,17 +59,13 @@ def customer_create(request):
                 is_active=request.POST.get("is_active") == "True",
                 created_by=request.user.username
             )
-
             messages.success(
                 request,
                 f"Customer created successfully! Code: {customer.customer_code}"
             )
-
             return redirect("customer_create")
-
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
-
     context = {
         "next_customer_code": next_customer_code
     }
