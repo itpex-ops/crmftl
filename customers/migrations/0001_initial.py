@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('customer_code', models.CharField(blank=True, max_length=20, unique=True)),
                 ('name', models.CharField(max_length=150)),
-                ('phone1', models.CharField(max_length=15, unique=True)),
+                ('phone1', models.CharField(max_length=15)),
                 ('phone2', models.CharField(blank=True, max_length=15, null=True)),
                 ('email', models.EmailField(blank=True, max_length=254, null=True)),
                 ('gst_number', models.CharField(blank=True, max_length=20, null=True)),
