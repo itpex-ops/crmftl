@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 @login_required
 def assign_vehicle(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    selling_rate = order.total_rate - order.gst_percent
     if request.method == "POST":
         try:
             vehicle = Vehicle(
@@ -47,10 +48,10 @@ def assign_vehicle(request, order_id):
         except ValidationError as e:
             messages.error(request, e.messages[0])
             return redirect("assign_vehicle",order_id=order.id)
-        Tracking.objects.get_or_create(order=order)
+        #Tracking.objects.get_or_create(order=order)
         messages.success(request,"Vehicle assigned successfully.")
-        return redirect("live_tracking_setup",vehicle_id=vehicle.id)
-    return render(request,"vehicle/assign_vehicle.html",{"order": order})
+        return redirect("order_detail")
+    return render(request,"vehicle/assign_vehicle.html",{"order": order,'selling_rate': selling_rate})
 
 def tracking_view(request):
     query = request.GET.get("q")
