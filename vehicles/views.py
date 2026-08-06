@@ -48,7 +48,7 @@ def assign_vehicle(request, order_id):
         except ValidationError as e:
             messages.error(request, e.messages[0])
             return redirect("assign_vehicle",order_id=order.id)
-        #Tracking.objects.get_or_create(order=order)
+        Tracking.objects.get_or_create(order=order)
         messages.success(request,"Vehicle assigned successfully.")
         return redirect("order_detail")
     return render(request,"vehicle/assign_vehicle.html",{"order": order,'selling_rate': selling_rate})
