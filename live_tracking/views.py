@@ -19,12 +19,6 @@ from .services.location_service import LocationService
 
 from django.shortcuts import render, get_object_or_404
 from vehicles.models import Vehicle
-
-
-from vehicles.models import Vehicle
-
-from vehicles.models import Vehicle
-
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 
@@ -89,12 +83,10 @@ def send_consent(request, session_id):
     return redirect("live_tracking_list")
 
 def check_consent(request, session_id):
-
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
-
     result = ConsentService.check_consent(session)
 
     if result["success"]:
@@ -187,12 +179,13 @@ def live_tracking_dashboard(request):
     )
 
 def vehicle_live(request, pk):
-
     session = get_object_or_404(
         TrackingSession,
         pk=pk
     )
-
+    print(f"Vehicle Live View: Session ID {session.id}, Vehicle ID {session.vehicle.id}")
+    print(f"Driver Mobile: {session.driver_mobile}, Status: {session.status}")
+    print(f"Last Location: {session.last_location}, Last Updated: {session.last_updated}")
     return render(
         request,
         "live_tracking/vehicle_live.html",
@@ -282,19 +275,25 @@ def import_driver(request, vehicle_id):
     )
 
 def refresh_location(request, session_id):
-
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
-
     result = LocationService.fetch_location(session)
+    session.refresh_from_db()
 
+    print("=" * 80)
+    print("DATABASE VALUES")
+    print("Status:", session.status)
+    print("Latitude:", session.latitude)
+    print("Longitude:", session.longitude)
+    print("Tracking Enabled:", session.tracking_enabled)
+    print("Location Status:", session.location_status)
+    print("=" * 80)
     if result["success"]:
         messages.success(request, "Location updated.")
     else:
         messages.error(request, result["message"])
-
     return redirect(
         "vehicle_live",
         pk=session.id

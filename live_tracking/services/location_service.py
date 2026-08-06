@@ -38,10 +38,20 @@ class LocationService:
 
         terminal = terminals[0]
 
+        print("\n")
+        print("=" * 80)
+        print("TERMINAL DATA")
+        print("=" * 80)
+        print("Entity ID        :", terminal.get("entityId"))
+        print("Tracked          :", terminal.get("tracked"))
+        print("Location Status  :", terminal.get("locationRetrievalStatus"))
+        print("Result Status    :", terminal.get("locationResultStatus"))
+        print("Current Location :", terminal.get("currentLocation"))
+        print("Full Terminal    :", terminal)
+        print("=" * 80)
+
         session.entity_id = terminal.get("entityId", session.entity_id)
         session.location_status = terminal.get("locationRetrievalStatus")
-
-        # Use your existing field
         session.tracking_enabled = terminal.get("tracked", False)
 
         current = terminal.get("currentLocation")
@@ -74,28 +84,46 @@ class LocationService:
             )
 
         else:
+            # Keep tracking session active if consent is already approved.
+            # Don't overwrite the status just because location isn't available yet.
+            if session.consent_received:
+                session.status = "active"
 
-            session.status = "pending"
+            # Clear old location if you don't want to display stale data.
+            session.latitude = None
+            session.longitude = None
+            session.last_location = None
 
         session.save()
+
+        print("\n")
+        print("=" * 80)
+        print("SESSION SAVED")
+        print("=" * 80)
+        print("Status           :", session.status)
+        print("Tracking Enabled :", session.tracking_enabled)
+        print("Latitude         :", session.latitude)
+        print("Longitude        :", session.longitude)
+        print("Last Location    :", session.last_location)
+        print("Location Status  :", session.location_status)
+        print("=" * 80)
 
         return {
             "success": True,
             "response": response
         }
-
     @classmethod
-    def get_location(cls, mobile):
+    def get_location(cls, driver_mobile):
         auth = TrackingAuthService.get_tracking_token()
         if not auth.get("success"):
             return auth
         token = auth["token"]
-        mobile = str(mobile).strip()
-        if mobile.startswith("+91"):
-            mobile = mobile.replace("+91", "")
-        if not mobile.startswith("91"):
-            mobile = "91" + mobile
-        url = f"{settings.TELENITY_LOCATION_API}/{mobile}?lastResult=True"
+        driver_mobile = str(driver_mobile).strip()
+        if driver_mobile.startswith("+91"):
+            driver_mobile = driver_mobile.replace("+91", "")
+        if not driver_mobile.startswith("91"):
+            driver_mobile = "91" + driver_mobile
+        url = f"{settings.TELENITY_LOCATION_API}/{driver_mobile}?lastResult=True"
         headers = {
             "Token": token,
             "Content-Type": "application/json"

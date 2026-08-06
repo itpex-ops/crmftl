@@ -20,3 +20,4 @@ def allowed_roles(allowed_roles=None):
 
         return wrapper
     return decorator
+

@@ -8,8 +8,7 @@ from live_tracking.models import (
     TrackingSession,
     ApiLog,
 )
-
-
+from .modify_service import ModifyService
 class ConsentService:
     @classmethod
     def send_consent(cls, session):
@@ -173,6 +172,8 @@ class ConsentService:
 
             try:
                 response_data = response.json()
+                print("RAW CONSENT JSON")
+                print(response_data)
             except Exception:
                 response_data = {
                     "raw_response": response.text
@@ -205,13 +206,24 @@ class ConsentService:
                 }
 
             consent = response_data.get("Consent", {})
+            print("CONSENT OBJECT:", consent)
 
             status = consent.get("status", "").lower()
+
+            print("STATUS:", status)
 
             if status in ["allowed", "consent_approved"]:
 
                 session.status = "active"
                 session.consent_received = True
+                session.save()
+
+                modify = ModifyService.start_tracking(session)
+
+                print("=" * 80)
+                print("MODIFY RESULT")
+                print(modify)
+                print("=" * 80)
 
             elif status == "pending":
 
