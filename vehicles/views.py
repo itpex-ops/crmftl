@@ -21,7 +21,6 @@ from django.core.exceptions import ValidationError
 @login_required
 def assign_vehicle(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    selling_rate = order.total_rate - order.gst_percent
     if request.method == "POST":
         try:
             vehicle = Vehicle(
@@ -45,6 +44,7 @@ def assign_vehicle(request, order_id):
             )
             vehicle.clean()
             vehicle.save()
+            selling_rate = order.finalized_rate + order.loading_charges + order.halting_charges
         except ValidationError as e:
             messages.error(request, e.messages[0])
             return redirect("assign_vehicle",order_id=order.id)
