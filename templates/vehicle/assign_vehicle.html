@@ -23,7 +23,9 @@
                 <div class="summary-value">
                     {% if order.total_rate %}
                     ₹
-                    {{ order.total_rate }}
+                    {{ order.total_rate - order.gst_percent|floatformat:2 }}
+                    {% else %}
+                    ₹ 0
                     {% endif %}
 
                 </div>
