@@ -1,14 +1,9 @@
 {% extends "layouts/base.html" %}
 {% load static %}
-
 {% block title %}Live Tracking{% endblock %}
-
 {% block content %}
-
 <link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
-
 <div class="container-fluid mt-1">
-
     <!-- Header -->
     <div class="page-header d-flex justify-content-between align-items-center mb-4">
 
@@ -28,14 +23,11 @@
         </a>
 
     </div>
-
     <!-- Search -->
     <div class="card shadow-sm mb-3">
         <div class="card-body">
-
             <form method="get">
                 <div class="row">
-
                     <div class="col-md-4">
                         <input type="text"
                                class="form-control"
@@ -50,19 +42,15 @@
                             Search
                         </button>
                     </div>
-
                 </div>
             </form>
-
         </div>
     </div>
 
     <!-- Table -->
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
-
             <table class="table table-hover align-middle">
-
                 <thead class="custom-table-head">
                     <tr class="main-head-row">
                         <th>#</th>
@@ -75,18 +63,12 @@
                         <th width="220">Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {% for vehicle in vehicles %}
-
                     <tr>
-
                         <td>{{ forloop.counter }}</td>
-
                         <td>
                             <strong>{{ vehicle.ftl_no }}</strong>
-                          
                         </td>
 
                         <td>{{ vehicle.vehicle_number }}</td>
@@ -127,76 +109,52 @@
 
                         <!-- Location -->
                         <td>
-
                             {% if vehicle.tracking_session %}
                                 {{ vehicle.tracking_session.last_location|default:"--" }}
                             {% else %}
                                 --
                             {% endif %}
-
                         </td>
-
                         <!-- Last Updated -->
                         <td>
-
                             {% if vehicle.tracking_session %}
                                 {{ vehicle.tracking_session.last_updated|date:"d-m-Y H:i" }}
                             {% else %}
                                 --
                             {% endif %}
-
                         </td>
-
                         <!-- Actions -->
                         <td class="text-nowrap">
-
                             {% if not vehicle.tracking_session %}
-
                                 <a href="{% url 'import_driver' vehicle.id %}"
                                    class="btn btn-primary btn-sm"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Import Driver">
-
                                     <i class="bi bi-cloud-upload"></i>
-
                                 </a>
-
                             {% else %}
 
-                                <!-- <a href="{% url 'check_consent' vehicle.tracking_session.id %}"
-                                   class="btn btn-warning btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-title="Check Consent">
-
-                                    <i class="bi bi-shield-check"></i>
-
-                                </a> -->
-
-                                <!-- <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
-                                   class="btn btn-success btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-title="Refresh Location">
-
-                                    <i class="bi bi-arrow-repeat"></i>
-
-                                </a> -->
+                               
 
                                 <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
                                    class="btn btn-info btn-sm"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="View Live">
-
                                     <i class="bi bi-geo-alt-fill"></i>
 
                                 </a>
+                               
                                 <a class="btn btn-secondary btn-sm"
-                                data-bs-toggle="collapse"
+                                data-bs-toggle="tooltip"
+                                data-bs-title="View History"
                                 href="#history{{ vehicle.id }}"
                                 role="button"
                                 aria-expanded="false">
                                     <i class="bi bi-clock-history"></i>
                                 </a>
+                               
 
+                                {% if vehicle.tracking_session.status != "live" %}
                                 {% if vehicle.tracking_session.entity_id %}
 
                                 <a href="{% url 'delete_tracking' vehicle.tracking_session.id %}"
@@ -214,67 +172,56 @@
                             {% endif %}
 
                         </td>
-
                     </tr>
-<tr class="collapse" id="history{{ vehicle.id }}">
-    <td colspan="8">
+                    <tr class="collapse" id="history{{ vehicle.id }}">
+                        <td colspan="8">
+                            {% if vehicle.tracking_session.locations.exists %}
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Date & Time</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for loc in vehicle.tracking_session.locations.all %}
+                                    <tr>
 
-        {% if vehicle.tracking_session.locations.exists %}
+                                        <td>{{ forloop.counter }}</td>
 
-        <table class="table table-sm table-bordered mb-0">
+                                        <td>{{ loc.received_at|date:"d-m-Y H:i:s" }}</td>
 
-            <thead class="table-light">
+                                        <td>{{ loc.latitude }}</td>
 
-                <tr>
+                                        <td>{{ loc.longitude }}</td>
 
-                    <th>#</th>
-                    <th>Date & Time</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>Location</th>
+                                        <td>{{ loc.location_name|default:loc.address }}</td>
 
-                </tr>
+                                    </tr>
 
-            </thead>
+                                    {% endfor %}
 
-            <tbody>
+                                </tbody>
 
-                {% for loc in vehicle.tracking_session.locations.all %}
+                            </table>
 
-                <tr>
+                            {% else %}
 
-                    <td>{{ forloop.counter }}</td>
+                            <div class="alert alert-warning mb-0">
 
-                    <td>{{ loc.received_at|date:"d-m-Y H:i:s" }}</td>
+                                No location history available.
 
-                    <td>{{ loc.latitude }}</td>
+                            </div>
 
-                    <td>{{ loc.longitude }}</td>
+                            {% endif %}
 
-                    <td>{{ loc.location_name|default:loc.address }}</td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-        {% else %}
-
-        <div class="alert alert-warning mb-0">
-
-            No location history available.
-
-        </div>
-
-        {% endif %}
-
-    </td>
-</tr>
+                        </td>
+                    </tr>
+                    {% endif %}
                     {% empty %}
-
                     <tr>
                         <td colspan="8" class="text-center text-muted py-5">
                             <i class="bi bi-broadcast-pin fs-1"></i>
@@ -282,25 +229,18 @@
                             No Assigned Vehicles Found.
                         </td>
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
     </div>
-
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     const tooltipTriggerList = [].slice.call(
         document.querySelectorAll('[data-bs-toggle="tooltip"]')
     );
-
     tooltipTriggerList.forEach(function (el) {
         new bootstrap.Tooltip(el, {
             delay: { show: 200, hide: 50 }
