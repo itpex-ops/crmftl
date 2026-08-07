@@ -4,13 +4,19 @@ from vehicles.models import Tracking, Vehicle
 class TrackingSession(models.Model):
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("active", "Active"),
-        ("stopped", "Stopped"),
-        ("license_hold", "License Hold"),
-        ("error", "Error"),
+    ("not_enabled", "Not Enabled"),
+    ("imported", "Imported"),
+    ("sms_sent", "SMS Sent"),
+    ("consent_received", "Consent Received"),
+    ("waiting_location", "Waiting Location"),
+    ("active", "Live Tracking"),
+    ("paused", "Paused"),
+    ("stopped", "Stopped"),
+    ("deleted", "Deleted"),
+    ("license_hold", "License Hold"),
+    ("expired", "Consent Expired"),
+    ("error", "Error"),
 ]
-
     vehicle = models.OneToOneField(
         Vehicle,
         on_delete=models.CASCADE,
