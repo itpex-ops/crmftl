@@ -76,36 +76,54 @@
                         <td>{{ vehicle.driver_number }}</td>
 
                         <!-- Status -->
-                        <td>
+                       <td>
 
-                            {% if vehicle.tracking_session %}
+{% if vehicle.tracking_session %}
 
-                                {% if vehicle.tracking_session.status == "active" %}
-                                    <span class="badge bg-success">Live</span>
+    {% if vehicle.tracking_session.status == "active" %}
+        <span class="badge bg-success">
+            <i class="bi bi-broadcast"></i> Live
+        </span>
 
-                                {% elif vehicle.tracking_session.status == "sms_sent" %}
-                                    <span class="badge bg-info">SMS Sent</span>
+    {% elif vehicle.tracking_session.location_status == "Not Retrieved" %}
+        <span class="badge bg-warning text-dark">
+            <i class="bi bi-hourglass-split"></i>
+            Waiting Location
+        </span>
 
-                                {% elif vehicle.tracking_session.status == "pending" %}
-                                    <span class="badge bg-warning">Pending</span>
+    {% elif vehicle.tracking_session.status == "pending" %}
+        <span class="badge bg-info">
+            <i class="bi bi-envelope"></i>
+            SMS Sent
+        </span>
 
-                                {% elif vehicle.tracking_session.status == "failed" %}
-                                    <span class="badge bg-danger">Failed</span>
+    {% elif vehicle.tracking_session.status == "error" %}
+        <span class="badge bg-danger">
+            <i class="bi bi-x-circle"></i>
+            Failed
+        </span>
 
-                                {% else %}
-                                    <span class="badge bg-secondary">Stopped</span>
+    {% elif vehicle.tracking_session.status == "stopped" %}
+        <span class="badge bg-secondary">
+            Deleted
+        </span>
 
-                                {% endif %}
+    {% else %}
+        <span class="badge bg-dark">
+            Unknown
+        </span>
 
-                            {% else %}
+    {% endif %}
 
-                                <span class="badge bg-dark">
-                                    Not Enabled
-                                </span>
+{% else %}
 
-                            {% endif %}
+<span class="badge bg-dark">
+    Not Enabled
+</span>
 
-                        </td>
+{% endif %}
+
+</td>
 
                         <!-- Location -->
                         <td>
