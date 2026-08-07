@@ -54,7 +54,6 @@
                                 <!-- PICKUPS -->
                                 <div class="route-card pickup-card">
                                     <div class="route-title">PICKUPS</div>
-
                                     {% for r in vehicle.order.routes %}
                                     <span class="route-chip">
                                         {{ r.origin }}
@@ -68,11 +67,9 @@
                                 <!-- DROPS -->
                                 <div class="route-card drop-card">
                                     <div class="route-title">DROPS</div>
-
                                     {% for r in vehicle.order.routes %}
                                     <span class="route-chip">
-                                        {% if r.destivation %}
-
+                                        {% if r.destination %}
                                         {{ r.destination }}
                                         {% endif %}
                                         {% if r.destination_pin %}
