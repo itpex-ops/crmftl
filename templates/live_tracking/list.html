@@ -86,15 +86,7 @@
 
                         <td>
                             <strong>{{ vehicle.ftl_no }}</strong>
-                            <a class="btn btn-secondary btn-sm"
-   data-bs-toggle="collapse"
-   href="#history{{ vehicle.id }}"
-   role="button"
-   aria-expanded="false">
-
-    <i class="bi bi-clock-history"></i>
-
-</a>
+                          
                         </td>
 
                         <td>{{ vehicle.vehicle_number }}</td>
@@ -171,23 +163,23 @@
 
                             {% else %}
 
-                                <a href="{% url 'check_consent' vehicle.tracking_session.id %}"
+                                <!-- <a href="{% url 'check_consent' vehicle.tracking_session.id %}"
                                    class="btn btn-warning btn-sm"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Check Consent">
 
                                     <i class="bi bi-shield-check"></i>
 
-                                </a>
+                                </a> -->
 
-                                <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
+                                <!-- <a href="{% url 'refresh_location' vehicle.tracking_session.id %}"
                                    class="btn btn-success btn-sm"
                                    data-bs-toggle="tooltip"
                                    data-bs-title="Refresh Location">
 
                                     <i class="bi bi-arrow-repeat"></i>
 
-                                </a>
+                                </a> -->
 
                                 <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
                                    class="btn btn-info btn-sm"
@@ -196,6 +188,13 @@
 
                                     <i class="bi bi-geo-alt-fill"></i>
 
+                                </a>
+                                <a class="btn btn-secondary btn-sm"
+                                data-bs-toggle="collapse"
+                                href="#history{{ vehicle.id }}"
+                                role="button"
+                                aria-expanded="false">
+                                    <i class="bi bi-clock-history"></i>
                                 </a>
 
                                 {% if vehicle.tracking_session.entity_id %}
