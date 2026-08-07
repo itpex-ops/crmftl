@@ -7,9 +7,10 @@
 
 <div class="container-fluid">
 
-    <div class="page-header">
-        <h5>✏️ Edit Customer</h5>
-        <small>Update customer information</small>
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h4 class="mb-1">✏️ Edit Customer</h4>
+        <small class="text-muted">Update customer information</small>
     </div>
 
     <form method="POST">
@@ -17,110 +18,151 @@
 
         <div class="row">
 
-            <!-- LEFT -->
-            <div class="col-lg-8">
+            <!-- ================= LEFT SIDE ================= -->
 
-                <div class="card section-card">
+            <div class="col-lg-9">
 
-                    <div class="section-title">
-                        Customer Information
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-primary text-white">
+                        <strong>Customer Information</strong>
                     </div>
 
                     <div class="card-body">
 
                         <div class="row g-3">
 
+                            <!-- Customer Code -->
+
                             <div class="col-md-3">
                                 <label class="form-label">Customer Code</label>
                                 <input type="text"
-                                       class="form-control readonly-box"
+                                       class="form-control"
                                        value="{{ customer.customer_code }}"
-                                       >
+                                       readonly>
                             </div>
- <div class="col-md-3">
-     <label class="form-label">Customer Name</label>
-                           <input type="text"
-       name="name"
-       class="form-control"
-       value="{{ customer.name }}">
-</div>
- <div class="col-md-3">
-     <label class="form-label">Customer Phone1</label>
-<input type="text"
-       name="phone1"
-       class="form-control"
-       value="{{ customer.phone1 }}">
- </div>
-  <div class="col-md-3">
-     <label class="form-label">Customer Phone2</label>
-<input type="text"
-       name="phone2"
-       class="form-control"
-       value="{{ customer.phone2|default:'' }}">
-</div>
- <div class="col-md-3">
-     <label class="form-label">Customer Email</label>
-<input type="email"
-       name="email"
-       class="form-control"
-       value="{{ customer.email|default:'' }}">
- </div>
-  <div class="col-md-3">
-     <label class="form-label">GST</label>
-<input type="text"
-       name="gst_number"
-       class="form-control"
-       value="{{ customer.gst_number|default:'' }}">
-  </div>
-   <div class="col-md-3">
-     <label class="form-label">PAN NUMBER</label>
-<input type="text"
-       name="pan_number"
-       class="form-control"
-       value="{{ customer.pan_number|default:'' }}">
-   </div>
- <div class="col-md-3">
-     <label class="form-label">STATE</label>
-<input type="text"
-       name="state"
-       class="form-control"
-       value="{{ customer.state|default:'' }}">
- </div>
-<div class="col-md-3">
-    <label class="form-label">Address</label>
-    <textarea name="address"
-              class="form-control"
-              rows="1"
-              style="resize: none;">{{ customer.address }}</textarea>
-</div>
-   <div class="col-md-3">
-     <label class="form-label">City</label>
-<input type="text"
-       name="city"
-       class="form-control"
-       value="{{ customer.city|default:'' }}">
-   </div>
-    <div class="col-md-3">
-     <label class="form-label">Pincode</label>
-<input type="text"
-       name="pincode"
-       class="form-control"
-       value="{{ customer.pincode|default:'' }}">
-    </div>
+
+                            <!-- Name -->
+
+                            <div class="col-md-3">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text"
+                                       name="name"
+                                       class="form-control"
+                                       value="{{ customer.name }}">
+                            </div>
+
+                            <!-- Phone1 -->
+
+                            <div class="col-md-3">
+                                <label class="form-label">Phone 1</label>
+                                <input type="text"
+                                       name="phone1"
+                                       class="form-control"
+                                       value="{{ customer.phone1 }}">
+                            </div>
+
+                            <!-- Phone2 -->
+
+                            <div class="col-md-3">
+                                <label class="form-label">Phone 2</label>
+                                <input type="text"
+                                       name="phone2"
+                                       class="form-control"
+                                       value="{{ customer.phone2|default:'' }}">
+                            </div>
+
+                            <!-- Email -->
 
                             <div class="col-md-4">
-                               <select name="is_active" class="form-select">
+                                <label class="form-label">Email</label>
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       value="{{ customer.email|default:'' }}">
+                            </div>
 
-    <option value="True"
-        {% if customer.is_active %}selected{% endif %}>
-        ACTIVE
-    </option>
+                            <!-- GST -->
 
-    <option value="False"
-        {% if not customer.is_active %}selected{% endif %}>
-        INACTIVE
-    </option>
-</select>
+                            <div class="col-md-4">
+                                <label class="form-label">GST Number</label>
+                                <input type="text"
+                                       name="gst_number"
+                                       class="form-control"
+                                       value="{{ customer.gst_number|default:'' }}">
+                            </div>
+
+                            <!-- PAN -->
+
+                            <div class="col-md-4">
+                                <label class="form-label">PAN Number</label>
+                                <input type="text"
+                                       name="pan_number"
+                                       class="form-control"
+                                       value="{{ customer.pan_number|default:'' }}">
+                            </div>
+
+                            <!-- State -->
+
+                            <div class="col-md-4">
+                                <label class="form-label">State</label>
+                                <input type="text"
+                                       name="state"
+                                       class="form-control"
+                                       value="{{ customer.state|default:'' }}">
+                            </div>
+
+                            <!-- City -->
+
+                            <div class="col-md-4">
+                                <label class="form-label">City</label>
+                                <input type="text"
+                                       name="city"
+                                       class="form-control"
+                                       value="{{ customer.city|default:'' }}">
+                            </div>
+
+                            <!-- Pincode -->
+
+                            <div class="col-md-4">
+                                <label class="form-label">Pincode</label>
+                                <input type="text"
+                                       name="pincode"
+                                       class="form-control"
+                                       value="{{ customer.pincode|default:'' }}">
+                            </div>
+
+                            <!-- Address -->
+
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+
+                                <textarea
+                                    name="address"
+                                    class="form-control"
+                                    rows="3"
+                                    style="resize:none;">{{ customer.address }}</textarea>
+                            </div>
+
+                            <!-- Status -->
+
+                            <div class="col-md-3">
+                                <label class="form-label">Status</label>
+
+                                <select name="is_active" class="form-select">
+
+                                    <option value="True"
+                                        {% if customer.is_active %}selected{% endif %}>
+                                        Active
+                                    </option>
+
+                                    <option value="False"
+                                        {% if not customer.is_active %}selected{% endif %}>
+                                        Inactive
+                                    </option>
+
+                                </select>
+
                             </div>
 
                         </div>
@@ -131,39 +173,87 @@
 
             </div>
 
-            <!-- RIGHT -->
-           
+            <!-- ================= RIGHT SIDE ================= -->
 
-                        
+            <div class="col-lg-3">
 
-                        <div class="user-box">
-                            {{ form.instance.created_at|date:"d-m-Y h:i A" }}
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-light">
+                        <strong>Information</strong>
+                    </div>
+
+                    <div class="card-body">
+                         <div class="mb-3">
+
+                            <label class="text-muted small">
+                                Created By
+                            </label>
+
+                            <div class="border rounded p-2 bg-light">
+
+                                {{ customer.created_by }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="text-muted small">
+                                Created On
+                            </label>
+
+                            <div class="border rounded p-2 bg-light">
+
+                                {{ customer.created_at|date:"d-m-Y h:i A" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="text-muted small">
+                                Last Updated
+                            </label>
+
+                            <div class="border rounded p-2 bg-light">
+
+                                {{ customer.updated_at|date:"d-m-Y h:i A" }}
+
+                            </div>
+
                         </div>
 
                         <hr>
 
-                        <label class="form-label">
-                            Last Updated
-                        </label>
+                        <div class="d-grid">
 
-                        <div class="user-box">
-                            {{ form.instance.updated_at|date:"d-m-Y h:i A" }}
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="bi bi-save me-1"></i>
+
+                                Update Customer
+
+                            </button>
+
+                        </div>
+
+                        <div class="d-grid mt-2">
+
+                            <a href="{% url 'customer_list' %}"
+                               class="btn btn-outline-secondary">
+
+                                ← Back to List
+
+                            </a>
+
                         </div>
 
                     </div>
 
-                </div>
-
-                <div class="d-grid mt-3">
-                    <button type="submit" class="btn btn-primary">
-                        💾 Update Customer
-                    </button>
-                </div>
-
-                <div class="d-grid mt-2">
-                    <a href="{% url 'customer_list' %}" class="btn btn-secondary">
-                        ← Back to List
-                    </a>
                 </div>
 
             </div>

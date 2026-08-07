@@ -16,18 +16,18 @@
     <!-- Table -->
     <div class="card shadow-sm border-0">
         <div class="table-container">
-
             <table class="table table-hover align-middle mb-0" id="vehicleTable">
-                <thead>
-                    <tr>
+               <thead class="custom-table-head">
+                    <tr class="main-head-row">
                         <th>#</th>
-                        <th class="sortable">FTL No</th>
-                        <th class="sortable">Vehicle No</th>
+                        <th >FTL No</th>
+                        <th>Vehicle No</th>
+                        <th>Route</th>
                         <th>Driver</th>
                         <th>Freight</th>
                         <th>Balance</th>
                         <th>Status</th>
-                        <th class="sortable">Assigned At</th>
+                        <th class="sortable">Assigned</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -35,19 +35,58 @@
 
                     {% for vehicle in vehicles %}
                     <tr class="vehicle-row">
-
                         <td>{{ forloop.counter }}</td>
-
                         <td class="fw-semibold">
-                            {{ vehicle.ftl_no }}
+                            {{ vehicle.ftl_no }}<br>
+                            <small>{{ vehicle.order.customer_name }}</small><br>
+                            <small>Created By: {{ vehicle.order.created_by }}</small>
                         </td>
-
                         <td>
                             <span class="vehicle-tag">
                                 {{ vehicle.vehicle_number }}
                             </span>
                         </td>
+ <!-- ROUTE -->
+                        <td>
+                            {% if vehicle.order.routes %}
+                            <div class="route-modern">
 
+                                <!-- PICKUPS -->
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+
+                                    {% for r in vehicle.order.routes %}
+                                    <span class="route-chip">
+                                        {{ r.origin }}
+                                        {% if r.origin_pin %}
+                                        [ {{ r.origin_pin }} ]
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- DROPS -->
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+
+                                    {% for r in vehicle.order.routes %}
+                                    <span class="route-chip">
+                                        {% if r.destivation %}
+
+                                        {{ r.destination }}
+                                        {% endif %}
+                                        {% if r.destination_pin %}
+                                        [ {{ r.destination_pin }} ]
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
                         <td>{{ vehicle.driver_number }}</td>
 
                         <td>

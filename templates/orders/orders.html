@@ -60,7 +60,7 @@
     <!-- TABLE -->
     <div class="card table-card p-3">
         <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table table-hover align-middle">
                 <thead class="custom-table-head">
                     <tr class="main-head-row">
                         <th>Date</th>
@@ -103,7 +103,8 @@
                             <a href="{% url 'view_order' order.id %}" class="fw-semibold text-decoration-none">
                                 {{ order.order_no }}
                             </a>
-                            {% endif %}
+                            {% endif %}<br>
+                            <small> Created By : {{ order.created_by }} </small>
                         </td>
 
                         <!-- CUSTOMER -->

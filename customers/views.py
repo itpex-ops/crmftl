@@ -2,19 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib import messages
 from .models import ExCustomer
-from .forms import ExCustomerForm
 from django.contrib.auth.decorators import login_required
 from customers.models import ExCustomer
-from django.utils import timezone
-from datetime import timedelta
-
+from django.db import transaction
+import re
+from django.core.exceptions import ValidationError
 
 @login_required
 def customer_list(request):
     query = request.GET.get("q", "").strip()
-
     customers = ExCustomer.objects.all()
-
+    is_superuser = request.user.is_superuser
     if query:
         customers = customers.filter(
             Q(customer_code__icontains=query) |
@@ -27,6 +25,7 @@ def customer_list(request):
     context = {
         "customers": customers,
         "query": query,
+        "is_superuser": is_superuser,
     }
 
     return render(
@@ -35,21 +34,10 @@ def customer_list(request):
         context
     )
 
-import re
-from django.core.exceptions import ValidationError
-
 def validate_pan(pan):
     pattern = r"^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
     if not re.match(pattern, pan):
         raise ValidationError("Invalid PAN format")
-
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.shortcuts import redirect, render
-
-from .models import ExCustomer
-
 
 @login_required
 def customer_create(request):
@@ -123,7 +111,7 @@ def customer_create(request):
         context,
     )
 
-
+@login_required
 def customer_update(request, pk):
 
     customer = get_object_or_404(ExCustomer, pk=pk)
@@ -161,6 +149,7 @@ def customer_update(request, pk):
         },
     )
 
+@login_required
 def customer_delete(request, pk):
     customer = get_object_or_404(ExCustomer, pk=pk)
 

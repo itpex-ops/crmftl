@@ -74,11 +74,11 @@
                                 <a href="{% url 'customer_update' c.id %}" class="btn btn-warning btn-sm">
                                     Edit
                                 </a>
-
+{% if is_superuser %}
                                 <a href="{% url 'customer_delete' c.id %}" class="btn btn-danger btn-sm">
                                     Delete
                                 </a> 
-
+{% endif %}
                             </td>
                         </tr>
 
