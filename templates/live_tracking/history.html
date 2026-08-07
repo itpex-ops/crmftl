@@ -1,32 +1,41 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+{% block title %}Tracking History{% endblock %}
 
 {% block content %}
 
-<div class="container mt-4">
+<div class="container-fluid">
 
-    <div class="card shadow">
+    <div class="page-header">
+        <h4>
+            <i class="bi bi-clock-history"></i>
+            Tracking History
+        </h4>
 
-        <div class="page-header">
-            <h4><i class="bi bi-geo-alt-fill"></i> Location History</h4>
-            <small class="text-muted">View the location history of the selected vehicle</small>
-        </div>
+        <small>
+            {{ session.vehicle.ftl_no }}
+            -
+            {{ session.vehicle.vehicle_number }}
+        </small>
+    </div>
 
-        <div class="card-body">
-             <table class="table table-hover align-middle">
+    <div class="card shadow-sm">
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-hover">
+
                 <thead class="custom-table-head">
-                    <tr class="main-head-row">
 
-                        <th>Date</th>
+                    <tr>
 
-                        <th>Location</th>
-
+                        <th>#</th>
+                        <th>Date & Time</th>
                         <th>Latitude</th>
-
                         <th>Longitude</th>
-
-                        <th>Accuracy</th>
+                        <th>Location</th>
+                        <th>Status</th>
 
                     </tr>
 
@@ -34,19 +43,29 @@
 
                 <tbody>
 
-                    {% for location in locations %}
+                    {% for item in history %}
 
                     <tr>
 
-                        <td>{{ location.received_at }}</td>
+                        <td>{{ forloop.counter }}</td>
 
-                        <td>{{ location.location_name }}</td>
+                        <td>{{ item.received_at|date:"d-m-Y H:i:s" }}</td>
 
-                        <td>{{ location.latitude }}</td>
+                        <td>{{ item.latitude }}</td>
 
-                        <td>{{ location.longitude }}</td>
+                        <td>{{ item.longitude }}</td>
 
-                        <td>{{ location.accuracy }} m</td>
+                        <td>{{ item.location_name|default:item.address }}</td>
+
+                        <td>
+
+                            {% if item.tracked %}
+                            <span class="badge bg-success">Tracked</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Tracked</span>
+                            {% endif %}
+
+                        </td>
 
                     </tr>
 
@@ -54,7 +73,7 @@
 
                     <tr>
 
-                        <td colspan="5" class="text-center">
+                        <td colspan="6" class="text-center text-muted py-4">
 
                             No location history found.
 

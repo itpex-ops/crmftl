@@ -50,7 +50,7 @@ def assign_vehicle(request, order_id):
             return redirect("assign_vehicle",order_id=order.id)
         Tracking.objects.get_or_create(order=order)
         messages.success(request,"Vehicle assigned successfully.")
-        return redirect("order_detail")
+        return redirect("/")
     return render(request,"vehicle/assign_vehicle.html",{"order": order,'selling_rate': selling_rate})
 
 def tracking_view(request):

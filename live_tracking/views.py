@@ -298,3 +298,21 @@ def refresh_location(request, session_id):
         "vehicle_live",
         pk=session.id
     )
+
+def tracking_history(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    history = session.locations.all()
+
+    return render(
+        request,
+        "live_tracking/history.html",
+        {
+            "session": session,
+            "history": history
+        }
+    )
