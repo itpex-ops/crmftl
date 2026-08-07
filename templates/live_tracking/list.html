@@ -129,49 +129,40 @@
                                 <a href="{% url 'import_driver' vehicle.id %}"
                                    class="btn btn-primary btn-sm"
                                    data-bs-toggle="tooltip"
-                                   data-bs-title="Import Driver">
+                                   title="Import Driver">
                                     <i class="bi bi-cloud-upload"></i>
                                 </a>
                             {% else %}
 
-                               
-
                                 <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
                                    class="btn btn-info btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-title="View Live">
+                                   data-bs-toggle="collapse"
+                                   title="View Live">
                                     <i class="bi bi-geo-alt-fill"></i>
 
                                 </a>
                                
                                 <a href="#history{{ vehicle.id }}"
-   class="btn btn-secondary btn-sm"
-   data-bs-toggle="collapse"
-   data-bs-title="Location History"
-   data-bs-placement="top"
-   role="button"
-   aria-expanded="false">
+                                class="btn btn-secondary btn-sm"
+                                data-bs-toggle="collapse"
+                                title="Location History"
+                                role="button"
+                                aria-expanded="false">
+                                    <i class="bi bi-clock-history"></i>
+                                </a>
 
-    <i class="bi bi-clock-history"></i>
-
-</a>
-
-                                {% if vehicle.tracking_session.status != "live" %}
-                                {% if vehicle.tracking_session.entity_id %}
+                               {% if vehicle.tracking_session.entity_id and vehicle.tracking_session.status != "active" %}
 
                                 <a href="{% url 'delete_tracking' vehicle.tracking_session.id %}"
-                                   class="btn btn-danger btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-title="Delete Tracking"
-                                   onclick="return confirm('Are you sure you want to delete this tracking?');">
+                                class="btn btn-danger btn-sm"
+                                title="Delete Tracking"
+                                onclick="return confirm('Are you sure you want to delete this tracking?');">
 
                                     <i class="bi bi-trash"></i>
 
                                 </a>
 
                                 {% endif %}
-
-                            {% endif %}
 
                         </td>
                     </tr>

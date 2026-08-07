@@ -131,6 +131,55 @@ class Vehicle(models.Model):
 
     def can_take_balance(self):
         return self.remaining_balance_amount == 0
+
+    def auto_close_live_tracking(self):
+            """
+            Remove SmartTrail tracking when trip is settled
+            """
+    
+            if not self.order:
+                return
+    
+            vehicle = self.order.vehicles.first()
+    
+            if not vehicle:
+                return
+    
+            session = getattr(vehicle, "tracking_session", None)
+    
+            if not session:
+                return
+    
+            # Optional: call Telenity Delete API
+            try:
+                from live_tracking.services.delete_service import DeleteService
+                DeleteService.delete_tracking(session)
+            except Exception:
+                pass
+    
+            # Delete location history
+            session.locations.all().delete()
+    
+            # Delete SMS logs
+            session.sms_logs.all().delete()
+    
+            # Delete tracking session
+            session.delete()
+    
+    def save(self, *args, **kwargs):
+    
+            was_settled = False
+    
+            if self.pk:
+                old = Tracking.objects.get(pk=self.pk)
+                was_settled = old.settled
+    
+            super().save(*args, **kwargs)
+    
+            # When settled changes from False -> True
+            if not was_settled and self.settled:
+                self.auto_close_live_tracking()
+    
     
 
     def save(self, *args, **kwargs):

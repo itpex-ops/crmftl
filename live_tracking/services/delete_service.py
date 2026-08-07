@@ -1,11 +1,7 @@
 import requests
-
 from django.conf import settings
-
 from .auth_service import TrackingAuthService
-
 from live_tracking.models import ApiLog
-
 
 class DeleteService:
     @classmethod
@@ -21,9 +17,9 @@ class DeleteService:
             mobile = "91" + mobile
         url = settings.TELENITY_DELETE_API
         headers = {
-            "x-access-token": token,
-            "Content-Type": "application/json"
-        }
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json"
+}
         payload = {
             "msisdnList": [
                 mobile

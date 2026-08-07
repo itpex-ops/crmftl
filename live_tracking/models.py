@@ -1,5 +1,5 @@
 from django.db import models
-from vehicles.models import Vehicle
+from vehicles.models import Tracking, Vehicle
 
 class TrackingSession(models.Model):
 
@@ -72,6 +72,7 @@ class TrackingSession(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+   
     def __str__(self):
         return f"{self.vehicle.ftl_no}"
     

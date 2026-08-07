@@ -5,60 +5,37 @@ from django.utils import timezone
 from vehicles.models import Vehicle
 from .models import TrackingSession, LiveLocation
 from vehicles.models import Vehicle
-
 from .models import (
     TrackingSession,
     LiveLocation,
 )
-
 from .services.auth_service import TrackingAuthService
 from .services.consent_auth_service import ConsentAuthService
 from .services.import_service import ImportService
 from .services.consent_service import ConsentService
 from .services.location_service import LocationService
-
-from django.shortcuts import render, get_object_or_404
-from vehicles.models import Vehicle
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-
-from .models import TrackingSession
-from .services.consent_service import ConsentService
-
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-
 from live_tracking.models import TrackingSession
 from live_tracking.services.delete_service import DeleteService
 
 def delete_tracking(request, session_id):
-
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
-
     result = DeleteService.delete_tracking(session)
-
     print("=" * 80)
     print("DELETE RESULT")
     print(result)
     print("=" * 80)
-
     if result.get("success"):
-
         messages.success(
             request,
             f"{session.driver_mobile} removed successfully from SmartTrail."
         )
-
     else:
-
         message = result.get("message", "Unable to delete tracking.")
-
         if isinstance(message, dict):
             message = str(message)
-
         messages.error(
             request,
             message
@@ -112,17 +89,32 @@ def test_location(request, vehicle_id):
     )
     return JsonResponse(result)
 
+from django.db.models import Q
+from vehicles.models import Vehicle
+
 def live_tracking_list(request):
+
+    query = request.GET.get("q", "")
+
     vehicles = Vehicle.objects.select_related(
-        "order"
+        "tracking_session",
+        "order__tracking"
+    ).filter(
+        tracking_session__isnull=False
+    ).exclude(
+        order__tracking__settled=True
     ).order_by("-id")
-    return render(
-        request,
-        "live_tracking/list.html",
-        {
-            "vehicles": vehicles
-        }
-    )
+
+    if query:
+        vehicles = vehicles.filter(
+            Q(ftl_no__icontains=query) |
+            Q(vehicle_number__icontains=query) |
+            Q(driver_number__icontains=query)
+        )
+
+    return render(request, "live_tracking/list.html", {
+        "vehicles": vehicles
+    })
 
 def live_tracking_setup(request, vehicle_id):
     vehicle = get_object_or_404(Vehicle, pk=vehicle_id)
@@ -233,11 +225,8 @@ def import_driver(request, vehicle_id):
         Vehicle,
         pk=vehicle_id
     )
-
     result = ImportService.import_driver(vehicle)
-
     if result.get("success"):
-
         if result.get("already_exists"):
             messages.info(
                 request,
@@ -248,14 +237,11 @@ def import_driver(request, vehicle_id):
                 request,
                 "Driver imported successfully into Telenity."
             )
-
         return redirect(
             "live_tracking_setup",
             vehicle_id=vehicle.id
         )
-
     error_message = result.get("message", "Import failed.")
-
     if isinstance(error_message, dict):
         if "errorMessage" in error_message:
             error_message = error_message["errorMessage"]
@@ -263,12 +249,10 @@ def import_driver(request, vehicle_id):
             error_message = error_message["raw_response"]
         else:
             error_message = str(error_message)
-
     messages.error(
         request,
         error_message
     )
-
     return redirect(
         "live_tracking_setup",
         vehicle_id=vehicle.id
