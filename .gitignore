@@ -40,8 +40,13 @@ dist/
 .pytest_cache/
 
 # Migrations (optional - be careful)
-# */migrations/*
-# !*/migrations/__init__.py
+customers/migrations/
+enquiries/migrations/
+vehicles/migrations/
+orders/migrations/
+accounts/migrations/
+live_tracking/migrations/
+
 
 
 

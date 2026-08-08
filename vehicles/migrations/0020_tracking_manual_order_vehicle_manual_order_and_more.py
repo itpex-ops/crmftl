@@ -7,7 +7,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('manual_order', '0004_alter_manualorder_order_no'),
         ('orders', '0013_order_kms'),
         ('vehicles', '0019_alter_vehicle_order'),
     ]
