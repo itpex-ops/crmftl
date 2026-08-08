@@ -284,7 +284,7 @@ def refresh_location(request, session_id):
         messages.error(request, result["message"])
     return redirect(
         "vehicle_live",
-        pk=session.id
+        session_id=session.id
     )
 
 def tracking_history(request, session_id):

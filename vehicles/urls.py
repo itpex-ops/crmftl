@@ -15,12 +15,7 @@ urlpatterns = [
     path('public_tracking/',views.public_tracking,name='public_tracking'),
     path('tracking/<int:id>/upload-docs/', views.upload_tracking_docs, name='upload_tracking_docs'),
     #path('api/order-status/<int:id>', views.order_status_api, name='order_status_api')
-    path("dashboard/",views.vehicle_dashboard,name="vehicle_dashboard"),
-    path(
-    "live/<int:session_id>/",
-    views.open_tracking,
-    name="open_tracking"
-),
+    path("dashboard/",views.vehicle_dashboard,name="vehicle_dashboard")
 ]
 
 

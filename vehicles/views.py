@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from authentications.decorators import allowed_roles
-from live_tracking.models import TrackingSession
-from live_tracking.services.location_service import LocationService
 from .forms import VehicleForm
 from django.urls import reverse
 from django.utils import timezone
@@ -19,21 +17,6 @@ from django.db.models import Count, Sum
 from django.views.decorators.http import require_POST
 
 from django.core.exceptions import ValidationError
-
-def open_tracking(request, session_id):
-    session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
-    )
-    result = LocationService.open_tracking(session)
-    if result["success"]:
-        messages.success(request, "Tracking opened successfully.")
-    else:
-        messages.error(request, result["message"])
-    return redirect(
-        "vehicle_live",
-        pk=session.id
-    )
 
 @login_required
 def assign_vehicle(request, order_id):
