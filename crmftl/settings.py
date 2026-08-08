@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'orders',
     'reports',
     'vehicles',
-    'manual_order',
     'channels',
     'customers',
     'dashboards',
