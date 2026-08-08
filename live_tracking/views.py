@@ -1,3 +1,4 @@
+from django.core.serializers import python
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
@@ -170,20 +171,23 @@ def live_tracking_dashboard(request):
         context
     )
 
-def vehicle_live(request, pk):
+
+def vehicle_live(request, session_id):
     session = get_object_or_404(
         TrackingSession,
-        pk=pk
+        pk=session_id
     )
+
     print(f"Vehicle Live View: Session ID {session.id}, Vehicle ID {session.vehicle.id}")
     print(f"Driver Mobile: {session.driver_mobile}, Status: {session.status}")
     print(f"Last Location: {session.last_location}, Last Updated: {session.last_updated}")
+
     return render(
         request,
         "live_tracking/vehicle_live.html",
         {
             "session": session,
-            "locations": session.locations.all()[:30]
+            "locations": session.locations.all()[:30],
         }
     )
 
@@ -300,3 +304,4 @@ def tracking_history(request, session_id):
             "history": history
         }
     )
+

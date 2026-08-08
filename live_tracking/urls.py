@@ -29,7 +29,7 @@ urlpatterns = [
 
     # Single vehicle live page
     path(
-        "vehicle/<int:pk>/",
+        "vehicle/<int:session_id>/",
         views.vehicle_live,
         name="vehicle_live"
     ),
@@ -98,6 +98,8 @@ path(
     views.delete_tracking,
     name="delete_tracking"
 ),
+
+
 
 
 ]

@@ -26,13 +26,7 @@
                         🚚 Operational Tracking
                     </div>
                     <div class="card-body">
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed %}checked
-                                {% endif %}>
-                                Vehicle Placed
-                            </label>
-                        </div>
+                       <!-- Vehicle Document -->
                         <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="vehicle_document" 
@@ -40,6 +34,36 @@
                                 Vehicle Document Collected
                             </label>
                         </div>
+                        <!-- Vehicle Placed -->
+                         <div class="track-item">
+                            <label class="track-label">
+                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed %}checked
+                                {% endif %}>
+                                Vehicle Placed
+                            </label>
+                        </div>
+                        <!-- Live Tracking -->
+                          <div class="track-item">
+
+    <label class="track-label">
+        <input type="checkbox"
+               id="liveTracking"
+               name="live_tracking"
+               {% if tracking.live_tracking %}checked{% endif %}>
+        Live Tracking Enabled
+    </label>
+
+    <div class="mt-2">
+        <a id="liveTrackingBtn"
+           href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
+           class="btn btn-primary btn-sm"
+           {% if not tracking.live_tracking %}style="display:none;"{% endif %}>
+            <i class="bi bi-broadcast-pin me-1"></i>
+            Live Tracking
+        </a>
+    </div>
+
+</div>
                         <!-- LR -->
                         <div class="track-item">
                             <label class="track-label">
@@ -246,53 +270,92 @@
 
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        function toggle(checkId, boxId) {
-            const c = document.getElementById(checkId);
-            const b = document.getElementById(boxId);
-            if (!c || !b) return;
-            function update() { b.style.display = c.checked ? "block" : "none"; }
-            c.addEventListener("change", update);
-            update();
+    function toggle(checkId, boxId) {
+        const c = document.getElementById(checkId);
+        const b = document.getElementById(boxId);
+
+        if (!c || !b) return;
+
+        function update() {
+            b.style.display = c.checked ? "block" : "none";
         }
 
-        toggle("lrCheck", "lrBox");
-        toggle("podCheck", "podBox");
+        c.addEventListener("change", update);
+        update();
+    }
 
-        window.showPOD = function (url) {
-            document.getElementById("podFrame").src = url;
+    toggle("lrCheck", "lrBox");
+    toggle("podCheck", "podBox");
 
-            const modal = new bootstrap.Modal(
-                document.getElementById("podModal")
-            );
+    window.showPOD = function (url) {
+        document.getElementById("podFrame").src = url;
 
-            modal.show();
-        };
+        const modal = new bootstrap.Modal(
+            document.getElementById("podModal")
+        );
 
-        const names = [
-            "vehicle_placed", "vehicle_document", "invoice_eway", "lr_no_b",
-            "advance_to_fleet", "fleet_departed", "arrived", "delivered",
-            "pod_received", "balance_trans_fleet", "settled"
-        ];
+        modal.show();
+    };
 
-        const boxes = names.map(n => document.querySelector(`[name="${n}"]`)).filter(Boolean);
+    const names = [
+        "vehicle_document",
+        "vehicle_placed",
+        "live_tracking",
+        "invoice_eway",
+        "lr_no_b",
+        "advance_to_fleet",
+        "fleet_departed",
+        "arrived",
+        "delivered",
+        "pod_received",
+        "balance_trans_fleet",
+        "settled"
+    ];
 
-        function updateWorkflow() {
-            let firstUnchecked = boxes.findIndex(b => !b.checked);
-            boxes.forEach((b, i) => {
-                b.disabled = (firstUnchecked !== -1 && i > firstUnchecked);
-            });
-        }
+    const boxes = names
+        .map(n => document.querySelector(`[name="${n}"]`))
+        .filter(Boolean);
 
-        boxes.forEach(b => b.addEventListener("change", updateWorkflow));
-        updateWorkflow();
+    function updateWorkflow() {
+        let firstUnchecked = boxes.findIndex(b => !b.checked);
 
-        const settled = "{{ tracking.settled|yesno:'true,false' }}" === "true";
-        if (settled) {
-            document.querySelectorAll("input,textarea,select,button").forEach(el => el.disabled = true);
-        }
-    });
+        boxes.forEach((b, i) => {
+            b.disabled = (firstUnchecked !== -1 && i > firstUnchecked);
+        });
+    }
+
+    boxes.forEach(b => b.addEventListener("change", updateWorkflow));
+    updateWorkflow();
+
+    const settled = "{{ tracking.settled|yesno:'true,false' }}" === "true";
+
+    if (settled) {
+        document.querySelectorAll("input,textarea,select,button").forEach(el => {
+            el.disabled = true;
+        });
+    }
+
+    // ===== Live Tracking Button =====
+
+    const liveTracking = document.getElementById("liveTracking");
+    const liveTrackingBtn = document.getElementById("liveTrackingBtn");
+
+    function toggleLiveTrackingButton() {
+
+        if (!liveTracking || !liveTrackingBtn) return;
+
+        liveTrackingBtn.style.display =
+            liveTracking.checked ? "inline-block" : "none";
+    }
+
+    if (liveTracking) {
+        liveTracking.addEventListener("change", toggleLiveTrackingButton);
+        toggleLiveTrackingButton();
+    }
+
+});
 </script>
 
 <style>

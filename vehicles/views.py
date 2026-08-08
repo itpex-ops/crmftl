@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from authentications.decorators import allowed_roles
+from live_tracking.models import TrackingSession
+from live_tracking.services.location_service import LocationService
 from .forms import VehicleForm
 from django.urls import reverse
 from django.utils import timezone
@@ -17,6 +19,21 @@ from django.db.models import Count, Sum
 from django.views.decorators.http import require_POST
 
 from django.core.exceptions import ValidationError
+
+def open_tracking(request, session_id):
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+    result = LocationService.open_tracking(session)
+    if result["success"]:
+        messages.success(request, "Tracking opened successfully.")
+    else:
+        messages.error(request, result["message"])
+    return redirect(
+        "vehicle_live",
+        pk=session.id
+    )
 
 @login_required
 def assign_vehicle(request, order_id):
@@ -231,6 +248,8 @@ def order_status_api(request):
                 status = "Documents Collected"
             elif o.tracking.vehicle_placed:
                 status = "Vehicle Placed"
+            elif o.tracking.live_tracking:
+                status = "Live Tracking Enabled"
             else:
                 status = "Pending Dispatch"
 
@@ -342,16 +361,32 @@ def tracking_page(request, vehicle_id):
 
         # 🚫 BLOCK EDIT IF SETTLED
         if tracking.settled:
-            messages.warning(
-                request,
-                "Tracking already settled. Editing is locked."
+            messages.success(
+            request,
+            "Tracking updated successfully."
+                )
+
+        if tracking.live_tracking:
+
+            if hasattr(vehicle, "tracking_session"):
+                return redirect(
+                    "vehicle_live",
+                    session_id=vehicle.tracking_session.id
+                )
+
+            return redirect(
+                "import_driver",
+                vehicle.id
             )
-            return redirect("all_assigned_vehicles")
+
+        return redirect("all_assigned_vehicles")
 
         # -----------------------
         # CHECKBOX VALUES
         # -----------------------
         tracking.vehicle_placed = 'vehicle_placed' in request.POST
+        tracking.live_tracking = 'live_tracking' in request.POST
+        tracking.advance_received = 'advance_received' in request.POST
         tracking.vehicle_document = 'vehicle_document' in request.POST
         tracking.lr_no_b = 'lr_no_b' in request.POST
         tracking.invoice_eway = 'invoice_eway' in request.POST
@@ -378,7 +413,8 @@ def tracking_page(request, vehicle_id):
         # -----------------------
         if tracking.vehicle_placed and not tracking.vehicle_placed_at:
             tracking.vehicle_placed_at = now
-
+        if tracking.live_tracking and not tracking.live_tracking_at:
+            tracking.live_tracking_at = now
         if tracking.fleet_departed and not tracking.fleet_departed_at:
             tracking.fleet_departed_at = now
 
@@ -416,7 +452,8 @@ def tracking_page(request, vehicle_id):
 
         elif tracking.vehicle_placed:
             tracking.status = "vehicle_placed"
-
+        elif tracking.live_tracking:
+            tracking.status = "live_tracking"
         tracking.save()
 
         # =========================
@@ -462,6 +499,9 @@ def update_tracking_ajax(request):
 
         if field == "vehicle_placed" and value and not tracking.vehicle_placed_at:
             tracking.vehicle_placed_at = now
+
+        if field == "live_tracking" and value and not tracking.live_tracking_at:
+            tracking.live_tracking_at = now
 
         if field == "fleet_departed" and value and not tracking.fleet_departed_at:
             tracking.fleet_departed_at = now
@@ -562,6 +602,11 @@ def vehicle_dashboard(request):
         "vehicle_placed":
             tracking.filter(
                 vehicle_placed=True
+            ).count(),
+        "live_tracking_enabled":
+            vehicles.filter(
+                tracking_session__isnull=False,
+                tracking_session__tracking_enabled=True
             ).count(),
 
         "in_transit":

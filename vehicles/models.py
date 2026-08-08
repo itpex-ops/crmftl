@@ -230,9 +230,9 @@ class Tracking(models.Model):
 
     STATUS_CHOICES = [
     ("vehicle_placed", "Vehicle Placed"),
+    ("live_tracking", "Live Tracking Enabled"),
     ("vehicle_document", "Vehicle Document"),
     ("invoice_eway", "Invoice / E-way"),
-
     ("advance_to_fleet", "Advance To Fleet"),
     ("fleet_departed", "Fleet Departed"),
     ("balance_trans_fleet", "Balance Transfer To Fleet"),
