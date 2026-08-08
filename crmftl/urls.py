@@ -27,7 +27,6 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('vehicles/', include('vehicles.urls')),
     path('accounts/', include('accounts.urls')),
-    path('manual_order/',include('manual_order.urls')),
     path('customers/',include('customers.urls')),
     path('', lambda request: redirect('auth')),
     path('Dashboard/',include('dashboards.urls')),
