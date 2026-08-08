@@ -4,12 +4,6 @@ from . import views
 urlpatterns = [
 
     path(
-        "",
-        views.live_tracking_dashboard,
-        name="live_tracking_dashboard"
-    ),
-
-    path(
         "list/",
         views.live_tracking_list,
         name="live_tracking_list"

@@ -1,0 +1,279 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Live Vehicle Tracking{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+<div class="container-fluid mt-4">
+
+    <div class="card">
+
+        <!-- HEADER -->
+        <div class="page-header">
+
+            <h4>
+                <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                Live Vehicle Tracking
+            </h4>
+
+            <small>
+                Monitor and track vehicle locations in real-time
+            </small>
+
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="custom-table-head">
+
+                        <tr class="main-head-row">
+
+                            <th>FTL No</th>
+                            <th>Vehicle</th>
+                            <th>Driver</th>
+                            <th>Status</th>
+                            <th>Current Location</th>
+                            <th>Last Updated</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for track in tracking_list %}
+
+                        <tr>
+
+                            <!-- FTL -->
+                            <td>
+                                <strong>
+                                    {{ track.vehicle.ftl_no }}
+                                </strong>
+                            </td>
+
+
+                            <!-- VEHICLE -->
+                            <td>
+                                {{ track.vehicle.vehicle_number }}
+                            </td>
+
+
+                            <!-- DRIVER -->
+                            <td>
+                                {{ track.driver_mobile }}
+                            </td>
+
+
+                            <!-- STATUS -->
+                            <td>
+
+                                {% if track.status == "active" %}
+
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-broadcast-pin me-1"></i>
+                                        Live Tracking
+                                    </span>
+
+                                {% elif track.status == "waiting_location" %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split me-1"></i>
+                                        Waiting Location
+                                    </span>
+
+                                {% elif track.status == "consent_received" %}
+
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Consent Received
+                                    </span>
+
+                                {% elif track.status == "sms_sent" %}
+
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-chat-left-text me-1"></i>
+                                        SMS Sent
+                                    </span>
+
+                                {% elif track.status == "imported" %}
+
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-cloud-upload me-1"></i>
+                                        Imported
+                                    </span>
+
+                                {% elif track.status == "paused" %}
+
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-pause-circle me-1"></i>
+                                        Paused
+                                    </span>
+
+                                {% elif track.status == "stopped" %}
+
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-stop-circle me-1"></i>
+                                        Stopped
+                                    </span>
+
+                                {% elif track.status == "license_hold" %}
+
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-shield-exclamation me-1"></i>
+                                        License Hold
+                                    </span>
+
+                                {% elif track.status == "expired" %}
+
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Consent Expired
+                                    </span>
+
+                                {% elif track.status == "error" %}
+
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Error
+                                    </span>
+
+                                {% elif track.status == "deleted" %}
+
+                                    <span class="badge bg-dark">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Deleted
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-light text-dark">
+                                        Not Enabled
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- LOCATION -->
+                            <td>
+
+                                {% if track.last_location %}
+
+                                    <span>
+                                        {{ track.last_location }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Location not available
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- LAST UPDATED -->
+                            <td>
+
+                                {% if track.last_updated %}
+
+                                    {{ track.last_updated|date:"d-m-Y H:i" }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        --
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTION -->
+                            <td>
+
+                                <a href="{% url 'live_tracking:vehicle_live' track.pk %}"
+                                   class="btn btn-primary btn-sm"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="View Live Tracking">
+
+                                    <i class="bi bi-geo-alt-fill"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="7"
+                                class="text-center text-muted py-5">
+
+                                <i class="bi bi-broadcast-pin fs-1"></i>
+
+                                <br><br>
+
+                                No vehicles currently available for live tracking.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOOLTIP -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const tooltipTriggerList =
+        [].slice.call(
+            document.querySelectorAll(
+                '[data-bs-toggle="tooltip"]'
+            )
+        );
+
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+
+        new bootstrap.Tooltip(tooltipTriggerEl);
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

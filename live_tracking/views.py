@@ -17,6 +17,7 @@ from .services.consent_service import ConsentService
 from .services.location_service import LocationService
 from live_tracking.models import TrackingSession
 from live_tracking.services.delete_service import DeleteService
+from django.db.models import Q
 
 def delete_tracking(request, session_id):
     session = get_object_or_404(
@@ -90,9 +91,6 @@ def test_location(request, vehicle_id):
     )
     return JsonResponse(result)
 
-from django.db.models import Q
-from vehicles.models import Vehicle
-
 def live_tracking_list(request):
 
     query = request.GET.get("q", "")
@@ -150,27 +148,6 @@ def api_token_status(request):
         "tracking": tracking,
         "consent": consent,
     })
-
-def live_tracking_dashboard(request):
-
-    context = {
-        "total": TrackingSession.objects.count(),
-        "active": TrackingSession.objects.filter(status="active").count(),
-        "pending": TrackingSession.objects.filter(status="pending").count(),
-        "stopped": TrackingSession.objects.filter(status="stopped").count(),
-        "recent_locations":
-            LiveLocation.objects.select_related(
-                "session",
-                "session__vehicle"
-            ).order_by("-received_at")[:10]
-    }
-
-    return render(
-        request,
-        "live_tracking/dashboard.html",
-        context
-    )
-
 
 def vehicle_live(request, session_id):
     session = get_object_or_404(
