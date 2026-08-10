@@ -176,6 +176,11 @@
                             </a>
 
                             {% endif %}
+                            {% if user.is_admin or user.is_superuser %}
+                               <a href="{% url 'delete_vehicle' vehicle.id %}" class="btn btn-warning btn-sm">
+                                Remove
+                            </a>
+                            {% endif %}
                         </td>
                     </tr>
 
@@ -195,8 +200,6 @@
     </div>
 
 </div>
-
-
 <script>
     /* Search */
     document.getElementById("searchInput").addEventListener("keyup", function () {

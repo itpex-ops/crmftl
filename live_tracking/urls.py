@@ -15,11 +15,7 @@ urlpatterns = [
         views.live_tracking_history,
         name="live_tracking_history"
     ),
-    path(
-    "history/<int:session_id>/",
-    views.tracking_history,
-    name="tracking_history"
-),
+
 
     # Single vehicle live page
     path(

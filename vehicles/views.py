@@ -326,10 +326,18 @@ def all_assigned_vehicles(request):
     })
 
 def delete_vehicle(request, vehicle_id):
+    is_superadmin = request.user.is_superuser
+    is_admin = request.user.is_admin
+
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
-    order_id = vehicle.order.id
     vehicle.delete()
-    return redirect(reverse('assigned_vehicles', args=[order_id]))
+
+    return redirect(
+        reverse(
+            'all_assigned_vehicles',
+            kwargs={'is_superadmin': is_superadmin, 'is_admin': is_admin}
+        )
+    )
 
 @login_required
 def tracking_page(request, vehicle_id):

@@ -5,89 +5,118 @@
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="page-header">
 
-    <div class="page-header">
-        <h4>
-            <i class="bi bi-clock-history"></i>
-            Tracking History
-        </h4>
+    <h4>
+        <i class="bi bi-clock-history text-primary me-2"></i>
+        Tracking History
+    </h4>
 
-        <small>
-            {{ session.vehicle.ftl_no }}
-            -
-            {{ session.vehicle.vehicle_number }}
-        </small>
-    </div>
+    <small class="text-muted">
+        {{ session.vehicle.ftl_no }}
+        -
+        {{ session.vehicle.vehicle_number }}
+    </small>
 
-    <div class="card shadow-sm">
+</div>
 
-        <div class="card-body table-responsive">
 
-            <table class="table table-hover">
+<div class="card shadow-sm">
 
-                <thead class="custom-table-head">
+    <div class="card-body table-responsive">
 
-                    <tr>
+        <table class="table table-hover align-middle">
 
-                        <th>#</th>
-                        <th>Date & Time</th>
-                        <th>Latitude</th>
-                        <th>Longitude</th>
-                        <th>Location</th>
-                        <th>Status</th>
+            <thead class="custom-table-head">
 
-                    </tr>
+                <tr>
 
-                </thead>
+                    <th>#</th>
+                    <th>Date & Time</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Location</th>
+                    <th>Status</th>
 
-                <tbody>
+                </tr>
 
-                    {% for item in history %}
+            </thead>
 
-                    <tr>
+            <tbody>
 
-                        <td>{{ forloop.counter }}</td>
+                {% for item in history %}
 
-                        <td>{{ item.received_at|date:"d-m-Y H:i:s" }}</td>
+                <tr>
 
-                        <td>{{ item.latitude }}</td>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
 
-                        <td>{{ item.longitude }}</td>
+                    <td>
+                        {{ item.received_at|date:"d-m-Y H:i:s" }}
+                    </td>
 
-                        <td>{{ item.location_name|default:item.address }}</td>
+                    <td>
+                        {{ item.latitude }}
+                    </td>
 
-                        <td>
+                    <td>
+                        {{ item.longitude }}
+                    </td>
 
-                            {% if item.tracked %}
-                            <span class="badge bg-success">Tracked</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Not Tracked</span>
-                            {% endif %}
+                    <td>
+                        {% if item.location_name %}
+                            {{ item.location_name }}
+                        {% elif item.address %}
+                            {{ item.address }}
+                        {% else %}
+                            <span class="text-muted">Location not available</span>
+                        {% endif %}
+                    </td>
 
-                        </td>
+                    <td>
 
-                    </tr>
+                        {% if item.tracked %}
 
-                    {% empty %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-geo-alt-fill me-1"></i>
+                                Tracked
+                            </span>
 
-                    <tr>
+                        {% else %}
 
-                        <td colspan="6" class="text-center text-muted py-4">
+                            <span class="badge bg-secondary">
+                                Not Tracked
+                            </span>
 
-                            No location history found.
+                        {% endif %}
 
-                        </td>
+                    </td>
 
-                    </tr>
+                </tr>
 
-                    {% endfor %}
+                {% empty %}
 
-                </tbody>
+                <tr>
 
-            </table>
+                    <td colspan="6"
+                        class="text-center text-muted py-5">
 
-        </div>
+                        <i class="bi bi-geo-alt fs-1"></i>
+
+                        <br><br>
+
+                        No location history found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </div>
 

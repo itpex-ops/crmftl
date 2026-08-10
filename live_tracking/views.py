@@ -175,29 +175,62 @@ def vehicle_history(request, pk):
         pk=pk
     )
 
-    locations = session.locations.all()
+    locations = session.locations.all().order_by("-received_at")
+
+    # Keep only the latest record for each latitude/longitude
+    history = []
+    seen = set()
+
+    for location in locations:
+
+        key = (
+            location.latitude,
+            location.longitude
+        )
+
+        if key not in seen:
+            seen.add(key)
+            history.append(location)
 
     return render(
         request,
         "live_tracking/history.html",
         {
             "session": session,
-            "locations": locations,
+            "history": history,
         }
     )
 
-def live_tracking_history(request):
+def live_tracking_history(request,pk):
 
-    locations = LiveLocation.objects.select_related(
-        "session",
-        "session__vehicle"
-    ).order_by("-received_at")
+    session = get_object_or_404(
+            TrackingSession,
+            pk=pk
+        )
+
+    locations = session.locations.all().order_by("-received_at")
+
+    # Keep only the latest record for each latitude/longitude
+    history = []
+    seen = set()
+
+    for location in locations:
+
+        key = (
+            location.latitude,
+            location.longitude
+        )
+
+        if key not in seen:
+            seen.add(key)
+            history.append(location)
 
     return render(
         request,
         "live_tracking/history.html",
         {
-            "locations": locations
+            "session": session,
+            "history": history,
         }
     )
 
