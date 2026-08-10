@@ -46,8 +46,7 @@ vehicles/migrations/
 orders/migrations/
 accounts/migrations/
 live_tracking/migrations/
-
-
+banking/migrations/
 
 
 # Celery / Redis (if used)
