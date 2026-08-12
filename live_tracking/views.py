@@ -154,17 +154,12 @@ def vehicle_live(request, session_id):
         TrackingSession,
         pk=session_id
     )
-
-    print(f"Vehicle Live View: Session ID {session.id}, Vehicle ID {session.vehicle.id}")
-    print(f"Driver Mobile: {session.driver_mobile}, Status: {session.status}")
-    print(f"Last Location: {session.last_location}, Last Updated: {session.last_updated}")
-
     return render(
         request,
         "live_tracking/vehicle_live.html",
         {
             "session": session,
-            "locations": session.locations.all()[:30],
+            "locations": session.locations.all(),
         }
     )
 

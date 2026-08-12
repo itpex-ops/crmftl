@@ -176,7 +176,7 @@
                             </a>
 
                             {% endif %}
-                            {% if user.is_admin or user.is_superuser %}
+                            {% if is_admin or is_superuser %}
                                <a href="{% url 'delete_vehicle' vehicle.id %}" class="btn btn-warning btn-sm">
                                 Remove
                             </a>
