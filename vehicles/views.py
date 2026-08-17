@@ -353,9 +353,9 @@ def tracking_page(request, vehicle_id):
 
     if request.method == "POST":
 
-        # ==========================================
-        # BLOCK EDIT IF SETTLED
-        # ==========================================
+        # --------------------------------
+        # BLOCK IF SETTLED
+        # --------------------------------
         if tracking.settled:
             messages.warning(
                 request,
@@ -363,9 +363,9 @@ def tracking_page(request, vehicle_id):
             )
             return redirect("all_assigned_vehicles")
 
-        # ==========================================
-        # CHECKBOX VALUES
-        # ==========================================
+        # --------------------------------
+        # CHECKBOXES
+        # --------------------------------
         tracking.vehicle_placed = (
             "vehicle_placed" in request.POST
         )
@@ -374,20 +374,16 @@ def tracking_page(request, vehicle_id):
             "live_tracking" in request.POST
         )
 
-        tracking.advance_received = (
-            "advance_received" in request.POST
-        )
-
         tracking.vehicle_document = (
             "vehicle_document" in request.POST
         )
 
-        tracking.lr_no_b = (
-            "lr_no_b" in request.POST
-        )
-
         tracking.invoice_eway = (
             "invoice_eway" in request.POST
+        )
+
+        tracking.lr_no_b = (
+            "lr_no_b" in request.POST
         )
 
         tracking.advance_to_fleet = (
@@ -423,54 +419,34 @@ def tracking_page(request, vehicle_id):
             ""
         ).strip()
 
-        # ==========================================
-        # REMARKS
-        # ==========================================
         tracking.remarks = request.POST.get(
             "remarks",
             ""
         ).strip()
 
+        # --------------------------------
+        # TIMELINE
+        # --------------------------------
         now = timezone.now()
 
-        # ==========================================
-        # TIMELINE AUTO STAMPS
-        # ==========================================
-
-        if (
-            tracking.vehicle_placed
-            and not tracking.vehicle_placed_at
-        ):
+        if tracking.vehicle_placed and not tracking.vehicle_placed_at:
             tracking.vehicle_placed_at = now
 
-        if (
-            tracking.live_tracking
-            and not tracking.live_tracking_at
-        ):
+        if tracking.live_tracking and not tracking.live_tracking_at:
             tracking.live_tracking_at = now
 
-        if (
-            tracking.fleet_departed
-            and not tracking.fleet_departed_at
-        ):
+        if tracking.fleet_departed and not tracking.fleet_departed_at:
             tracking.fleet_departed_at = now
 
-        if (
-            tracking.arrived
-            and not tracking.arrived_at
-        ):
+        if tracking.arrived and not tracking.arrived_at:
             tracking.arrived_at = now
 
-        if (
-            tracking.delivered
-            and not tracking.delivered_at
-        ):
+        if tracking.delivered and not tracking.delivered_at:
             tracking.delivered_at = now
 
-        # ==========================================
+        # --------------------------------
         # STATUS
-        # ==========================================
-
+        # --------------------------------
         if tracking.settled:
             tracking.status = "settled"
 
@@ -483,37 +459,32 @@ def tracking_page(request, vehicle_id):
         elif tracking.arrived:
             tracking.status = "arrived"
 
-        elif tracking.advance_received:
-            tracking.status = "advance_received"
-
         elif tracking.fleet_departed:
             tracking.status = "fleet_departed"
+
+        elif tracking.advance_to_fleet:
+            tracking.status = "advance_to_fleet"
 
         elif tracking.invoice_eway:
             tracking.status = "invoice_eway"
 
         elif tracking.lr_no_b:
-            tracking.status = "invoice_eway"
+            tracking.status = "lr_generated"
 
         elif tracking.vehicle_document:
             tracking.status = "vehicle_document"
 
-        elif tracking.vehicle_placed:
-            tracking.status = "vehicle_placed"
-
         elif tracking.live_tracking:
             tracking.status = "live_tracking"
 
-        # ==========================================
-        # SAVE TRACKING
-        # ==========================================
+        elif tracking.vehicle_placed:
+            tracking.status = "vehicle_placed"
 
         tracking.save()
 
-        # ==========================================
-        # DOCUMENT UPLOAD
-        # ==========================================
-
+        # --------------------------------
+        # DOCUMENTS
+        # --------------------------------
         files = request.FILES.getlist("documents")
 
         for file in files:
@@ -522,40 +493,29 @@ def tracking_page(request, vehicle_id):
                 file=file
             )
 
-        # ==========================================
+        # --------------------------------
         # LIVE TRACKING
-        # ==========================================
-
+        # --------------------------------
         if tracking.live_tracking:
 
-            # Existing tracking session
+            # Existing TrackingSession
             if hasattr(vehicle, "tracking_session"):
-
-                messages.success(
-                    request,
-                    "Live Tracking enabled."
-                )
 
                 return redirect(
                     "live_tracking:vehicle_live",
                     vehicle.tracking_session.pk
                 )
 
-            # No tracking session yet
-            messages.success(
-                request,
-                "Live Tracking enabled. Driver import required."
-            )
-
+            # No TrackingSession
+            # Start/import tracking
             return redirect(
                 "import_driver",
                 vehicle.id
             )
 
-        # ==========================================
+        # --------------------------------
         # NORMAL SAVE
-        # ==========================================
-
+        # --------------------------------
         messages.success(
             request,
             "Tracking updated successfully."
@@ -564,10 +524,6 @@ def tracking_page(request, vehicle_id):
         return redirect(
             "all_assigned_vehicles"
         )
-
-    # ==========================================
-    # GET
-    # ==========================================
 
     return render(
         request,
