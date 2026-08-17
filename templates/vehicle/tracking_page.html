@@ -54,7 +54,7 @@
     </label>
 
     <div class="mt-2">
-    {% if tracking.live_tracking and vehicle.tracking_session %}
+    {% if tracking.live_tracking  %}
 
         <a href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
            class="btn btn-primary btn-sm"
