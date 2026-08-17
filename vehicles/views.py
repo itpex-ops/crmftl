@@ -366,6 +366,7 @@ def tracking_page(request, vehicle_id):
         # --------------------------------
         # CHECKBOXES
         # --------------------------------
+
         tracking.vehicle_placed = (
             "vehicle_placed" in request.POST
         )
@@ -427,6 +428,7 @@ def tracking_page(request, vehicle_id):
         # --------------------------------
         # TIMELINE
         # --------------------------------
+
         now = timezone.now()
 
         if tracking.vehicle_placed and not tracking.vehicle_placed_at:
@@ -447,6 +449,7 @@ def tracking_page(request, vehicle_id):
         # --------------------------------
         # STATUS
         # --------------------------------
+
         if tracking.settled:
             tracking.status = "settled"
 
@@ -480,11 +483,16 @@ def tracking_page(request, vehicle_id):
         elif tracking.vehicle_placed:
             tracking.status = "vehicle_placed"
 
+        # --------------------------------
+        # SAVE TRACKING
+        # --------------------------------
+
         tracking.save()
 
         # --------------------------------
         # DOCUMENTS
         # --------------------------------
+
         files = request.FILES.getlist("documents")
 
         for file in files:
@@ -496,26 +504,40 @@ def tracking_page(request, vehicle_id):
         # --------------------------------
         # LIVE TRACKING
         # --------------------------------
+
         if tracking.live_tracking:
 
-            # Existing TrackingSession
-            if hasattr(vehicle, "tracking_session"):
+            # --------------------------------
+            # SESSION ALREADY EXISTS
+            # --------------------------------
+
+            tracking_session = getattr(
+                vehicle,
+                "tracking_session",
+                None
+            )
+
+            if tracking_session:
 
                 return redirect(
                     "live_tracking:vehicle_live",
-                    vehicle.tracking_session.pk
+                    tracking_session.pk
                 )
 
-            # No TrackingSession
-            # Start/import tracking
+            # --------------------------------
+            # SESSION DOES NOT EXIST
+            # IMPORT DRIVER
+            # --------------------------------
+
             return redirect(
-                "import_driver",
+                "live_tracking:import_driver",
                 vehicle.id
             )
 
         # --------------------------------
         # NORMAL SAVE
         # --------------------------------
+
         messages.success(
             request,
             "Tracking updated successfully."
@@ -533,7 +555,6 @@ def tracking_page(request, vehicle_id):
             "tracking": tracking,
         }
     )
-
 @csrf_exempt
 def update_tracking_ajax(request):
 

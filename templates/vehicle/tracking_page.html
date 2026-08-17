@@ -53,16 +53,55 @@
         Live Tracking Enabled
     </label>
 
-                        <div class="mt-2">
-                            {% if tracking.live_tracking and vehicle.tracking_session %}
-                            <a href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
-                            class="btn btn-primary btn-sm"
-                            id="liveTrackingBtn">
-                                <i class="bi bi-broadcast-pin me-1"></i>
-                                Live Tracking
-                            </a>
-                            {% endif %}
-                        </div>
+                        <div class="track-item">
+
+    <label class="track-label">
+
+        <input
+            type="checkbox"
+            id="liveTracking"
+            name="live_tracking"
+            {% if tracking.live_tracking %}checked{% endif %}
+        >
+
+        Live Tracking Enabled
+
+    </label>
+
+
+    {% if tracking.live_tracking %}
+
+        {% if vehicle.tracking_session %}
+
+            <div class="mt-2">
+
+                <a
+                    href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
+                    class="btn btn-primary btn-sm"
+                >
+
+                    <i class="bi bi-broadcast-pin me-1"></i>
+                    Open Live Tracking
+
+                </a>
+
+            </div>
+
+        {% else %}
+
+            <div class="mt-2">
+
+                <span class="text-muted small">
+                    Live tracking enabled. Save to start tracking.
+                </span>
+
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
 </div>
                         <div class="track-item">
                             <label class="track-label">
