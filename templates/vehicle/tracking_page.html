@@ -65,7 +65,7 @@
 
         </a>
 
-    {% endif %}
+    
 
          <a href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
                                    class="btn btn-info btn-sm"
@@ -74,7 +74,7 @@
                                     <i class="bi bi-geo-alt-fill"></i>
                                 </a>
     </div>
-
+{% endif %}
 </div>
                         <!-- LR -->
                         <div class="track-item">
