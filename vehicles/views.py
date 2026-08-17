@@ -342,7 +342,10 @@ def delete_vehicle(request, vehicle_id):
 @login_required
 def tracking_page(request, vehicle_id):
 
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(
+        Vehicle,
+        id=vehicle_id
+    )
 
     tracking, created = Tracking.objects.get_or_create(
         order=vehicle.order
@@ -350,48 +353,79 @@ def tracking_page(request, vehicle_id):
 
     if request.method == "POST":
 
-        # 🚫 BLOCK EDIT IF SETTLED
+        # ==========================================
+        # BLOCK EDIT IF SETTLED
+        # ==========================================
         if tracking.settled:
-            messages.success(
-            request,
-            "Tracking updated successfully."
-                )
-
-        if tracking.live_tracking:
-
-            if hasattr(vehicle, "tracking_session"):
-                return redirect(
-                    "vehicle_live",
-                    session_id=vehicle.tracking_session.id
-                )
-
-            return redirect(
-                "import_driver",
-                vehicle.id
+            messages.warning(
+                request,
+                "Tracking already settled. Editing is locked."
             )
+            return redirect("all_assigned_vehicles")
 
-        return redirect("all_assigned_vehicles")
-
-        # -----------------------
+        # ==========================================
         # CHECKBOX VALUES
-        # -----------------------
-        tracking.vehicle_placed = 'vehicle_placed' in request.POST
-        tracking.live_tracking = 'live_tracking' in request.POST
-        tracking.advance_received = 'advance_received' in request.POST
-        tracking.vehicle_document = 'vehicle_document' in request.POST
-        tracking.lr_no_b = 'lr_no_b' in request.POST
-        tracking.invoice_eway = 'invoice_eway' in request.POST
-        tracking.advance_to_fleet = "advance_to_fleet" in request.POST
-        tracking.fleet_departed = 'fleet_departed' in request.POST
-        tracking.balance_trans_fleet = 'balance_trans_fleet' in request.POST
-        tracking.arrived = 'arrived' in request.POST
-        tracking.delivered = 'delivered' in request.POST
-        tracking.pod_received = 'pod_received' in request.POST
-        tracking.settled = 'settled' in request.POST
-        tracking.lr_no = request.POST.get('lr_no', '').strip()
-    
+        # ==========================================
+        tracking.vehicle_placed = (
+            "vehicle_placed" in request.POST
+        )
 
+        tracking.live_tracking = (
+            "live_tracking" in request.POST
+        )
+
+        tracking.advance_received = (
+            "advance_received" in request.POST
+        )
+
+        tracking.vehicle_document = (
+            "vehicle_document" in request.POST
+        )
+
+        tracking.lr_no_b = (
+            "lr_no_b" in request.POST
+        )
+
+        tracking.invoice_eway = (
+            "invoice_eway" in request.POST
+        )
+
+        tracking.advance_to_fleet = (
+            "advance_to_fleet" in request.POST
+        )
+
+        tracking.fleet_departed = (
+            "fleet_departed" in request.POST
+        )
+
+        tracking.balance_trans_fleet = (
+            "balance_trans_fleet" in request.POST
+        )
+
+        tracking.arrived = (
+            "arrived" in request.POST
+        )
+
+        tracking.delivered = (
+            "delivered" in request.POST
+        )
+
+        tracking.pod_received = (
+            "pod_received" in request.POST
+        )
+
+        tracking.settled = (
+            "settled" in request.POST
+        )
+
+        tracking.lr_no = request.POST.get(
+            "lr_no",
+            ""
+        ).strip()
+
+        # ==========================================
         # REMARKS
+        # ==========================================
         tracking.remarks = request.POST.get(
             "remarks",
             ""
@@ -399,21 +433,44 @@ def tracking_page(request, vehicle_id):
 
         now = timezone.now()
 
-        # -----------------------
+        # ==========================================
         # TIMELINE AUTO STAMPS
-        # -----------------------
-        if tracking.vehicle_placed and not tracking.vehicle_placed_at:
+        # ==========================================
+
+        if (
+            tracking.vehicle_placed
+            and not tracking.vehicle_placed_at
+        ):
             tracking.vehicle_placed_at = now
-        if tracking.live_tracking and not tracking.live_tracking_at:
+
+        if (
+            tracking.live_tracking
+            and not tracking.live_tracking_at
+        ):
             tracking.live_tracking_at = now
-        if tracking.fleet_departed and not tracking.fleet_departed_at:
+
+        if (
+            tracking.fleet_departed
+            and not tracking.fleet_departed_at
+        ):
             tracking.fleet_departed_at = now
 
-        if tracking.arrived and not tracking.arrived_at:
+        if (
+            tracking.arrived
+            and not tracking.arrived_at
+        ):
             tracking.arrived_at = now
 
-        if tracking.delivered and not tracking.delivered_at:
+        if (
+            tracking.delivered
+            and not tracking.delivered_at
+        ):
             tracking.delivered_at = now
+
+        # ==========================================
+        # STATUS
+        # ==========================================
+
         if tracking.settled:
             tracking.status = "settled"
 
@@ -436,38 +493,88 @@ def tracking_page(request, vehicle_id):
             tracking.status = "invoice_eway"
 
         elif tracking.lr_no_b:
-            tracking.status = "invoice_eway"   # or create LR status choice
+            tracking.status = "invoice_eway"
 
         elif tracking.vehicle_document:
             tracking.status = "vehicle_document"
 
         elif tracking.vehicle_placed:
             tracking.status = "vehicle_placed"
+
         elif tracking.live_tracking:
             tracking.status = "live_tracking"
+
+        # ==========================================
+        # SAVE TRACKING
+        # ==========================================
+
         tracking.save()
 
-        # =========================
+        # ==========================================
         # DOCUMENT UPLOAD
-        # =========================
-        files = request.FILES.getlist('documents')
+        # ==========================================
+
+        files = request.FILES.getlist("documents")
+
         for file in files:
             TrackingDocument.objects.create(
                 tracking=tracking,
                 file=file
             )
+
+        # ==========================================
+        # LIVE TRACKING
+        # ==========================================
+
+        if tracking.live_tracking:
+
+            # Existing tracking session
+            if hasattr(vehicle, "tracking_session"):
+
+                messages.success(
+                    request,
+                    "Live Tracking enabled."
+                )
+
+                return redirect(
+                    "live_tracking:vehicle_live",
+                    vehicle.tracking_session.pk
+                )
+
+            # No tracking session yet
+            messages.success(
+                request,
+                "Live Tracking enabled. Driver import required."
+            )
+
+            return redirect(
+                "import_driver",
+                vehicle.id
+            )
+
+        # ==========================================
+        # NORMAL SAVE
+        # ==========================================
+
         messages.success(
             request,
             "Tracking updated successfully."
         )
-        return redirect("all_assigned_vehicles")
+
+        return redirect(
+            "all_assigned_vehicles"
+        )
+
+    # ==========================================
+    # GET
+    # ==========================================
 
     return render(
         request,
         "vehicle/tracking_page.html",
         {
             "vehicle": vehicle,
-            "tracking": tracking
+            "tracking": tracking,
         }
     )
 
