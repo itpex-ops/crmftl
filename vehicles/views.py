@@ -520,7 +520,7 @@ def tracking_page(request, vehicle_id):
             if tracking_session:
 
                 return redirect(
-                    "live_tracking:vehicle_live",
+                    "vehicle_live",
                     tracking_session.pk
                 )
 
@@ -530,7 +530,7 @@ def tracking_page(request, vehicle_id):
             # --------------------------------
 
             return redirect(
-                "live_tracking:import_driver",
+                "import_driver",
                 vehicle.id
             )
 
@@ -555,6 +555,8 @@ def tracking_page(request, vehicle_id):
             "tracking": tracking,
         }
     )
+
+
 @csrf_exempt
 def update_tracking_ajax(request):
 

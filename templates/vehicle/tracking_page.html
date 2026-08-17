@@ -58,7 +58,6 @@
 
     </label>
 
-
     {% if tracking.live_tracking %}
 
         {% if vehicle.tracking_session %}
@@ -66,13 +65,12 @@
             <div class="mt-2">
 
                 <a
-                    href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
+                    href="{% url 'vehicle_live' vehicle.tracking_session.pk %}"
                     class="btn btn-primary btn-sm"
+                    id="liveTrackingBtn"
                 >
-
                     <i class="bi bi-broadcast-pin me-1"></i>
                     Open Live Tracking
-
                 </a>
 
             </div>
