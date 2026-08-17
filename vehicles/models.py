@@ -292,6 +292,11 @@ class Tracking(models.Model):
         blank=True
     )
 
+    live_tracking_at = models.DateTimeField(
+    null=True,
+    blank=True
+)
+
     fleet_departed_at = models.DateTimeField(
         null=True,
         blank=True
