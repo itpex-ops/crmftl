@@ -53,22 +53,17 @@
         Live Tracking Enabled
     </label>
 
-    <div class="mt-2">
-         {% if tracking.live_tracking and vehicle.tracking_session %}
-
-        <a href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
-           class="btn btn-primary btn-sm"
-           id="liveTrackingBtn">
-
-            <i class="bi bi-broadcast-pin me-1"></i>
-            Live Tracking
-        </a>
-{% endif %}
-
-
-    </div>
+                        <div class="mt-2">
+                            {% if tracking.live_tracking and vehicle.tracking_session %}
+                            <a href="{% url 'live_tracking:vehicle_live' vehicle.tracking_session.pk %}"
+                            class="btn btn-primary btn-sm"
+                            id="liveTrackingBtn">
+                                <i class="bi bi-broadcast-pin me-1"></i>
+                                Live Tracking
+                            </a>
+                            {% endif %}
+                        </div>
 </div>
-                        <!-- LR -->
                         <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked
