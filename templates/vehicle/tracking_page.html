@@ -43,6 +43,21 @@
                             </label>
                         </div>
                         <!-- Live Tracking -->
+<div class="track-item">
+
+    <label class="track-label">
+
+        <input
+            type="checkbox"
+            id="liveTracking"
+            name="live_tracking"
+            {% if tracking.live_tracking %}checked{% endif %}
+        >
+
+        Live Tracking Enabled
+
+    </label>
+
 
     {% if tracking.live_tracking %}
 
@@ -77,7 +92,7 @@
     {% endif %}
 
 </div>
-                 <div class="track-item">
+                        <div class="track-item">
                             <label class="track-label">
                                 <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked
                                 {% endif %}>
