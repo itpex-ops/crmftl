@@ -54,7 +54,14 @@
     </label>
 
     <div class="mt-2">
-        <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
+        <a  href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
+            class="btn btn-primary btn-sm" id="liveTrackingBtn"
+           {% if not tracking.live_tracking %}style="display:none;"{% endif %}>
+            <i class="bi bi-broadcast-pin me-1"></i>
+            Live Tracking
+        </a>
+
+         <a href="{% url 'vehicle_live' vehicle.tracking_session.id %}"
                                    class="btn btn-info btn-sm"
                                    data-bs-toggle="tooltip"
                                    title="View Live">
