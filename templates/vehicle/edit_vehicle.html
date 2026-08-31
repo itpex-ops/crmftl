@@ -39,7 +39,7 @@
                         </div>
                     </div>
 
-                    {% if vehicle.order.vehicle_place_date %}
+                    {% if vehicle.order.vehicle_place_date or vehicle.vehicle_reassign_date %}
                     <div class="col-md-3">
                         <div class="mini-box">
                             <small>Vehicle Assigned Date</small>
@@ -48,7 +48,7 @@
                             </h6>
                         </div>
                     </div>
-{% else  %}
+{% else %}
                     <div class="col-md-3">
                         <div class="mini-box">
                             <small>Reassign Vehicle Date</small>
