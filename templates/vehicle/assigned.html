@@ -158,7 +158,7 @@
                             {% if vehicle.order.vehicle_place_date %}
                             {{ vehicle.order.vehicle_place_date|date:"d M Y h:i A" }}
                             {% else %}
-                            -
+                            {{ vehicle.vehicle_reassign_date|date:"d M Y h:i A" }}
                             {% endif %}
                         </td>
                         <!-- Actions -->

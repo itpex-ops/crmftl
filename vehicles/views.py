@@ -294,7 +294,6 @@ def edit_vehicle(request, vehicle_id):
         vehicle.upi_number = request.POST.get("upi_number")
         vehicle.upi_app = request.POST.get("upi_app")
         vehicle.beneficiary_name = request.POST.get("beneficiary_name")
-        print("benificary name",vehicle.beneficiary_name)
         vehicle.account_number = request.POST.get("account_number")
         vehicle.ifsc = request.POST.get("ifsc")
         vehicle.ac_type = request.POST.get("ac_type")
