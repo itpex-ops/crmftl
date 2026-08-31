@@ -95,17 +95,14 @@
                                
                                 <select id="vehicle_type" name="vehicle_type" class="form-select vehicle-select"
                                     required>
-
                                     <option value="">
                                         Select Vehicle
                                         </optform-labelion>
-
                                         {% for value, label in vehicle_types %}
                                     <option value="{{ value }}">
                                         {{ label }}
                                     </option>
                                     {% endfor %}
-
                                 </select>
                             </div>
 
@@ -132,7 +129,6 @@
                                 <input type="number" name="deliveries" class="form-control"
                                     value="{{ enquiry.deliveries|default_if_none:'' }}" readonly>
                             </div>
-
                         </div>
                         {% if enquiry.routes %}
                         <div class="row mt-3">
