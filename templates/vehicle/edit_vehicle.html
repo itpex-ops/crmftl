@@ -39,26 +39,38 @@
                         </div>
                     </div>
 
-                    {% if vehicle.order.vehicle_place_date or vehicle.vehicle_reassign_date %}
-                    <div class="col-md-3">
-                        <div class="mini-box">
-                            <small>Vehicle Assigned Date</small>
-                            <h6>
-                                {{ vehicle.order.vehicle_place_date }}
-                            </h6>
-                        </div>
-                    </div>
-{% else %}
-                    <div class="col-md-3">
-                        <div class="mini-box">
-                            <small>Reassign Vehicle Date</small>
+            {% if vehicle.vehicle_reassign_date %}
 
-                            <input type="text" id="vehicle_reassign_date" name="vehicle_reassign_date"
-                                class="form-control mt-2" value="" placeholder="Select Date & Time">
-                        </div>
-                    </div>
-                    
-                    {% endif %}
+    <div class="col-md-3">
+        <div class="mini-box">
+            <small>Reassign Vehicle Date</small>
+            <h6>
+                {{ vehicle.vehicle_reassign_date|date:"d-m-Y H:i" }}
+            </h6>
+        </div>
+    </div>
+
+{% elif vehicle.order.vehicle_place_date %}
+
+    <div class="col-md-3">
+        <div class="mini-box">
+            <small>Vehicle Assigned Date</small>
+            <h6>
+                {{ vehicle.order.vehicle_place_date|date:"d-m-Y H:i" }}
+            </h6>
+        </div>
+    </div>
+
+{% else %}
+
+    <div class="col-md-3">
+        <div class="mini-box">
+            <small>Vehicle Assigned Date</small>
+            <h6>--</h6>
+        </div>
+    </div>
+
+{% endif %}
 
                 </div>
             </div>
