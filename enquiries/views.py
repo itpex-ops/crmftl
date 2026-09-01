@@ -322,6 +322,8 @@ def create_enquiry(request):
 
 @login_required
 def enquiry_list(request):
+    today = timezone.now().date()
+
     user = request.user
     is_admin = user.role == 'admin'
     is_sales = user.role == 'sales'
