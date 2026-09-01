@@ -273,15 +273,44 @@
     .page-header h4 {
         margin: 0;
         font-weight: 700;
-        color: black;
+        color: rgb(101, 67, 33);
+
     }
 
-    .table tbody td {
-        border-bottom: 2px solid #e5e7eb;
+    .page-header small {
+        color: #FDB81B;
     }
 
     .small {
         color: black;
+    }
+
+    .status-badge {
+        background: #e8f5e9;
+        color: #198754;
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 12px;
+        padding: 7px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+        border: none;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d6efd;
+        border-bottom: 1px solid #edf2f7;
+        padding-bottom: 7px;
+        margin-bottom: 18px;
     }
 
     label {
@@ -310,12 +339,42 @@
         color: #495057;
     }
 
+    .route-box {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #fafafa;
+    }
+
+    .btn-save {
+        height: 48px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 9px;
+        margin-bottom: 15px;
+    }
+
+    .info-title {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
     .sticky-panel {
         position: sticky;
         top: 15px;
     }
 
-    .route-modern {
+    route-modern {
         max-width: 180px;
         min-height: 80px;
         text-align: left;
@@ -329,14 +388,6 @@
         /* Left align content */
     }
 
-    .route-title {
-        font-size: 9px;
-        font-weight: 700;
-        margin-bottom: 2px;
-        /* Fix typo: 2x -> 2px */
-        text-transform: uppercase;
-        text-align: left;
-    }
 
     .route-chip {
         display: inline-block;
@@ -376,48 +427,6 @@
             position: static;
         }
     }
-
-    .custom-alert {
-        animation: slideIn .4s ease;
-        margin-bottom: 10px;
-    }
-
-    .progress-time {
-        animation: progress 5s linear forwards;
-    }
-
-    .toast-container-custom {
-        position: fixed;
-        top: 80px;
-        /* Below navbar */
-        right: 20px;
-        z-index: 9999;
-        min-width: 350px;
-        max-width: 450px;
-    }
-
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes progress {
-        from {
-            width: 100%;
-        }
-
-        to {
-            width: 0;
-        }
-    }
 </style>
-
 
 {% endblock %}
