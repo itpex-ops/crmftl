@@ -1,41 +1,1365 @@
 {% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}
+Management Dashboard | Parcelex
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link rel="stylesheet"
+      href="{% static 'css/management_dashboard.css' %}">
+
+{% endblock %}
+
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="management-page">
 
-    <div class="page-header mb-4">
-        <h3>📊 Management Dashboard</h3>
-        <small>
-            Company Overview
-        </small>
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="management-header">
+
+        <div>
+            <div class="management-breadcrumb">
+                Dashboard
+                <i class="bi bi-chevron-right"></i>
+                Management
+            </div>
+
+            <h2 class="management-title">
+                Management Dashboard
+            </h2>
+
+            <p class="management-subtitle">
+                Executive overview of sales, operations and financial performance.
+            </p>
+        </div>
+
+
+        <div class="management-actions">
+
+            <span class="last-updated">
+                <i class="bi bi-clock"></i>
+                Updated {{ last_updated|date:"d M Y, h:i A" }}
+            </span>
+
+            <button
+                type="button"
+                class="refresh-btn"
+                onclick="window.location.reload();">
+
+                <i class="bi bi-arrow-clockwise"></i>
+                Refresh
+
+            </button>
+
+        </div>
+
     </div>
 
-    <!-- CUSTOMERS -->
-    <h5 class="mb-3">👥 Customers</h5>
 
-    <!-- 3 Cards -->
+    <!-- =====================================================
+         KPI ROW 1
+    ====================================================== -->
 
-    <!-- ENQUIRIES -->
-    <h5 class="mt-4 mb-3">📋 Enquiries</h5>
+    <div class="row g-3 mb-3">
 
-    <!-- 4 Cards -->
+        <!-- Enquiries -->
+        <div class="col-xl-3 col-md-6">
 
-    <!-- ORDERS -->
-    <h5 class="mt-4 mb-3">🚚 Orders</h5>
+            <div class="management-kpi kpi-blue">
 
-    <!-- 4 Cards -->
+                <div class="kpi-icon">
+                    <i class="bi bi-chat-square-text"></i>
+                </div>
 
-    <!-- OPERATIONS -->
-    <h5 class="mt-4 mb-3">🚛 Operations</h5>
+                <div class="kpi-content">
 
-    <!-- 5 Cards -->
+                    <span class="kpi-label">
+                        Total Enquiries
+                    </span>
 
-    <!-- FINANCE -->
-    <h5 class="mt-4 mb-3">💰 Finance</h5>
+                    <h3>
+                        {{ total_enquiries }}
+                    </h3>
 
-    <!-- 4 Cards -->
+                    <span class="kpi-description">
+                        All registered enquiries
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Orders -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="management-kpi kpi-purple">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span class="kpi-label">
+                        Total Orders
+                    </span>
+
+                    <h3>
+                        {{ total_orders }}
+                    </h3>
+
+                    <span class="kpi-description">
+                        {{ assigned_orders }} vehicles assigned
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Vehicles -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="management-kpi kpi-orange">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-truck"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span class="kpi-label">
+                        Total Vehicles
+                    </span>
+
+                    <h3>
+                        {{ total_vehicles }}
+                    </h3>
+
+                    <span class="kpi-description">
+                        {{ in_transit_orders }} currently in transit
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Revenue -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="management-kpi kpi-green">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span class="kpi-label">
+                        Total Revenue
+                    </span>
+
+                    <h3>
+                        ₹ {{ total_billed|floatformat:0 }}
+                    </h3>
+
+                    <span class="kpi-description">
+                        Order billing value
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         KPI ROW 2
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- Profit -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="finance-mini-card">
+
+                <div class="finance-mini-icon profit-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Profit
+                    </span>
+
+                    <strong>
+                        ₹ {{ total_profit|floatformat:0 }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Customer Outstanding -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="finance-mini-card">
+
+                <div class="finance-mini-icon receivable-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Customer Outstanding
+                    </span>
+
+                    <strong>
+                        ₹ {{ customer_outstanding|floatformat:0 }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Vehicle Balance -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="finance-mini-card">
+
+                <div class="finance-mini-icon vehicle-icon">
+                    <i class="bi bi-truck"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Vehicle Balance
+                    </span>
+
+                    <strong>
+                        ₹ {{ vehicle_balance|floatformat:0 }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Conversion -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="finance-mini-card">
+
+                <div class="finance-mini-icon conversion-icon">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Enquiry Conversion
+                    </span>
+
+                    <strong>
+                        {{ conversion_rate }}%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERTS
+    ====================================================== -->
+
+    {% if alerts %}
+
+    <div class="section-card mb-4">
+
+        <div class="section-header">
+
+            <div>
+                <h5>
+                    Management Alerts
+                </h5>
+
+                <span>
+                    Items requiring attention
+                </span>
+            </div>
+
+            <i class="bi bi-bell"></i>
+
+        </div>
+
+
+        <div class="alerts-grid">
+
+            {% for alert in alerts %}
+
+            <div class="management-alert {{ alert.type }}">
+
+                <div class="alert-icon">
+
+                    {% if alert.type == "danger" %}
+                        <i class="bi bi-exclamation-octagon"></i>
+                    {% elif alert.type == "warning" %}
+                        <i class="bi bi-exclamation-triangle"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle"></i>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="alert-content">
+
+                    <strong>
+                        {{ alert.title }}
+                    </strong>
+
+                    <span>
+                        {{ alert.message }}
+                    </span>
+
+                </div>
+
+
+                <div class="alert-count">
+                    {{ alert.count }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         CHARTS
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- Revenue / Profit -->
+
+        <div class="col-xl-8">
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <div>
+                        <h5>
+                            Revenue & Profit
+                        </h5>
+
+                        <span>
+                            Monthly business performance
+                        </span>
+                    </div>
+
+                    <div class="chart-badge">
+                        Last 6 months
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container">
+                    <canvas id="revenueProfitChart"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Enquiry Status -->
+
+        <div class="col-xl-4">
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <div>
+                        <h5>
+                            Enquiry Status
+                        </h5>
+
+                        <span>
+                            Current enquiry distribution
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container doughnut-container">
+                    <canvas id="enquiryStatusChart"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         OPERATION PIPELINE
+    ====================================================== -->
+
+    <div class="section-card mb-4">
+
+        <div class="section-header">
+
+            <div>
+                <h5>
+                    Operations Pipeline
+                </h5>
+
+                <span>
+                    Current shipment movement
+                </span>
+            </div>
+
+            <i class="bi bi-diagram-3"></i>
+
+        </div>
+
+
+        <div class="pipeline">
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.vehicle_placed }}
+                </div>
+
+                <span>
+                    Vehicle Placed
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.live_tracking }}
+                </div>
+
+                <span>
+                    Live Tracking
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.fleet_departed }}
+                </div>
+
+                <span>
+                    In Transit
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.arrived }}
+                </div>
+
+                <span>
+                    Arrived
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.delivered }}
+                </div>
+
+                <span>
+                    Delivered
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.pod_pending }}
+                </div>
+
+                <span>
+                    POD Pending
+                </span>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+
+            <div class="pipeline-item">
+
+                <div class="pipeline-number">
+                    {{ pipeline.settled }}
+                </div>
+
+                <span>
+                    Settled
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FINANCIAL + OPERATIONS SUMMARY
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-6">
+
+            <div class="summary-card">
+
+                <div class="summary-header">
+
+                    <div>
+                        <h5>
+                            Financial Overview
+                        </h5>
+
+                        <span>
+                            Current business position
+                        </span>
+                    </div>
+
+                    <i class="bi bi-cash-stack"></i>
+
+                </div>
+
+
+                <div class="summary-list">
+
+                    <div class="summary-row">
+
+                        <span>
+                            Total Billing
+                        </span>
+
+                        <strong>
+                            ₹ {{ total_billed|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Customer Received
+                        </span>
+
+                        <strong class="text-success">
+                            ₹ {{ customer_received|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Customer Outstanding
+                        </span>
+
+                        <strong class="text-danger">
+                            ₹ {{ customer_outstanding|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Vehicle Freight
+                        </span>
+
+                        <strong>
+                            ₹ {{ total_vehicle_freight|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Vehicle Expenses
+                        </span>
+
+                        <strong>
+                            ₹ {{ vehicle_expenses|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row total-row">
+
+                        <span>
+                            Total Profit
+                        </span>
+
+                        <strong>
+                            ₹ {{ total_profit|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-xl-6">
+
+            <div class="summary-card">
+
+                <div class="summary-header">
+
+                    <div>
+                        <h5>
+                            Operational Summary
+                        </h5>
+
+                        <span>
+                            Current operational position
+                        </span>
+                    </div>
+
+                    <i class="bi bi-speedometer2"></i>
+
+                </div>
+
+
+                <div class="operation-grid">
+
+                    <div class="operation-stat">
+
+                        <span>
+                            Total Vehicles
+                        </span>
+
+                        <strong>
+                            {{ total_vehicles }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat">
+
+                        <span>
+                            In Transit
+                        </span>
+
+                        <strong>
+                            {{ in_transit_orders }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat">
+
+                        <span>
+                            Delivered
+                        </span>
+
+                        <strong>
+                            {{ delivered_orders }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat">
+
+                        <span>
+                            Settled
+                        </span>
+
+                        <strong>
+                            {{ settled_orders }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat warning-stat">
+
+                        <span>
+                            Vehicle Assignment Pending
+                        </span>
+
+                        <strong>
+                            {{ unassigned_orders }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat danger-stat">
+
+                        <span>
+                            Approval Required
+                        </span>
+
+                        <strong>
+                            {{ approval_required }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat warning-stat">
+
+                        <span>
+                            POD Pending
+                        </span>
+
+                        <strong>
+                            {{ pending_pod }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="operation-stat warning-stat">
+
+                        <span>
+                            Bank Verification Pending
+                        </span>
+
+                        <strong>
+                            {{ bank_pending }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT ORDERS
+    ====================================================== -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+                <h5>
+                    Recent Orders
+                </h5>
+
+                <span>
+                    Latest 10 orders
+                </span>
+            </div>
+
+            <a href="{% url 'order_list' %}"
+               class="view-all-btn">
+
+                View All
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table management-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Order
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th>
+                            Vehicle
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for order in recent_orders %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong class="order-number">
+                                {{ order.order_no }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+                            {{ order.customer_name }}
+                        </td>
+
+
+                        <td>
+
+                            {% if order.vehicle_number != "-" %}
+
+                                <span class="vehicle-number">
+                                    <i class="bi bi-truck"></i>
+                                    {{ order.vehicle_number }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not Assigned
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                ₹ {{ order.total_rate|floatformat:0 }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="order-status">
+                                {{ order.status }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="date-text">
+                                {{ order.created_at|date:"d M Y" }}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6"
+                            class="empty-table">
+
+                            <i class="bi bi-inbox"></i>
+
+                            <span>
+                                No orders found
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
+
+
+<!-- =====================================================
+     CHART DATA
+====================================================== -->
+
+{{ monthly_data|json_script:"monthly-data" }}
+
+{{ enquiry_status_data|json_script:"enquiry-status-data" }}
+
+
+<!-- =====================================================
+     CHART.JS
+====================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       LOAD DATA
+    ====================================================== */
+
+    const monthlyData =
+        JSON.parse(
+            document.getElementById("monthly-data").textContent
+        );
+
+    const enquiryStatusData =
+        JSON.parse(
+            document.getElementById("enquiry-status-data").textContent
+        );
+
+
+    /* =====================================================
+       GLOBAL CHART DEFAULTS
+    ====================================================== */
+
+    Chart.defaults.font.family =
+        "'Poppins', sans-serif";
+
+    Chart.defaults.font.size = 12;
+
+    Chart.defaults.color = "#6b7280";
+
+
+    /* =====================================================
+       REVENUE + PROFIT CHART
+    ====================================================== */
+
+    const revenueProfitCanvas =
+        document.getElementById("revenueProfitChart");
+
+
+    if (revenueProfitCanvas) {
+
+        new Chart(
+            revenueProfitCanvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: monthlyData.map(
+                        item => item.label
+                    ),
+
+                    datasets: [
+
+                        {
+                            label: "Revenue",
+
+                            data: monthlyData.map(
+                                item => item.revenue
+                            ),
+
+                            borderWidth: 3,
+
+                            tension: 0.35,
+
+                            fill: true,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 6
+                        },
+
+
+                        {
+                            label: "Profit",
+
+                            data: monthlyData.map(
+                                item => item.profit
+                            ),
+
+                            borderWidth: 3,
+
+                            tension: 0.35,
+
+                            fill: false,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 6
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        intersect: false,
+
+                        mode: "index"
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "top",
+
+                            align: "end",
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                padding: 18
+
+                            }
+
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    return (
+                                        " ₹ " +
+                                        Number(
+                                            context.raw
+                                        ).toLocaleString(
+                                            "en-IN"
+                                        )
+                                    );
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            grid: {
+
+                                drawBorder: false
+
+                            },
+
+                            ticks: {
+
+                                callback: function (value) {
+
+                                    if (
+                                        value >= 10000000
+                                    ) {
+
+                                        return (
+                                            "₹ " +
+                                            (
+                                                value /
+                                                10000000
+                                            ).toFixed(1) +
+                                            " Cr"
+                                        );
+
+                                    }
+
+
+                                    if (
+                                        value >= 100000
+                                    ) {
+
+                                        return (
+                                            "₹ " +
+                                            (
+                                                value /
+                                                100000
+                                            ).toFixed(1) +
+                                            " L"
+                                        );
+
+                                    }
+
+
+                                    if (
+                                        value >= 1000
+                                    ) {
+
+                                        return (
+                                            "₹ " +
+                                            (
+                                                value /
+                                                1000
+                                            ).toFixed(0) +
+                                            " K"
+                                        );
+
+                                    }
+
+
+                                    return "₹ " + value;
+
+                                }
+
+                            }
+
+                        },
+
+
+                        x: {
+
+                            grid: {
+
+                                display: false
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       ENQUIRY STATUS CHART
+    ====================================================== */
+
+    const enquiryCanvas =
+        document.getElementById(
+            "enquiryStatusChart"
+        );
+
+
+    if (
+        enquiryCanvas &&
+        enquiryStatusData.length
+    ) {
+
+        new Chart(
+            enquiryCanvas,
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels:
+                        enquiryStatusData.map(
+                            item => item.label
+                        ),
+
+                    datasets: [
+
+                        {
+
+                            data:
+                                enquiryStatusData.map(
+                                    item => item.count
+                                ),
+
+                            borderWidth: 3,
+
+                            borderColor: "#ffffff",
+
+                            hoverOffset: 8
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "68%",
+
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                padding: 14
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+});
+
+</script>
 
 {% endblock %}
