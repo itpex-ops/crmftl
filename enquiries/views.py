@@ -327,16 +327,18 @@ def enquiry_list(request):
     is_sales = user.role == 'sales'
     is_superadmin = user.role == 'superadmin'
     if is_admin:
-        base_qs = Enquiry.objects.filter(
-            is_converted_to_order=False,
-         status__in=[
-             'waiting for rate approval',
-                'pending_pitch1',
-                'pending_pitch2',
-                'pending_pitch3',
-                "disagree",
+        # base_qs = Enquiry.objects.filter(
+        #     is_converted_to_order=False,
+        #  status__in=[
+        #      'waiting for rate approval',
+        #         'pending_pitch1',
+        #         'pending_pitch2',
+        #         'pending_pitch3',
+        #         "disagree",
                 
-            ])
+        #     ])
+        base_qs = Enquiry.objects.filter(
+                        created_at__date=today)
     else:
         today = timezone.now().date()
         base_qs = Enquiry.objects.filter(
