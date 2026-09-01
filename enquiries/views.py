@@ -339,7 +339,7 @@ def enquiry_list(request):
             ])
     else:
         today = timezone.now().date()
-        base_qs = Enquiry.enquiries.filter(
+        base_qs = Enquiry.objects.filter(
                         created_at__date=today)
             # is_converted_to_order=False,
             # status__in=[
