@@ -1,11 +1,104 @@
 # dashboards/views.py
+from django.shortcuts import render
+from django.db.models import Sum 
+from django.utils import timezone
+from customers.models import ExCustomer
+from enquiries.models import Enquiry
+from orders.models import Order
+from vehicles.models import Vehicle, Tracking
+from django.contrib.auth.decorators import login_required
+from live_tracking.models import TrackingSession, LiveLocation
+from accounts.models import (
+    CustomerTransaction,
+    VehicleTransaction,
+    BankTransaction,
+    Expense
+)
+def customer_dashboard(request):
+    today = timezone.now()
+    context = {
+        "total_customers": ExCustomer.objects.count(),
+        "active_customers": ExCustomer.objects.filter(is_active=True).count(),
+        "inactive_customers": ExCustomer.objects.filter(is_active=False).count(),
+        "new_this_month": ExCustomer.objects.filter(
+            created_at__month=today.month,
+            created_at__year=today.year
+        ).count(),
+        "recent_customers": ExCustomer.objects.order_by('-id')
+    }
+    return render(
+        request,
+        "dashboards/customer_dashboard.html",
+        context
+    )
+
+@login_required
+def live_tracking_dashboard(request):
+    context = {
+        "total": TrackingSession.objects.count(),
+
+        "active": TrackingSession.objects.filter(
+            status="active"
+        ).count(),
+
+        "waiting_location": TrackingSession.objects.filter(
+            status="waiting_location"
+        ).count(),
+
+        "sms_sent": TrackingSession.objects.filter(
+            status="sms_sent"
+        ).count(),
+
+        "consent_received": TrackingSession.objects.filter(
+            status="consent_received"
+        ).count(),
+
+        "paused": TrackingSession.objects.filter(
+            status="paused"
+        ).count(),
+
+        "stopped": TrackingSession.objects.filter(
+            status="stopped"
+        ).count(),
+
+        "license_hold": TrackingSession.objects.filter(
+            status="license_hold"
+        ).count(),
+
+        "expired": TrackingSession.objects.filter(
+            status="expired"
+        ).count(),
+
+        "error": TrackingSession.objects.filter(
+            status="error"
+        ).count(),
+
+        # -------------------------
+        # RECENT LOCATIONS
+        # -------------------------
+
+        "recent_locations": (
+            LiveLocation.objects
+            .select_related(
+                "session",
+                "session__vehicle"
+            )
+            .order_by("-received_at")
+        ),
+    }
+
+    return render(
+        request,
+        "dashboards/live_tracking.html",
+        context
+    )
+
+# dashboards/views.py
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-
 from .services import get_management_dashboard_data
-
 
 def management_access_required(view_func):
 
@@ -37,7 +130,6 @@ def management_access_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapper
-
 
 @management_access_required
 def management_dashboard(request):

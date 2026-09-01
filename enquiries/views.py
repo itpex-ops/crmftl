@@ -338,16 +338,19 @@ def enquiry_list(request):
                 
             ])
     else:
-        base_qs = Enquiry.objects.filter(
-            is_converted_to_order=False,
-            status__in=[
-                'waiting for rate approval',
-                'pending_pitch1',
-                'pending_pitch2',
-                'pending_pitch3',
-                "disagree",
-            ]
-    )
+        today = timezone.now().date()
+        base_qs = Enquiry.enquiries.filter(
+                        created_at__date=today)
+            # is_converted_to_order=False,
+            # status__in=[
+            #     'waiting for rate approval',
+            #     'pending_pitch1',
+            #     'pending_pitch2',
+            #     'pending_pitch3',
+            #     "disagree",
+            # ]
+
+
     total_count = base_qs.count()
     disagree_count = base_qs.filter(status='disagree').count()
     pending_count = base_qs.filter(
