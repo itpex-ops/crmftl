@@ -898,19 +898,23 @@ from django.shortcuts import get_object_or_404, render
 from decimal import Decimal
 
 def vehicle_ledger(request, vehicle_id):
+
     vehicle = get_object_or_404(
         Vehicle.objects.select_related('order'),
         id=vehicle_id
     )
 
     ledger = []
-    balance = Decimal('0.00')
 
-    # Initial Freight Entry
+    # ---------------------------------------------------------
+    # INITIAL BALANCE
+    # ---------------------------------------------------------
     freight = Decimal(vehicle.freight_amount or 0)
     advance = Decimal(vehicle.advance or 0)
 
-    balance += freight - advance
+    # Freight = Debit
+    # Advance already paid = Credit
+    balance = freight - advance
 
     ledger.append({
         "date": vehicle.created_at,
@@ -921,12 +925,20 @@ def vehicle_ledger(request, vehicle_id):
         "balance": balance,
     })
 
-    # Payment Entries
+    # IMPORTANT:
+    # current_balance must exist even when there are no transactions
+    current_balance = balance
+
+    # ---------------------------------------------------------
+    # PAYMENT ENTRIES
+    # ---------------------------------------------------------
     transactions = VehicleTransaction.objects.filter(
         vehicle=vehicle
     ).order_by("date", "id")
 
-    adv = bal = oth = 0
+    adv = 0
+    bal = 0
+    oth = 0
 
     for t in transactions:
 
@@ -944,30 +956,37 @@ def vehicle_ledger(request, vehicle_id):
 
         amount = Decimal(t.amount or 0)
 
-        # Payment received by vehicle owner => Credit
-        current_balance = ledger[-1]['balance'] if ledger else 0
+        # Payment to vehicle owner
+        # reduces the outstanding balance
+        current_balance -= amount
 
         ledger.append({
             "date": t.date,
             "ftlno": vehicle.ftl_no,
             "particular": label,
-            "debit": 0,
+            "debit": Decimal("0.00"),
             "credit": amount,
-            "balance": balance,
+            "balance": current_balance,
         })
 
+        # Temporary attribute for template if required
         t.label = label
 
+    # ---------------------------------------------------------
+    # RENDER
+    # ---------------------------------------------------------
     return render(
         request,
         "accounts/vehicle_ledger.html",
         {
             "vehicle": vehicle,
             "ledger": ledger,
-            'current_balance': current_balance,
+            "current_balance": current_balance,
             "transactions": transactions,
         }
     )
+
+
 
 def dashboard(request):
 
