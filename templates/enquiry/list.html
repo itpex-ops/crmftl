@@ -401,7 +401,7 @@
                 {% csrf_token %}
 
                 <div class="row g-2 align-items-end">
-                    {% if is_admin %}
+                    {% if is_admin or is_superadmin %}
                     <div class="col-md-5">
                         <label class="form-label small">Remarks</label>
                         <input type="text" name="remarks" id="remarks" class="form-control" placeholder="Remarks">
@@ -604,7 +604,6 @@
 
 <!-- SEARCH -->
 <script>
-
     document.getElementById("searchInput").addEventListener("keyup", function () {
 
         let value = this.value.toLowerCase();

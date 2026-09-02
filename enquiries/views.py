@@ -662,7 +662,6 @@ def update_pitch(request, id):
             enquiry,
             message
         )
-
     messages.success(request, message)
     return redirect("enquiry_list")
 
