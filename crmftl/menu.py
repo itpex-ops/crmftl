@@ -1,6 +1,6 @@
 ROLE_MENUS = {
 
-    'superadmin': ['dashboard','enquiry_create','enquiry_list','orders_list','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
+    'superadmin': ['management_dashboard','dashboard','enquiry_create','enquiry_list','orders_list','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
 
     'admin': ['dashboard','enquiry_create','enquiry_list', 'orders_list','vehicles_placement','vehicle_tracking','accounts_vehicle','accounts_customer','accounts_bank', 'live_tracking_dashboard', 'live_tracking_list', 'live_tracking_history'],
 
