@@ -388,20 +388,26 @@
         // =========================
         // TOTAL
         // =========================
-
         function calcTotal() {
 
-            let b = num(finalRate.value);
-            let g = num(gst.value);
-            let l = num(load.value);
-            let h = num(halt.value);
+        let b = num(finalRate.value);
+        let g = num(gst.value);
+        let l = num(load.value);
+        let h = num(halt.value);
 
-            total.value = (
-                b + (b * g / 100) + l + h
-            ).toFixed(2);
+        // Taxable value
+        let taxableValue = b + l + h;
 
-            calcPayment();
-        }
+        // GST on complete taxable value
+        let gstAmount = taxableValue * g / 100;
+
+        // Final invoice total
+        total.value = (
+            taxableValue + gstAmount
+        ).toFixed(2);
+
+        calcPayment();
+    }
 
         // =========================
         // HIDE
