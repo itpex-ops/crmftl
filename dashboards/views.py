@@ -119,7 +119,7 @@ def management_access_required(view_func):
         # Management dashboard access.
         allowed_roles = {
             "admin",
-            "it",
+            "superadmin",
         }
 
         if role not in allowed_roles:

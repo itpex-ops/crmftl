@@ -1,6 +1,5 @@
 # dashboards/services.py
 
-from datetime import timedelta
 from decimal import Decimal
 
 from django.db.models import Sum, Count
@@ -9,7 +8,6 @@ from django.utils import timezone
 from enquiries.models import Enquiry
 from orders.models import Order
 from vehicles.models import Vehicle, Tracking
-
 from accounts.models import CustomerTransaction, VehicleTransaction
 
 
@@ -17,16 +15,11 @@ ZERO = Decimal("0.00")
 
 
 def money(value):
-    """
-    Safely convert DB aggregate values to Decimal.
-    """
     return Decimal(value or 0)
 
 
 def get_month_range(months=6):
-    """
-    Returns the first day of each month for the last `months` months.
-    """
+
     today = timezone.localdate()
 
     current_year = today.year
@@ -35,6 +28,7 @@ def get_month_range(months=6):
     result = []
 
     for i in range(months - 1, -1, -1):
+
         month = current_month - i
         year = current_year
 
@@ -48,12 +42,6 @@ def get_month_range(months=6):
 
 
 def get_management_dashboard_data():
-    """
-    Main data service for the Management Dashboard.
-
-    All business calculations are kept here rather than inside
-    the template or view.
-    """
 
     # ============================================================
     # BASE QUERYSETS
@@ -62,9 +50,11 @@ def get_management_dashboard_data():
     orders = Order.objects.all()
     vehicles = Vehicle.objects.all()
     enquiries = Enquiry.objects.all()
+    tracking = Tracking.objects.all()
+
 
     # ============================================================
-    # ORDER KPIs
+    # ORDERS
     # ============================================================
 
     total_orders = orders.count()
@@ -76,80 +66,101 @@ def get_management_dashboard_data():
         .count()
     )
 
-    unassigned_orders = max(total_orders - assigned_orders, 0)
+    unassigned_orders = max(
+        total_orders - assigned_orders,
+        0
+    )
+
 
     # ============================================================
-    # TRACKING KPIs
+    # ENQUIRIES
     # ============================================================
 
-    total_tracking = Tracking.objects.count()
+    total_enquiries = enquiries.count()
 
-    delivered_orders = Tracking.objects.filter(
+
+    # ============================================================
+    # TRACKING
+    # ============================================================
+
+    delivered_orders = tracking.filter(
         delivered=True
     ).count()
 
-    arrived_orders = Tracking.objects.filter(
+    arrived_orders = tracking.filter(
         arrived=True,
-        delivered=False,
+        delivered=False
     ).count()
 
-    in_transit_orders = Tracking.objects.filter(
+    in_transit_orders = tracking.filter(
         fleet_departed=True,
-        delivered=False,
+        delivered=False
     ).count()
 
-    settled_orders = Tracking.objects.filter(
+    settled_orders = tracking.filter(
         settled=True
     ).count()
 
-    pending_pod = Tracking.objects.filter(
+    pending_pod = tracking.filter(
         delivered=True,
-        pod_received=False,
+        pod_received=False
     ).count()
 
+    live_tracking_count = tracking.filter(
+        status="live_tracking",
+        delivered=False
+    ).count()
+
+    vehicle_placed_count = tracking.filter(
+        vehicle_placed=True,
+        delivered=False
+    ).count()
+
+
     # ============================================================
-    # VEHICLE KPIs
+    # VEHICLES
     # ============================================================
 
     total_vehicles = vehicles.count()
 
-    vehicles_with_order = (
-        vehicles
-        .filter(order__isnull=False)
-        .count()
-    )
+    vehicles_with_order = vehicles.filter(
+        order__isnull=False
+    ).count()
 
-    vehicles_without_order = (
-        vehicles
-        .filter(order__isnull=True)
-        .count()
-    )
-
-    approval_required = vehicles.filter(
-        approval_required=True
+    vehicles_without_order = vehicles.filter(
+        order__isnull=True
     ).count()
 
     bank_pending = vehicles.filter(
         bank_verified=False
     ).count()
 
+
     # ============================================================
     # VEHICLE FINANCIALS
+    #
+    # Vehicle model contains:
+    # freight_amount
+    # total_freight
+    # advance
+    # balance
+    #
+    # There is NO profit_amount.
     # ============================================================
 
     vehicle_financials = vehicles.aggregate(
+
         total_freight=Sum("total_freight"),
-        total_profit=Sum("profit_amount"),
+
         total_advance=Sum("advance"),
+
         total_balance=Sum("balance"),
+
     )
+
 
     total_vehicle_freight = money(
         vehicle_financials["total_freight"]
-    )
-
-    total_profit = money(
-        vehicle_financials["total_profit"]
     )
 
     vehicle_advance = money(
@@ -160,8 +171,9 @@ def get_management_dashboard_data():
         vehicle_financials["total_balance"]
     )
 
+
     # ============================================================
-    # CUSTOMER FINANCIALS
+    # CUSTOMER BILLING
     # ============================================================
 
     total_billed = money(
@@ -170,36 +182,76 @@ def get_management_dashboard_data():
         )["total"]
     )
 
+
+    # ============================================================
+    # CUSTOMER PAYMENTS
+    #
+    # Use actual CustomerTransaction records.
+    # ============================================================
+
     customer_received = money(
-        CustomerTransaction.objects.filter(
-            transaction_type__in=[
-                "payment",
-                "advance",
-            ]
-        ).aggregate(
+        CustomerTransaction.objects.aggregate(
             total=Sum("amount")
         )["total"]
     )
+
 
     customer_outstanding = max(
         total_billed - customer_received,
         ZERO
     )
 
+
     # ============================================================
     # VEHICLE EXPENSES
     # ============================================================
 
     vehicle_expenses = money(
-        VehicleTransaction.objects.exclude(
-            transaction_type__in=[
-                "advance",
-                "balance",
-            ]
-        ).aggregate(
+        VehicleTransaction.objects.aggregate(
             total=Sum("amount")
         )["total"]
     )
+
+
+    # ============================================================
+    # MANAGEMENT PROFIT
+    #
+    # No profit_amount field exists in Vehicle.
+    #
+    # Therefore:
+    #
+    # Revenue - Vehicle Freight
+    #
+    # This is the gross operating margin before any
+    # additional company overhead.
+    # ============================================================
+
+    total_profit = (
+        total_billed -
+        total_vehicle_freight
+    )
+
+
+    if total_profit < ZERO:
+        total_profit = ZERO
+
+
+    # ============================================================
+    # PROFIT MARGIN
+    # ============================================================
+
+    profit_margin = 0
+
+    if total_billed > 0:
+
+        profit_margin = round(
+            (
+                total_profit /
+                total_billed
+            ) * 100,
+            1
+        )
+
 
     # ============================================================
     # MONTHLY CHART DATA
@@ -207,39 +259,49 @@ def get_management_dashboard_data():
 
     monthly_data = []
 
+
     for year, month in get_month_range(6):
+
+        current_tz = timezone.get_current_timezone()
 
         start_date = timezone.datetime(
             year,
             month,
             1,
-            tzinfo=timezone.get_current_timezone(),
+            tzinfo=current_tz
         )
 
+
         if month == 12:
+
             next_month = timezone.datetime(
                 year + 1,
                 1,
                 1,
-                tzinfo=timezone.get_current_timezone(),
+                tzinfo=current_tz
             )
+
         else:
+
             next_month = timezone.datetime(
                 year,
                 month + 1,
                 1,
-                tzinfo=timezone.get_current_timezone(),
+                tzinfo=current_tz
             )
+
 
         month_orders = orders.filter(
             created_at__gte=start_date,
-            created_at__lt=next_month,
+            created_at__lt=next_month
         )
+
 
         month_vehicles = vehicles.filter(
             created_at__gte=start_date,
-            created_at__lt=next_month,
+            created_at__lt=next_month
         )
+
 
         revenue = money(
             month_orders.aggregate(
@@ -247,20 +309,36 @@ def get_management_dashboard_data():
             )["total"]
         )
 
-        profit = money(
+
+        freight = money(
             month_vehicles.aggregate(
-                total=Sum("profit_amount")
+                total=Sum("total_freight")
             )["total"]
         )
 
+
+        profit = revenue - freight
+
+
+        if profit < ZERO:
+            profit = ZERO
+
+
         order_count = month_orders.count()
 
+
         monthly_data.append({
+
             "label": start_date.strftime("%b %Y"),
+
             "revenue": float(revenue),
+
             "profit": float(profit),
+
             "orders": order_count,
+
         })
+
 
     # ============================================================
     # ENQUIRY STATUS
@@ -269,69 +347,87 @@ def get_management_dashboard_data():
     enquiry_status_rows = (
         enquiries
         .values("status")
-        .annotate(total=Count("id"))
+        .annotate(
+            total=Count("id")
+        )
         .order_by("-total")
     )
 
+
     enquiry_status_data = []
 
+
     for row in enquiry_status_rows:
+
         status = row["status"] or "Unknown"
 
+
         enquiry_status_data.append({
-            "label": str(status).replace("_", " ").title(),
-            "count": row["total"],
+
+            "label":
+                str(status)
+                .replace("_", " ")
+                .title(),
+
+            "count":
+                row["total"],
+
         })
 
-    total_enquiries = enquiries.count()
 
     # ============================================================
-    # CONVERSION
+    # CONVERSION RATE
     # ============================================================
 
     conversion_rate = 0
 
+
     if total_enquiries:
+
         conversion_rate = round(
-            (total_orders / total_enquiries) * 100,
+            (
+                total_orders /
+                total_enquiries
+            ) * 100,
             1
         )
 
+
     # ============================================================
-    # OPERATIONAL PIPELINE
+    # OPERATIONS PIPELINE
     # ============================================================
 
     pipeline = {
-        "vehicle_placed": Tracking.objects.filter(
-            vehicle_placed=True,
-            delivered=False,
-        ).count(),
 
-        "live_tracking": Tracking.objects.filter(
-            status="live_tracking",
-            delivered=False,
-        ).count(),
+        "vehicle_placed":
+            vehicle_placed_count,
 
-        "fleet_departed": Tracking.objects.filter(
-            fleet_departed=True,
-            delivered=False,
-        ).count(),
+        "live_tracking":
+            live_tracking_count,
 
-        "arrived": Tracking.objects.filter(
-            arrived=True,
-            delivered=False,
-        ).count(),
+        "fleet_departed":
+            tracking.filter(
+                fleet_departed=True,
+                delivered=False
+            ).count(),
 
-        "delivered": Tracking.objects.filter(
-            delivered=True,
-        ).count(),
+        "arrived":
+            tracking.filter(
+                arrived=True,
+                delivered=False
+            ).count(),
 
-        "pod_pending": pending_pod,
+        "delivered":
+            delivered_orders,
 
-        "settled": Tracking.objects.filter(
-            settled=True
-        ).count(),
+        "pod_pending":
+            pending_pod,
+
+        "settled":
+            settled_orders,
+
     }
+
 
     # ============================================================
     # RECENT ORDERS
@@ -343,7 +439,9 @@ def get_management_dashboard_data():
         .order_by("-created_at")[:10]
     )
 
+
     recent_orders_data = []
+
 
     for order in recent_orders:
 
@@ -353,131 +451,276 @@ def get_management_dashboard_data():
             .first()
         )
 
-        tracking = (
+
+        order_tracking = (
             Tracking.objects
             .filter(order=order)
             .first()
         )
 
-        if tracking:
-            status = tracking.get_status_display()
+
+        if order_tracking:
+
+            status = (
+                order_tracking
+                .get_status_display()
+            )
+
         elif vehicle:
+
             status = "Vehicle Assigned"
+
         else:
+
             status = "Pending Assignment"
 
+
         recent_orders_data.append({
-            "order_no": order.order_no,
-            "customer_name": order.customer_name,
-            "vehicle_number": (
-                vehicle.vehicle_number
-                if vehicle
-                else "-"
-            ),
-            "total_rate": money(order.total_rate),
-            "status": status,
-            "created_at": order.created_at,
+
+            "order_no":
+                order.order_no,
+
+            "customer_name":
+                order.customer_name,
+
+            "vehicle_number":
+                (
+                    vehicle.vehicle_number
+                    if vehicle
+                    else "-"
+                ),
+
+            "total_rate":
+                money(order.total_rate),
+
+            "status":
+                status,
+
+            "created_at":
+                order.created_at,
+
         })
 
+
     # ============================================================
-    # ALERTS
+    # MANAGEMENT ALERTS
     # ============================================================
 
     alerts = []
 
+
     if unassigned_orders:
+
         alerts.append({
+
             "type": "warning",
-            "title": "Vehicle assignment pending",
-            "count": unassigned_orders,
-            "message": "Orders are waiting for vehicle assignment.",
+
+            "title":
+                "Vehicle assignment pending",
+
+            "count":
+                unassigned_orders,
+
+            "message":
+                "Orders are waiting for vehicle assignment.",
+
         })
+
 
     if in_transit_orders:
+
         alerts.append({
+
             "type": "info",
-            "title": "Vehicles in transit",
-            "count": in_transit_orders,
-            "message": "Vehicles are currently marked as departed.",
+
+            "title":
+                "Vehicles in transit",
+
+            "count":
+                in_transit_orders,
+
+            "message":
+                "Vehicles are currently marked as departed.",
+
         })
+
 
     if pending_pod:
+
         alerts.append({
+
             "type": "warning",
-            "title": "POD pending",
-            "count": pending_pod,
-            "message": "Delivered trips are waiting for POD.",
+
+            "title":
+                "POD pending",
+
+            "count":
+                pending_pod,
+
+            "message":
+                "Delivered trips are waiting for POD.",
+
         })
 
-    if approval_required:
-        alerts.append({
-            "type": "danger",
-            "title": "Approval required",
-            "count": approval_required,
-            "message": "Vehicle transactions require management approval.",
-        })
 
     if bank_pending:
+
         alerts.append({
+
             "type": "warning",
-            "title": "Bank verification pending",
-            "count": bank_pending,
-            "message": "Vehicle bank details are not verified.",
+
+            "title":
+                "Bank verification pending",
+
+            "count":
+                bank_pending,
+
+            "message":
+                "Vehicle bank details are not verified.",
+
         })
 
+
     # ============================================================
-    # RETURN DATA
+    # RETURN CONTEXT
     # ============================================================
 
     return {
 
-        # KPI
-        "total_enquiries": total_enquiries,
-        "total_orders": total_orders,
-        "assigned_orders": assigned_orders,
-        "unassigned_orders": unassigned_orders,
+        # --------------------------------------------------------
+        # ORDER / ENQUIRY
+        # --------------------------------------------------------
 
-        "total_vehicles": total_vehicles,
-        "vehicles_with_order": vehicles_with_order,
-        "vehicles_without_order": vehicles_without_order,
+        "total_enquiries":
+            total_enquiries,
 
-        "in_transit_orders": in_transit_orders,
-        "arrived_orders": arrived_orders,
-        "delivered_orders": delivered_orders,
-        "settled_orders": settled_orders,
+        "total_orders":
+            total_orders,
 
-        # Finance
-        "total_billed": total_billed,
-        "customer_received": customer_received,
-        "customer_outstanding": customer_outstanding,
+        "assigned_orders":
+            assigned_orders,
 
-        "total_vehicle_freight": total_vehicle_freight,
-        "vehicle_advance": vehicle_advance,
-        "vehicle_balance": vehicle_balance,
-        "vehicle_expenses": vehicle_expenses,
-        "total_profit": total_profit,
+        "unassigned_orders":
+            unassigned_orders,
 
-        # Operations
-        "approval_required": approval_required,
-        "bank_pending": bank_pending,
-        "pending_pod": pending_pod,
 
-        # Conversion
-        "conversion_rate": conversion_rate,
+        # --------------------------------------------------------
+        # VEHICLES
+        # --------------------------------------------------------
 
-        # Charts
-        "monthly_data": monthly_data,
-        "enquiry_status_data": enquiry_status_data,
+        "total_vehicles":
+            total_vehicles,
 
-        # Pipeline
-        "pipeline": pipeline,
+        "vehicles_with_order":
+            vehicles_with_order,
 
-        # Tables
-        "recent_orders": recent_orders_data,
+        "vehicles_without_order":
+            vehicles_without_order,
 
-        # Alerts
-        "alerts": alerts,
 
-        # Misc
-        "last_updated": timezone.now(),
+        # --------------------------------------------------------
+        # OPERATIONS
+        # --------------------------------------------------------
+
+        "in_transit_orders":
+            in_transit_orders,
+
+        "arrived_orders":
+            arrived_orders,
+
+        "delivered_orders":
+            delivered_orders,
+
+        "settled_orders":
+            settled_orders,
+
+        "pending_pod":
+            pending_pod,
+
+        "bank_pending":
+            bank_pending,
+
+
+        # --------------------------------------------------------
+        # FINANCIAL
+        # --------------------------------------------------------
+
+        "total_billed":
+            total_billed,
+
+        "customer_received":
+            customer_received,
+
+        "customer_outstanding":
+            customer_outstanding,
+
+        "total_vehicle_freight":
+            total_vehicle_freight,
+
+        "vehicle_advance":
+            vehicle_advance,
+
+        "vehicle_balance":
+            vehicle_balance,
+
+        "vehicle_expenses":
+            vehicle_expenses,
+
+        "total_profit":
+            total_profit,
+
+        "profit_margin":
+            profit_margin,
+
+
+        # --------------------------------------------------------
+        # CONVERSION
+        # --------------------------------------------------------
+
+        "conversion_rate":
+            conversion_rate,
+
+
+        # --------------------------------------------------------
+        # CHARTS
+        # --------------------------------------------------------
+
+        "monthly_data":
+            monthly_data,
+
+        "enquiry_status_data":
+            enquiry_status_data,
+
+
+        # --------------------------------------------------------
+        # PIPELINE
+        # --------------------------------------------------------
+
+        "pipeline":
+            pipeline,
+
+
+        # --------------------------------------------------------
+        # RECENT ORDERS
+        # --------------------------------------------------------
+
+        "recent_orders":
+            recent_orders_data,
+
+
+        # --------------------------------------------------------
+        # ALERTS
+        # --------------------------------------------------------
+
+        "alerts":
+            alerts,
+
+
+        # --------------------------------------------------------
+        # LAST UPDATED
+        # --------------------------------------------------------
+
+        "last_updated":
+            timezone.now(),
+
     }
