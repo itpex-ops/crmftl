@@ -5,914 +5,6 @@
 Management Dashboard | Parcelex
 {% endblock %}
 
-<style>
-
-/* =========================================================
-   PARCELEX MANAGEMENT DASHBOARD
-   ========================================================= */
-
-.management-page {
-    padding: 22px;
-    background: #f6f7fb;
-    min-height: calc(100vh - 70px);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.management-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 20px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-}
-
-.management-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #8a8f98;
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 7px;
-}
-
-.management-breadcrumb i {
-    font-size: 9px;
-}
-
-.management-title {
-    margin: 0;
-    font-size: 25px;
-    font-weight: 700;
-    color: #1f2937;
-}
-
-.management-subtitle {
-    margin: 6px 0 0;
-    color: #7b8490;
-    font-size: 13px;
-}
-
-.management-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.last-updated {
-    color: #7b8490;
-    font-size: 12px;
-}
-
-.last-updated i {
-    margin-right: 4px;
-}
-
-.refresh-btn {
-    border: 1px solid #e1e4e8;
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 9px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #4b5563;
-    transition: all .2s ease;
-}
-
-.refresh-btn:hover {
-    border-color: #654321;
-    color: #654321;
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   KPI CARDS
-   ========================================================= */
-
-.management-kpi {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-
-    min-height: 128px;
-
-    padding: 20px;
-
-    background: #ffffff;
-
-    border-radius: 16px;
-
-    border: 1px solid #edf0f3;
-
-    box-shadow:
-        0 4px 15px rgba(15, 23, 42, .045);
-
-    overflow: hidden;
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-}
-
-.management-kpi:hover {
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 12px 25px rgba(15, 23, 42, .08);
-}
-
-.management-kpi::after {
-    content: "";
-
-    position: absolute;
-
-    right: -35px;
-    bottom: -45px;
-
-    width: 120px;
-    height: 120px;
-
-    border-radius: 50%;
-
-    opacity: .08;
-}
-
-.kpi-blue::after {
-    background: #2563eb;
-}
-
-.kpi-purple::after {
-    background: #7c3aed;
-}
-
-.kpi-orange::after {
-    background: #ea580c;
-}
-
-.kpi-green::after {
-    background: #16a34a;
-}
-
-.kpi-icon {
-    width: 52px;
-    height: 52px;
-
-    min-width: 52px;
-
-    border-radius: 14px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 22px;
-}
-
-.kpi-blue .kpi-icon {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.kpi-purple .kpi-icon {
-    background: #f5f3ff;
-    color: #7c3aed;
-}
-
-.kpi-orange .kpi-icon {
-    background: #fff7ed;
-    color: #ea580c;
-}
-
-.kpi-green .kpi-icon {
-    background: #f0fdf4;
-    color: #16a34a;
-}
-
-.kpi-content {
-    min-width: 0;
-}
-
-.kpi-label {
-    display: block;
-    color: #6b7280;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.kpi-content h3 {
-    margin: 4px 0;
-
-    color: #1f2937;
-
-    font-size: 25px;
-    line-height: 1.2;
-
-    font-weight: 700;
-}
-
-.kpi-description {
-    display: block;
-
-    color: #9ca3af;
-
-    font-size: 11px;
-}
-
-
-/* =========================================================
-   MINI FINANCE CARDS
-   ========================================================= */
-
-.finance-mini-card {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-
-    padding: 16px 18px;
-
-    min-height: 82px;
-
-    background: #ffffff;
-
-    border: 1px solid #edf0f3;
-
-    border-radius: 14px;
-
-    box-shadow:
-        0 3px 12px rgba(15, 23, 42, .035);
-}
-
-.finance-mini-icon {
-    width: 42px;
-    height: 42px;
-
-    min-width: 42px;
-
-    border-radius: 11px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 18px;
-}
-
-.profit-icon {
-    background: #ecfdf5;
-    color: #059669;
-}
-
-.receivable-icon {
-    background: #fff7ed;
-    color: #ea580c;
-}
-
-.vehicle-icon {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.conversion-icon {
-    background: #f5f3ff;
-    color: #7c3aed;
-}
-
-.finance-mini-card span {
-    display: block;
-
-    color: #7b8490;
-
-    font-size: 11px;
-
-    margin-bottom: 3px;
-}
-
-.finance-mini-card strong {
-    display: block;
-
-    color: #1f2937;
-
-    font-size: 17px;
-
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   COMMON CARDS
-   ========================================================= */
-
-.section-card,
-.chart-card,
-.summary-card {
-    background: #ffffff;
-
-    border: 1px solid #edf0f3;
-
-    border-radius: 17px;
-
-    box-shadow:
-        0 3px 15px rgba(15, 23, 42, .04);
-}
-
-.section-header,
-.chart-header,
-.summary-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 18px 20px;
-
-    border-bottom: 1px solid #f0f1f3;
-}
-
-.section-header h5,
-.chart-header h5,
-.summary-header h5 {
-    margin: 0;
-
-    color: #1f2937;
-
-    font-size: 15px;
-
-    font-weight: 700;
-}
-
-.section-header span,
-.chart-header span,
-.summary-header span {
-    display: block;
-
-    margin-top: 3px;
-
-    color: #9ca3af;
-
-    font-size: 11px;
-}
-
-.section-header > i,
-.summary-header > i {
-    font-size: 20px;
-
-    color: #654321;
-}
-
-
-/* =========================================================
-   ALERTS
-   ========================================================= */
-
-.alerts-grid {
-    padding: 15px;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(260px, 1fr));
-
-    gap: 10px;
-}
-
-.management-alert {
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 13px 15px;
-
-    border-radius: 12px;
-
-    border: 1px solid transparent;
-}
-
-.management-alert.warning {
-    background: #fffbeb;
-    border-color: #fde68a;
-}
-
-.management-alert.danger {
-    background: #fef2f2;
-    border-color: #fecaca;
-}
-
-.management-alert.info {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-}
-
-.alert-icon {
-    width: 38px;
-    height: 38px;
-
-    min-width: 38px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 10px;
-
-    font-size: 17px;
-}
-
-.warning .alert-icon {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.danger .alert-icon {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.info .alert-icon {
-    background: #dbeafe;
-    color: #2563eb;
-}
-
-.alert-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.alert-content strong {
-    display: block;
-
-    color: #374151;
-
-    font-size: 12px;
-}
-
-.alert-content span {
-    display: block;
-
-    margin-top: 2px;
-
-    color: #7b8490;
-
-    font-size: 10px;
-}
-
-.alert-count {
-    font-size: 19px;
-    font-weight: 700;
-    color: #374151;
-}
-
-
-/* =========================================================
-   CHARTS
-   ========================================================= */
-
-.chart-card {
-    overflow: hidden;
-}
-
-.chart-badge {
-    background: #f7f1ed;
-
-    color: #654321;
-
-    padding: 6px 10px;
-
-    border-radius: 20px;
-
-    font-size: 10px;
-
-    font-weight: 600;
-}
-
-.chart-container {
-    position: relative;
-
-    height: 340px;
-
-    padding: 18px 20px 20px;
-}
-
-.doughnut-container {
-    height: 340px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-}
-
-
-/* =========================================================
-   PIPELINE
-   ========================================================= */
-
-.pipeline {
-    padding: 22px 18px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 8px;
-
-    overflow-x: auto;
-}
-
-.pipeline-item {
-    min-width: 105px;
-
-    text-align: center;
-}
-
-.pipeline-number {
-    width: 48px;
-    height: 48px;
-
-    margin: 0 auto 8px;
-
-    border-radius: 50%;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: #f7f1ed;
-
-    color: #654321;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    border: 1px solid #eaded5;
-}
-
-.pipeline-item span {
-    display: block;
-
-    white-space: nowrap;
-
-    color: #6b7280;
-
-    font-size: 10px;
-
-    font-weight: 600;
-}
-
-.pipeline-arrow {
-    color: #c8cdd3;
-
-    font-size: 16px;
-}
-
-
-/* =========================================================
-   FINANCIAL SUMMARY
-   ========================================================= */
-
-.summary-card {
-    overflow: hidden;
-}
-
-.summary-list {
-    padding: 5px 20px 12px;
-}
-
-.summary-row {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    padding: 13px 0;
-
-    border-bottom: 1px solid #f1f2f4;
-}
-
-.summary-row:last-child {
-    border-bottom: none;
-}
-
-.summary-row span {
-    color: #6b7280;
-
-    font-size: 12px;
-}
-
-.summary-row strong {
-    color: #374151;
-
-    font-size: 13px;
-}
-
-.summary-row.total-row {
-    margin-top: 3px;
-
-    padding-top: 16px;
-}
-
-.total-row span {
-    color: #1f2937;
-
-    font-weight: 700;
-}
-
-.total-row strong {
-    color: #654321;
-
-    font-size: 16px;
-}
-
-
-/* =========================================================
-   OPERATIONS GRID
-   ========================================================= */
-
-.operation-grid {
-    padding: 18px;
-
-    display: grid;
-
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 10px;
-}
-
-.operation-stat {
-    padding: 13px;
-
-    border-radius: 11px;
-
-    background: #f8fafc;
-
-    border: 1px solid #eef0f3;
-}
-
-.operation-stat span {
-    display: block;
-
-    color: #7b8490;
-
-    font-size: 10px;
-
-    margin-bottom: 5px;
-}
-
-.operation-stat strong {
-    color: #1f2937;
-
-    font-size: 19px;
-
-    font-weight: 700;
-}
-
-.warning-stat {
-    background: #fffbeb;
-
-    border-color: #fde68a;
-}
-
-.danger-stat {
-    background: #fef2f2;
-
-    border-color: #fecaca;
-}
-
-
-/* =========================================================
-   RECENT ORDERS TABLE
-   ========================================================= */
-
-.view-all-btn {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    text-decoration: none;
-
-    color: #654321;
-
-    font-size: 11px;
-
-    font-weight: 600;
-}
-
-.view-all-btn:hover {
-    color: #4a301e;
-}
-
-.management-table {
-    margin: 0;
-}
-
-.management-table thead th {
-    padding: 13px 18px;
-
-    background: #fafafa;
-
-    color: #8a8f98;
-
-    border-bottom: 1px solid #eceef1;
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    letter-spacing: .3px;
-
-    white-space: nowrap;
-}
-
-.management-table tbody td {
-    padding: 14px 18px;
-
-    color: #4b5563;
-
-    font-size: 12px;
-
-    border-bottom: 1px solid #f1f2f4;
-
-    vertical-align: middle;
-}
-
-.management-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.management-table tbody tr {
-    transition: background .15s ease;
-}
-
-.management-table tbody tr:hover {
-    background: #fcfaf8;
-}
-
-.order-number {
-    color: #654321;
-
-    font-size: 12px;
-}
-
-.vehicle-number {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    color: #4b5563;
-
-    font-size: 11px;
-
-    font-weight: 600;
-}
-
-.vehicle-number i {
-    color: #654321;
-}
-
-.order-status {
-    display: inline-flex;
-
-    padding: 5px 9px;
-
-    border-radius: 20px;
-
-    background: #f7f1ed;
-
-    color: #654321;
-
-    font-size: 10px;
-
-    font-weight: 600;
-}
-
-.date-text {
-    color: #8a8f98;
-
-    font-size: 11px;
-}
-
-.empty-table {
-    height: 180px;
-
-    text-align: center;
-
-    color: #9ca3af !important;
-}
-
-.empty-table i {
-    display: block;
-
-    margin-bottom: 8px;
-
-    font-size: 30px;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 1199px) {
-
-    .pipeline {
-        justify-content: flex-start;
-    }
-
-}
-
-@media (max-width: 767px) {
-
-    .management-page {
-        padding: 14px;
-    }
-
-    .management-title {
-        font-size: 21px;
-    }
-
-    .management-actions {
-        width: 100%;
-
-        justify-content: space-between;
-    }
-
-    .last-updated {
-        font-size: 10px;
-    }
-
-    .chart-container {
-        height: 290px;
-
-        padding: 15px;
-    }
-
-    .doughnut-container {
-        height: 300px;
-    }
-
-    .operation-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .management-table {
-        min-width: 750px;
-    }
-
-}
-
-@media (max-width: 480px) {
-
-    .management-kpi {
-        min-height: 110px;
-
-        padding: 15px;
-    }
-
-    .kpi-icon {
-        width: 44px;
-        height: 44px;
-
-        min-width: 44px;
-
-        font-size: 18px;
-    }
-
-    .kpi-content h3 {
-        font-size: 21px;
-    }
-
-    .pipeline-item {
-        min-width: 90px;
-    }
-
-}
-</style>
-
-
 {% block content %}
 
 <div class="management-page">
@@ -2260,5 +1352,911 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
+<style>
+
+/* =========================================================
+   PARCELEX MANAGEMENT DASHBOARD
+   ========================================================= */
+
+.management-page {
+    padding: 22px;
+    background: #f6f7fb;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.management-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8a8f98;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 7px;
+}
+
+.management-breadcrumb i {
+    font-size: 9px;
+}
+
+.management-title {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.management-subtitle {
+    margin: 6px 0 0;
+    color: #7b8490;
+    font-size: 13px;
+}
+
+.management-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.last-updated {
+    color: #7b8490;
+    font-size: 12px;
+}
+
+.last-updated i {
+    margin-right: 4px;
+}
+
+.refresh-btn {
+    border: 1px solid #e1e4e8;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all .2s ease;
+}
+
+.refresh-btn:hover {
+    border-color: #654321;
+    color: #654321;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   KPI CARDS
+   ========================================================= */
+
+.management-kpi {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    min-height: 128px;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    border: 1px solid #edf0f3;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, .045);
+
+    overflow: hidden;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.management-kpi:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 25px rgba(15, 23, 42, .08);
+}
+
+.management-kpi::after {
+    content: "";
+
+    position: absolute;
+
+    right: -35px;
+    bottom: -45px;
+
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    opacity: .08;
+}
+
+.kpi-blue::after {
+    background: #2563eb;
+}
+
+.kpi-purple::after {
+    background: #7c3aed;
+}
+
+.kpi-orange::after {
+    background: #ea580c;
+}
+
+.kpi-green::after {
+    background: #16a34a;
+}
+
+.kpi-icon {
+    width: 52px;
+    height: 52px;
+
+    min-width: 52px;
+
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+}
+
+.kpi-blue .kpi-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.kpi-purple .kpi-icon {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.kpi-orange .kpi-icon {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.kpi-green .kpi-icon {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.kpi-content {
+    min-width: 0;
+}
+
+.kpi-label {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.kpi-content h3 {
+    margin: 4px 0;
+
+    color: #1f2937;
+
+    font-size: 25px;
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+.kpi-description {
+    display: block;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MINI FINANCE CARDS
+   ========================================================= */
+
+.finance-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 16px 18px;
+
+    min-height: 82px;
+
+    background: #ffffff;
+
+    border: 1px solid #edf0f3;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 3px 12px rgba(15, 23, 42, .035);
+}
+
+.finance-mini-icon {
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    border-radius: 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+.profit-icon {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.receivable-icon {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.vehicle-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.conversion-icon {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.finance-mini-card span {
+    display: block;
+
+    color: #7b8490;
+
+    font-size: 11px;
+
+    margin-bottom: 3px;
+}
+
+.finance-mini-card strong {
+    display: block;
+
+    color: #1f2937;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   COMMON CARDS
+   ========================================================= */
+
+.section-card,
+.chart-card,
+.summary-card {
+    background: #ffffff;
+
+    border: 1px solid #edf0f3;
+
+    border-radius: 17px;
+
+    box-shadow:
+        0 3px 15px rgba(15, 23, 42, .04);
+}
+
+.section-header,
+.chart-header,
+.summary-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #f0f1f3;
+}
+
+.section-header h5,
+.chart-header h5,
+.summary-header h5 {
+    margin: 0;
+
+    color: #1f2937;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+.section-header span,
+.chart-header span,
+.summary-header span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+.section-header > i,
+.summary-header > i {
+    font-size: 20px;
+
+    color: #654321;
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.alerts-grid {
+    padding: 15px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
+
+    gap: 10px;
+}
+
+.management-alert {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    border-radius: 12px;
+
+    border: 1px solid transparent;
+}
+
+.management-alert.warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.management-alert.danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.management-alert.info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.alert-icon {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+}
+
+.warning .alert-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.danger .alert-icon {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.info .alert-icon {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.alert-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert-content strong {
+    display: block;
+
+    color: #374151;
+
+    font-size: 12px;
+}
+
+.alert-content span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #7b8490;
+
+    font-size: 10px;
+}
+
+.alert-count {
+    font-size: 19px;
+    font-weight: 700;
+    color: #374151;
+}
+
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+
+.chart-card {
+    overflow: hidden;
+}
+
+.chart-badge {
+    background: #f7f1ed;
+
+    color: #654321;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+.chart-container {
+    position: relative;
+
+    height: 340px;
+
+    padding: 18px 20px 20px;
+}
+
+.doughnut-container {
+    height: 340px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/* =========================================================
+   PIPELINE
+   ========================================================= */
+
+.pipeline {
+    padding: 22px 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    overflow-x: auto;
+}
+
+.pipeline-item {
+    min-width: 105px;
+
+    text-align: center;
+}
+
+.pipeline-number {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 8px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #f7f1ed;
+
+    color: #654321;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    border: 1px solid #eaded5;
+}
+
+.pipeline-item span {
+    display: block;
+
+    white-space: nowrap;
+
+    color: #6b7280;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+.pipeline-arrow {
+    color: #c8cdd3;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   FINANCIAL SUMMARY
+   ========================================================= */
+
+.summary-card {
+    overflow: hidden;
+}
+
+.summary-list {
+    padding: 5px 20px 12px;
+}
+
+.summary-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #f1f2f4;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row span {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+.summary-row strong {
+    color: #374151;
+
+    font-size: 13px;
+}
+
+.summary-row.total-row {
+    margin-top: 3px;
+
+    padding-top: 16px;
+}
+
+.total-row span {
+    color: #1f2937;
+
+    font-weight: 700;
+}
+
+.total-row strong {
+    color: #654321;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   OPERATIONS GRID
+   ========================================================= */
+
+.operation-grid {
+    padding: 18px;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+}
+
+.operation-stat {
+    padding: 13px;
+
+    border-radius: 11px;
+
+    background: #f8fafc;
+
+    border: 1px solid #eef0f3;
+}
+
+.operation-stat span {
+    display: block;
+
+    color: #7b8490;
+
+    font-size: 10px;
+
+    margin-bottom: 5px;
+}
+
+.operation-stat strong {
+    color: #1f2937;
+
+    font-size: 19px;
+
+    font-weight: 700;
+}
+
+.warning-stat {
+    background: #fffbeb;
+
+    border-color: #fde68a;
+}
+
+.danger-stat {
+    background: #fef2f2;
+
+    border-color: #fecaca;
+}
+
+
+/* =========================================================
+   RECENT ORDERS TABLE
+   ========================================================= */
+
+.view-all-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    text-decoration: none;
+
+    color: #654321;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.view-all-btn:hover {
+    color: #4a301e;
+}
+
+.management-table {
+    margin: 0;
+}
+
+.management-table thead th {
+    padding: 13px 18px;
+
+    background: #fafafa;
+
+    color: #8a8f98;
+
+    border-bottom: 1px solid #eceef1;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+
+    white-space: nowrap;
+}
+
+.management-table tbody td {
+    padding: 14px 18px;
+
+    color: #4b5563;
+
+    font-size: 12px;
+
+    border-bottom: 1px solid #f1f2f4;
+
+    vertical-align: middle;
+}
+
+.management-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.management-table tbody tr {
+    transition: background .15s ease;
+}
+
+.management-table tbody tr:hover {
+    background: #fcfaf8;
+}
+
+.order-number {
+    color: #654321;
+
+    font-size: 12px;
+}
+
+.vehicle-number {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color: #4b5563;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.vehicle-number i {
+    color: #654321;
+}
+
+.order-status {
+    display: inline-flex;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: #f7f1ed;
+
+    color: #654321;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+.date-text {
+    color: #8a8f98;
+
+    font-size: 11px;
+}
+
+.empty-table {
+    height: 180px;
+
+    text-align: center;
+
+    color: #9ca3af !important;
+}
+
+.empty-table i {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 30px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1199px) {
+
+    .pipeline {
+        justify-content: flex-start;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .management-page {
+        padding: 14px;
+    }
+
+    .management-title {
+        font-size: 21px;
+    }
+
+    .management-actions {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .last-updated {
+        font-size: 10px;
+    }
+
+    .chart-container {
+        height: 290px;
+
+        padding: 15px;
+    }
+
+    .doughnut-container {
+        height: 300px;
+    }
+
+    .operation-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .management-table {
+        min-width: 750px;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .management-kpi {
+        min-height: 110px;
+
+        padding: 15px;
+    }
+
+    .kpi-icon {
+        width: 44px;
+        height: 44px;
+
+        min-width: 44px;
+
+        font-size: 18px;
+    }
+
+    .kpi-content h3 {
+        font-size: 21px;
+    }
+
+    .pipeline-item {
+        min-width: 90px;
+    }
+
+}
+</style>
 
 {% endblock %}
