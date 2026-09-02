@@ -967,7 +967,7 @@ def vehicle_ledger(request, vehicle_id):
                 'current_balance': current_balance,
                 "transactions": transactions,
             }
-    )
+        )
 
 def dashboard(request):
 
