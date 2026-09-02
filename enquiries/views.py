@@ -597,7 +597,7 @@ def update_pitch(request, id):
             enquiry.pitch3
             or enquiry.pitch2
             or enquiry.pitch1
-            or enquiry.expected_rate
+            or enquiry.pitch_rate
         )
 
         enquiry.approval_rate = latest_rate

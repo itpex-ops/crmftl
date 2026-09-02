@@ -401,8 +401,7 @@
                 {% csrf_token %}
 
                 <div class="row g-2 align-items-end">
-
-
+                    {% if is_admin %}
                     <div class="col-md-5">
                         <label class="form-label small">Remarks</label>
                         <input type="text" name="remarks" id="remarks" class="form-control" placeholder="Remarks">
@@ -413,7 +412,6 @@
                         <input type="number" name="pitch_rate" id="pitch_rate" class="form-control"
                             placeholder="Enter Rate" required>
                     </div>
-                    {% if is_admin %}
                     <div class="col-md-2">
                         <button type="submit" name="is_approved" value="false" class="btn btn-success w-100">
                             Rate Revision
