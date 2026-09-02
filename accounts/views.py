@@ -958,16 +958,16 @@ def vehicle_ledger(request, vehicle_id):
 
         t.label = label
 
-        return render(
-            request,
-            "accounts/vehicle_ledger.html",
-            {
-                "vehicle": vehicle,
-                "ledger": ledger,
-                'current_balance': current_balance,
-                "transactions": transactions,
-            }
-        )
+    return render(
+        request,
+        "accounts/vehicle_ledger.html",
+        {
+            "vehicle": vehicle,
+            "ledger": ledger,
+            'current_balance': current_balance,
+            "transactions": transactions,
+        }
+    )
 
 def dashboard(request):
 
