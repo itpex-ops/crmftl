@@ -286,7 +286,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "live_tracking:vehicle_live",
+            "vehicle_live",
             session_id=session.id
         )
 
@@ -304,7 +304,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "live_tracking:vehicle_live",
+            "vehicle_live",
             session_id=session.id
         )
 
@@ -329,7 +329,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "live_tracking:vehicle_live",
+            "vehicle_live",
             session_id=session.id
         )
 
@@ -395,7 +395,7 @@ def refresh_location(request, session_id):
     )
 
     return redirect(
-        "live_tracking:vehicle_live",
+        "vehicle_live",
         session_id=session.id
     )
 def tracking_history(request, session_id):
