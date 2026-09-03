@@ -19,6 +19,7 @@ from live_tracking.models import TrackingSession
 from live_tracking.services.delete_service import DeleteService
 from django.db.models import Q
 from .services.modify_service import ModifyService
+from django.contrib.auth.decorators import login_required
 
 def delete_tracking(request, session_id):
     session = get_object_or_404(
