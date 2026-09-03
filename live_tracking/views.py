@@ -18,6 +18,7 @@ from .services.location_service import LocationService
 from live_tracking.models import TrackingSession
 from live_tracking.services.delete_service import DeleteService
 from django.db.models import Q
+from .services.modify_service import ModifyService
 
 def delete_tracking(request, session_id):
     session = get_object_or_404(
@@ -61,29 +62,95 @@ def send_consent(request, session_id):
 
     return redirect("live_tracking_list")
 
+@login_required
 def check_consent(request, session_id):
+
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
+
+    # --------------------------------
+    # CHECK CONSENT
+    # --------------------------------
     result = ConsentService.check_consent(session)
 
-    if result["success"]:
-
-        messages.success(
-            request,
-            f"Consent Status : {result['status']}"
-        )
-
-    else:
+    if not result.get("success"):
 
         messages.error(
             request,
-            str(result["message"])
+            str(result.get(
+                "message",
+                "Unable to check consent."
+            ))
+        )
+
+        return redirect("live_tracking_list")
+
+    consent_status = result.get("status")
+
+    # --------------------------------
+    # CONSENT RECEIVED
+    # --------------------------------
+    if consent_status in [
+        "approved",
+        "accepted",
+        "consent_received",
+        "active"
+    ]:
+
+        session.consent_received = True
+        session.status = "consent_received"
+        session.save(
+            update_fields=[
+                "consent_received",
+                "status"
+            ]
+        )
+
+        # --------------------------------
+        # ACTIVATE TRACKING
+        # --------------------------------
+        modify_result = ModifyService.start_tracking(session)
+
+        if modify_result.get("success"):
+
+            session.tracking_enabled = True
+            session.status = "waiting_location"
+
+            session.save(
+                update_fields=[
+                    "tracking_enabled",
+                    "status"
+                ]
+            )
+
+            messages.success(
+                request,
+                "Consent received. Live tracking has been activated."
+            )
+
+        else:
+
+            messages.warning(
+                request,
+                "Consent received, but live tracking could not be activated: "
+                + str(
+                    modify_result.get(
+                        "message",
+                        "Modify API failed."
+                    )
+                )
+            )
+
+    else:
+
+        messages.warning(
+            request,
+            f"Consent Status : {consent_status}"
         )
 
     return redirect("live_tracking_list")
-
 def test_location(request, vehicle_id):
     vehicle = Vehicle.objects.get(id=vehicle_id)
     result = LocationService.get_location(
@@ -398,6 +465,7 @@ def refresh_location(request, session_id):
         "vehicle_live",
         session_id=session.id
     )
+
 def tracking_history(request, session_id):
 
     session = get_object_or_404(

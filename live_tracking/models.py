@@ -31,10 +31,10 @@ class TrackingSession(models.Model):
     driver_mobile = models.CharField(max_length=15)
 
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="pending"
-    )
+    max_length=20,
+    choices=STATUS_CHOICES,
+    default="not_enabled"
+)
     consent_received = models.BooleanField(default=False)
     latitude = models.DecimalField(
     max_digits=10,
