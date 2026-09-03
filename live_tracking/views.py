@@ -267,31 +267,137 @@ def import_driver(request, vehicle_id):
         vehicle_id=vehicle.id
     )
 
+
 def refresh_location(request, session_id):
+
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
     )
-    result = LocationService.fetch_location(session)
-    session.refresh_from_db()
 
-    print("=" * 80)
-    print("DATABASE VALUES")
-    print("Status:", session.status)
-    print("Latitude:", session.latitude)
-    print("Longitude:", session.longitude)
-    print("Tracking Enabled:", session.tracking_enabled)
-    print("Location Status:", session.location_status)
-    print("=" * 80)
-    if result["success"]:
-        messages.success(request, "Location updated.")
-    else:
-        messages.error(request, result["message"])
-    return redirect(
-        "vehicle_live",
-        session_id=session.id
+    result = LocationService.get_location(session)
+    if not result.get("success"):
+        messages.warning(
+            request,
+            result.get(
+                "message",
+                "Unable to retrieve the vehicle location."
+            )
+        )
+
+        return redirect(
+            "live_tracking:vehicle_live",
+            session_id=session.id
+        )
+
+    location = result.get("location")
+
+    # --------------------------------------------------
+    # NO LOCATION AVAILABLE
+    # --------------------------------------------------
+
+    if not location:
+        messages.warning(
+            request,
+            "Current vehicle location is not available yet. "
+            "Telenity has not retrieved the location."
+        )
+
+        return redirect(
+            "live_tracking:vehicle_live",
+            session_id=session.id
+        )
+
+    latitude = location.get("latitude")
+    longitude = location.get("longitude")
+
+    # --------------------------------------------------
+    # LOCATION NOT RETRIEVED / NO COORDINATES
+    # --------------------------------------------------
+
+    if latitude is None or longitude is None:
+
+        status = location.get(
+            "location_status",
+            "Not Retrieved"
+        )
+
+        messages.warning(
+            request,
+            f"Vehicle location is currently unavailable "
+            f"({status}). Please try again later."
+        )
+
+        return redirect(
+            "live_tracking:vehicle_live",
+            session_id=session.id
+        )
+
+    # --------------------------------------------------
+    # SAVE LOCATION ONLY WHEN COORDINATES EXIST
+    # --------------------------------------------------
+
+    LiveLocation.objects.create(
+        session=session,
+        tracked=location.get("tracked", False),
+        location_status=location.get(
+            "location_status",
+            ""
+        ),
+        address=location.get(
+            "address",
+            ""
+        ),
+        latitude=latitude,
+        longitude=longitude,
+        accuracy=location.get(
+            "accuracy",
+            0
+        ) or 0,
+        location_name=location.get(
+            "location_name",
+            ""
+        ),
+        received_at=timezone.now()
     )
 
+    # Update latest location in TrackingSession
+
+    session.latitude = latitude
+    session.longitude = longitude
+    session.last_location = (
+        location.get("location_name")
+        or location.get("address")
+        or ""
+    )
+    session.location_status = location.get(
+        "location_status",
+        ""
+    )
+    session.last_updated = timezone.now()
+    session.status = "active"
+    session.tracking_enabled = True
+    session.save(
+        update_fields=[
+            "latitude",
+            "longitude",
+            "last_location",
+            "location_status",
+            "last_updated",
+            "status",
+            "tracking_enabled",
+        ]
+    )
+
+    messages.success(
+        request,
+        "Vehicle location updated successfully."
+    )
+
+    return redirect(
+        "live_tracking:vehicle_live",
+        session_id=session.id
+    )
 def tracking_history(request, session_id):
 
     session = get_object_or_404(
