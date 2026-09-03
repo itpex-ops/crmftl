@@ -267,7 +267,6 @@ def import_driver(request, vehicle_id):
         vehicle_id=vehicle.id
     )
 
-
 def refresh_location(request, session_id):
 
     session = get_object_or_404(
@@ -286,7 +285,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "vehicle_live",
+            "live_tracking:vehicle_live",
             session_id=session.id
         )
 
@@ -304,7 +303,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "vehicle_live",
+            "live_tracking:vehicle_live",
             session_id=session.id
         )
 
@@ -329,7 +328,7 @@ def refresh_location(request, session_id):
         )
 
         return redirect(
-            "vehicle_live",
+            "live_tracking:vehicle_live",
             session_id=session.id
         )
 
@@ -395,9 +394,10 @@ def refresh_location(request, session_id):
     )
 
     return redirect(
-        "vehicle_live",
+        "live_tracking:vehicle_live",
         session_id=session.id
     )
+
 def tracking_history(request, session_id):
 
     session = get_object_or_404(
