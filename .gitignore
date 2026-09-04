@@ -73,3 +73,12 @@ npm-debug.log
 # Backup files
 *.bak
 *.swp
+
+#whatsapp
+/group_exports
+/whatsapp_business_profile
+/whatsapp_profile
+whatsapp.py
+whatsapp1.py
+whatsapp2.py
+fleet_contacts.xlsx

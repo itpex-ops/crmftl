@@ -25,6 +25,7 @@ urlpatterns = [
     path('auth/',include('authentications.urls')),
     path('enquiry/', include('enquiries.urls')),
     path('orders/', include('orders.urls')),
+    path('onepageorder/', include('onepage_order.urls')),
     path('vehicles/', include('vehicles.urls')),
     path('accounts/', include('accounts.urls')),
     path('customers/',include('customers.urls')),

@@ -1,0 +1,10 @@
+{% extends "layouts/base.html" %}
+
+
+{% block content %}
+{% include "onepageorders/nav.html" %}
+<h3>Vehicle Payments</h3>
+<div class="card p-4 mb-4">
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">{% for f in form %}<div class="col-md-4">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div><button class="btn btn-primary mt-3">Make Payment</button></form></div><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Trip</th><th>Vehicle</th><th>Type</th><th>Amount</th><th>Transaction</th></tr></thead><tbody>{% for p in payments %}<tr><td>{{ p.order.trip_number }}</td><td>{{ p.vehicle_number }}</td><td>{{ p.payment_type }}</td><td>₹{{ p.amount }}</td><td>{{ p.transaction_reference }}</td></tr>{% empty %}<tr><td colspan="5">No payments.</td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}

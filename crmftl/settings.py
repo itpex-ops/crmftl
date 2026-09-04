@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'customers',
     'dashboards',
     'live_tracking',
-    'banking.apps.BankingConfig'
+    'banking.apps.BankingConfig',
+    'onepage_order'
    
 ]
 AUTH_USER_MODEL = 'authentications.User'

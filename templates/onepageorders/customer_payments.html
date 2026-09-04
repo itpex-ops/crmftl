@@ -1,0 +1,6 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+{% include "onepageorders/nav.html" %}
+<h3>Customer Payments</h3>
+<div class="card p-4 mb-4"><form method="post">{% csrf_token %}<div class="row g-3">{% for f in form %}<div class="col-md-4">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div><button class="btn btn-primary mt-3">Save Receipt</button></form></div><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Trip</th><th>Customer</th><th>Selling</th><th>Received</th><th>Status</th><th>Mode</th><th>UTR</th></tr></thead><tbody>{% for p in payments %}<tr><td>{{ p.order.trip_number }}</td><td>{{ p.order.customer.name }}</td><td>₹{{ p.selling_amount }}</td><td>₹{{ p.received_amount }}</td><td>{{ p.status }}</td><td>{{ p.received_through }}</td><td>{{ p.utr_details }}</td></tr>{% empty %}<tr><td colspan="7">No receipts.</td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}
