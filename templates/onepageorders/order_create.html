@@ -1,0 +1,1279 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="order-create-page">
+
+    <!-- =========================================================
+         PAGE TITLE
+         ========================================================= -->
+
+    <h1 class="order-create-title">
+        Order Creation
+    </h1>
+
+
+    <!-- =========================================================
+         FORM
+         ========================================================= -->
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- =====================================================
+             NON-FIELD ERRORS
+             ===================================================== -->
+
+        {% if customer_form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ customer_form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+
+        <!-- =====================================================
+             TWO COLUMN ORDER GRID
+             ===================================================== -->
+
+        <div class="order-two-columns">
+
+
+            <!-- =================================================
+                 1. CUSTOMER DETAILS
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Customer Details
+                </div>
+
+
+                <!-- Customer Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Name
+                        <span class="text-danger ms-1">*</span>
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ customer_form.name }}
+                    </div>
+
+                </div>
+
+
+                <!-- Contact Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Contact Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ customer_form.contact_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Email
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ customer_form.email }}
+                    </div>
+
+                </div>
+
+
+                <!-- Customer Address -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Address
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ customer_form.address }}
+                    </div>
+
+                </div>
+
+
+                <!-- Lead -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Lead Generated Through
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.lead_generated_through }}
+                    </div>
+
+                </div>
+
+
+                <!-- Sales Closed -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Sales Closed By
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.sales_closed_by }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 2. COMMERCIALS
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Commercials
+                </div>
+
+
+                <!-- Freight Amount -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Freight Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.freight_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Loading / Unloading -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Loading / Unloading Charges
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.loading_unloading_charges }}
+                    </div>
+
+                </div>
+
+
+                <!-- Halting -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Halting Charges
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.halting_charges }}
+                    </div>
+
+                </div>
+
+
+                <!-- Other Charges -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Other Charges
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.other_charges }}
+                    </div>
+
+                </div>
+
+
+                <!-- Total Trip Cost -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Total Trip Cost
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            id="total_trip_cost"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Selling Amount -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Selling Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.selling_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Manager Approval -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Manager Approval
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.manager_approval }}
+                    </div>
+
+                </div>
+
+
+                <!-- Approved By -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Approved By
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.approved_by }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 3. SHIPMENT DETAILS
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Shipment Details
+                </div>
+
+
+                <!-- Origin -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Origin Pincode / Area Name
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.origin_pincode_area }}
+                    </div>
+
+                </div>
+
+
+                <!-- Destination -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Destination Pincode / Area Name
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.destination_pincode_area }}
+                    </div>
+
+                </div>
+
+
+                <!-- Material -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Material
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.material }}
+                    </div>
+
+                </div>
+
+
+                <!-- Packing -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Packing Type
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.packing_type }}
+                    </div>
+
+                </div>
+
+
+                <!-- Pieces -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        No of Pieces
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.no_of_pieces }}
+                    </div>
+
+                </div>
+
+
+                <!-- Weight -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Weight in Tons
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.weight_tons }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 4. PAYMENT TERMS BY CUSTOMER
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Payment Terms by Customer
+                </div>
+
+
+                <!-- Billing Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Billing Type
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.customer_billing_type }}
+                    </div>
+
+                </div>
+
+
+                <!-- Payment Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Payment Type
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.customer_payment_type }}
+                    </div>
+
+                </div>
+
+
+                <!-- Advance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Advance Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.customer_advance_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Balance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Balance Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.customer_balance_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Payment Method -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Payment Method
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.customer_payment_method }}
+                    </div>
+
+                </div>
+
+
+                <!-- Due Date -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Promised Due Date
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.promised_due_date }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 5. VEHICLE DETAILS
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Vehicle Details
+                </div>
+
+
+                <!-- Vehicle Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Type
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_type }}
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- Driver Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Driver Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.driver_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- Owner Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Owner Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.owner_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Sourced By -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Sourced By
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_sourced_by }}
+                    </div>
+
+                </div>
+
+
+                <!-- Owner / Broker -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Owner / Broker Name
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.owner_broker_name }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 6. PAYMENT TERMS TO CONTRACTED VEHICLE
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Payment Terms to Contracted Vehicle
+                </div>
+
+
+                <!-- Vehicle Advance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Advance Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_advance_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Balance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Balance Amount
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_balance_amount }}
+                    </div>
+
+                </div>
+
+
+                <!-- Owner Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Owner Name
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.vehicle_owner_name }}
+                    </div>
+
+                </div>
+
+
+                <!-- PAN -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        PAN Card
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.pan_card }}
+                    </div>
+
+                </div>
+
+
+                <!-- Account Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Name
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.account_name }}
+                    </div>
+
+                </div>
+
+
+                <!-- Account Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.account_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- IFSC -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        IFSC Code
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.ifsc_code }}
+                    </div>
+
+                </div>
+
+
+                <!-- UPI -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        UPI Number
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.upi_number }}
+                    </div>
+
+                </div>
+
+
+                <!-- Send SMS -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Send SMS
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.send_sms }}
+                    </div>
+
+                </div>
+
+
+                <!-- Agreement -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Create Agreement &amp; TDS Certificate
+                    </div>
+
+                    <div class="order-form-control">
+                        {{ form.create_agreement_tds }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CREATE ORDER
+             ===================================================== -->
+
+        <div class="create-order-container">
+
+            <button
+                type="submit"
+                class="btn btn-primary create-order-button"
+            >
+                <i class="bi bi-save me-1"></i>
+                Create Order
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     STYLES
+     ========================================================= -->
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .order-create-page {
+        width: 100%;
+        padding: 22px 28px 35px;
+        box-sizing: border-box;
+    }
+
+
+    .order-create-title {
+        font-size: 23px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 20px 0;
+    }
+
+
+    /* =========================================================
+       MAIN TWO-COLUMN GRID
+       
+       IMPORTANT:
+       All six cards are direct grid items.
+       
+       Row 1:
+       Customer Details       Commercials
+       
+       Row 2:
+       Shipment Details       Payment Terms by Customer
+       
+       Row 3:
+       Vehicle Details        Contracted Vehicle Payment
+       ========================================================= */
+
+    .order-two-columns {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        column-gap: 22px;
+        row-gap: 14px;
+
+        width: 100%;
+
+        align-items: stretch;
+    }
+
+
+    /* =========================================================
+       CARD
+       ========================================================= */
+
+    .order-card {
+        width: 100%;
+
+        margin: 0;
+
+        border: 1px solid #8d8d8d;
+
+        background: #ffffff;
+
+        overflow: hidden;
+
+        box-sizing: border-box;
+
+        align-self: stretch;
+    }
+
+
+    /* =========================================================
+       CARD HEADER
+       ========================================================= */
+
+    .order-card-title {
+        min-height: 38px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 7px 10px;
+
+        background: #ffc000;
+
+        border-bottom: 1px solid #777;
+
+        color: #111;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        text-align: center;
+
+        line-height: 1.2;
+
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+       FORM ROW
+       ========================================================= */
+
+    .order-form-row {
+        display: grid;
+
+        grid-template-columns:
+            42%
+            58%;
+
+        min-height: 39px;
+
+        border-bottom: 1px solid #b8b8b8;
+
+        box-sizing: border-box;
+    }
+
+
+    .order-form-row:last-child {
+        border-bottom: none;
+    }
+
+
+    /* =========================================================
+       LABEL
+       ========================================================= */
+
+    .order-form-label {
+        display: flex;
+
+        align-items: center;
+
+        padding: 5px 9px;
+
+        border-right: 1px solid #b8b8b8;
+
+        color: #172033;
+
+        font-size: 12.5px;
+
+        line-height: 1.2;
+
+        background: #ffffff;
+
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+       FORM CONTROL
+       ========================================================= */
+
+    .order-form-control {
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        padding: 3px 5px;
+
+        box-sizing: border-box;
+    }
+
+
+    .order-form-control input,
+    .order-form-control select,
+    .order-form-control textarea {
+        width: 100%;
+
+        min-width: 0;
+
+        border: 1px solid #d5d5d5;
+
+        border-radius: 3px;
+
+        background: #ffffff;
+
+        color: #222;
+
+        font-size: 12.5px;
+
+        padding: 4px 7px;
+
+        outline: none;
+
+        box-shadow: none;
+
+        box-sizing: border-box;
+    }
+
+
+    .order-form-control input,
+    .order-form-control select {
+        height: 29px;
+    }
+
+
+    .order-form-control textarea {
+        height: 48px;
+
+        resize: vertical;
+    }
+
+
+    /* =========================================================
+       FOCUS
+       ========================================================= */
+
+    .order-form-control input:focus,
+    .order-form-control select:focus,
+    .order-form-control textarea:focus {
+        border-color: #9b9b9b;
+
+        box-shadow: none;
+
+        background: #fffef0;
+    }
+
+
+    /* =========================================================
+       READONLY
+       ========================================================= */
+
+    .order-form-control input[readonly] {
+        background: #eef0f2;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       CHECKBOX
+       ========================================================= */
+
+    .order-form-control input[type="checkbox"] {
+        width: 16px;
+
+        height: 16px;
+
+        margin: 0 0 0 6px;
+    }
+
+
+    /* =========================================================
+       ERRORS
+       ========================================================= */
+
+    .order-error {
+        color: #dc3545;
+
+        font-size: 10px;
+
+        padding: 2px 5px 0;
+    }
+
+
+    /* =========================================================
+       CREATE ORDER BUTTON
+       ========================================================= */
+
+    .create-order-container {
+        width: 100%;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        padding: 14px 0 20px;
+    }
+
+
+    .create-order-button {
+        min-width: 120px;
+
+        height: 38px;
+
+        border-radius: 4px;
+
+        font-size: 13px;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       LARGE DESKTOP
+       ========================================================= */
+
+    @media (min-width: 1400px) {
+
+        .order-create-page {
+            padding-left: 34px;
+            padding-right: 34px;
+        }
+
+        .order-two-columns {
+            column-gap: 24px;
+        }
+
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 950px) {
+
+        .order-two-columns {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+        .order-create-page {
+            padding: 15px;
+        }
+
+
+        .order-two-columns {
+            column-gap: 0;
+            row-gap: 12px;
+        }
+
+
+        .order-form-row {
+            grid-template-columns:
+                44%
+                56%;
+        }
+
+
+        .order-form-label,
+        .order-form-control input,
+        .order-form-control select,
+        .order-form-control textarea {
+            font-size: 11.5px;
+        }
+
+
+        .order-card-title {
+            font-size: 12px;
+        }
+
+    }
+
+</style>
+
+
+<!-- =========================================================
+     TOTAL TRIP COST CALCULATION
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* =========================================================
+       GET NUMERIC VALUE
+       ========================================================= */
+
+    function numberValue(id) {
+
+        const element = document.getElementById(id);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value = parseFloat(element.value);
+
+        return isNaN(value) ? 0 : value;
+    }
+
+
+    /* =========================================================
+       CALCULATE TOTAL TRIP COST
+       ========================================================= */
+
+    function calculateTripCost() {
+
+        const freight =
+            numberValue("id_freight_amount");
+
+        const loading =
+            numberValue("id_loading_unloading_charges");
+
+        const halting =
+            numberValue("id_halting_charges");
+
+        const other =
+            numberValue("id_other_charges");
+
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+
+        const totalField =
+            document.getElementById("total_trip_cost");
+
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+
+    }
+
+
+    /* =========================================================
+       WATCH COMMERCIAL FIELDS
+       ========================================================= */
+
+    const fields = [
+
+        "id_freight_amount",
+
+        "id_loading_unloading_charges",
+
+        "id_halting_charges",
+
+        "id_other_charges"
+
+    ];
+
+
+    fields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+
+        if (!field) {
+            return;
+        }
+
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    /* =========================================================
+       INITIAL CALCULATION
+       ========================================================= */
+
+    calculateTripCost();
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,7 +1,6 @@
 {% extends "layouts/base.html" %}
 
    {% block content %}
-   {% include "onepageorders/nav.html" %}
 
     <h3>Vehicle vs Customer — Admin</h3>
     <div class="card"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Trip Details</th><th>Vehicle Cost</th><th>Vehicle Payment Status</th><th>Customer Selling</th><th>Customer Payment Status</th><th>Margin</th></tr></thead><tbody>{% for o in orders %}<tr><td>{{ o.trip_number }}<br><small>{{ o.origin }} TO {{ o.destination }} / {{ o.vehicle_type }}</small></td><td>₹{{ o.vehicle_cost|floatformat:2 }}</td><td>{% if o.vehicle_cost > 0 %}Advance/Payment Made{% else %}No Payment Done{% endif %}</td><td>₹{{ o.customer_selling_amount|floatformat:2 }}</td><td>{% with p=o.customer_payments.last %}{% if p %}{{ p.status }}{% else %}Pending{% endif %}{% endwith %}</td><td><strong>₹{{ o.margin|floatformat:2 }}</strong></td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}

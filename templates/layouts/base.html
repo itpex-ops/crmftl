@@ -209,174 +209,256 @@
         <div class="content" id="content">
 
             <!-- ===== NAVBAR ===== -->
-            <nav id="mainNavbar" class="navbar fixed-top px-4 d-flex justify-content-between align-items-center">
 
-                <!-- LEFT (FIXED TOGGLE BUTTON) -->
-                <button class="btn btn-sm btn-light border" id="toggleBtn">
-                    <i class="bi bi-list"></i>
-                </button>
+<nav id="mainNavbar">
 
-                <!-- RIGHT -->
-                <div class="d-flex align-items-center gap-3">
+    <!-- =========================================
+         LEFT
+         ========================================= -->
 
-                    <!-- 🔔 NOTIFICATION -->
-                    <!-- RIGHT -->
-                    <div class="d-flex align-items-center gap-3">
+    <div class="navbar-left">
 
-                        <!-- 🔔 NOTIFICATION -->
-                        <div class="dropdown">
+        <button
+            class="btn btn-sm btn-light border"
+            id="toggleBtn"
+            type="button">
 
-                            <!-- BELL ICON -->
-                            <a href="#" class="position-relative text-dark text-decoration-none"
-                                data-bs-toggle="dropdown">
+            <i class="bi bi-list"></i>
 
-                                <i class="bi bi-bell fs-5"></i>
+        </button>
 
-                                {% if notification_count > 0 %}
-                                <span class="badge bg-danger notif-badge">
-                                    {{ notification_count }}
-                                </span>
-                                {% endif %}
+    </div>
 
-                            </a>
 
-                            <!-- DROPDOWN -->
-                            <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
-                                style="width: 360px; border-radius: 14px; overflow: hidden;">
+    <!-- =========================================
+         RIGHT
+         ========================================= -->
 
-                                <!-- HEADER -->
-                                <div class="p-3 border-bottom bg-light">
+    <div class="top-nav-right">
 
-                                    <div class="d-flex justify-content-between align-items-center">
 
-                                        <div>
-                                            <h6 class="fw-bold mb-0">
-                                                <i class="bi bi-bell-fill text-warning me-1"></i>
-                                                Notifications
-                                            </h6>
+        <!-- =====================================
+             PAGE LINKS
+             ===================================== -->
 
-                                            <small class="text-muted">
-                                                Recent alerts and updates
-                                            </small>
-                                        </div>
+        <div class="top-page-links">
 
-                                        <span class="badge bg-primary rounded-pill">
-                                            {{ notification_count }}
-                                        </span>
+            {% include "onepageorders/nav.html" %}
 
-                                    </div>
+        </div>
 
-                                </div>
 
-                                <!-- BODY -->
-                                <div style="max-height: 400px; overflow-y: auto;">
+        <!-- =====================================
+             NOTIFICATION
+             ===================================== -->
 
-                                    {% for n in notifications %}
+        <div class="dropdown">
 
-                                    <a href="{% url 'notifications' %}" class="dropdown-item border-bottom p-3">
+            <a
+                href="#"
+                class="notification-button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
 
-                                        <div class="d-flex align-items-start">
+                <i class="bi bi-bell"></i>
 
-                                            <div class="notif-icon me-3">
-                                                <i class="bi bi-bell"></i>
-                                            </div>
+                {% if notification_count > 0 %}
 
-                                            <div class="flex-grow-1">
+                    <span class="badge bg-danger notif-badge">
 
-                                                <div class="small fw-semibold text-dark">
-                                                    {{ n.message }}
-                                                </div>
+                        {{ notification_count }}
 
-                                                <small class="text-muted">
-                                                    <i class="bi bi-clock me-1"></i>
-                                                    {{ n.created_at|date:"d M Y · h:i A" }}
-                                                </small>
+                    </span>
 
-                                            </div>
+                {% endif %}
 
-                                            {% if not n.is_read %}
-                                            <span class="badge bg-success rounded-pill ms-2">
-                                                New
-                                            </span>
-                                            {% endif %}
+            </a>
 
-                                        </div>
 
-                                    </a>
+            <!-- ===============================
+                 NOTIFICATION DROPDOWN
+                 =============================== -->
 
-                                    {% empty %}
+            <div
+                class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+                style="
+                    width:360px;
+                    border-radius:14px;
+                    overflow:hidden;
+                ">
 
-                                    <div class="text-center py-5">
 
-                                        <div class="empty-icon mb-3">
-                                            <i class="bi bi-bell-slash"></i>
-                                        </div>
+                <!-- HEADER -->
 
-                                        <h6 class="fw-semibold">
-                                            No Notifications
-                                        </h6>
+                <div class="p-3 border-bottom bg-light">
 
-                                        <p class="text-muted small mb-0">
-                                            You're all caught up.
-                                        </p>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                                    </div>
+                        <div>
 
-                                    {% endfor %}
+                            <h6 class="fw-bold mb-0">
 
-                                </div>
+                                <i class="bi bi-bell-fill text-warning me-1"></i>
 
-                                <!-- FOOTER -->
-                                <div class="p-2 border-top bg-light text-center">
+                                Notifications
 
-                                    <a href="{% url 'notifications' %}" class="small text-decoration-none fw-semibold">
+                            </h6>
 
-                                        View All Notifications
+                            <small class="text-muted">
 
-                                    </a>
+                                Recent alerts and updates
 
-                                </div>
-
-                            </div>
+                            </small>
 
                         </div>
 
-                        <!-- USER -->
-                        <div class="d-flex align-items-center gap-2">
 
-                            <div class="user-avatar">
-                                {{ request.user.username|slice:":1"|upper }}
-                            </div>
+                        <span class="badge bg-primary rounded-pill">
 
-                            <div class="d-none d-md-block">
-                                <div class="flex-wrap small">
-                                    {{ request.user.employee_code }}
-                                </div>
+                            {{ notification_count }}
 
-                                <div class="text-muted small">
-                                    {{ request.user.role }}
-                                </div>
-                            </div>
-
-                        </div>
+                        </span>
 
                     </div>
-
-                    <!-- USER
-                <div class="d-flex align-items-center gap-2">
-                    <div class="user-avatar">
-                        {{ request.user.username|slice:":1"|upper }}
-                    </div>
-                    <div class="d-none d-md-block">
-                        <div class="flex-wrap small">{{ request.user.employee_code }}</div>
-                        <div class="text-muted small">{{ request.user.role }}</div>
-                    </div>
-                </div> -->
 
                 </div>
 
-            </nav>
 
+                <!-- BODY -->
+
+                <div style="max-height:400px; overflow-y:auto;">
+
+                    {% for n in notifications %}
+
+                        <a
+                            href="{% url 'notifications' %}"
+                            class="dropdown-item border-bottom p-3">
+
+                            <div class="d-flex align-items-start">
+
+                                <div class="notif-icon me-3">
+
+                                    <i class="bi bi-bell"></i>
+
+                                </div>
+
+
+                                <div class="flex-grow-1">
+
+                                    <div class="small fw-semibold text-dark">
+
+                                        {{ n.message }}
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        <i class="bi bi-clock me-1"></i>
+
+                                        {{ n.created_at|date:"d M Y · h:i A" }}
+
+                                    </small>
+
+                                </div>
+
+
+                                {% if not n.is_read %}
+
+                                    <span class="badge bg-success rounded-pill ms-2">
+
+                                        New
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </a>
+
+
+                    {% empty %}
+
+                        <div class="text-center py-5">
+
+                            <div class="empty-icon mb-3">
+
+                                <i class="bi bi-bell-slash"></i>
+
+                            </div>
+
+                            <h6 class="fw-semibold">
+
+                                No Notifications
+
+                            </h6>
+
+                            <p class="text-muted small mb-0">
+
+                                You're all caught up.
+
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="p-2 border-top bg-light text-center">
+
+                    <a
+                        href="{% url 'notifications' %}"
+                        class="small text-decoration-none fw-semibold">
+
+                        View All Notifications
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             USER
+             ===================================== -->
+
+        <div class="top-user-area">
+
+            <div class="user-avatar">
+
+                {{ request.user.username|slice:":1"|upper }}
+
+            </div>
+
+
+            <div class="d-none d-md-block">
+
+                <div class="small">
+
+                    {{ request.user.employee_code }}
+
+                </div>
+
+                <div class="text-dark small">
+
+                    {{ request.user.role }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
             {% block content %}
             {% endblock %}
 
@@ -445,6 +527,189 @@
                 }
             });
         </script>
+        <style>
+
+    /* =========================================================
+       MAIN CONTENT
+       ========================================================= */
+
+    .content {
+        margin-left: 240px;
+        min-height: 100vh;
+        padding-top: 70px;
+        transition: all 0.3s ease;
+    }
+
+    .content.full {
+        margin-left: 0;
+    }
+
+
+    /* =========================================================
+       TOP NAVBAR
+       ========================================================= */
+
+    #mainNavbar {
+        position: fixed;
+        top: 0;
+        left: 240px;
+        right: 0;
+
+        height: 64px;
+
+        background: #ffb813;
+
+        padding: 0 22px !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+
+        z-index: 1050;
+
+        box-shadow: 0 1px 5px rgba(0,0,0,0.12);
+
+        transition: left 0.3s ease;
+    }
+
+    .content.full #mainNavbar {
+        left: 0;
+    }
+
+
+    /* =========================================================
+       TOGGLE BUTTON
+       ========================================================= */
+
+    #toggleBtn {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0;
+
+        border-radius: 4px;
+    }
+
+
+    /* =========================================================
+       TOP RIGHT NAVIGATION
+       ========================================================= */
+
+    .top-nav-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 24px;
+        margin-left: auto;
+    }
+
+    .top-page-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }
+
+    .top-page-links a {
+        color: #222;
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 500;
+
+        white-space: nowrap;
+    }
+
+    .top-page-links a:hover {
+        color: #ffffff;
+    }
+
+
+    /* =========================================================
+       USER AREA
+       ========================================================= */
+
+    .top-user-area {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #1d5fd1;
+        color: #ffffff;
+
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       NOTIFICATION
+       ========================================================= */
+
+    .notification-button {
+        color: #222 !important;
+        text-decoration: none;
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .notification-button i {
+        font-size: 20px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE NAVBAR
+       ========================================================= */
+
+    @media (max-width: 1100px) {
+
+        .top-page-links {
+            gap: 12px;
+        }
+
+        .top-page-links a {
+            font-size: 12px;
+        }
+
+    }
+
+
+    @media (max-width: 800px) {
+
+        #mainNavbar {
+            left: 0;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        .top-page-links {
+            display: none;
+        }
+
+    }
+
+</style>
     </body>
 
 </html>

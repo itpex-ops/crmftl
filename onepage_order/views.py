@@ -11,7 +11,7 @@ def onepageorder_list(request):
     if q: orders=orders.filter(Q(trip_number__icontains=q)|Q(customer__name__icontains=q)|Q(vehicle_number__icontains=q)|Q(origin__icontains=q)|Q(destination__icontains=q))
     return render(request,'onepageorders/order_list.html',{'orders':orders,'q':q})
 
-def onepageorder_create(request):
+def onepageorder_create1(request):
     if request.method=='POST':
         customer_form=CustomerForm(request.POST); order_form=OrderForm(request.POST)
         if customer_form.is_valid() and order_form.is_valid():
@@ -19,6 +19,52 @@ def onepageorder_create(request):
             messages.success(request,f'{order.trip_number} created successfully.'); return redirect('onepageorder_detail',pk=order.pk)
     else: customer_form=CustomerForm(); order_form=OrderForm()
     return render(request,'onepageorders/order_form.html',{'customer_form':customer_form,'order_form':order_form,'title':'Create Order'})
+
+def onepageorder_create(request):
+
+    if request.method == "POST":
+
+        customer_form = CustomerForm(request.POST)
+        order_form = OrderForm(request.POST)
+
+        if customer_form.is_valid() and order_form.is_valid():
+
+            # Save customer
+            customer = customer_form.save()
+
+            # Save order
+            order = order_form.save(commit=False)
+
+            # Link customer to order
+            order.customer = customer
+
+            order.save()
+
+            messages.success(
+                request,
+                f"Order {order.trip_number} created successfully."
+            )
+
+            return redirect(
+                "order_detail",
+                pk=order.pk
+            )
+
+    else:
+
+        customer_form = CustomerForm()
+        order_form = OrderForm()
+
+
+    return render(
+        request,
+        "onepageorders/order_create.html",
+        {
+            "customer_form": customer_form,
+            "form": order_form,
+        }
+    )
+
 
 def onepageorder_detail(request,pk):
     order=get_object_or_404(Order.objects.prefetch_related('vehicle_payments','customer_payments'),pk=pk)
