@@ -1,13 +1,21 @@
 {% extends "layouts/base.html" %}
 {% block title %}Orders{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center">
-    <h3>Orders</h3><a class="btn btn-primary" href="{% url 'onepageorder_create' %}">
-        + Create Order</a>
-    </div><form class="input-group">
-        <input class="form-control" name="q" value="{{ q }}" placeholder="Search trip, customer, vehicle, route...">
-        <button class="btn btn-outline-secondary">Search</button>
-    </form>
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Orders</h3>
+        <a class="btn btn-primary" href="{% url 'onepageorder_create' %}">
+            + Create Order</a>
+    </div>
+    <form class="input-group">
+    <input
+        class="form-control"
+        name="q"
+        value="{{ q }}"
+        placeholder="Search trip, customer, vehicle, route..."
+    >
+    <button class="btn btn-outline-secondary">Search</button>
+</form>
     <div class="card"><div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
@@ -19,8 +27,8 @@
                     <th>Freight</th>
                     <th>Margin</th>
                     <th>Action</th></tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                     {% for o in orders %}
                     <tr>
                         <td><strong>{{ o.trip_number }}</strong></td>
@@ -36,8 +44,105 @@
                         <td colspan="7" class="text-center py-4">No orders found.</td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
+</div>
+<style>
+/* =========================================================
+   SEARCH BAR
+   ========================================================= */
+
+.input-group {
+    width: 100%;
+    max-width: 650px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Search Input */
+.input-group .form-control {
+    height: 44px;
+    padding: 0 15px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+
+    color: #343a40;
+    background: #ffffff;
+
+    border: 1px solid #dee2e6;
+    border-right: 0;
+
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+.input-group .form-control::placeholder {
+    color: #9aa0a6;
+    font-weight: 400;
+}
+
+/* Focus */
+.input-group .form-control:focus {
+    border-color: #FDB81B;
+    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
+    outline: none;
+}
+
+/* Search Button */
+.input-group .btn {
+    height: 44px;
+    min-width: 90px;
+
+    padding: 0 20px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #343434;
+    background: #FDB81B;
+
+    border: 1px solid #FDB81B;
+
+    transition: all 0.2s ease;
+}
+
+/* Hover */
+.input-group .btn:hover {
+    background: #e6a500;
+    border-color: #e6a500;
+    color: #ffffff;
+}
+
+/* Active */
+.input-group .btn:active {
+    transform: translateY(1px);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .input-group {
+        max-width: 100%;
+    }
+
+    .input-group .form-control {
+        height: 42px;
+        font-size: 12px;
+    }
+
+    .input-group .btn {
+        height: 42px;
+        min-width: 75px;
+        padding: 0 14px;
+        font-size: 12px;
+    }
+}
+</style>
 {% endblock %}
