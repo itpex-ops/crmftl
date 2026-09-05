@@ -1,9 +1,9 @@
-html
 {% extends "layouts/base.html" %}
 
 {% block content %}
 
 <style>
+
 /* =========================================================
    EDIT ORDER PAGE
    ========================================================= */
@@ -35,7 +35,6 @@ html
     font-size: 22px;
     font-weight: 600;
     color: #212529;
-    line-height: 1.3;
 }
 
 .edit-order-subtitle {
@@ -68,6 +67,7 @@ html
     font-weight: 500;
 
     text-decoration: none;
+
     transition: all 0.2s ease;
 }
 
@@ -79,48 +79,100 @@ html
 
 
 /* =========================================================
-   FORM CARD
+   TWO COLUMN LAYOUT
    ========================================================= */
 
-.edit-order-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+.edit-order-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+}
 
-    padding: 26px;
-
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.03),
-        0 8px 24px rgba(0, 0, 0, 0.03);
+.edit-order-column {
+    min-width: 0;
 }
 
 
 /* =========================================================
-   FORM GRID
+   CATEGORY CARD
    ========================================================= */
 
-.edit-order-fields {
+.edit-category-card {
+    background: #ffffff;
+
+    border: 1px solid #d9dde2;
+
+    border-radius: 8px;
+
+    margin-bottom: 16px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   CATEGORY HEADER
+   ========================================================= */
+
+.edit-category-title {
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffc000;
+
+    border-bottom: 1px solid #d0a300;
+
+    color: #111827;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   CATEGORY FIELDS
+   ========================================================= */
+
+.edit-category-body {
+    padding: 15px;
+}
+
+.edit-category-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px 24px;
+
+    gap: 14px 18px;
 }
 
 
 /* =========================================================
-   FIELD GROUP
+   FIELD
    ========================================================= */
 
 .edit-field {
     min-width: 0;
 }
 
+.edit-field.full-width {
+    grid-column: 1 / -1;
+}
+
 .edit-field label {
     display: block;
 
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 
     font-family: "Poppins", sans-serif;
-    font-size: 12px;
+
+    font-size: 11px;
     font-weight: 500;
 
     color: #495057;
@@ -128,90 +180,87 @@ html
 
 
 /* =========================================================
-   DJANGO FORM INPUTS
+   INPUTS
    ========================================================= */
 
 .edit-field input,
 .edit-field select,
 .edit-field textarea {
-    width: 100%;
-    min-height: 42px;
 
-    padding: 9px 12px;
+    width: 100%;
+
+    min-height: 40px;
+
+    padding: 8px 10px;
 
     border: 1px solid #dfe3e8;
-    border-radius: 8px;
+
+    border-radius: 6px;
 
     background: #ffffff;
+
     color: #343a40;
 
     font-family: "Poppins", sans-serif;
-    font-size: 12px;
+
+    font-size: 11px;
 
     outline: none;
 
+    box-sizing: border-box;
+
     transition:
         border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
-
-    box-sizing: border-box;
+        box-shadow 0.2s ease;
 }
 
 .edit-field textarea {
-    min-height: 90px;
+    min-height: 75px;
     resize: vertical;
 }
 
 
-/* =========================================================
-   INPUT PLACEHOLDER
-   ========================================================= */
-
-.edit-field input::placeholder,
-.edit-field textarea::placeholder {
-    color: #adb5bd;
-}
-
-
-/* =========================================================
-   INPUT FOCUS
-   ========================================================= */
-
 .edit-field input:focus,
 .edit-field select:focus,
 .edit-field textarea:focus {
-    border-color: #FDB81B;
-    background: #ffffff;
 
-    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
+    border-color: #FDB81B;
+
+    box-shadow:
+        0 0 0 3px rgba(253, 184, 27, 0.12);
+
 }
 
 
 /* =========================================================
-   DISABLED / READ ONLY
+   CHECKBOX
    ========================================================= */
 
-.edit-field input:disabled,
-.edit-field select:disabled,
-.edit-field textarea:disabled {
-    background: #f5f6f7;
-    color: #8a9199;
-    cursor: not-allowed;
+.edit-field input[type="checkbox"] {
+
+    width: 17px;
+    min-height: 17px;
+
+    margin-top: 8px;
+
 }
 
 
 /* =========================================================
-   ERROR MESSAGE
+   ERROR
    ========================================================= */
 
 .edit-field .errorlist {
+
     list-style: none;
+
     padding: 0;
-    margin: 5px 0 0;
+    margin: 4px 0 0;
 
     color: #dc3545;
-    font-size: 11px;
+
+    font-size: 10px;
+
 }
 
 
@@ -220,29 +269,40 @@ html
    ========================================================= */
 
 .edit-field .helptext {
+
     display: block;
-    margin-top: 5px;
+
+    margin-top: 4px;
 
     color: #8a9199;
-    font-size: 10px;
+
+    font-size: 9px;
 }
 
 
 /* =========================================================
-   FORM FOOTER
+   FOOTER
    ========================================================= */
 
 .edit-order-footer {
+
     display: flex;
+
+    justify-content: center;
+
     align-items: center;
-    justify-content: flex-end;
 
     gap: 10px;
 
-    margin-top: 26px;
-    padding-top: 20px;
+    margin-top: 8px;
 
-    border-top: 1px solid #eef0f2;
+    padding: 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
 }
 
 
@@ -251,63 +311,38 @@ html
    ========================================================= */
 
 .edit-update-btn {
-    min-width: 110px;
+
+    min-width: 130px;
+
     height: 40px;
 
     padding: 0 20px;
 
     border: 1px solid #FDB81B;
-    border-radius: 8px;
+
+    border-radius: 6px;
 
     background: #FDB81B;
+
     color: #212529;
 
     font-family: "Poppins", sans-serif;
+
     font-size: 12px;
     font-weight: 600;
 
     cursor: pointer;
 
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .edit-update-btn:hover {
+
     background: #e9a900;
+
     border-color: #e9a900;
+
     color: #ffffff;
-}
-
-.edit-update-btn:active {
-    transform: translateY(1px);
-}
-
-
-/* =========================================================
-   BOOTSTRAP FORM COMPATIBILITY
-   ========================================================= */
-
-.edit-field .form-control,
-.edit-field .form-select {
-    min-height: 42px;
-
-    border-color: #dfe3e8;
-    border-radius: 8px;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-
-    box-shadow: none;
-}
-
-.edit-field .form-control:focus,
-.edit-field .form-select:focus {
-    border-color: #FDB81B;
-
-    box-shadow:
-        0 0 0 3px rgba(253, 184, 27, 0.12);
 }
 
 
@@ -315,138 +350,810 @@ html
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 950px) {
+
+    .edit-order-layout {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
 
     .edit-order-page {
-        padding: 18px 16px 30px;
+        padding: 18px 14px 30px;
+    }
+
+    .edit-category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .edit-field.full-width {
+        grid-column: auto;
     }
 
     .edit-order-header {
-        align-items: flex-start;
         flex-direction: column;
-        gap: 12px;
-    }
-
-    .edit-order-heading {
-        font-size: 19px;
+        align-items: flex-start;
     }
 
     .edit-back-btn {
         width: 100%;
     }
 
-    .edit-order-card {
-        padding: 20px 16px;
-    }
-
-    .edit-order-fields {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .edit-order-footer {
-        flex-direction: column;
-    }
-
-    .edit-update-btn {
-        width: 100%;
-    }
 }
+
 </style>
 
 
-<div class="container-fluid">
+<div class="edit-order-page">
 
-    <div class="edit-order-page">
 
-        <!-- =================================================
-             HEADER
-             ================================================= -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
-        <div class="edit-order-header">
+    <div class="edit-order-header">
 
-            <div>
-                <h3 class="edit-order-heading">
-                    Edit {{ order.trip_number }}
-                </h3>
+        <div>
 
-                <div class="edit-order-subtitle">
-                    Update order information and save your changes
-                </div>
+            <h3 class="edit-order-heading">
+
+                Edit {{ order.trip_number }}
+
+            </h3>
+
+            <div class="edit-order-subtitle">
+
+                Update order information and save your changes
+
             </div>
-
-            <a
-                class="edit-back-btn"
-                href="{% url 'onepageorder_detail' order.pk %}"
-            >
-                ← Back
-            </a>
 
         </div>
 
 
+        <a
+            href="{% url 'onepageorder_detail' order.pk %}"
+            class="edit-back-btn"
+        >
+
+            <i class="bi bi-arrow-left me-1"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FORM
+         ===================================================== -->
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+
         <!-- =================================================
-             FORM
+             TWO COLUMNS
              ================================================= -->
 
-        <form method="post" class="edit-order-card">
+        <div class="edit-order-layout">
 
-            {% csrf_token %}
 
-            <div class="edit-order-fields">
 
-                {% for f in form %}
+            <!-- =============================================
+                 LEFT COLUMN
+                 ============================================= -->
 
-                    <div class="edit-field">
+            <div class="edit-order-column">
 
-                        {{ f.label_tag }}
 
-                        {{ f }}
 
-                        {% if f.errors %}
-                            {{ f.errors }}
-                        {% endif %}
+                <!-- =========================================
+                     CUSTOMER DETAILS
+                     ========================================= -->
 
-                        {% if f.help_text %}
-                            <span class="helptext">
-                                {{ f.help_text }}
-                            </span>
-                        {% endif %}
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Customer Details
 
                     </div>
 
-                {% endfor %}
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Customer Name -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer.label_tag }}
+
+                                {{ form.customer }}
+
+                                {{ form.customer.errors }}
+
+                            </div>
+
+
+                            <!-- Lead Generated Through -->
+
+                            <div class="edit-field">
+
+                                {{ form.lead_generated_through.label_tag }}
+
+                                {{ form.lead_generated_through }}
+
+                                {{ form.lead_generated_through.errors }}
+
+                            </div>
+
+
+                            <!-- Sales Closed By -->
+
+                            <div class="edit-field">
+
+                                {{ form.sales_closed_by.label_tag }}
+
+                                {{ form.sales_closed_by }}
+
+                                {{ form.sales_closed_by.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     SHIPMENT DETAILS
+                     ========================================= -->
+
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Shipment Details
+
+                    </div>
+
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Origin -->
+
+                            <div class="edit-field">
+
+                                {{ form.origin.label_tag }}
+
+                                {{ form.origin }}
+
+                                {{ form.origin.errors }}
+
+                            </div>
+
+
+                            <!-- Destination -->
+
+                            <div class="edit-field">
+
+                                {{ form.destination.label_tag }}
+
+                                {{ form.destination }}
+
+                                {{ form.destination.errors }}
+
+                            </div>
+
+
+                            <!-- Material -->
+
+                            <div class="edit-field">
+
+                                {{ form.material.label_tag }}
+
+                                {{ form.material }}
+
+                                {{ form.material.errors }}
+
+                            </div>
+
+
+                            <!-- Packing Type -->
+
+                            <div class="edit-field">
+
+                                {{ form.packing_type.label_tag }}
+
+                                {{ form.packing_type }}
+
+                                {{ form.packing_type.errors }}
+
+                            </div>
+
+
+                            <!-- No Of Pieces -->
+
+                            <div class="edit-field">
+
+                                {{ form.no_of_pieces.label_tag }}
+
+                                {{ form.no_of_pieces }}
+
+                                {{ form.no_of_pieces.errors }}
+
+                            </div>
+
+
+                            <!-- Weight -->
+
+                            <div class="edit-field">
+
+                                {{ form.weight_tons.label_tag }}
+
+                                {{ form.weight_tons }}
+
+                                {{ form.weight_tons.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     VEHICLE DETAILS
+                     ========================================= -->
+
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Vehicle Details
+
+                    </div>
+
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Vehicle Type -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_type.label_tag }}
+
+                                {{ form.vehicle_type }}
+
+                                {{ form.vehicle_type.errors }}
+
+                            </div>
+
+
+                            <!-- Vehicle Number -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_number.label_tag }}
+
+                                {{ form.vehicle_number }}
+
+                                {{ form.vehicle_number.errors }}
+
+                            </div>
+
+
+                            <!-- Driver Number -->
+
+                            <div class="edit-field">
+
+                                {{ form.driver_number.label_tag }}
+
+                                {{ form.driver_number }}
+
+                                {{ form.driver_number.errors }}
+
+                            </div>
+
+
+                            <!-- Owner Number -->
+
+                            <div class="edit-field">
+
+                                {{ form.owner_number.label_tag }}
+
+                                {{ form.owner_number }}
+
+                                {{ form.owner_number.errors }}
+
+                            </div>
+
+
+                            <!-- Vehicle Source -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_sourced_by.label_tag }}
+
+                                {{ form.vehicle_sourced_by }}
+
+                                {{ form.vehicle_sourced_by.errors }}
+
+                            </div>
+
+
+                            <!-- Owner / Broker -->
+
+                            <div class="edit-field">
+
+                                {{ form.owner_broker_name.label_tag }}
+
+                                {{ form.owner_broker_name }}
+
+                                {{ form.owner_broker_name.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
 
             </div>
 
 
-            <!-- =================================================
-                 FOOTER
-                 ================================================= -->
 
-            <div class="edit-order-footer">
+            <!-- =============================================
+                 RIGHT COLUMN
+                 ============================================= -->
 
-                <a
-                    href="{% url 'onepageorder_detail' order.pk %}"
-                    class="edit-back-btn"
-                >
-                    Cancel
-                </a>
+            <div class="edit-order-column">
 
-                <button
-                    type="submit"
-                    class="edit-update-btn"
-                >
-                    Update Order
-                </button>
+
+
+                <!-- =========================================
+                     COMMERCIALS
+                     ========================================= -->
+
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Commercials
+
+                    </div>
+
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Freight -->
+
+                            <div class="edit-field">
+
+                                {{ form.freight_amount.label_tag }}
+
+                                {{ form.freight_amount }}
+
+                                {{ form.freight_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Loading / Unloading -->
+
+                            <div class="edit-field">
+
+                                {{ form.loading_unloading_charges.label_tag }}
+
+                                {{ form.loading_unloading_charges }}
+
+                                {{ form.loading_unloading_charges.errors }}
+
+                            </div>
+
+
+                            <!-- Halting -->
+
+                            <div class="edit-field">
+
+                                {{ form.halting_charges.label_tag }}
+
+                                {{ form.halting_charges }}
+
+                                {{ form.halting_charges.errors }}
+
+                            </div>
+
+
+                            <!-- Other -->
+
+                            <div class="edit-field">
+
+                                {{ form.other_charges.label_tag }}
+
+                                {{ form.other_charges }}
+
+                                {{ form.other_charges.errors }}
+
+                            </div>
+
+
+                            <!-- Selling -->
+
+                            <div class="edit-field">
+
+                                {{ form.selling_amount.label_tag }}
+
+                                {{ form.selling_amount }}
+
+                                {{ form.selling_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Manager Approval -->
+
+                            <div class="edit-field">
+
+                                {{ form.manager_approval.label_tag }}
+
+                                {{ form.manager_approval }}
+
+                                {{ form.manager_approval.errors }}
+
+                            </div>
+
+
+                            <!-- Approved By -->
+
+                            <div class="edit-field">
+
+                                {{ form.approved_by.label_tag }}
+
+                                {{ form.approved_by }}
+
+                                {{ form.approved_by.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     PAYMENT TERMS BY CUSTOMER
+                     ========================================= -->
+
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Payment Terms by Customer
+
+                    </div>
+
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Billing Type -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer_billing_type.label_tag }}
+
+                                {{ form.customer_billing_type }}
+
+                                {{ form.customer_billing_type.errors }}
+
+                            </div>
+
+
+                            <!-- Payment Type -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer_payment_type.label_tag }}
+
+                                {{ form.customer_payment_type }}
+
+                                {{ form.customer_payment_type.errors }}
+
+                            </div>
+
+
+                            <!-- Advance -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer_advance_amount.label_tag }}
+
+                                {{ form.customer_advance_amount }}
+
+                                {{ form.customer_advance_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Balance -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer_balance_amount.label_tag }}
+
+                                {{ form.customer_balance_amount }}
+
+                                {{ form.customer_balance_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Payment Method -->
+
+                            <div class="edit-field">
+
+                                {{ form.customer_payment_method.label_tag }}
+
+                                {{ form.customer_payment_method }}
+
+                                {{ form.customer_payment_method.errors }}
+
+                            </div>
+
+
+                            <!-- Due Date -->
+
+                            <div class="edit-field">
+
+                                {{ form.promised_due_date.label_tag }}
+
+                                {{ form.promised_due_date }}
+
+                                {{ form.promised_due_date.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     PAYMENT TERMS TO CONTRACTED VEHICLE
+                     ========================================= -->
+
+                <div class="edit-category-card">
+
+                    <div class="edit-category-title">
+
+                        Payment Terms to Contracted Vehicle
+
+                    </div>
+
+
+                    <div class="edit-category-body">
+
+                        <div class="edit-category-grid">
+
+
+                            <!-- Vehicle Advance -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_advance_amount.label_tag }}
+
+                                {{ form.vehicle_advance_amount }}
+
+                                {{ form.vehicle_advance_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Vehicle Balance -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_balance_amount.label_tag }}
+
+                                {{ form.vehicle_balance_amount }}
+
+                                {{ form.vehicle_balance_amount.errors }}
+
+                            </div>
+
+
+                            <!-- Owner Name -->
+
+                            <div class="edit-field">
+
+                                {{ form.vehicle_owner_name.label_tag }}
+
+                                {{ form.vehicle_owner_name }}
+
+                                {{ form.vehicle_owner_name.errors }}
+
+                            </div>
+
+
+                            <!-- PAN -->
+
+                            <div class="edit-field">
+
+                                {{ form.pan_card.label_tag }}
+
+                                {{ form.pan_card }}
+
+                                {{ form.pan_card.errors }}
+
+                            </div>
+
+
+                            <!-- Account Name -->
+
+                            <div class="edit-field">
+
+                                {{ form.account_name.label_tag }}
+
+                                {{ form.account_name }}
+
+                                {{ form.account_name.errors }}
+
+                            </div>
+
+
+                            <!-- Account Number -->
+
+                            <div class="edit-field">
+
+                                {{ form.account_number.label_tag }}
+
+                                {{ form.account_number }}
+
+                                {{ form.account_number.errors }}
+
+                            </div>
+
+
+                            <!-- IFSC -->
+
+                            <div class="edit-field">
+
+                                {{ form.ifsc_code.label_tag }}
+
+                                {{ form.ifsc_code }}
+
+                                {{ form.ifsc_code.errors }}
+
+                            </div>
+
+
+                            <!-- UPI -->
+
+                            <div class="edit-field">
+
+                                {{ form.upi_number.label_tag }}
+
+                                {{ form.upi_number }}
+
+                                {{ form.upi_number.errors }}
+
+                            </div>
+
+
+                            <!-- Send SMS -->
+
+                            <div class="edit-field">
+
+                                {{ form.send_sms.label_tag }}
+
+                                {{ form.send_sms }}
+
+                                {{ form.send_sms.errors }}
+
+                            </div>
+
+
+                            <!-- Agreement / TDS -->
+
+                            <div class="edit-field">
+
+                                {{ form.create_agreement_tds.label_tag }}
+
+                                {{ form.create_agreement_tds }}
+
+                                {{ form.create_agreement_tds.errors }}
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
 
             </div>
 
-        </form>
+        </div>
 
-    </div>
+
+
+        <!-- =================================================
+             FOOTER
+             ================================================= -->
+
+        <div class="edit-order-footer">
+
+            <a
+                href="{% url 'onepageorder_detail' order.pk %}"
+                class="edit-back-btn"
+            >
+
+                Cancel
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="edit-update-btn"
+            >
+
+                <i class="bi bi-check2-circle me-1"></i>
+
+                Update Order
+
+            </button>
+
+        </div>
+
+
+    </form>
 
 </div>
 
 {% endblock %}
-
