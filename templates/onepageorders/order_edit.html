@@ -1,9 +1,9 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<div class="container-fluid mt-2">
-<a class="btn btn-outline-primary mb-3" href="{% url 'onepageorder_detail' order.pk %}">Back</a>
+<div class="container-fluid mt-3 mb-4">
 <h3>Edit {{ order.trip_number }}
+<a class="btn btn-outline-primary mb-3" href="{% url 'onepageorder_detail' order.pk %}">Back</a>
 
 </h3><form method="post" class="card p-4">{% csrf_token %}
     <div class="row g-3">{% for f in form %}
