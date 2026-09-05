@@ -1,6 +1,8 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
+<div class="container-fluid mt-2">
+<a class="btn btn-outline-primary mb-3" href="{% url 'onepageorder_detail' order.pk %}">Back</a>
 <h3>Edit {{ order.trip_number }}
 
 </h3><form method="post" class="card p-4">{% csrf_token %}
@@ -8,3 +10,4 @@
         <div class="col-md-6">{{ f.label_tag }}{{ f }}</div>
         {% endfor %}
     </div><button class="btn btn-primary mt-3">Update</button></form>{% endblock %}
+</div>
