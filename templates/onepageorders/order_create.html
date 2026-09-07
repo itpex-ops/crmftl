@@ -47,61 +47,42 @@
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-
-
         <!-- =====================================================
              TWO COLUMN ORDER GRID
              ===================================================== -->
 
         <div class="order-two-columns">
-
-
             <!-- =================================================
                  1. CUSTOMER DETAILS
                  ================================================= -->
 
             <div class="order-card">
-
                 <div class="order-card-title">
                     Customer Details
                 </div>
-
-
                 <!-- Customer Name -->
-
                 <div class="order-form-row">
-
                     <div class="order-form-label">
                         Customer Name
                         <span class="text-danger ms-1">*</span>
                     </div>
-
                     <div class="order-form-control">
                         {{ customer_form.name }}
                     </div>
 
                 </div>
-
-
                 <!-- Contact Number -->
-
                 <div class="order-form-row">
-
                     <div class="order-form-label">
                         Contact Number
                     </div>
-
                     <div class="order-form-control">
                         {{ customer_form.contact_number }}
                     </div>
-
                 </div>
-
-
                 <!-- Email -->
 
                 <div class="order-form-row">
-
                     <div class="order-form-label">
                         Email
                     </div>
@@ -320,7 +301,7 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.origin_pincode_area }}
+                        {{ form.origin }}
                     </div>
 
                 </div>
@@ -335,7 +316,7 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.destination_pincode_area }}
+                        {{ form.destination }}
                     </div>
 
                 </div>

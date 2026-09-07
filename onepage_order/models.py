@@ -8,11 +8,7 @@ class Customer(models.Model):
     address=models.TextField(blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
     def __str__(self): return self.name
-
-from decimal import Decimal
-from django.db import models
-
-
+    
 class Order(models.Model):
 
     LEAD_CHOICES = [
@@ -374,6 +370,7 @@ class Order(models.Model):
             f"{self.trip_number} - "
             f"{self.origin} to {self.destination}"
         )
+
 class VehiclePayment(models.Model):
     PAYMENT_TYPES=[('Advance','Advance'),('Balance','Balance'),('Others','Others')]
     order=models.ForeignKey(Order,on_delete=models.CASCADE,related_name='vehicle_payments')
