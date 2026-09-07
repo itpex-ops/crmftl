@@ -62,6 +62,7 @@ def onepageorder_create(request):
         {
             "customer_form": customer_form,
             "form": order_form,
+            "messages" : messages.get_messages(request),
         }
     )
 
