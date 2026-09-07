@@ -20,6 +20,11 @@ def onepageorder_create1(request):
     else: customer_form=CustomerForm(); order_form=OrderForm()
     return render(request,'onepageorders/order_form.html',{'customer_form':customer_form,'order_form':order_form,'title':'Create Order'})
 
+from django.contrib import messages
+from django.db import transaction
+from django.shortcuts import render, redirect
+
+
 def onepageorder_create(request):
 
     if request.method == "POST":
@@ -29,25 +34,43 @@ def onepageorder_create(request):
 
         if customer_form.is_valid() and order_form.is_valid():
 
-            # Save customer
-            customer = customer_form.save()
+            try:
+                with transaction.atomic():
 
-            # Save order
-            order = order_form.save(commit=False)
+                    # Save customer
+                    customer = customer_form.save()
 
-            # Link customer to order
-            order.customer = customer
+                    # Save order
+                    order = order_form.save(commit=False)
 
-            order.save()
+                    # Link customer to order
+                    order.customer = customer
 
-            messages.success(
+                    # Save order
+                    order.save()
+
+                messages.success(
+                    request,
+                    f"Order {order.trip_number} created successfully."
+                )
+
+                return redirect(
+                    "order_detail",
+                    pk=order.pk
+                )
+
+            except Exception as e:
+
+                messages.error(
+                    request,
+                    f"Order was not saved. Error: {str(e)}"
+                )
+
+        else:
+
+            messages.error(
                 request,
-                f"Order {order.trip_number} created successfully."
-            )
-
-            return redirect(
-                "order_detail",
-                pk=order.pk
+                "Please correct the errors in the form."
             )
 
     else:
@@ -55,17 +78,14 @@ def onepageorder_create(request):
         customer_form = CustomerForm()
         order_form = OrderForm()
 
-
     return render(
         request,
         "onepageorders/order_create.html",
         {
             "customer_form": customer_form,
             "form": order_form,
-            "messages" : messages.get_messages(request),
         }
     )
-
 
 def onepageorder_detail(request,pk):
     order=get_object_or_404(Order.objects.prefetch_related('vehicle_payments','customer_payments'),pk=pk)
