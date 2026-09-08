@@ -3,7 +3,7 @@ from django.conf import settings
 
 import random
 
-class TelenityService:
+class TelenityService1:
 
     def send_tracking_sms(self, mobile):
 
@@ -94,7 +94,7 @@ class TelenityService:
 
         }
 
-class TelenityService1:
+class TelenityService:
 
     def send_tracking_sms(self, mobile):
 
