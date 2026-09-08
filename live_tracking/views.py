@@ -335,6 +335,13 @@ def import_driver(request, vehicle_id):
         vehicle_id=vehicle.id
     )
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+
+from live_tracking.models import TrackingSession
+from live_tracking.services.location_service import LocationService
+from live_tracking.services.modify_service import ModifyService
+
 
 def refresh_location(request, session_id):
 
@@ -343,129 +350,133 @@ def refresh_location(request, session_id):
         pk=session_id
     )
 
-    result = LocationService.get_location(session)
-    if not result.get("success"):
+    print("\n")
+    print("=" * 80)
+    print("REFRESH LOCATION")
+    print("=" * 80)
+    print("Session ID       :", session.id)
+    print("Vehicle ID       :", session.vehicle_id)
+    print("Driver Mobile    :", session.driver_mobile)
+    print("Entity ID        :", session.entity_id)
+    print("Consent Received :", session.consent_received)
+    print("Current Status   :", session.status)
+    print("=" * 80)
+
+    # ---------------------------------------------------------
+    # 1. CONSENT MUST BE APPROVED
+    # ---------------------------------------------------------
+
+    if not session.consent_received:
+
         messages.warning(
+            request,
+            "Driver consent has not been approved yet."
+        )
+
+        return redirect(
+            "vehicle_live",
+            pk=session.id
+        )
+
+    # ---------------------------------------------------------
+    # 2. START / ENABLE TRACKING
+    # ---------------------------------------------------------
+
+    if not session.tracking_enabled:
+
+        print("=" * 80)
+        print("TRACKING NOT ENABLED")
+        print("Calling Modify API...")
+        print("=" * 80)
+
+        modify_result = ModifyService.start_tracking(session)
+
+        print("=" * 80)
+        print("MODIFY RESULT")
+        print(modify_result)
+        print("=" * 80)
+
+        if not modify_result.get("success"):
+
+            messages.error(
+                request,
+                f"Unable to start tracking: "
+                f"{modify_result.get('message', 'Unknown error')}"
+            )
+
+            return redirect(
+                "vehicle_live",
+                pk=session.id
+            )
+
+        session.tracking_enabled = True
+        session.status = "active"
+        session.save()
+
+        messages.success(
+            request,
+            "Tracking started. Fetching vehicle location..."
+        )
+
+    # ---------------------------------------------------------
+    # 3. FETCH LOCATION
+    # ---------------------------------------------------------
+
+    result = LocationService.fetch_location(session)
+
+    print("=" * 80)
+    print("REFRESH LOCATION RESULT")
+    print(result)
+    print("=" * 80)
+
+    if result.get("success"):
+
+        response = result.get("response", {})
+
+        terminals = response.get("terminalLocation", [])
+
+        if terminals:
+
+            terminal = terminals[0]
+
+            current = terminal.get("currentLocation")
+
+            if current:
+
+                messages.success(
+                    request,
+                    "Vehicle location updated successfully."
+                )
+
+            else:
+
+                messages.info(
+                    request,
+                    "Tracking is enabled, but the current location has not been retrieved yet."
+                )
+
+        else:
+
+            messages.warning(
+                request,
+                "Location information is not available yet."
+            )
+
+    else:
+
+        messages.error(
             request,
             result.get(
                 "message",
-                "Unable to retrieve the vehicle location."
+                "Unable to retrieve vehicle location."
             )
         )
 
-        return redirect(
-            "vehicle_live",
-            session_id=session.id
-        )
-
-    location = result.get("location")
-
-    # --------------------------------------------------
-    # NO LOCATION AVAILABLE
-    # --------------------------------------------------
-
-    if not location:
-        messages.warning(
-            request,
-            "Current vehicle location is not available yet. "
-            "Telenity has not retrieved the location."
-        )
-
-        return redirect(
-            "vehicle_live",
-            session_id=session.id
-        )
-
-    latitude = location.get("latitude")
-    longitude = location.get("longitude")
-
-    # --------------------------------------------------
-    # LOCATION NOT RETRIEVED / NO COORDINATES
-    # --------------------------------------------------
-
-    if latitude is None or longitude is None:
-
-        status = location.get(
-            "location_status",
-            "Not Retrieved"
-        )
-
-        messages.warning(
-            request,
-            f"Vehicle location is currently unavailable "
-            f"({status}). Please try again later."
-        )
-
-        return redirect(
-            "vehicle_live",
-            session_id=session.id
-        )
-
-    # --------------------------------------------------
-    # SAVE LOCATION ONLY WHEN COORDINATES EXIST
-    # --------------------------------------------------
-
-    LiveLocation.objects.create(
-        session=session,
-        tracked=location.get("tracked", False),
-        location_status=location.get(
-            "location_status",
-            ""
-        ),
-        address=location.get(
-            "address",
-            ""
-        ),
-        latitude=latitude,
-        longitude=longitude,
-        accuracy=location.get(
-            "accuracy",
-            0
-        ) or 0,
-        location_name=location.get(
-            "location_name",
-            ""
-        ),
-        received_at=timezone.now()
-    )
-
-    # Update latest location in TrackingSession
-
-    session.latitude = latitude
-    session.longitude = longitude
-    session.last_location = (
-        location.get("location_name")
-        or location.get("address")
-        or ""
-    )
-    session.location_status = location.get(
-        "location_status",
-        ""
-    )
-    session.last_updated = timezone.now()
-    session.status = "active"
-    session.tracking_enabled = True
-    session.save(
-        update_fields=[
-            "latitude",
-            "longitude",
-            "last_location",
-            "location_status",
-            "last_updated",
-            "status",
-            "tracking_enabled",
-        ]
-    )
-
-    messages.success(
-        request,
-        "Vehicle location updated successfully."
-    )
-
     return redirect(
         "vehicle_live",
-        session_id=session.id
+        pk=session.id
     )
+
 
 def tracking_history(request, session_id):
 
