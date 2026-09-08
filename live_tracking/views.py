@@ -363,7 +363,7 @@ def refresh_location(request, session_id):
     print("=" * 80)
 
     # ---------------------------------------------------------
-    # 1. CONSENT MUST BE APPROVED
+    # 1. CONSENT CHECK
     # ---------------------------------------------------------
 
     if not session.consent_received:
@@ -375,11 +375,11 @@ def refresh_location(request, session_id):
 
         return redirect(
             "vehicle_live",
-            pk=session.id
+            session_id=session.id
         )
 
     # ---------------------------------------------------------
-    # 2. START / ENABLE TRACKING
+    # 2. START TRACKING IF NOT ENABLED
     # ---------------------------------------------------------
 
     if not session.tracking_enabled:
@@ -406,7 +406,7 @@ def refresh_location(request, session_id):
 
             return redirect(
                 "vehicle_live",
-                pk=session.id
+                session_id=session.id
             )
 
         session.tracking_enabled = True
@@ -472,11 +472,14 @@ def refresh_location(request, session_id):
             )
         )
 
+    # ---------------------------------------------------------
+    # 4. REDIRECT
+    # ---------------------------------------------------------
+
     return redirect(
         "vehicle_live",
-        pk=session.id
+        session_id=session.id
     )
-
 
 def tracking_history(request, session_id):
 
