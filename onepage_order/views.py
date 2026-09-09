@@ -215,7 +215,7 @@ def onepageorder_create(request):
 
     return render(
         request,
-        "onepage_order/order_create.html",
+        "onepageorders/order_create.html",
         {
             "customer_form": customer_form,
             "order_form": order_form,
