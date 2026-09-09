@@ -35,6 +35,7 @@ class TrackingSession(models.Model):
     choices=STATUS_CHOICES,
     default="not_enabled"
 )
+
     consent_received = models.BooleanField(default=False)
     latitude = models.DecimalField(
     max_digits=10,

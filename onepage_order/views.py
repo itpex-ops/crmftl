@@ -114,3 +114,490 @@ def customer_payments(request):
 def admin_margin(request):
     orders=Order.objects.select_related('customer').prefetch_related('vehicle_payments','customer_payments')
     return render(request,'onepageorders/admin_margin.html',{'orders':orders})
+
+from django.core.serializers import python
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from django.utils import timezone
+import services as services
+from services.auth_service import TrackingAuthService
+from services.consent_auth_service import ConsentAuthService
+from services.import_service import ImportService
+from services.consent_service import ConsentService
+from services.location_service import LocationService
+from live_tracking.models import TrackingSession
+from live_tracking.services.delete_service import DeleteService
+from django.db.models import Q
+from services.modify_service import ModifyService
+from django.contrib.auth.decorators import login_required
+
+def delete_tracking(request, session_id):
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+    result = DeleteService.delete_tracking(session)
+    print("=" * 80)
+    print("DELETE RESULT")
+    print(result)
+    print("=" * 80)
+    if result.get("success"):
+        messages.success(
+            request,
+            f"{session.driver_mobile} removed successfully from SmartTrail."
+        )
+    else:
+        message = result.get("message", "Unable to delete tracking.")
+        if isinstance(message, dict):
+            message = str(message)
+        messages.error(
+            request,
+            message
+        )
+
+    return redirect("live_tracking_list")
+
+def send_consent(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    result = ConsentService.check_consent(session)
+
+    if result["success"]:
+        messages.success(request, "Consent status checked successfully.")
+    else:
+        messages.error(request, str(result["message"]))
+
+    return redirect("live_tracking_list")
+
+@login_required
+def check_consent(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    # --------------------------------
+    # CHECK CONSENT
+    # --------------------------------
+    result = ConsentService.check_consent(session)
+
+    if not result.get("success"):
+
+        messages.error(
+            request,
+            str(result.get(
+                "message",
+                "Unable to check consent."
+            ))
+        )
+
+        return redirect("live_tracking_list")
+
+    consent_status = result.get("status")
+
+    # --------------------------------
+    # CONSENT RECEIVED
+    # --------------------------------
+    if consent_status in [
+        "approved",
+        "accepted",
+        "consent_received",
+        "active"
+    ]:
+
+        session.consent_received = True
+        session.status = "consent_received"
+        session.save(
+            update_fields=[
+                "consent_received",
+                "status"
+            ]
+        )
+
+        # --------------------------------
+        # ACTIVATE TRACKING
+        # --------------------------------
+        modify_result = ModifyService.start_tracking(session)
+
+        if modify_result.get("success"):
+
+            session.tracking_enabled = True
+            session.status = "waiting_location"
+
+            session.save(
+                update_fields=[
+                    "tracking_enabled",
+                    "status"
+                ]
+            )
+
+            messages.success(
+                request,
+                "Consent received. Live tracking has been activated."
+            )
+
+        else:
+
+            messages.warning(
+                request,
+                "Consent received, but live tracking could not be activated: "
+                + str(
+                    modify_result.get(
+                        "message",
+                        "Modify API failed."
+                    )
+                )
+            )
+
+    else:
+
+        messages.warning(
+            request,
+            f"Consent Status : {consent_status}"
+        )
+
+    return redirect("live_tracking_list")
+def test_location(request, vehicle_id):
+    vehicle = Vehicle.objects.get(id=vehicle_id)
+    result = LocationService.get_location(
+        vehicle.driver_number
+    )
+    return JsonResponse(result)
+
+def live_tracking_list(request):
+
+    query = request.GET.get("q", "")
+
+    vehicles = Vehicle.objects.select_related(
+        "tracking_session",
+        "order__tracking"
+    ).filter(
+        tracking_session__isnull=False
+    ).exclude(
+        order__tracking__settled=True
+    ).order_by("-id")
+
+    if query:
+        vehicles = vehicles.filter(
+            Q(ftl_no__icontains=query) |
+            Q(vehicle_number__icontains=query) |
+            Q(driver_number__icontains=query)
+        )
+
+    return render(request, "live_tracking/list.html", {
+        "vehicles": vehicles
+    })
+
+def live_tracking_setup(request, vehicle_id):
+    vehicle = get_object_or_404(Vehicle, pk=vehicle_id)
+    session = TrackingSession.objects.filter(
+        vehicle=vehicle
+    ).first()
+    return render(
+        request,
+        "live_tracking/setup.html",
+        {
+            "vehicle": vehicle,
+            "session": session,
+        }
+    )
+
+def test_consent_auth(request):
+
+    result = ConsentAuthService.get_consent_token()
+
+    return JsonResponse(result)
+
+def test_tracking_auth(request):
+    result = TrackingAuthService.get_tracking_token()
+    print(type(result))
+    print(result)
+    return JsonResponse(result, safe=False)
+
+def api_token_status(request):
+    tracking = TrackingAuthService.get_tracking_token()
+    consent = ConsentAuthService.get_tracking_token()
+    return JsonResponse({
+        "tracking": tracking,
+        "consent": consent,
+    })
+
+def vehicle_live(request, session_id):
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+    return render(
+        request,
+        "live_tracking/vehicle_live.html",
+        {
+            "session": session,
+            "locations": session.locations.all(),
+        }
+    )
+
+def vehicle_history(request, pk):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=pk
+    )
+
+    locations = session.locations.all().order_by("-received_at")
+
+    # Keep only the latest record for each latitude/longitude
+    history = []
+    seen = set()
+
+    for location in locations:
+
+        key = (
+            location.latitude,
+            location.longitude
+        )
+
+        if key not in seen:
+            seen.add(key)
+            history.append(location)
+
+    return render(
+        request,
+        "live_tracking/history.html",
+        {
+            "session": session,
+            "history": history,
+        }
+    )
+
+def live_tracking_history(request,pk):
+
+    session = get_object_or_404(
+            TrackingSession,
+            pk=pk
+        )
+
+    locations = session.locations.all().order_by("-received_at")
+
+    # Keep only the latest record for each latitude/longitude
+    history = []
+    seen = set()
+
+    for location in locations:
+
+        key = (
+            location.latitude,
+            location.longitude
+        )
+
+        if key not in seen:
+            seen.add(key)
+            history.append(location)
+
+    return render(
+        request,
+        "live_tracking/history.html",
+        {
+            "session": session,
+            "history": history,
+        }
+    )
+
+def import_driver(request, vehicle_id):
+    vehicle = get_object_or_404(
+        Vehicle,
+        pk=vehicle_id
+    )
+    result = ImportService.import_driver(vehicle)
+    if result.get("success"):
+        if result.get("already_exists"):
+            messages.info(
+                request,
+                "Driver is already registered in Telenity. Using the existing tracking profile."
+            )
+        else:
+            messages.success(
+                request,
+                "Driver imported successfully into Telenity."
+            )
+        return redirect(
+            "live_tracking_setup",
+            vehicle_id=vehicle.id
+        )
+    error_message = result.get("message", "Import failed.")
+    if isinstance(error_message, dict):
+        if "errorMessage" in error_message:
+            error_message = error_message["errorMessage"]
+        elif "raw_response" in error_message:
+            error_message = error_message["raw_response"]
+        else:
+            error_message = str(error_message)
+    messages.error(
+        request,
+        error_message
+    )
+    return redirect(
+        "live_tracking_setup",
+        vehicle_id=vehicle.id
+    )
+
+def refresh_location(request, session_id):
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    print("\n")
+    print("=" * 80)
+    print("REFRESH LOCATION")
+    print("=" * 80)
+    print("Session ID       :", session.id)
+    print("Vehicle ID       :", session.vehicle_id)
+    print("Driver Mobile    :", session.driver_mobile)
+    print("Entity ID        :", session.entity_id)
+    print("Consent Received :", session.consent_received)
+    print("Current Status   :", session.status)
+    print("=" * 80)
+
+    # ---------------------------------------------------------
+    # 1. CONSENT CHECK
+    # ---------------------------------------------------------
+
+    if not session.consent_received:
+
+        messages.warning(
+            request,
+            "Driver consent has not been approved yet."
+        )
+
+        return redirect(
+            "vehicle_live",
+            session_id=session.id
+        )
+
+    # ---------------------------------------------------------
+    # 2. START TRACKING IF NOT ENABLED
+    # ---------------------------------------------------------
+
+    if not session.tracking_enabled:
+
+        print("=" * 80)
+        print("TRACKING NOT ENABLED")
+        print("Calling Modify API...")
+        print("=" * 80)
+
+        modify_result = ModifyService.start_tracking(session)
+
+        print("=" * 80)
+        print("MODIFY RESULT")
+        print(modify_result)
+        print("=" * 80)
+
+        if not modify_result.get("success"):
+
+            messages.error(
+                request,
+                f"Unable to start tracking: "
+                f"{modify_result.get('message', 'Unknown error')}"
+            )
+
+            return redirect(
+                "vehicle_live",
+                session_id=session.id
+            )
+
+        session.tracking_enabled = True
+        session.status = "active"
+        session.save()
+
+        messages.success(
+            request,
+            "Tracking started. Fetching vehicle location..."
+        )
+
+    # ---------------------------------------------------------
+    # 3. FETCH LOCATION
+    # ---------------------------------------------------------
+
+    result = LocationService.fetch_location(session)
+
+    print("=" * 80)
+    print("REFRESH LOCATION RESULT")
+    print(result)
+    print("=" * 80)
+
+    if result.get("success"):
+
+        response = result.get("response", {})
+
+        terminals = response.get("terminalLocation", [])
+
+        if terminals:
+
+            terminal = terminals[0]
+
+            current = terminal.get("currentLocation")
+
+            if current:
+
+                messages.success(
+                    request,
+                    "Vehicle location updated successfully."
+                )
+
+            else:
+
+                messages.info(
+                    request,
+                    "Tracking is enabled, but the current location has not been retrieved yet."
+                )
+
+        else:
+
+            messages.warning(
+                request,
+                "Location information is not available yet."
+            )
+
+    else:
+
+        messages.error(
+            request,
+            result.get(
+                "message",
+                "Unable to retrieve vehicle location."
+            )
+        )
+
+    # ---------------------------------------------------------
+    # 4. REDIRECT
+    # ---------------------------------------------------------
+
+    return redirect(
+        "vehicle_live",
+        session_id=session.id
+    )
+
+def tracking_history(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id
+    )
+
+    history = session.locations.all()
+
+    return render(
+        request,
+        "live_tracking/history.html",
+        {
+            "session": session,
+            "history": history
+        }
+    )
+
