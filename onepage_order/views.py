@@ -798,52 +798,262 @@ def onepageorder_edit(request, pk):
 # VEHICLE PAYMENTS
 # ============================================================
 
+from decimal import Decimal, InvalidOperation
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .models import Order, VehiclePayment
+
+
 @login_required
 def vehicle_payments(request):
 
+    # ---------------------------------------------------------
+    # Orders for dropdown
+    # ---------------------------------------------------------
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .order_by("-id")
+    )
+
+    # ---------------------------------------------------------
+    # Payment history
+    # ---------------------------------------------------------
     payments = (
         VehiclePayment.objects
-        .select_related("order")
-        .order_by("-paid_at")
+        .select_related("order", "order__customer")
+        .order_by("-paid_at", "-id")
     )
 
-    form = VehiclePaymentForm(
-        request.POST or None
-    )
-
+    # ---------------------------------------------------------
+    # SAVE PAYMENT
+    # ---------------------------------------------------------
     if request.method == "POST":
 
-        if form.is_valid():
+        try:
 
-            payment = form.save()
+            order_id = request.POST.get("order", "").strip()
+
+            vehicle_number = request.POST.get(
+                "vehicle_number", ""
+            ).strip().upper()
+
+            payment_type = request.POST.get(
+                "payment_type", ""
+            ).strip()
+
+            amount_value = request.POST.get(
+                "amount", ""
+            ).strip()
+
+            transaction_reference = request.POST.get(
+                "transaction_reference", ""
+            ).strip()
+
+
+            # =====================================================
+            # VALIDATE ORDER
+            # =====================================================
+
+            if not order_id:
+
+                messages.error(
+                    request,
+                    "Please select a Trip / Order."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/vehicle_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            order = get_object_or_404(
+                Order,
+                pk=order_id
+            )
+
+
+            # =====================================================
+            # VALIDATE VEHICLE NUMBER
+            # =====================================================
+
+            if not vehicle_number:
+
+                messages.error(
+                    request,
+                    "Vehicle Number is required."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/vehicle_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            # =====================================================
+            # VALIDATE PAYMENT TYPE
+            # =====================================================
+
+            valid_payment_types = {
+                "Advance",
+                "Balance",
+                "Others",
+            }
+
+            if payment_type not in valid_payment_types:
+
+                messages.error(
+                    request,
+                    "Please select a valid Payment Type."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/vehicle_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            # =====================================================
+            # VALIDATE AMOUNT
+            # =====================================================
+
+            try:
+
+                amount = Decimal(
+                    amount_value
+                )
+
+            except (
+                InvalidOperation,
+                ValueError,
+                TypeError
+            ):
+
+                messages.error(
+                    request,
+                    "Please enter a valid payment amount."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/vehicle_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            if amount <= 0:
+
+                messages.error(
+                    request,
+                    "Payment amount must be greater than zero."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/vehicle_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            # =====================================================
+            # SAVE PAYMENT
+            # =====================================================
+
+            with transaction.atomic():
+
+                payment = VehiclePayment.objects.create(
+
+                    order=order,
+
+                    vehicle_number=vehicle_number,
+
+                    payment_type=payment_type,
+
+                    amount=amount,
+
+                    transaction_reference=(
+                        transaction_reference
+                    ),
+
+                )
+
+
+            # =====================================================
+            # SUCCESS
+            # =====================================================
 
             messages.success(
                 request,
                 (
                     f"Vehicle payment of "
-                    f"₹{payment.amount:,.2f} saved successfully."
-                ),
+                    f"₹{payment.amount:,.2f} "
+                    f"saved successfully for "
+                    f"{order.trip_number}."
+                )
             )
 
             return redirect(
                 "vehicle_payments"
             )
 
-        messages.error(
-            request,
-            "Please correct the payment form.",
-        )
+
+        except Exception as e:
+
+            print(
+                "VEHICLE PAYMENT ERROR:",
+                repr(e)
+            )
+
+            messages.error(
+                request,
+                f"Unable to save payment: {str(e)}"
+            )
+
+            return render(
+                request,
+                "onepageorders/vehicle_payments.html",
+                {
+                    "orders": orders,
+                    "payments": payments,
+                }
+            )
+
+
+    # ---------------------------------------------------------
+    # GET
+    # ---------------------------------------------------------
 
     return render(
         request,
         "onepageorders/vehicle_payments.html",
         {
+            "orders": orders,
             "payments": payments,
-            "form": form,
-        },
+        }
     )
-
-
 # ============================================================
 # CUSTOMER PAYMENTS
 # ============================================================
