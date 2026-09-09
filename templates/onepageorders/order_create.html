@@ -417,7 +417,7 @@
          FORM
          ===================================================== -->
 
-    <form method="POST">
+g    <form method="POST">
 
         {% csrf_token %}
 
@@ -1540,24 +1540,24 @@
 
                 <!-- Send SMS -->
 
-                <!--
+            
                 <div class="order-form-row">
 
-                    <div class="order-form-label">
-                        Send SMS
-                    </div>
+                   <div class="mt-2">
 
-                    <div class="order-form-control">
+                <a
+                    href="{% url 'vehicle_live' order.tracking_session.pk %}"
+                    class="btn btn-primary btn-sm"
+                    id="liveTrackingBtn"
+                >
+                    <i class="bi bi-broadcast-pin me-1"></i>
+                    Open Live Tracking
+                </a>
 
-                        <input
-                            type="checkbox"
-                            name="send_sms"
-                        >
-
-                    </div>
+            </div>
 
                 </div>
-                -->
+            
 
 
                 <!-- Agreement / TDS -->

@@ -83,7 +83,7 @@ urlpatterns = [
     name="test_location",
 ),
 path(
-    "delete/<int:session_id>/",
+    "delete/<int:pk>/",
     views.delete_tracking,
     name="delete_tracking"
 ),

@@ -21,31 +21,61 @@ from django.db.models import Q
 from .services.modify_service import ModifyService
 from django.contrib.auth.decorators import login_required
 
-def delete_tracking(request, session_id):
+@login_required
+def delete_tracking(request, pk):
+
+    if request.method != "POST":
+        return redirect("live_tracking_list")
+
     session = get_object_or_404(
         TrackingSession,
-        pk=session_id
+        pk=pk
     )
+
+    # -----------------------------------------
+    # CHECK ENTITY ID
+    # -----------------------------------------
+    if not session.entity_id:
+        messages.warning(
+            request,
+            "Tracking entity ID is missing."
+        )
+        return redirect("live_tracking_list")
+
+    # -----------------------------------------
+    # CALL TELENITY DELETE API
+    # -----------------------------------------
     result = DeleteService.delete_tracking(session)
-    print("=" * 80)
-    print("DELETE RESULT")
-    print(result)
-    print("=" * 80)
+
     if result.get("success"):
+
+        # Keep local record but mark it deleted
+        session.status = "deleted"
+        session.tracking_enabled = False
+        session.save(
+            update_fields=[
+                "status",
+                "tracking_enabled",
+            ]
+        )
+
         messages.success(
             request,
-            f"{session.driver_mobile} removed successfully from SmartTrail."
+            f"Tracking deleted successfully for {session.vehicle.ftl_no}."
         )
+
     else:
-        message = result.get("message", "Unable to delete tracking.")
-        if isinstance(message, dict):
-            message = str(message)
+
         messages.error(
             request,
-            message
+            result.get(
+                "message",
+                "Unable to delete tracking."
+            )
         )
 
     return redirect("live_tracking_list")
+
 
 def send_consent(request, session_id):
 

@@ -476,7 +476,7 @@ class TrackingSession(models.Model):
    
     def __str__(self):
         return f"{self.order.trip_number}"
-    
+  
 class LiveLocation(models.Model):
 
     tracked = models.BooleanField(default=False)
