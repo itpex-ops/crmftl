@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
-from live_tracking.models import ApiToken
+from .models import ApiToken
 
 
 class ConsentAuthService:

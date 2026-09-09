@@ -1,29 +1,135 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
-from .forms import CustomerForm, OrderForm, VehiclePaymentForm, CustomerPaymentForm
-from .models import Order, VehiclePayment, CustomerPayment
-
-def onepageorder_list(request):
-    q=request.GET.get('q','').strip()
-    orders=Order.objects.select_related('customer').prefetch_related('vehicle_payments','customer_payments')
-    if q: orders=orders.filter(Q(trip_number__icontains=q)|Q(customer__name__icontains=q)|Q(vehicle_number__icontains=q)|Q(origin__icontains=q)|Q(destination__icontains=q))
-    return render(request,'onepageorders/order_list.html',{'orders':orders,'q':q})
-
-def onepageorder_create1(request):
-    if request.method=='POST':
-        customer_form=CustomerForm(request.POST); order_form=OrderForm(request.POST)
-        if customer_form.is_valid() and order_form.is_valid():
-            customer=customer_form.save(); order=order_form.save(commit=False); order.customer=customer; order.save()
-            messages.success(request,f'{order.trip_number} created successfully.'); return redirect('onepageorder_detail',pk=order.pk)
-    else: customer_form=CustomerForm(); order_form=OrderForm()
-    return render(request,'onepageorders/order_form.html',{'customer_form':customer_form,'order_form':order_form,'title':'Create Order'})
-
-from django.contrib import messages
 from django.db import transaction
-from django.shortcuts import render, redirect
+from django.db.models import Q, Prefetch
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import (
+    CustomerForm,
+    OrderForm,
+    VehiclePaymentForm,
+    CustomerPaymentForm,
+)
+
+from .models import (
+    Customer,
+    Order,
+    VehiclePayment,
+    CustomerPayment,
+    TrackingSession,
+    LiveLocation,
+)
+
+# Telenity services
+from live_tracking.services.auth_service import TrackingAuthService
+from live_tracking.services.consent_auth_service import ConsentAuthService
+from live_tracking.services.consent_service import ConsentService
+from live_tracking.services.import_service import ImportService
+from live_tracking.services.location_service import LocationService
+from live_tracking.services.modify_service import ModifyService
+from live_tracking.services.delete_service import DeleteService
+
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+
+def _safe_message(value: Any) -> str:
+    """
+    Convert API/service responses into a readable message.
+    """
+
+    if isinstance(value, dict):
+
+        if value.get("errorMessage"):
+            return str(value["errorMessage"])
+
+        if value.get("message"):
+            return str(value["message"])
+
+        if value.get("raw_response"):
+            return str(value["raw_response"])
+
+    return str(value)
+
+
+def _tracking_queryset():
+    """
+    Common TrackingSession queryset.
+
+    TrackingSession is linked to Order through:
+        TrackingSession.order
+    """
+
+    return (
+        TrackingSession.objects
+        .select_related(
+            "order",
+            "order__customer",
+        )
+        .prefetch_related(
+            Prefetch(
+                "locations",
+                queryset=LiveLocation.objects.order_by("-received_at"),
+            )
+        )
+    )
+
+
+# ============================================================
+# ORDER LIST
+# ============================================================
+
+
+@login_required
+def onepageorder_list(request):
+
+    query = request.GET.get("q", "").strip()
+
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .prefetch_related(
+            "vehicle_payments",
+            "customer_payments",
+        )
+        .order_by("-id")
+    )
+
+    if query:
+
+        orders = orders.filter(
+            Q(trip_number__icontains=query)
+            | Q(customer__name__icontains=query)
+            | Q(vehicle_number__icontains=query)
+            | Q(origin__icontains=query)
+            | Q(destination__icontains=query)
+        )
+
+    context = {
+        "orders": orders,
+        "q": query,
+    }
+
+    return render(
+        request,
+        "onepageorders/order_list.html",
+        context,
+    )
+
+
+# ============================================================
+# CREATE ORDER
+# ============================================================
+
+
+@login_required
 def onepageorder_create(request):
 
     if request.method == "POST":
@@ -31,45 +137,53 @@ def onepageorder_create(request):
         customer_form = CustomerForm(request.POST)
         order_form = OrderForm(request.POST)
 
-        if customer_form.is_valid() and order_form.is_valid():
+        if (
+            customer_form.is_valid()
+            and order_form.is_valid()
+        ):
 
             try:
+
                 with transaction.atomic():
 
-                    # Save customer
+                    # -----------------------------
+                    # Create Customer
+                    # -----------------------------
+
                     customer = customer_form.save()
 
-                    # Save order
+                    # -----------------------------
+                    # Create Order
+                    # -----------------------------
+
                     order = order_form.save(commit=False)
 
-                    # Link customer to order
                     order.customer = customer
 
-                    # Save order
                     order.save()
 
                 messages.success(
                     request,
-                    f"Order {order.trip_number} created successfully."
+                    f"Order {order.trip_number} created successfully.",
                 )
 
                 return redirect(
-                    "order_detail",
-                    pk=order.pk
+                    "onepageorder_detail",
+                    pk=order.pk,
                 )
 
-            except Exception as e:
+            except Exception as exc:
 
                 messages.error(
                     request,
-                    f"Order was not saved. Error: {str(e)}"
+                    f"Order was not saved: {exc}",
                 )
 
         else:
 
             messages.error(
                 request,
-                "Please correct the errors in the form."
+                "Please correct the errors in the form.",
             )
 
     else:
@@ -82,148 +196,493 @@ def onepageorder_create(request):
         "onepageorders/order_create.html",
         {
             "customer_form": customer_form,
-            "form": order_form,
-            "messages" : messages.get_messages(request),
-        }
+            "order_form": order_form,
+            "form": order_form,  # backward compatibility
+            "title": "Create Order",
+        },
     )
 
-def onepageorder_detail(request,pk):
-    order=get_object_or_404(Order.objects.prefetch_related('vehicle_payments','customer_payments'),pk=pk)
-    return render(request,'onepageorders/order_detail.html',{'order':order})
 
-def onepageorder_edit(request,pk):
-    order=get_object_or_404(Order,pk=pk)
-    if request.method=='POST':
-        form=OrderForm(request.POST,instance=order)
-        if form.is_valid(): form.save(); messages.success(request,'Order updated.'); return redirect('onepageorder_detail',pk=pk)
-    else: form=OrderForm(instance=order)
-    return render(request,'onepageorders/order_edit.html',{'form':form,'order':order})
+# ============================================================
+# ORDER DETAIL
+# ============================================================
 
-def vehicle_payments(request):
-    payments=VehiclePayment.objects.select_related('order').order_by('-paid_at')
-    form=VehiclePaymentForm(request.POST or None)
-    if request.method=='POST' and form.is_valid(): form.save(); messages.success(request,'Vehicle payment saved.'); return redirect('vehicle_payments')
-    return render(request,'onepageorders/vehicle_payments.html',{'payments':payments,'form':form})
 
-def customer_payments(request):
-    payments=CustomerPayment.objects.select_related('order','order__customer').order_by('-received_at')
-    form=CustomerPaymentForm(request.POST or None)
-    if request.method=='POST' and form.is_valid(): form.save(); messages.success(request,'Customer payment saved.'); return redirect('customer_payments')
-    return render(request,'onepageorders/customer_payments.html',{'payments':payments,'form':form})
+@login_required
+def onepageorder_detail(request, pk):
 
-def admin_margin(request):
-    orders=Order.objects.select_related('customer').prefetch_related('vehicle_payments','customer_payments')
-    return render(request,'onepageorders/admin_margin.html',{'orders':orders})
-
-from django.core.serializers import python
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.http import JsonResponse
-from django.utils import timezone
-import services as services
-from services.auth_service import TrackingAuthService
-from services.consent_auth_service import ConsentAuthService
-from services.import_service import ImportService
-from services.consent_service import ConsentService
-from services.location_service import LocationService
-from live_tracking.models import TrackingSession
-from live_tracking.services.delete_service import DeleteService
-from django.db.models import Q
-from services.modify_service import ModifyService
-from django.contrib.auth.decorators import login_required
-
-def delete_tracking(request, session_id):
-    session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
+    order = get_object_or_404(
+        Order.objects
+        .select_related("customer")
+        .prefetch_related(
+            "vehicle_payments",
+            "customer_payments",
+        ),
+        pk=pk,
     )
-    result = DeleteService.delete_tracking(session)
-    print("=" * 80)
-    print("DELETE RESULT")
-    print(result)
-    print("=" * 80)
-    if result.get("success"):
-        messages.success(
-            request,
-            f"{session.driver_mobile} removed successfully from SmartTrail."
+
+    tracking_session = (
+        TrackingSession.objects
+        .filter(order=order)
+        .first()
+    )
+
+    context = {
+        "order": order,
+        "tracking_session": tracking_session,
+    }
+
+    return render(
+        request,
+        "onepageorders/order_detail.html",
+        context,
+    )
+
+
+# ============================================================
+# EDIT ORDER
+# ============================================================
+
+
+@login_required
+def onepageorder_edit(request, pk):
+
+    order = get_object_or_404(
+        Order.objects.select_related("customer"),
+        pk=pk,
+    )
+
+    if request.method == "POST":
+
+        form = OrderForm(
+            request.POST,
+            instance=order,
         )
-    else:
-        message = result.get("message", "Unable to delete tracking.")
-        if isinstance(message, dict):
-            message = str(message)
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                f"{order.trip_number} updated successfully.",
+            )
+
+            return redirect(
+                "onepageorder_detail",
+                pk=order.pk,
+            )
+
         messages.error(
             request,
-            message
+            "Please correct the errors in the form.",
         )
 
-    return redirect("live_tracking_list")
+    else:
 
-def send_consent(request, session_id):
+        form = OrderForm(
+            instance=order,
+        )
 
-    session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
+    return render(
+        request,
+        "onepageorders/order_edit.html",
+        {
+            "form": form,
+            "order": order,
+        },
     )
 
-    result = ConsentService.check_consent(session)
 
-    if result["success"]:
-        messages.success(request, "Consent status checked successfully.")
+# ============================================================
+# VEHICLE PAYMENTS
+# ============================================================
+
+
+@login_required
+def vehicle_payments(request):
+
+    payments = (
+        VehiclePayment.objects
+        .select_related("order")
+        .order_by("-paid_at")
+    )
+
+    form = VehiclePaymentForm(
+        request.POST or None
+    )
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            payment = form.save()
+
+            messages.success(
+                request,
+                (
+                    f"Vehicle payment of "
+                    f"₹{payment.amount:,.2f} saved successfully."
+                ),
+            )
+
+            return redirect(
+                "vehicle_payments"
+            )
+
+        messages.error(
+            request,
+            "Please correct the payment form.",
+        )
+
+    return render(
+        request,
+        "onepageorders/vehicle_payments.html",
+        {
+            "payments": payments,
+            "form": form,
+        },
+    )
+
+
+# ============================================================
+# CUSTOMER PAYMENTS
+# ============================================================
+
+
+@login_required
+def customer_payments(request):
+
+    payments = (
+        CustomerPayment.objects
+        .select_related(
+            "order",
+            "order__customer",
+        )
+        .order_by("-received_at")
+    )
+
+    form = CustomerPaymentForm(
+        request.POST or None
+    )
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            payment = form.save()
+
+            messages.success(
+                request,
+                (
+                    f"Customer payment of "
+                    f"₹{payment.received_amount:,.2f} saved successfully."
+                ),
+            )
+
+            return redirect(
+                "customer_payments"
+            )
+
+        messages.error(
+            request,
+            "Please correct the payment form.",
+        )
+
+    return render(
+        request,
+        "onepageorders/customer_payments.html",
+        {
+            "payments": payments,
+            "form": form,
+        },
+    )
+
+
+# ============================================================
+# ADMIN MARGIN
+# ============================================================
+
+
+@login_required
+def admin_margin(request):
+
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .prefetch_related(
+            "vehicle_payments",
+            "customer_payments",
+        )
+        .order_by("-id")
+    )
+
+    return render(
+        request,
+        "onepageorders/admin_margin.html",
+        {
+            "orders": orders,
+        },
+    )
+
+
+# ============================================================
+# CREATE / GET TRACKING SESSION
+# ============================================================
+
+
+@login_required
+def tracking_setup(request, order_id):
+
+    order = get_object_or_404(
+        Order.objects.select_related("customer"),
+        pk=order_id,
+    )
+
+    session = (
+        TrackingSession.objects
+        .filter(order=order)
+        .first()
+    )
+
+    return render(
+        request,
+        "live_tracking/setup.html",
+        {
+            "order": order,
+            "session": session,
+        },
+    )
+
+
+# ============================================================
+# CREATE TRACKING SESSION FOR ORDER
+# ============================================================
+
+
+@login_required
+def create_tracking_session(request, order_id):
+
+    if request.method != "POST":
+
+        return redirect(
+            "live_tracking_setup",
+            order_id=order_id,
+        )
+
+    order = get_object_or_404(
+        Order.objects.select_related("customer"),
+        pk=order_id,
+    )
+
+    # --------------------------------------------------------
+    # Already exists
+    # --------------------------------------------------------
+
+    existing = (
+        TrackingSession.objects
+        .filter(order=order)
+        .first()
+    )
+
+    if existing:
+
+        messages.info(
+            request,
+            "Tracking session already exists for this order.",
+        )
+
+        return redirect(
+            "live_tracking_setup",
+            order_id=order.id,
+        )
+
+    # --------------------------------------------------------
+    # Driver mobile
+    # --------------------------------------------------------
+
+    driver_mobile = (
+        request.POST.get("driver_mobile")
+        or order.driver_number
+    )
+
+    if not driver_mobile:
+
+        messages.error(
+            request,
+            "Driver mobile number is required.",
+        )
+
+        return redirect(
+            "live_tracking_setup",
+            order_id=order.id,
+        )
+
+    # --------------------------------------------------------
+    # Tracking reference
+    # --------------------------------------------------------
+
+    tracking_reference = (
+        request.POST.get("tracking_reference")
+        or order.trip_number
+    )
+
+    try:
+
+        with transaction.atomic():
+
+            session = TrackingSession.objects.create(
+                order=order,
+                tracking_reference=tracking_reference,
+                driver_mobile=driver_mobile,
+                status="not_enabled",
+                tracking_enabled=False,
+                consent_received=False,
+            )
+
+        messages.success(
+            request,
+            "Tracking session created successfully.",
+        )
+
+    except Exception as exc:
+
+        messages.error(
+            request,
+            f"Unable to create tracking session: {exc}",
+        )
+
+    return redirect(
+        "live_tracking_setup",
+        order_id=order.id,
+    )
+
+
+# ============================================================
+# IMPORT DRIVER TO TELENITY
+# ============================================================
+
+
+@login_required
+def import_driver(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession.objects.select_related("order"),
+        pk=session_id,
+    )
+
+    result = ImportService.import_driver(session)
+
+    if result.get("success"):
+
+        if result.get("already_exists"):
+
+            messages.info(
+                request,
+                (
+                    "Driver is already registered in "
+                    "Telenity. Existing tracking profile will be used."
+                ),
+            )
+
+        else:
+
+            messages.success(
+                request,
+                "Driver imported successfully into Telenity.",
+            )
+
+        session.status = "imported"
+        session.save(
+            update_fields=["status"]
+        )
+
     else:
-        messages.error(request, str(result["message"]))
 
-    return redirect("live_tracking_list")
+        error_message = _safe_message(
+            result.get(
+                "message",
+                "Driver import failed.",
+            )
+        )
+
+        messages.error(
+            request,
+            error_message,
+        )
+
+    return redirect(
+        "tracking_setup",
+        order_id=session.order_id,
+    )
+
+
+# ============================================================
+# CHECK CONSENT
+# ============================================================
+
 
 @login_required
 def check_consent(request, session_id):
 
     session = get_object_or_404(
         TrackingSession,
-        pk=session_id
+        pk=session_id,
     )
 
-    # --------------------------------
-    # CHECK CONSENT
-    # --------------------------------
-    result = ConsentService.check_consent(session)
+    result = ConsentService.check_consent(
+        session
+    )
 
     if not result.get("success"):
 
         messages.error(
             request,
-            str(result.get(
-                "message",
-                "Unable to check consent."
-            ))
+            _safe_message(
+                result.get(
+                    "message",
+                    "Unable to check consent.",
+                )
+            ),
         )
 
-        return redirect("live_tracking_list")
+        return redirect(
+            "vehicle_live",
+            session_id=session.id,
+        )
 
-    consent_status = result.get("status")
+    consent_status = result.get(
+        "status"
+    )
 
-    # --------------------------------
-    # CONSENT RECEIVED
-    # --------------------------------
-    if consent_status in [
+    approved_statuses = {
         "approved",
         "accepted",
         "consent_received",
-        "active"
-    ]:
+        "active",
+    }
+
+    if consent_status in approved_statuses:
 
         session.consent_received = True
         session.status = "consent_received"
+
         session.save(
             update_fields=[
                 "consent_received",
-                "status"
+                "status",
             ]
         )
 
-        # --------------------------------
-        # ACTIVATE TRACKING
-        # --------------------------------
-        modify_result = ModifyService.start_tracking(session)
+        # --------------------------------------------
+        # Start tracking
+        # --------------------------------------------
+
+        modify_result = (
+            ModifyService.start_tracking(
+                session
+            )
+        )
 
         if modify_result.get("success"):
 
@@ -233,371 +692,435 @@ def check_consent(request, session_id):
             session.save(
                 update_fields=[
                     "tracking_enabled",
-                    "status"
+                    "status",
                 ]
             )
 
             messages.success(
                 request,
-                "Consent received. Live tracking has been activated."
+                "Consent received. Live tracking activated.",
             )
 
         else:
 
             messages.warning(
                 request,
-                "Consent received, but live tracking could not be activated: "
-                + str(
-                    modify_result.get(
-                        "message",
-                        "Modify API failed."
+                (
+                    "Consent received, but tracking could not "
+                    "be activated: "
+                    + _safe_message(
+                        modify_result.get(
+                            "message",
+                            "Modify API failed.",
+                        )
                     )
-                )
+                ),
             )
 
     else:
 
+        session.status = (
+            "waiting_location"
+            if session.tracking_enabled
+            else "sms_sent"
+        )
+
+        session.save(
+            update_fields=["status"]
+        )
+
         messages.warning(
             request,
-            f"Consent Status : {consent_status}"
+            f"Consent status: {consent_status}",
         )
 
-    return redirect("live_tracking_list")
-def test_location(request, vehicle_id):
-    vehicle = Vehicle.objects.get(id=vehicle_id)
-    result = LocationService.get_location(
-        vehicle.driver_number
+    return redirect(
+        "vehicle_live",
+        session_id=session.id,
     )
-    return JsonResponse(result)
 
+
+# ============================================================
+# LIVE TRACKING LIST
+# ============================================================
+
+
+@login_required
 def live_tracking_list(request):
 
-    query = request.GET.get("q", "")
+    query = request.GET.get(
+        "q",
+        "",
+    ).strip()
 
-    vehicles = Vehicle.objects.select_related(
-        "tracking_session",
-        "order__tracking"
-    ).filter(
-        tracking_session__isnull=False
-    ).exclude(
-        order__tracking__settled=True
-    ).order_by("-id")
+    sessions = (
+        _tracking_queryset()
+        .order_by("-id")
+    )
 
     if query:
-        vehicles = vehicles.filter(
-            Q(ftl_no__icontains=query) |
-            Q(vehicle_number__icontains=query) |
-            Q(driver_number__icontains=query)
+
+        sessions = sessions.filter(
+            Q(order__trip_number__icontains=query)
+            | Q(order__customer__name__icontains=query)
+            | Q(order__vehicle_number__icontains=query)
+            | Q(order__driver_number__icontains=query)
+            | Q(driver_mobile__icontains=query)
         )
 
-    return render(request, "live_tracking/list.html", {
-        "vehicles": vehicles
-    })
-
-def live_tracking_setup(request, vehicle_id):
-    vehicle = get_object_or_404(Vehicle, pk=vehicle_id)
-    session = TrackingSession.objects.filter(
-        vehicle=vehicle
-    ).first()
     return render(
         request,
-        "live_tracking/setup.html",
+        "live_tracking/list.html",
         {
-            "vehicle": vehicle,
-            "session": session,
-        }
+            "sessions": sessions,
+            "query": query,
+        },
     )
 
-def test_consent_auth(request):
 
-    result = ConsentAuthService.get_consent_token()
+# ============================================================
+# LIVE TRACKING PAGE
+# ============================================================
 
-    return JsonResponse(result)
 
-def test_tracking_auth(request):
-    result = TrackingAuthService.get_tracking_token()
-    print(type(result))
-    print(result)
-    return JsonResponse(result, safe=False)
-
-def api_token_status(request):
-    tracking = TrackingAuthService.get_tracking_token()
-    consent = ConsentAuthService.get_tracking_token()
-    return JsonResponse({
-        "tracking": tracking,
-        "consent": consent,
-    })
-
+@login_required
 def vehicle_live(request, session_id):
+
     session = get_object_or_404(
-        TrackingSession,
-        pk=session_id
+        _tracking_queryset(),
+        pk=session_id,
     )
+
+    locations = (
+        session.locations
+        .all()
+        .order_by("-received_at")
+    )
+
+    latest_location = (
+        locations.first()
+    )
+
     return render(
         request,
         "live_tracking/vehicle_live.html",
         {
             "session": session,
-            "locations": session.locations.all(),
-        }
+            "locations": locations,
+            "latest_location": latest_location,
+        },
     )
 
-def vehicle_history(request, pk):
 
-    session = get_object_or_404(
-        TrackingSession,
-        pk=pk
-    )
+# ============================================================
+# REFRESH LOCATION
+# ============================================================
 
-    locations = session.locations.all().order_by("-received_at")
 
-    # Keep only the latest record for each latitude/longitude
-    history = []
-    seen = set()
-
-    for location in locations:
-
-        key = (
-            location.latitude,
-            location.longitude
-        )
-
-        if key not in seen:
-            seen.add(key)
-            history.append(location)
-
-    return render(
-        request,
-        "live_tracking/history.html",
-        {
-            "session": session,
-            "history": history,
-        }
-    )
-
-def live_tracking_history(request,pk):
-
-    session = get_object_or_404(
-            TrackingSession,
-            pk=pk
-        )
-
-    locations = session.locations.all().order_by("-received_at")
-
-    # Keep only the latest record for each latitude/longitude
-    history = []
-    seen = set()
-
-    for location in locations:
-
-        key = (
-            location.latitude,
-            location.longitude
-        )
-
-        if key not in seen:
-            seen.add(key)
-            history.append(location)
-
-    return render(
-        request,
-        "live_tracking/history.html",
-        {
-            "session": session,
-            "history": history,
-        }
-    )
-
-def import_driver(request, vehicle_id):
-    vehicle = get_object_or_404(
-        Vehicle,
-        pk=vehicle_id
-    )
-    result = ImportService.import_driver(vehicle)
-    if result.get("success"):
-        if result.get("already_exists"):
-            messages.info(
-                request,
-                "Driver is already registered in Telenity. Using the existing tracking profile."
-            )
-        else:
-            messages.success(
-                request,
-                "Driver imported successfully into Telenity."
-            )
-        return redirect(
-            "live_tracking_setup",
-            vehicle_id=vehicle.id
-        )
-    error_message = result.get("message", "Import failed.")
-    if isinstance(error_message, dict):
-        if "errorMessage" in error_message:
-            error_message = error_message["errorMessage"]
-        elif "raw_response" in error_message:
-            error_message = error_message["raw_response"]
-        else:
-            error_message = str(error_message)
-    messages.error(
-        request,
-        error_message
-    )
-    return redirect(
-        "live_tracking_setup",
-        vehicle_id=vehicle.id
-    )
-
+@login_required
 def refresh_location(request, session_id):
+
     session = get_object_or_404(
         TrackingSession,
-        pk=session_id
+        pk=session_id,
     )
 
-    print("\n")
-    print("=" * 80)
-    print("REFRESH LOCATION")
-    print("=" * 80)
-    print("Session ID       :", session.id)
-    print("Vehicle ID       :", session.vehicle_id)
-    print("Driver Mobile    :", session.driver_mobile)
-    print("Entity ID        :", session.entity_id)
-    print("Consent Received :", session.consent_received)
-    print("Current Status   :", session.status)
-    print("=" * 80)
-
-    # ---------------------------------------------------------
-    # 1. CONSENT CHECK
-    # ---------------------------------------------------------
+    # --------------------------------------------------------
+    # 1. Consent
+    # --------------------------------------------------------
 
     if not session.consent_received:
 
         messages.warning(
             request,
-            "Driver consent has not been approved yet."
+            "Driver consent has not been approved yet.",
         )
 
         return redirect(
             "vehicle_live",
-            session_id=session.id
+            session_id=session.id,
         )
 
-    # ---------------------------------------------------------
-    # 2. START TRACKING IF NOT ENABLED
-    # ---------------------------------------------------------
+    # --------------------------------------------------------
+    # 2. Activate tracking if necessary
+    # --------------------------------------------------------
 
     if not session.tracking_enabled:
 
-        print("=" * 80)
-        print("TRACKING NOT ENABLED")
-        print("Calling Modify API...")
-        print("=" * 80)
-
-        modify_result = ModifyService.start_tracking(session)
-
-        print("=" * 80)
-        print("MODIFY RESULT")
-        print(modify_result)
-        print("=" * 80)
+        modify_result = (
+            ModifyService.start_tracking(
+                session
+            )
+        )
 
         if not modify_result.get("success"):
 
             messages.error(
                 request,
-                f"Unable to start tracking: "
-                f"{modify_result.get('message', 'Unknown error')}"
+                (
+                    "Unable to start tracking: "
+                    + _safe_message(
+                        modify_result.get(
+                            "message",
+                            "Unknown error.",
+                        )
+                    )
+                ),
             )
 
             return redirect(
                 "vehicle_live",
-                session_id=session.id
+                session_id=session.id,
             )
 
         session.tracking_enabled = True
         session.status = "active"
-        session.save()
 
-        messages.success(
-            request,
-            "Tracking started. Fetching vehicle location..."
+        session.save(
+            update_fields=[
+                "tracking_enabled",
+                "status",
+            ]
         )
 
-    # ---------------------------------------------------------
-    # 3. FETCH LOCATION
-    # ---------------------------------------------------------
+    # --------------------------------------------------------
+    # 3. Fetch location
+    # --------------------------------------------------------
 
-    result = LocationService.fetch_location(session)
-
-    print("=" * 80)
-    print("REFRESH LOCATION RESULT")
-    print(result)
-    print("=" * 80)
+    result = LocationService.fetch_location(
+        session
+    )
 
     if result.get("success"):
 
-        response = result.get("response", {})
+        response = result.get(
+            "response",
+            {},
+        )
 
-        terminals = response.get("terminalLocation", [])
+        terminals = response.get(
+            "terminalLocation",
+            [],
+        )
 
         if terminals:
 
             terminal = terminals[0]
 
-            current = terminal.get("currentLocation")
+            current = terminal.get(
+                "currentLocation"
+            )
 
             if current:
 
                 messages.success(
                     request,
-                    "Vehicle location updated successfully."
+                    "Vehicle location updated successfully.",
                 )
 
             else:
 
                 messages.info(
                     request,
-                    "Tracking is enabled, but the current location has not been retrieved yet."
+                    (
+                        "Tracking is enabled, but the "
+                        "current location is not available yet."
+                    ),
                 )
 
         else:
 
             messages.warning(
                 request,
-                "Location information is not available yet."
+                "Location information is not available yet.",
             )
 
     else:
 
         messages.error(
             request,
-            result.get(
-                "message",
-                "Unable to retrieve vehicle location."
-            )
+            _safe_message(
+                result.get(
+                    "message",
+                    "Unable to retrieve vehicle location.",
+                )
+            ),
         )
-
-    # ---------------------------------------------------------
-    # 4. REDIRECT
-    # ---------------------------------------------------------
 
     return redirect(
         "vehicle_live",
-        session_id=session.id
+        session_id=session.id,
     )
 
+
+# ============================================================
+# TRACKING HISTORY
+# ============================================================
+
+
+@login_required
 def tracking_history(request, session_id):
 
     session = get_object_or_404(
         TrackingSession,
-        pk=session_id
+        pk=session_id,
     )
 
-    history = session.locations.all()
+    history = (
+        session.locations
+        .all()
+        .order_by("-received_at")
+    )
 
     return render(
         request,
         "live_tracking/history.html",
         {
             "session": session,
-            "history": history
-        }
+            "history": history,
+        },
     )
 
+
+# ============================================================
+# API TOKEN TEST
+# ============================================================
+
+
+@login_required
+def test_tracking_auth(request):
+
+    result = (
+        TrackingAuthService
+        .get_tracking_token()
+    )
+
+    return JsonResponse(
+        result,
+        safe=False,
+    )
+
+
+@login_required
+def test_consent_auth(request):
+
+    result = (
+        ConsentAuthService
+        .get_consent_token()
+    )
+
+    return JsonResponse(
+        result,
+        safe=False,
+    )
+
+
+@login_required
+def api_token_status(request):
+
+    tracking = (
+        TrackingAuthService
+        .get_tracking_token()
+    )
+
+    consent = (
+        ConsentAuthService
+        .get_consent_token()
+    )
+
+    return JsonResponse(
+        {
+            "tracking": tracking,
+            "consent": consent,
+        },
+        safe=False,
+    )
+
+
+# ============================================================
+# TEST LOCATION
+# ============================================================
+
+
+@login_required
+def test_location(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=session_id,
+    )
+
+    result = LocationService.get_location(
+        session.driver_mobile
+    )
+
+    return JsonResponse(
+        result,
+        safe=False,
+    )
+
+
+# ============================================================
+# DELETE TRACKING
+# ============================================================
+
+
+@login_required
+def delete_tracking(request, session_id):
+
+    session = get_object_or_404(
+        TrackingSession.objects.select_related("order"),
+        pk=session_id,
+    )
+
+    if request.method != "POST":
+
+        messages.error(
+            request,
+            "Invalid request.",
+        )
+
+        return redirect(
+            "live_tracking_list"
+        )
+
+    result = (
+        DeleteService
+        .delete_tracking(session)
+    )
+
+    if result.get("success"):
+
+        session.tracking_enabled = False
+        session.status = "deleted"
+
+        session.save(
+            update_fields=[
+                "tracking_enabled",
+                "status",
+            ]
+        )
+
+        messages.success(
+            request,
+            (
+                f"{session.driver_mobile} "
+                "tracking removed successfully."
+            ),
+        )
+
+    else:
+
+        messages.error(
+            request,
+            _safe_message(
+                result.get(
+                    "message",
+                    "Unable to delete tracking.",
+                )
+            ),
+        )
+
+    return redirect(
+        "live_tracking_list"
+    )
