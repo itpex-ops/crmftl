@@ -394,7 +394,7 @@
 
                                     {% if session.entity_id %}
 
-                                        {% if session.status != "active" and session.status != "deleted" %}
+                                        {% if vehicle.is_trip_completed %}
 
                                             <form method="post"
                                                   action="{% url 'delete_tracking' session.pk %}"

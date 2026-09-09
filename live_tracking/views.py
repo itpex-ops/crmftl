@@ -182,6 +182,7 @@ def check_consent(request, session_id):
         )
 
     return redirect("live_tracking_list")
+
 def test_location(request, vehicle_id):
     vehicle = Vehicle.objects.get(id=vehicle_id)
     result = LocationService.get_location(
