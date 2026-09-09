@@ -826,7 +826,7 @@ def onepageorder_edit(request, pk):
 
             return render(
                 request,
-                "onepage_order/order_edit.html",
+                "onepageorders/order_edit.html",
                 {
                     "order": order
                 }
@@ -835,7 +835,7 @@ def onepageorder_edit(request, pk):
 
     return render(
         request,
-        "onepage_order/order_edit.html",
+        "onepageorders/order_edit.html",
         {
             "order": order
         }
