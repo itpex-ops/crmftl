@@ -917,7 +917,7 @@ def admin_margin(request):
 
     return render(
         request,
-        "onepage_order/admin_margin.html",
+        "onepageorders/admin_margin.html",
         {
             "orders": orders,
         },
