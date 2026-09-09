@@ -335,16 +335,7 @@ def import_driver(request, vehicle_id):
         vehicle_id=vehicle.id
     )
 
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-
-from live_tracking.models import TrackingSession
-from live_tracking.services.location_service import LocationService
-from live_tracking.services.modify_service import ModifyService
-
-
 def refresh_location(request, session_id):
-
     session = get_object_or_404(
         TrackingSession,
         pk=session_id
