@@ -33,7 +33,7 @@ from live_tracking.services.import_service import ImportService
 from live_tracking.services.location_service import LocationService
 from live_tracking.services.modify_service import ModifyService
 from live_tracking.services.delete_service import DeleteService
-
+from datetime import datetime
 
 # ============================================================
 # HELPER FUNCTIONS
@@ -127,16 +127,6 @@ def onepageorder_list(request):
 # ============================================================
 # CREATE ORDER
 # ============================================================
-from decimal import Decimal
-from datetime import datetime
-
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.shortcuts import render, redirect
-
-from .models import Customer, Order
-
 
 def decimal_value(value, default="0.00"):
     """
@@ -445,53 +435,31 @@ def onepageorder_create(request):
 # ============================================================
 # ORDER DETAIL
 # ============================================================
-
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
+from .models import Order
 @login_required
 def onepageorder_detail(request, pk):
 
     order = get_object_or_404(
-        Order.objects
-        .select_related("customer")
-        .prefetch_related(
-            "vehicle_payments",
-            "customer_payments",
-        ),
-        pk=pk,
+        Order.objects.select_related("customer"),
+        pk=pk
     )
-
-    tracking_session = (
-        TrackingSession.objects
-        .filter(order=order)
-        .first()
-    )
-
-    context = {
-        "order": order,
-        "tracking_session": tracking_session,
-    }
 
     return render(
         request,
-        "onepageorders/order_detail.html",
-        context,
+        "onepage_order/order_detail.html",
+        {
+            "order": order,
+        }
     )
-
-
 # ============================================================
 # EDIT ORDER
 # ============================================================
 
 
 from decimal import Decimal
-from datetime import datetime
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.shortcuts import get_object_or_404, render, redirect
-
-from .models import Customer, Order
 
 
 def edit_decimal(value, default="0.00"):
