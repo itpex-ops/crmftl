@@ -58,7 +58,6 @@ def _safe_message(value: Any) -> str:
 
     return str(value)
 
-
 def _tracking_queryset():
     """
     Common TrackingSession queryset.
@@ -80,12 +79,6 @@ def _tracking_queryset():
             )
         )
     )
-
-
-# ============================================================
-# ORDER LIST
-# ============================================================
-
 
 @login_required
 def onepageorder_list(request):
@@ -123,11 +116,6 @@ def onepageorder_list(request):
         context,
     )
 
-
-# ============================================================
-# CREATE ORDER
-# ============================================================
-
 def decimal_value(value, default="0.00"):
     """
     Convert empty/invalid numeric values safely to Decimal.
@@ -152,7 +140,6 @@ def int_value(value, default=0):
         return int(value)
     except (ValueError, TypeError):
         return default
-
 
 def date_value(value):
     """
@@ -435,9 +422,7 @@ def onepageorder_create(request):
 # ============================================================
 # ORDER DETAIL
 # ============================================================
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
-from .models import Order
+
 @login_required
 def onepageorder_detail(request, pk):
 
@@ -448,7 +433,7 @@ def onepageorder_detail(request, pk):
 
     return render(
         request,
-        "onepage_order/order_detail.html",
+        "onepageorders/order_detail.html",
         {
             "order": order,
         }
@@ -543,7 +528,7 @@ def onepageorder_edit(request, pk):
 
                     return render(
                         request,
-                        "onepage_order/order_edit.html",
+                        "onepageorders/order_edit.html",
                         {
                             "order": order
                         }
