@@ -1,11 +1,750 @@
 {% extends "layouts/base.html" %}
+
+{% block title %}Vehicle Payments{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-<h3>Vehicle Payments</h3>
-<div class="card p-4 mb-4 mt-4">
-    <form method="post">
-        {% csrf_token %}
-        <div class="row g-3">{% for f in form %}
-            <div class="col-md-4">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div>
-            <button class="btn btn-primary mt-3">Make Payment</button></form></div><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Trip</th><th>Vehicle</th><th>Type</th><th>Amount</th><th>Transaction</th></tr></thead><tbody>{% for p in payments %}<tr><td>{{ p.order.trip_number }}</td><td>{{ p.vehicle_number }}</td><td>{{ p.payment_type }}</td><td>₹{{ p.amount }}</td><td>{{ p.transaction_reference }}</td></tr>{% empty %}<tr><td colspan="5">No payments.</td></tr>{% endfor %}</tbody></table></div></div>
-</div>{% endblock %}
+
+<style>
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.veh-page {
+    width: 100%;
+    padding: 22px 28px 40px;
+
+    background: #f8f9fb;
+
+    box-sizing: border-box;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.veh-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.veh-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.veh-subtitle {
+    margin: 4px 0 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #8a9199;
+}
+
+
+/* =========================================================
+   FORM CARD
+   ========================================================= */
+
+.veh-form-card {
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.veh-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px 18px;
+}
+
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.veh-field {
+    min-width: 0;
+}
+
+.veh-field label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    font-weight: 500;
+
+    color: #495057;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.veh-field input,
+.veh-field select {
+
+    width: 100%;
+
+    height: 38px;
+
+    padding: 6px 9px;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #343a40;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.veh-field input:focus,
+.veh-field select:focus {
+
+    border-color: #FDB81B;
+
+    box-shadow:
+        0 0 0 3px rgba(253, 184, 27, 0.12);
+
+}
+
+
+/* =========================================================
+   BUTTON AREA
+   ========================================================= */
+
+.veh-form-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    margin-top: 16px;
+}
+
+
+.veh-payment-btn {
+
+    min-width: 140px;
+
+    height: 38px;
+
+    padding: 0 18px;
+
+    border: 1px solid #0d6efd;
+
+    border-radius: 6px;
+
+    background: #0d6efd;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+.veh-payment-btn:hover {
+
+    background: #0b5ed7;
+
+    border-color: #0a58ca;
+}
+
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.veh-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.veh-table {
+
+    width: 100%;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.veh-table thead th {
+
+    padding: 11px 10px;
+
+    background: #f3f4f6;
+
+    border-bottom: 1px solid #dfe3e8;
+
+    color: #343a40;
+
+    font-size: 10.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.veh-table tbody td {
+
+    padding: 11px 10px;
+
+    border-bottom: 1px solid #eef0f2;
+
+    color: #555e68;
+
+    vertical-align: middle;
+}
+
+.veh-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.veh-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   TRIP
+   ========================================================= */
+
+.trip-number {
+
+    font-weight: 600;
+
+    color: #212529;
+}
+
+
+/* =========================================================
+   AMOUNT
+   ========================================================= */
+
+.amount {
+
+    text-align: right;
+
+    white-space: nowrap;
+
+    font-weight: 600;
+
+    color: #343a40;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-row {
+
+    padding: 35px 20px !important;
+
+    text-align: center;
+
+    color: #8a9199 !important;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+.veh-message {
+
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #495057;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .veh-page {
+        padding: 18px 15px 30px;
+    }
+
+    .veh-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .veh-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .veh-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+}
+
+</style>
+
+
+<div class="veh-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="veh-header">
+
+        <div>
+
+            <h1 class="veh-title">
+                Vehicle Payments
+            </h1>
+
+            <p class="veh-subtitle">
+                Manage vehicle payments.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="veh-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         PAYMENT FORM
+         ===================================================== -->
+
+    <div class="veh-form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="veh-form-grid">
+
+
+                <!-- =========================================
+                     ORDER
+                     ========================================= -->
+
+                <div class="veh-field">
+
+                    <label for="order">
+                        Trip / Order
+                    </label>
+
+                    <select
+                        id="order"
+                        name="order"
+                        required
+                    >
+
+                        <option value="">
+                            Select Trip
+                        </option>
+
+                        {% for order in orders %}
+
+                            <option
+                                value="{{ order.pk }}"
+                                {% if request.POST.order == order.pk|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ order.trip_number }}
+                                -
+                                {{ order.origin }}
+                                → {{ order.destination }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     VEHICLE NUMBER
+                     ========================================= -->
+
+                <div class="veh-field">
+
+                    <label for="vehicle_number">
+                        Vehicle Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="vehicle_number"
+                        name="vehicle_number"
+                        value="{{ request.POST.vehicle_number|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT TYPE
+                     ========================================= -->
+
+                <div class="veh-field">
+
+                    <label for="payment_type">
+                        Payment Type
+                    </label>
+
+                    <select
+                        id="payment_type"
+                        name="payment_type"
+                        required
+                    >
+
+                        <option value="">
+                            Select Payment Type
+                        </option>
+
+                        <option
+                            value="Advance"
+                            {% if request.POST.payment_type == "Advance" %}
+                                selected
+                            {% endif %}
+                        >
+                            Advance
+                        </option>
+
+                        <option
+                            value="Balance"
+                            {% if request.POST.payment_type == "Balance" %}
+                                selected
+                            {% endif %}
+                        >
+                            Balance
+                        </option>
+
+                        <option
+                            value="Others"
+                            {% if request.POST.payment_type == "Others" %}
+                                selected
+                            {% endif %}
+                        >
+                            Others
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     AMOUNT
+                     ========================================= -->
+
+                <div class="veh-field">
+
+                    <label for="amount">
+                        Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        step="0.01"
+                        min="0"
+                        value="{{ request.POST.amount|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     TRANSACTION
+                     ========================================= -->
+
+                <div class="veh-field">
+
+                    <label for="transaction_reference">
+                        Transaction Reference
+                    </label>
+
+                    <input
+                        type="text"
+                        id="transaction_reference"
+                        name="transaction_reference"
+                        value="{{ request.POST.transaction_reference|default:'' }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BUTTON
+                 ================================================= -->
+
+            <div class="veh-form-actions">
+
+                <button
+                    type="submit"
+                    class="veh-payment-btn"
+                >
+
+                    <i class="bi bi-credit-card me-1"></i>
+
+                    Make Payment
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAYMENT HISTORY
+         ===================================================== -->
+
+    <div class="veh-card">
+
+        <div class="table-responsive">
+
+            <table class="veh-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Trip
+                        </th>
+
+                        <th>
+                            Vehicle
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th class="text-end">
+                            Amount
+                        </th>
+
+                        <th>
+                            Transaction
+                        </th>
+
+                        <th>
+                            Paid At
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for p in payments %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="trip-number">
+                                {{ p.order.trip_number }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            {{ p.vehicle_number|default:"-" }}
+                        </td>
+
+
+                        <td>
+                            {{ p.payment_type|default:"-" }}
+                        </td>
+
+
+                        <td class="amount">
+
+                            ₹{{ p.amount|floatformat:2 }}
+
+                        </td>
+
+
+                        <td>
+                            {{ p.transaction_reference|default:"-" }}
+                        </td>
+
+
+                        <td>
+                            {{ p.paid_at|date:"d/m/Y H:i" }}
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="empty-row"
+                        >
+                            No vehicle payments found.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

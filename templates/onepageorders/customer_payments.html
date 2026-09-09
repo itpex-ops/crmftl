@@ -1,12 +1,838 @@
 {% extends "layouts/base.html" %}
 
-{% block content %}
-<div class="container py-4">
-    {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+{% block title %}Customer Payments{% endblock %}
 
-<h3>Customer Payments</h3>
-<div class="card p-4 mb-4"><form method="post">{% csrf_token %}<div class="row g-3">{% for f in form %}<div class="col-md-4">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div><button class="btn btn-primary mt-3">Save Receipt</button></form></div><div class="card"><div class="table-responsive"><table class="table"><thead><tr><th>Trip</th><th>Customer</th><th>Selling</th><th>Received</th><th>Status</th><th>Mode</th><th>UTR</th></tr></thead><tbody>{% for p in payments %}<tr><td>{{ p.order.trip_number }}</td><td>{{ p.order.customer.name }}</td><td>₹{{ p.selling_amount }}</td><td>₹{{ p.received_amount }}</td><td>{{ p.status }}</td><td>{{ p.received_through }}</td><td>{{ p.utr_details }}</td></tr>{% empty %}<tr><td colspan="7">No receipts.</td></tr>{% endfor %}</tbody></table></div></div>
-{% endblock %}
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.cpay-page {
+    width: 100%;
+    padding: 22px 28px 40px;
+
+    background: #f8f9fb;
+
+    box-sizing: border-box;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.cpay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.cpay-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.cpay-subtitle {
+    margin: 4px 0 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #8a9199;
+}
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.cpay-message {
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #495057;
+}
+
+
+/* =========================================================
+   FORM CARD
+   ========================================================= */
+
+.cpay-form-card {
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.cpay-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px 18px;
+}
+
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.cpay-field {
+    min-width: 0;
+}
+
+.cpay-field label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    font-weight: 500;
+
+    color: #495057;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.cpay-field input,
+.cpay-field select {
+
+    width: 100%;
+
+    height: 38px;
+
+    padding: 6px 9px;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #343a40;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cpay-field input:focus,
+.cpay-field select:focus {
+
+    border-color: #FDB81B;
+
+    box-shadow:
+        0 0 0 3px rgba(253, 184, 27, 0.12);
+}
+
+
+/* =========================================================
+   PAYMENT BUTTON
+   ========================================================= */
+
+.cpay-form-actions {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    margin-top: 16px;
+}
+
+.cpay-save-btn {
+
+    min-width: 140px;
+
+    height: 38px;
+
+    padding: 0 18px;
+
+    border: 1px solid #0d6efd;
+
+    border-radius: 6px;
+
+    background: #0d6efd;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.cpay-save-btn:hover {
+
+    background: #0b5ed7;
+
+    border-color: #0a58ca;
+}
+
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.cpay-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.cpay-table {
+
+    width: 100%;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.cpay-table thead th {
+
+    padding: 11px 10px;
+
+    background: #f3f4f6;
+
+    border-bottom: 1px solid #dfe3e8;
+
+    color: #343a40;
+
+    font-size: 10.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.cpay-table tbody td {
+
+    padding: 11px 10px;
+
+    border-bottom: 1px solid #eef0f2;
+
+    color: #555e68;
+
+    vertical-align: middle;
+}
+
+.cpay-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cpay-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   TRIP
+   ========================================================= */
+
+.trip-number {
+    font-weight: 600;
+    color: #212529;
+}
+
+
+/* =========================================================
+   AMOUNT
+   ========================================================= */
+
+.amount {
+
+    text-align: right;
+
+    white-space: nowrap;
+
+    font-weight: 600;
+
+    color: #343a40;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+
+    font-size: 9.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.status-success {
+
+    background: #d1e7dd;
+
+    color: #0f5132;
+}
+
+.status-warning {
+
+    background: #fff3cd;
+
+    color: #856404;
+}
+
+.status-info {
+
+    background: #cff4fc;
+
+    color: #055160;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-row {
+
+    padding: 35px 20px !important;
+
+    text-align: center;
+
+    color: #8a9199 !important;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .cpay-page {
+        padding: 18px 15px 30px;
+    }
+
+    .cpay-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .cpay-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cpay-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+}
+
+</style>
+
+
+<div class="cpay-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="cpay-header">
+
+        <div>
+
+            <h1 class="cpay-title">
+                Customer Payments
+            </h1>
+
+            <p class="cpay-subtitle">
+                Manage customer receipts and payment details.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="cpay-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         PAYMENT FORM
+         ===================================================== -->
+
+    <div class="cpay-form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="cpay-form-grid">
+
+
+                <!-- =========================================
+                     ORDER
+                     ========================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="order">
+                        Trip / Order
+                    </label>
+
+                    <select
+                        id="order"
+                        name="order"
+                        required
+                    >
+
+                        <option value="">
+                            Select Trip
+                        </option>
+
+                        {% for order in orders %}
+
+                            <option
+                                value="{{ order.pk }}"
+                                {% if request.POST.order == order.pk|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ order.trip_number }}
+                                -
+                                {{ order.customer.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     SELLING AMOUNT
+                     ========================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="selling_amount">
+                        Selling Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="selling_amount"
+                        name="selling_amount"
+                        step="0.01"
+                        min="0"
+                        value="{{ request.POST.selling_amount|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     RECEIVED AMOUNT
+                     ========================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_amount">
+                        Received Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="received_amount"
+                        name="received_amount"
+                        step="0.01"
+                        min="0"
+                        value="{{ request.POST.received_amount|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT MODE
+                     ========================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_through">
+                        Received Through
+                    </label>
+
+                    <select
+                        id="received_through"
+                        name="received_through"
+                    >
+
+                        <option value="">
+                            Select Mode
+                        </option>
+
+                        <option
+                            value="RTGS"
+                            {% if request.POST.received_through == "RTGS" %}
+                                selected
+                            {% endif %}
+                        >
+                            RTGS
+                        </option>
+
+                        <option
+                            value="NEFT"
+                            {% if request.POST.received_through == "NEFT" %}
+                                selected
+                            {% endif %}
+                        >
+                            NEFT
+                        </option>
+
+                        <option
+                            value="CASH"
+                            {% if request.POST.received_through == "CASH" %}
+                                selected
+                            {% endif %}
+                        >
+                            CASH
+                        </option>
+
+                        <option
+                            value="IMPS"
+                            {% if request.POST.received_through == "IMPS" %}
+                                selected
+                            {% endif %}
+                        >
+                            IMPS
+                        </option>
+
+                        <option
+                            value="UPI"
+                            {% if request.POST.received_through == "UPI" %}
+                                selected
+                            {% endif %}
+                        >
+                            UPI
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     UTR
+                     ========================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="utr_details">
+                        UTR / Transaction Details
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utr_details"
+                        name="utr_details"
+                        value="{{ request.POST.utr_details|default:'' }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BUTTON
+                 ================================================= -->
+
+            <div class="cpay-form-actions">
+
+                <button
+                    type="submit"
+                    class="cpay-save-btn"
+                >
+
+                    <i class="bi bi-receipt me-1"></i>
+
+                    Save Receipt
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAYMENT HISTORY
+         ===================================================== -->
+
+    <div class="cpay-card">
+
+        <div class="table-responsive">
+
+            <table class="cpay-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Trip
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th class="text-end">
+                            Selling
+                        </th>
+
+                        <th class="text-end">
+                            Received
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Mode
+                        </th>
+
+                        <th>
+                            UTR
+                        </th>
+
+                        <th>
+                            Received At
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for p in payments %}
+
+                    <tr>
+
+                        <td>
+                            <div class="trip-number">
+                                {{ p.order.trip_number }}
+                            </div>
+                        </td>
+
+
+                        <td>
+                            {{ p.order.customer.name|default:"-" }}
+                        </td>
+
+
+                        <td class="amount">
+                            ₹{{ p.selling_amount|floatformat:2 }}
+                        </td>
+
+
+                        <td class="amount">
+                            ₹{{ p.received_amount|floatformat:2 }}
+                        </td>
+
+
+                        <td>
+
+                            {% if p.status == "Payment Cleared" %}
+
+                                <span class="status status-success">
+                                    {{ p.status }}
+                                </span>
+
+                            {% elif p.status == "Part Amount Received" %}
+
+                                <span class="status status-info">
+                                    {{ p.status }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-warning">
+                                    {{ p.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ p.received_through|default:"-" }}
+                        </td>
+
+
+                        <td>
+                            {{ p.utr_details|default:"-" }}
+                        </td>
+
+
+                        <td>
+                            {{ p.received_at|date:"d/m/Y H:i" }}
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="empty-row"
+                        >
+                            No customer receipts found.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
+
+{% endblock %}
