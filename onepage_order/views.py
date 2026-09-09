@@ -902,7 +902,6 @@ def customer_payments(request):
 # ADMIN MARGIN
 # ============================================================
 
-
 @login_required
 def admin_margin(request):
 
@@ -918,12 +917,11 @@ def admin_margin(request):
 
     return render(
         request,
-        "onepageorders/admin_margin.html",
+        "onepage_order/admin_margin.html",
         {
             "orders": orders,
         },
     )
-
 
 # ============================================================
 # CREATE / GET TRACKING SESSION

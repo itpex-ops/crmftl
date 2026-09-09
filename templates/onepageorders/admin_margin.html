@@ -1,7 +1,518 @@
 {% extends "layouts/base.html" %}
 
-   {% block content %}
-<div class="container py-4 mt-4">
-    <h3>Vehicle vs Customer — Admin</h3>
-    <div class="card"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Trip Details</th><th>Vehicle Cost</th><th>Vehicle Payment Status</th><th>Customer Selling</th><th>Customer Payment Status</th><th>Margin</th></tr></thead><tbody>{% for o in orders %}<tr><td>{{ o.trip_number }}<br><small>{{ o.origin }} TO {{ o.destination }} / {{ o.vehicle_type }}</small></td><td>₹{{ o.vehicle_cost|floatformat:2 }}</td><td>{% if o.vehicle_cost > 0 %}Advance/Payment Made{% else %}No Payment Done{% endif %}</td><td>₹{{ o.customer_selling_amount|floatformat:2 }}</td><td>{% with p=o.customer_payments.last %}{% if p %}{{ p.status }}{% else %}Pending{% endif %}{% endwith %}</td><td><strong>₹{{ o.margin|floatformat:2 }}</strong></td></tr>{% endfor %}</tbody></table></div>
-    </div></div>{% endblock %}
+{% block title %}Vehicle vs Customer{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.admin-margin-page {
+    width: 100%;
+    padding: 22px 28px 40px;
+
+    background: #f8f9fb;
+
+    box-sizing: border-box;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.admin-margin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.admin-margin-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.admin-margin-subtitle {
+    margin-top: 4px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #8a9199;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.admin-margin-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.admin-margin-table {
+
+    width: 100%;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+}
+
+
+/* Header */
+
+.admin-margin-table thead th {
+
+    padding: 11px 10px;
+
+    background: #f3f4f6;
+
+    border-bottom: 1px solid #dfe3e8;
+
+    color: #343a40;
+
+    font-size: 10.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* Body */
+
+.admin-margin-table tbody td {
+
+    padding: 11px 10px;
+
+    border-bottom: 1px solid #eef0f2;
+
+    color: #555e68;
+
+    vertical-align: middle;
+}
+
+.admin-margin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.admin-margin-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   TRIP DETAILS
+   ========================================================= */
+
+.trip-number {
+
+    font-weight: 600;
+
+    color: #212529;
+}
+
+
+.trip-route {
+
+    margin-top: 3px;
+
+    color: #7a828a;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   AMOUNT
+   ========================================================= */
+
+.amount {
+
+    text-align: right;
+
+    white-space: nowrap;
+
+    font-weight: 500;
+
+    color: #343a40;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+
+    font-size: 9.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.status-success {
+
+    background: #d1e7dd;
+
+    color: #0f5132;
+}
+
+
+.status-warning {
+
+    background: #fff3cd;
+
+    color: #856404;
+}
+
+
+/* =========================================================
+   MARGIN
+   ========================================================= */
+
+.margin-positive {
+
+    text-align: right;
+
+    font-weight: 700;
+
+    color: #198754;
+
+    white-space: nowrap;
+}
+
+
+.margin-negative {
+
+    text-align: right;
+
+    font-weight: 700;
+
+    color: #dc3545;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-table {
+
+    padding: 35px 20px !important;
+
+    text-align: center;
+
+    color: #8a9199 !important;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .admin-margin-page {
+        padding: 18px 15px 30px;
+    }
+
+    .admin-margin-header {
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+}
+
+</style>
+
+
+<div class="admin-margin-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="admin-margin-header">
+
+        <div>
+
+            <h1 class="admin-margin-title">
+                Vehicle vs Customer — Admin
+            </h1>
+
+            <div class="admin-margin-subtitle">
+                Vehicle cost, customer selling amount and trip margin
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+         ===================================================== -->
+
+    <div class="admin-margin-card">
+
+        <div class="table-responsive">
+
+            <table class="admin-margin-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Trip Details
+                        </th>
+
+                        <th class="text-end">
+                            Vehicle Cost
+                        </th>
+
+                        <th>
+                            Vehicle Payment Status
+                        </th>
+
+                        <th class="text-end">
+                            Customer Selling
+                        </th>
+
+                        <th>
+                            Customer Payment Status
+                        </th>
+
+                        <th class="text-end">
+                            Margin
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for o in orders %}
+
+                    <tr>
+
+
+                        <!-- =====================================
+                             TRIP
+                             ===================================== -->
+
+                        <td>
+
+                            <div class="trip-number">
+                                {{ o.trip_number }}
+                            </div>
+
+                            <div class="trip-route">
+
+                                {{ o.origin|default:"-" }}
+
+                                <span>→</span>
+
+                                {{ o.destination|default:"-" }}
+
+                                {% if o.vehicle_type %}
+                                    / {{ o.vehicle_type }}
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- =====================================
+                             VEHICLE COST
+                             ===================================== -->
+
+                        <td class="amount">
+
+                            ₹{{ o.vehicle_cost|floatformat:2 }}
+
+                        </td>
+
+
+                        <!-- =====================================
+                             VEHICLE PAYMENT STATUS
+                             ===================================== -->
+
+                        <td>
+
+                            {% if o.vehicle_cost > 0 %}
+
+                                <span class="status status-success">
+                                    Advance / Payment Made
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-warning">
+                                    No Payment Done
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =====================================
+                             CUSTOMER SELLING
+                             ===================================== -->
+
+                        <td class="amount">
+
+                            ₹{{ o.selling_amount|floatformat:2 }}
+
+                        </td>
+
+
+                        <!-- =====================================
+                             CUSTOMER PAYMENT STATUS
+                             ===================================== -->
+
+                        <td>
+
+                            {% with p=o.customer_payments.last %}
+
+                                {% if p %}
+
+                                    {% if p.status == "Payment Cleared" %}
+
+                                        <span class="status status-success">
+                                            {{ p.status }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status status-warning">
+                                            {{ p.status }}
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="status status-warning">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </td>
+
+
+                        <!-- =====================================
+                             MARGIN
+                             ===================================== -->
+
+                        <td>
+
+                            {% if o.margin >= 0 %}
+
+                                <div class="margin-positive">
+                                    ₹{{ o.margin|floatformat:2 }}
+                                </div>
+
+                            {% else %}
+
+                                <div class="margin-negative">
+                                    ₹{{ o.margin|floatformat:2 }}
+                                </div>
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="empty-table"
+                        >
+                            No orders available.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
