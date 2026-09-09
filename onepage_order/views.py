@@ -1059,54 +1059,287 @@ def vehicle_payments(request):
 # ============================================================
 
 
+from decimal import Decimal, InvalidOperation
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import get_object_or_404, render, redirect
+
+from .models import Order, CustomerPayment
+
+
 @login_required
 def customer_payments(request):
 
+    # ---------------------------------------------------------
+    # Orders for dropdown
+    # ---------------------------------------------------------
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .order_by("-id")
+    )
+
+    # ---------------------------------------------------------
+    # Customer payment history
+    # ---------------------------------------------------------
     payments = (
         CustomerPayment.objects
         .select_related(
             "order",
             "order__customer",
         )
-        .order_by("-received_at")
+        .order_by("-received_at", "-id")
     )
 
-    form = CustomerPaymentForm(
-        request.POST or None
-    )
-
+    # ---------------------------------------------------------
+    # SAVE CUSTOMER PAYMENT
+    # ---------------------------------------------------------
     if request.method == "POST":
 
-        if form.is_valid():
+        try:
 
-            payment = form.save()
+            order_id = request.POST.get(
+                "order",
+                ""
+            ).strip()
+
+            selling_amount_value = request.POST.get(
+                "selling_amount",
+                ""
+            ).strip()
+
+            received_amount_value = request.POST.get(
+                "received_amount",
+                ""
+            ).strip()
+
+            received_through = request.POST.get(
+                "received_through",
+                ""
+            ).strip()
+
+            utr_details = request.POST.get(
+                "utr_details",
+                ""
+            ).strip()
+
+
+            # =====================================================
+            # ORDER
+            # =====================================================
+
+            if not order_id:
+
+                messages.error(
+                    request,
+                    "Please select a Trip / Order."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/customer_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            order = get_object_or_404(
+                Order,
+                pk=order_id
+            )
+
+
+            # =====================================================
+            # SELLING AMOUNT
+            # =====================================================
+
+            try:
+
+                selling_amount = Decimal(
+                    selling_amount_value
+                )
+
+            except (
+                InvalidOperation,
+                ValueError,
+                TypeError
+            ):
+
+                messages.error(
+                    request,
+                    "Please enter a valid Selling Amount."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/customer_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            if selling_amount <= 0:
+
+                messages.error(
+                    request,
+                    "Selling Amount must be greater than zero."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/customer_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            # =====================================================
+            # RECEIVED AMOUNT
+            # =====================================================
+
+            try:
+
+                received_amount = Decimal(
+                    received_amount_value
+                )
+
+            except (
+                InvalidOperation,
+                ValueError,
+                TypeError
+            ):
+
+                messages.error(
+                    request,
+                    "Please enter a valid Received Amount."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/customer_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            if received_amount < 0:
+
+                messages.error(
+                    request,
+                    "Received Amount cannot be negative."
+                )
+
+                return render(
+                    request,
+                    "onepageorders/customer_payments.html",
+                    {
+                        "orders": orders,
+                        "payments": payments,
+                    }
+                )
+
+
+            # =====================================================
+            # PAYMENT MODE
+            # =====================================================
+
+            valid_modes = {
+                "RTGS",
+                "NEFT",
+                "CASH",
+                "IMPS",
+                "UPI",
+            }
+
+            if received_through not in valid_modes:
+
+                received_through = ""
+
+
+            # =====================================================
+            # SAVE
+            # =====================================================
+
+            with transaction.atomic():
+
+                payment = CustomerPayment.objects.create(
+
+                    order=order,
+
+                    selling_amount=selling_amount,
+
+                    received_amount=received_amount,
+
+                    received_through=received_through,
+
+                    utr_details=utr_details,
+
+                )
+
+
+            # =====================================================
+            # SUCCESS
+            # =====================================================
 
             messages.success(
                 request,
                 (
                     f"Customer payment of "
-                    f"₹{payment.received_amount:,.2f} saved successfully."
-                ),
+                    f"₹{payment.received_amount:,.2f} "
+                    f"saved successfully for "
+                    f"{order.trip_number}."
+                )
             )
 
             return redirect(
                 "customer_payments"
             )
 
-        messages.error(
-            request,
-            "Please correct the payment form.",
-        )
+
+        except Exception as e:
+
+            print(
+                "CUSTOMER PAYMENT ERROR:",
+                repr(e)
+            )
+
+            messages.error(
+                request,
+                f"Unable to save customer payment: {str(e)}"
+            )
+
+            return render(
+                request,
+                "onepageorders/customer_payments.html",
+                {
+                    "orders": orders,
+                    "payments": payments,
+                }
+            )
+
+
+    # ---------------------------------------------------------
+    # GET
+    # ---------------------------------------------------------
 
     return render(
         request,
         "onepageorders/customer_payments.html",
         {
+            "orders": orders,
             "payments": payments,
-            "form": form,
-        },
+        }
     )
-
 
 # ============================================================
 # ADMIN MARGIN
