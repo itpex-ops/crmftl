@@ -14,25 +14,21 @@
     {% endif %}
 <div class="order-create-page">
 
-    <!-- =========================================================
-         PAGE TITLE
-         ========================================================= -->
+    <div class="order-create-header">
 
-    <h1 class="order-create-title">
-        Order Creation
-    </h1>
-    </div>
+        <h1 class="order-create-title">
+            Order Creation
+        </h1>
 
-    <a
+        <a
             href="{% url 'onepageorder_list' %}"
             class="edit-back-btn"
         >
-
             <i class="bi bi-arrow-left me-1"></i>
-
             Back
-
         </a>
+
+    </div>
 
 
     <!-- =========================================================
@@ -797,7 +793,58 @@
     /* =========================================================
        PAGE
        ========================================================= */
+/* =========================================================
+   ORDER CREATE HEADER
+   ========================================================= */
 
+.order-create-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.order-create-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.edit-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #495057;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.edit-back-btn:hover {
+    background: #f4f5f7;
+    border-color: #cfd4da;
+    color: #212529;
+}
     .order-create-page {
         width: 100%;
         padding: 22px 28px 35px;
