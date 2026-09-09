@@ -10,7 +10,7 @@
 
 .edit-order-page {
     width: 100%;
-    padding: 24px 28px 40px;
+    padding: 22px 28px 40px;
     box-sizing: border-box;
     background: #f8f9fb;
     min-height: calc(100vh - 70px);
@@ -18,28 +18,35 @@
 
 
 /* =========================================================
-   PAGE HEADER
+   HEADER
    ========================================================= */
 
 .edit-order-header {
+    width: 100%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 22px;
+
+    margin-bottom: 20px;
 }
 
 .edit-order-heading {
     margin: 0;
+
     font-family: "Poppins", sans-serif;
     font-size: 22px;
     font-weight: 600;
+
     color: #212529;
 }
 
 .edit-order-subtitle {
-    margin-top: 5px;
-    font-size: 12px;
+    margin-top: 4px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+
     color: #8a9199;
 }
 
@@ -79,169 +86,231 @@
 
 
 /* =========================================================
+   ALERT
+   ========================================================= */
+
+.edit-message {
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #d9dde2;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #495057;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+}
+
+
+/* =========================================================
    TWO COLUMN LAYOUT
    ========================================================= */
 
 .edit-order-layout {
+    width: 100%;
+
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 22px;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    column-gap: 22px;
+    row-gap: 14px;
+
     align-items: start;
 }
 
-.edit-order-column {
-    min-width: 0;
-}
-
 
 /* =========================================================
-   CATEGORY CARD
+   CARD
    ========================================================= */
 
 .edit-category-card {
+    width: 100%;
+
+    margin: 0 0 14px;
+
+    border: 1px solid #8d8d8d;
+
     background: #ffffff;
 
-    border: 1px solid #d9dde2;
-
-    border-radius: 8px;
-
-    margin-bottom: 16px;
-
     overflow: hidden;
+
+    box-sizing: border-box;
 }
 
 
 /* =========================================================
-   CATEGORY HEADER
+   CARD TITLE
    ========================================================= */
 
 .edit-category-title {
-    height: 38px;
+    min-height: 38px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    padding: 7px 10px;
+
     background: #ffc000;
 
-    border-bottom: 1px solid #d0a300;
+    border-bottom: 1px solid #777;
 
-    color: #111827;
+    color: #111111;
 
     font-family: "Poppins", sans-serif;
 
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
 
     text-transform: uppercase;
+
+    text-align: center;
+
+    line-height: 1.2;
 }
 
 
 /* =========================================================
-   CATEGORY FIELDS
+   FORM ROW
    ========================================================= */
 
-.edit-category-body {
-    padding: 15px;
-}
-
-.edit-category-grid {
+.edit-form-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    gap: 14px 18px;
+    grid-template-columns:
+        42%
+        58%;
+
+    min-height: 39px;
+
+    border-bottom: 1px solid #b8b8b8;
+
+    box-sizing: border-box;
+}
+
+.edit-form-row:last-child {
+    border-bottom: none;
 }
 
 
 /* =========================================================
-   FIELD
+   LABEL
    ========================================================= */
 
-.edit-field {
-    min-width: 0;
-}
+.edit-form-label {
+    display: flex;
+    align-items: center;
 
-.edit-field.full-width {
-    grid-column: 1 / -1;
-}
+    padding: 5px 9px;
 
-.edit-field label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-    font-weight: 500;
-
-    color: #495057;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-.edit-field input,
-.edit-field select,
-.edit-field textarea {
-
-    width: 100%;
-
-    min-height: 40px;
-
-    padding: 8px 10px;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 6px;
+    border-right: 1px solid #b8b8b8;
 
     background: #ffffff;
 
-    color: #343a40;
+    color: #172033;
 
     font-family: "Poppins", sans-serif;
 
-    font-size: 11px;
+    font-size: 11.5px;
 
-    outline: none;
+    line-height: 1.25;
 
     box-sizing: border-box;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
 }
 
-.edit-field textarea {
-    min-height: 75px;
+
+/* =========================================================
+   CONTROL
+   ========================================================= */
+
+.edit-form-control {
+    min-width: 0;
+
+    padding: 3px 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+   ========================================================= */
+
+.edit-form-control input,
+.edit-form-control select,
+.edit-form-control textarea {
+
+    width: 100%;
+    min-width: 0;
+
+    height: 30px;
+
+    padding: 4px 7px;
+
+    border: 1px solid #d5d5d5;
+    border-radius: 3px;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11.5px;
+
+    outline: none;
+    box-shadow: none;
+
+    box-sizing: border-box;
+}
+
+.edit-form-control textarea {
+    min-height: 48px;
+    height: auto;
+
     resize: vertical;
 }
 
 
-.edit-field input:focus,
-.edit-field select:focus,
-.edit-field textarea:focus {
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.edit-form-control input:focus,
+.edit-form-control select:focus,
+.edit-form-control textarea:focus {
 
     border-color: #FDB81B;
 
-    box-shadow:
-        0 0 0 3px rgba(253, 184, 27, 0.12);
+    background: #fffef0;
 
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px rgba(253, 184, 27, 0.10);
 }
 
 
 /* =========================================================
-   CHECKBOX
+   READONLY
    ========================================================= */
 
-.edit-field input[type="checkbox"] {
+.edit-form-control input[readonly] {
 
-    width: 17px;
-    min-height: 17px;
+    background: #eef0f2;
 
-    margin-top: 8px;
+    font-weight: 600;
 
 }
 
@@ -250,33 +319,17 @@
    ERROR
    ========================================================= */
 
-.edit-field .errorlist {
+.edit-field-error {
 
-    list-style: none;
-
-    padding: 0;
-    margin: 4px 0 0;
+    margin-top: 2px;
 
     color: #dc3545;
 
-    font-size: 10px;
-
-}
-
-
-/* =========================================================
-   HELP TEXT
-   ========================================================= */
-
-.edit-field .helptext {
-
-    display: block;
-
-    margin-top: 4px;
-
-    color: #8a9199;
+    font-family: "Poppins", sans-serif;
 
     font-size: 9px;
+
+    line-height: 1.2;
 }
 
 
@@ -286,23 +339,17 @@
 
 .edit-order-footer {
 
+    width: 100%;
+
     display: flex;
 
     justify-content: center;
-
     align-items: center;
 
     gap: 10px;
 
-    margin-top: 8px;
+    padding: 14px 0 20px;
 
-    padding: 15px;
-
-    background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 8px;
 }
 
 
@@ -314,21 +361,22 @@
 
     min-width: 130px;
 
-    height: 40px;
+    height: 38px;
 
-    padding: 0 20px;
+    padding: 0 18px;
 
-    border: 1px solid #FDB81B;
+    border: 1px solid #0d6efd;
 
-    border-radius: 6px;
+    border-radius: 5px;
 
-    background: #FDB81B;
+    background: #0d6efd;
 
-    color: #212529;
+    color: #ffffff;
 
     font-family: "Poppins", sans-serif;
 
     font-size: 12px;
+
     font-weight: 600;
 
     cursor: pointer;
@@ -338,11 +386,10 @@
 
 .edit-update-btn:hover {
 
-    background: #e9a900;
+    background: #0b5ed7;
 
-    border-color: #e9a900;
+    border-color: #0a58ca;
 
-    color: #ffffff;
 }
 
 
@@ -359,27 +406,32 @@
 }
 
 
-@media (max-width: 650px) {
+@media (max-width: 600px) {
 
     .edit-order-page {
-        padding: 18px 14px 30px;
-    }
-
-    .edit-category-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .edit-field.full-width {
-        grid-column: auto;
+        padding: 15px;
     }
 
     .edit-order-header {
-        flex-direction: column;
         align-items: flex-start;
+
+        gap: 10px;
     }
 
-    .edit-back-btn {
-        width: 100%;
+    .edit-form-row {
+        grid-template-columns:
+            44%
+            56%;
+    }
+
+    .edit-form-label {
+        font-size: 10.5px;
+    }
+
+    .edit-form-control input,
+    .edit-form-control select,
+    .edit-form-control textarea {
+        font-size: 10.5px;
     }
 
 }
@@ -398,16 +450,12 @@
 
         <div>
 
-            <h3 class="edit-order-heading">
-
+            <h1 class="edit-order-heading">
                 Edit {{ order.trip_number }}
-
-            </h3>
+            </h1>
 
             <div class="edit-order-subtitle">
-
                 Update order information and save your changes
-
             </div>
 
         </div>
@@ -427,89 +475,210 @@
     </div>
 
 
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="edit-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
 
     <!-- =====================================================
          FORM
          ===================================================== -->
 
-    <form method="post">
+    <form method="POST">
 
         {% csrf_token %}
 
 
-
-        <!-- =================================================
-             TWO COLUMNS
-             ================================================= -->
-
         <div class="edit-order-layout">
 
 
-
-            <!-- =============================================
+            <!-- =================================================
                  LEFT COLUMN
-                 ============================================= -->
+                 ================================================= -->
 
-            <div class="edit-order-column">
+            <div>
 
 
-
-                <!-- =========================================
+                <!-- =============================================
                      CUSTOMER DETAILS
-                     ========================================= -->
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Customer Details
+                    </div>
+
+
+                    <!-- Customer Name -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Customer Name
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="customer_name"
+                                value="{{ order.customer.name|default:'' }}"
+                                required
+                            >
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Contact -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Contact Number
+                        </div>
 
-                            <!-- Customer Name -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <input
+                                type="text"
+                                name="contact_number"
+                                value="{{ order.customer.contact_number|default:'' }}"
+                            >
 
-                                {{ form.customer.label_tag }}
+                        </div>
 
-                                {{ form.customer }}
-
-                                {{ form.customer.errors }}
-
-                            </div>
-
-
-                            <!-- Lead Generated Through -->
-
-                            <div class="edit-field">
-
-                                {{ form.lead_generated_through.label_tag }}
-
-                                {{ form.lead_generated_through }}
-
-                                {{ form.lead_generated_through.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Sales Closed By -->
+                    <!-- Email -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.sales_closed_by.label_tag }}
+                        <div class="edit-form-label">
+                            Email
+                        </div>
 
-                                {{ form.sales_closed_by }}
+                        <div class="edit-form-control">
 
-                                {{ form.sales_closed_by.errors }}
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ order.customer.email|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
 
+                    </div>
+
+
+                    <!-- Address -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Customer Address
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <textarea
+                                name="address"
+                                rows="2"
+                            >{{ order.customer.address|default:'' }}</textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Lead -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Lead Generated Through
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <select name="lead_generated_through">
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option
+                                    value="Social Media"
+                                    {% if order.lead_generated_through == "Social Media" %}selected{% endif %}
+                                >
+                                    Social Media
+                                </option>
+
+                                <option
+                                    value="Outbound Calls"
+                                    {% if order.lead_generated_through == "Outbound Calls" %}selected{% endif %}
+                                >
+                                    Outbound Calls
+                                </option>
+
+                                <option
+                                    value="Reference"
+                                    {% if order.lead_generated_through == "Reference" %}selected{% endif %}
+                                >
+                                    Reference
+                                </option>
+
+                                <option
+                                    value="Field Sales"
+                                    {% if order.lead_generated_through == "Field Sales" %}selected{% endif %}
+                                >
+                                    Field Sales
+                                </option>
+
+                                <option
+                                    value="Justdial"
+                                    {% if order.lead_generated_through == "Justdial" %}selected{% endif %}
+                                >
+                                    Justdial
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Sales -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Sales Closed By
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="sales_closed_by"
+                                value="{{ order.sales_closed_by|default:'' }}"
+                            >
 
                         </div>
 
@@ -518,102 +687,140 @@
                 </div>
 
 
-
-                <!-- =========================================
+                <!-- =============================================
                      SHIPMENT DETAILS
-                     ========================================= -->
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Shipment Details
+                    </div>
+
+
+                    <!-- Origin -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Origin Pincode / Area Name
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="origin"
+                                value="{{ order.origin|default:'' }}"
+                            >
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Destination -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Destination Pincode / Area Name
+                        </div>
 
-                            <!-- Origin -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <input
+                                type="text"
+                                name="destination"
+                                value="{{ order.destination|default:'' }}"
+                            >
 
-                                {{ form.origin.label_tag }}
+                        </div>
 
-                                {{ form.origin }}
-
-                                {{ form.origin.errors }}
-
-                            </div>
-
-
-                            <!-- Destination -->
-
-                            <div class="edit-field">
-
-                                {{ form.destination.label_tag }}
-
-                                {{ form.destination }}
-
-                                {{ form.destination.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Material -->
+                    <!-- Material -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.material.label_tag }}
+                        <div class="edit-form-label">
+                            Material
+                        </div>
 
-                                {{ form.material }}
+                        <div class="edit-form-control">
 
-                                {{ form.material.errors }}
+                            <input
+                                type="text"
+                                name="material"
+                                value="{{ order.material|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
 
-
-                            <!-- Packing Type -->
-
-                            <div class="edit-field">
-
-                                {{ form.packing_type.label_tag }}
-
-                                {{ form.packing_type }}
-
-                                {{ form.packing_type.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- No Of Pieces -->
+                    <!-- Packing -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.no_of_pieces.label_tag }}
+                        <div class="edit-form-label">
+                            Packing Type
+                        </div>
 
-                                {{ form.no_of_pieces }}
+                        <div class="edit-form-control">
 
-                                {{ form.no_of_pieces.errors }}
+                            <input
+                                type="text"
+                                name="packing_type"
+                                value="{{ order.packing_type|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
+
+                    </div>
 
 
-                            <!-- Weight -->
+                    <!-- Pieces -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.weight_tons.label_tag }}
+                        <div class="edit-form-label">
+                            No of Pieces
+                        </div>
 
-                                {{ form.weight_tons }}
+                        <div class="edit-form-control">
 
-                                {{ form.weight_tons.errors }}
+                            <input
+                                type="number"
+                                name="no_of_pieces"
+                                min="0"
+                                value="{{ order.no_of_pieces|default:'0' }}"
+                            >
 
-                            </div>
+                        </div>
 
+                    </div>
+
+
+                    <!-- Weight -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Weight in Tons
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="number"
+                                name="weight_tons"
+                                step="0.001"
+                                min="0"
+                                value="{{ order.weight_tons|default:'0' }}"
+                            >
 
                         </div>
 
@@ -622,231 +829,373 @@
                 </div>
 
 
-
-                <!-- =========================================
+                <!-- =============================================
                      VEHICLE DETAILS
-                     ========================================= -->
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Vehicle Details
+                    </div>
+
+
+                    <!-- Vehicle Type -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Vehicle Type
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="vehicle_type"
+                                value="{{ order.vehicle_type|default:'' }}"
+                            >
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Vehicle Number -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Vehicle Number
+                        </div>
 
-                            <!-- Vehicle Type -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <input
+                                type="text"
+                                name="vehicle_number"
+                                value="{{ order.vehicle_number|default:'' }}"
+                            >
 
-                                {{ form.vehicle_type.label_tag }}
+                        </div>
 
-                                {{ form.vehicle_type }}
-
-                                {{ form.vehicle_type.errors }}
-
-                            </div>
-
-
-                            <!-- Vehicle Number -->
-
-                            <div class="edit-field">
-
-                                {{ form.vehicle_number.label_tag }}
-
-                                {{ form.vehicle_number }}
-
-                                {{ form.vehicle_number.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Driver Number -->
+                    <!-- Driver Number -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.driver_number.label_tag }}
+                        <div class="edit-form-label">
+                            Driver Number
+                        </div>
 
-                                {{ form.driver_number }}
+                        <div class="edit-form-control">
 
-                                {{ form.driver_number.errors }}
+                            <input
+                                type="text"
+                                name="driver_number"
+                                value="{{ order.driver_number|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
 
-
-                            <!-- Owner Number -->
-
-                            <div class="edit-field">
-
-                                {{ form.owner_number.label_tag }}
-
-                                {{ form.owner_number }}
-
-                                {{ form.owner_number.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Vehicle Source -->
+                    <!-- Owner Number -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.vehicle_sourced_by.label_tag }}
+                        <div class="edit-form-label">
+                            Owner Number
+                        </div>
 
-                                {{ form.vehicle_sourced_by }}
+                        <div class="edit-form-control">
 
-                                {{ form.vehicle_sourced_by.errors }}
+                            <input
+                                type="text"
+                                name="owner_number"
+                                value="{{ order.owner_number|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
+
+                    </div>
 
 
-                            <!-- Owner / Broker -->
+                    <!-- Source -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.owner_broker_name.label_tag }}
+                        <div class="edit-form-label">
+                            Vehicle Sourced By
+                        </div>
 
-                                {{ form.owner_broker_name }}
+                        <div class="edit-form-control">
 
-                                {{ form.owner_broker_name.errors }}
+                            <select name="vehicle_sourced_by">
 
-                            </div>
+                                <option
+                                    value="Direct"
+                                    {% if order.vehicle_sourced_by == "Direct" %}selected{% endif %}
+                                >
+                                    Direct
+                                </option>
 
+                                <option
+                                    value="Broker"
+                                    {% if order.vehicle_sourced_by == "Broker" %}selected{% endif %}
+                                >
+                                    Broker
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Owner / Broker -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Owner / Broker Name
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="owner_broker_name"
+                                value="{{ order.owner_broker_name|default:'' }}"
+                            >
 
                         </div>
 
                     </div>
 
                 </div>
-
-
 
             </div>
 
 
-
-            <!-- =============================================
+            <!-- =================================================
                  RIGHT COLUMN
-                 ============================================= -->
+                 ================================================= -->
 
-            <div class="edit-order-column">
+            <div>
 
 
-
-                <!-- =========================================
+                <!-- =============================================
                      COMMERCIALS
-                     ========================================= -->
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Commercials
+                    </div>
+
+
+                    <!-- Freight -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Freight Amount
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="number"
+                                id="id_freight_amount"
+                                name="freight_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.freight_amount|default:'0' }}"
+                            >
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Loading -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Loading / Unloading Charges
+                        </div>
 
-                            <!-- Freight -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <input
+                                type="number"
+                                id="id_loading_unloading_charges"
+                                name="loading_unloading_charges"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.loading_unloading_charges|default:'0' }}"
+                            >
 
-                                {{ form.freight_amount.label_tag }}
+                        </div>
 
-                                {{ form.freight_amount }}
-
-                                {{ form.freight_amount.errors }}
-
-                            </div>
-
-
-                            <!-- Loading / Unloading -->
-
-                            <div class="edit-field">
-
-                                {{ form.loading_unloading_charges.label_tag }}
-
-                                {{ form.loading_unloading_charges }}
-
-                                {{ form.loading_unloading_charges.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Halting -->
+                    <!-- Halting -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.halting_charges.label_tag }}
+                        <div class="edit-form-label">
+                            Halting Charges
+                        </div>
 
-                                {{ form.halting_charges }}
+                        <div class="edit-form-control">
 
-                                {{ form.halting_charges.errors }}
+                            <input
+                                type="number"
+                                id="id_halting_charges"
+                                name="halting_charges"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.halting_charges|default:'0' }}"
+                            >
 
-                            </div>
+                        </div>
 
-
-                            <!-- Other -->
-
-                            <div class="edit-field">
-
-                                {{ form.other_charges.label_tag }}
-
-                                {{ form.other_charges }}
-
-                                {{ form.other_charges.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Selling -->
+                    <!-- Other -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.selling_amount.label_tag }}
+                        <div class="edit-form-label">
+                            Other Charges
+                        </div>
 
-                                {{ form.selling_amount }}
+                        <div class="edit-form-control">
 
-                                {{ form.selling_amount.errors }}
+                            <input
+                                type="number"
+                                id="id_other_charges"
+                                name="other_charges"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.other_charges|default:'0' }}"
+                            >
 
-                            </div>
+                        </div>
 
-
-                            <!-- Manager Approval -->
-
-                            <div class="edit-field">
-
-                                {{ form.manager_approval.label_tag }}
-
-                                {{ form.manager_approval }}
-
-                                {{ form.manager_approval.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Approved By -->
+                    <!-- Total -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.approved_by.label_tag }}
+                        <div class="edit-form-label">
+                            Total Trip Cost
+                        </div>
 
-                                {{ form.approved_by }}
+                        <div class="edit-form-control">
 
-                                {{ form.approved_by.errors }}
+                            <input
+                                type="text"
+                                id="total_trip_cost"
+                                value="{{ order.total_trip_cost|default:'0.00' }}"
+                                readonly
+                            >
 
-                            </div>
+                        </div>
 
+                    </div>
+
+
+                    <!-- Selling -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Selling Amount
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="number"
+                                name="selling_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.selling_amount|default:'0' }}"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Manager -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Manager Approval
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <select name="manager_approval">
+
+                                <option
+                                    value="Pending"
+                                    {% if order.manager_approval == "Pending" %}selected{% endif %}
+                                >
+                                    Pending
+                                </option>
+
+                                <option
+                                    value="Approved"
+                                    {% if order.manager_approval == "Approved" %}selected{% endif %}
+                                >
+                                    Approved
+                                </option>
+
+                                <option
+                                    value="Rejected"
+                                    {% if order.manager_approval == "Rejected" %}selected{% endif %}
+                                >
+                                    Rejected
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Approved By -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Approved By
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="text"
+                                name="approved_by"
+                                value="{{ order.approved_by|default:'' }}"
+                            >
 
                         </div>
 
@@ -855,102 +1204,203 @@
                 </div>
 
 
-
-                <!-- =========================================
-                     PAYMENT TERMS BY CUSTOMER
-                     ========================================= -->
+                <!-- =============================================
+                     CUSTOMER PAYMENT
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Payment Terms by Customer
+                    </div>
+
+
+                    <!-- Billing -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Customer Billing Type
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <select name="customer_billing_type">
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option
+                                    value="Retail"
+                                    {% if order.customer_billing_type == "Retail" %}selected{% endif %}
+                                >
+                                    Retail
+                                </option>
+
+                                <option
+                                    value="Credit"
+                                    {% if order.customer_billing_type == "Credit" %}selected{% endif %}
+                                >
+                                    Credit
+                                </option>
+
+                            </select>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Payment Type -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Payment Type
+                        </div>
 
-                            <!-- Billing Type -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <select name="customer_payment_type">
 
-                                {{ form.customer_billing_type.label_tag }}
+                                <option value="">
+                                    Select
+                                </option>
 
-                                {{ form.customer_billing_type }}
+                                <option
+                                    value="Paid"
+                                    {% if order.customer_payment_type == "Paid" %}selected{% endif %}
+                                >
+                                    Paid
+                                </option>
 
-                                {{ form.customer_billing_type.errors }}
+                                <option
+                                    value="Today"
+                                    {% if order.customer_payment_type == "Today" %}selected{% endif %}
+                                >
+                                    Today
+                                </option>
 
-                            </div>
+                                <option
+                                    value="TBB"
+                                    {% if order.customer_payment_type == "TBB" %}selected{% endif %}
+                                >
+                                    TBB
+                                </option>
 
+                            </select>
 
-                            <!-- Payment Type -->
+                        </div>
 
-                            <div class="edit-field">
-
-                                {{ form.customer_payment_type.label_tag }}
-
-                                {{ form.customer_payment_type }}
-
-                                {{ form.customer_payment_type.errors }}
-
-                            </div>
-
-
-                            <!-- Advance -->
-
-                            <div class="edit-field">
-
-                                {{ form.customer_advance_amount.label_tag }}
-
-                                {{ form.customer_advance_amount }}
-
-                                {{ form.customer_advance_amount.errors }}
-
-                            </div>
-
-
-                            <!-- Balance -->
-
-                            <div class="edit-field">
-
-                                {{ form.customer_balance_amount.label_tag }}
-
-                                {{ form.customer_balance_amount }}
-
-                                {{ form.customer_balance_amount.errors }}
-
-                            </div>
+                    </div>
 
 
-                            <!-- Payment Method -->
+                    <!-- Advance -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.customer_payment_method.label_tag }}
+                        <div class="edit-form-label">
+                            Customer Advance Amount
+                        </div>
 
-                                {{ form.customer_payment_method }}
+                        <div class="edit-form-control">
 
-                                {{ form.customer_payment_method.errors }}
+                            <input
+                                type="number"
+                                name="customer_advance_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.customer_advance_amount|default:'0' }}"
+                            >
 
-                            </div>
+                        </div>
+
+                    </div>
 
 
-                            <!-- Due Date -->
+                    <!-- Balance -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.promised_due_date.label_tag }}
+                        <div class="edit-form-label">
+                            Customer Balance Amount
+                        </div>
 
-                                {{ form.promised_due_date }}
+                        <div class="edit-form-control">
 
-                                {{ form.promised_due_date.errors }}
+                            <input
+                                type="number"
+                                name="customer_balance_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.customer_balance_amount|default:'0' }}"
+                            >
 
-                            </div>
+                        </div>
 
+                    </div>
+
+
+                    <!-- Method -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Customer Payment Method
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <select name="customer_payment_method">
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option
+                                    value="Cash"
+                                    {% if order.customer_payment_method == "Cash" %}selected{% endif %}
+                                >
+                                    Cash
+                                </option>
+
+                                <option
+                                    value="Account"
+                                    {% if order.customer_payment_method == "Account" %}selected{% endif %}
+                                >
+                                    Account
+                                </option>
+
+                                <option
+                                    value="UPI"
+                                    {% if order.customer_payment_method == "UPI" %}selected{% endif %}
+                                >
+                                    UPI
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Due Date -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Promised Due Date
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="date"
+                                name="promised_due_date"
+                                value="{% if order.promised_due_date %}{{ order.promised_due_date|date:'Y-m-d' }}{% endif %}"
+                            >
 
                         </div>
 
@@ -959,171 +1409,197 @@
                 </div>
 
 
-
-                <!-- =========================================
-                     PAYMENT TERMS TO CONTRACTED VEHICLE
-                     ========================================= -->
+                <!-- =============================================
+                     CONTRACTED VEHICLE
+                     ============================================= -->
 
                 <div class="edit-category-card">
 
                     <div class="edit-category-title">
-
                         Payment Terms to Contracted Vehicle
+                    </div>
+
+
+                    <!-- Advance -->
+
+                    <div class="edit-form-row">
+
+                        <div class="edit-form-label">
+                            Vehicle Advance Amount
+                        </div>
+
+                        <div class="edit-form-control">
+
+                            <input
+                                type="number"
+                                name="vehicle_advance_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.vehicle_advance_amount|default:'0' }}"
+                            >
+
+                        </div>
 
                     </div>
 
 
-                    <div class="edit-category-body">
+                    <!-- Balance -->
 
-                        <div class="edit-category-grid">
+                    <div class="edit-form-row">
 
+                        <div class="edit-form-label">
+                            Vehicle Balance Amount
+                        </div>
 
-                            <!-- Vehicle Advance -->
+                        <div class="edit-form-control">
 
-                            <div class="edit-field">
+                            <input
+                                type="number"
+                                name="vehicle_balance_amount"
+                                step="0.01"
+                                min="0"
+                                value="{{ order.vehicle_balance_amount|default:'0' }}"
+                            >
 
-                                {{ form.vehicle_advance_amount.label_tag }}
+                        </div>
 
-                                {{ form.vehicle_advance_amount }}
+                    </div>
 
-                                {{ form.vehicle_advance_amount.errors }}
 
-                            </div>
+                    <!-- Owner -->
 
+                    <div class="edit-form-row">
 
-                            <!-- Vehicle Balance -->
+                        <div class="edit-form-label">
+                            Vehicle Owner Name
+                        </div>
 
-                            <div class="edit-field">
+                        <div class="edit-form-control">
 
-                                {{ form.vehicle_balance_amount.label_tag }}
+                            <input
+                                type="text"
+                                name="vehicle_owner_name"
+                                value="{{ order.vehicle_owner_name|default:'' }}"
+                            >
 
-                                {{ form.vehicle_balance_amount }}
+                        </div>
 
-                                {{ form.vehicle_balance_amount.errors }}
+                    </div>
 
-                            </div>
 
+                    <!-- PAN -->
 
-                            <!-- Owner Name -->
+                    <div class="edit-form-row">
 
-                            <div class="edit-field">
+                        <div class="edit-form-label">
+                            PAN Card
+                        </div>
 
-                                {{ form.vehicle_owner_name.label_tag }}
+                        <div class="edit-form-control">
 
-                                {{ form.vehicle_owner_name }}
+                            <input
+                                type="text"
+                                name="pan_card"
+                                value="{{ order.pan_card|default:'' }}"
+                            >
 
-                                {{ form.vehicle_owner_name.errors }}
+                        </div>
 
-                            </div>
+                    </div>
 
 
-                            <!-- PAN -->
+                    <!-- Account Name -->
 
-                            <div class="edit-field">
+                    <div class="edit-form-row">
 
-                                {{ form.pan_card.label_tag }}
+                        <div class="edit-form-label">
+                            Account Name
+                        </div>
 
-                                {{ form.pan_card }}
+                        <div class="edit-form-control">
 
-                                {{ form.pan_card.errors }}
+                            <input
+                                type="text"
+                                name="account_name"
+                                value="{{ order.account_name|default:'' }}"
+                            >
 
-                            </div>
+                        </div>
 
+                    </div>
 
-                            <!-- Account Name -->
 
-                            <div class="edit-field">
+                    <!-- Account Number -->
 
-                                {{ form.account_name.label_tag }}
+                    <div class="edit-form-row">
 
-                                {{ form.account_name }}
+                        <div class="edit-form-label">
+                            Account Number
+                        </div>
 
-                                {{ form.account_name.errors }}
+                        <div class="edit-form-control">
 
-                            </div>
+                            <input
+                                type="text"
+                                name="account_number"
+                                value="{{ order.account_number|default:'' }}"
+                            >
 
+                        </div>
 
-                            <!-- Account Number -->
+                    </div>
 
-                            <div class="edit-field">
 
-                                {{ form.account_number.label_tag }}
+                    <!-- IFSC -->
 
-                                {{ form.account_number }}
+                    <div class="edit-form-row">
 
-                                {{ form.account_number.errors }}
+                        <div class="edit-form-label">
+                            IFSC Code
+                        </div>
 
-                            </div>
+                        <div class="edit-form-control">
 
+                            <input
+                                type="text"
+                                name="ifsc_code"
+                                value="{{ order.ifsc_code|default:'' }}"
+                            >
 
-                            <!-- IFSC -->
+                        </div>
 
-                            <div class="edit-field">
+                    </div>
 
-                                {{ form.ifsc_code.label_tag }}
 
-                                {{ form.ifsc_code }}
+                    <!-- UPI -->
 
-                                {{ form.ifsc_code.errors }}
+                    <div class="edit-form-row">
 
-                            </div>
+                        <div class="edit-form-label">
+                            UPI Number
+                        </div>
 
+                        <div class="edit-form-control">
 
-                            <!-- UPI -->
-
-                            <div class="edit-field">
-
-                                {{ form.upi_number.label_tag }}
-
-                                {{ form.upi_number }}
-
-                                {{ form.upi_number.errors }}
-
-                            </div>
-
-
-                            <!-- Send SMS 
-
-                            <div class="edit-field">
-
-                                {{ form.send_sms.label_tag }}
-
-                                {{ form.send_sms }}
-
-                                {{ form.send_sms.errors }}
-
-                            </div>
-
-
-                             Agreement / TDS
-
-                            <div class="edit-field">
-
-                                {{ form.create_agreement_tds.label_tag }}
-
-                                {{ form.create_agreement_tds }}
-
-                                {{ form.create_agreement_tds.errors }}
-
-                            </div>-->
-
+                            <input
+                                type="text"
+                                name="upi_number"
+                                value="{{ order.upi_number|default:'' }}"
+                            >
 
                         </div>
 
                     </div>
 
                 </div>
-
-
 
             </div>
 
         </div>
 
 
-
         <!-- =================================================
-             FOOTER
+             FOOTER BUTTONS
              ================================================= -->
 
         <div class="edit-order-footer">
@@ -1132,9 +1608,7 @@
                 href="{% url 'onepageorder_detail' order.pk %}"
                 class="edit-back-btn"
             >
-
                 Cancel
-
             </a>
 
 
@@ -1151,9 +1625,109 @@
 
         </div>
 
-
     </form>
 
 </div>
+
+
+<!-- =========================================================
+     TOTAL TRIP COST
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    function getNumber(id) {
+
+        const element =
+            document.getElementById(id);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value =
+            parseFloat(element.value);
+
+        return isNaN(value)
+            ? 0
+            : value;
+    }
+
+
+    function calculateTripCost() {
+
+        const freight =
+            getNumber("id_freight_amount");
+
+        const loading =
+            getNumber("id_loading_unloading_charges");
+
+        const halting =
+            getNumber("id_halting_charges");
+
+        const other =
+            getNumber("id_other_charges");
+
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+
+        const totalField =
+            document.getElementById("total_trip_cost");
+
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+
+    }
+
+
+    const fields = [
+
+        "id_freight_amount",
+        "id_loading_unloading_charges",
+        "id_halting_charges",
+        "id_other_charges"
+
+    ];
+
+
+    fields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (!field) {
+            return;
+        }
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    calculateTripCost();
+
+});
+
+</script>
 
 {% endblock %}

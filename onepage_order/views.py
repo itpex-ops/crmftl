@@ -483,60 +483,367 @@ def onepageorder_detail(request, pk):
 # ============================================================
 
 
+from decimal import Decimal
+from datetime import datetime
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import get_object_or_404, render, redirect
+
+from .models import Customer, Order
+
+
+def edit_decimal(value, default="0.00"):
+    if value in (None, ""):
+        return Decimal(default)
+
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return Decimal(default)
+
+
+def edit_int(value, default=0):
+    if value in (None, ""):
+        return default
+
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def edit_date(value):
+    if not value:
+        return None
+
+    try:
+        return datetime.strptime(
+            value,
+            "%Y-%m-%d"
+        ).date()
+    except ValueError:
+        return None
+
+
 @login_required
 def onepageorder_edit(request, pk):
 
     order = get_object_or_404(
         Order.objects.select_related("customer"),
-        pk=pk,
+        pk=pk
     )
 
     if request.method == "POST":
 
-        form = OrderForm(
-            request.POST,
-            instance=order,
-        )
+        try:
 
-        if form.is_valid():
+            with transaction.atomic():
 
-            form.save()
+                # =================================================
+                # CUSTOMER
+                # =================================================
+
+                customer = order.customer
+
+                customer.name = request.POST.get(
+                    "customer_name",
+                    ""
+                ).strip()
+
+                customer.contact_number = request.POST.get(
+                    "contact_number",
+                    ""
+                ).strip()
+
+                customer.email = request.POST.get(
+                    "email",
+                    ""
+                ).strip()
+
+                customer.address = request.POST.get(
+                    "address",
+                    ""
+                ).strip()
+
+                if not customer.name:
+                    messages.error(
+                        request,
+                        "Customer Name is required."
+                    )
+
+                    return render(
+                        request,
+                        "onepage_order/order_edit.html",
+                        {
+                            "order": order
+                        }
+                    )
+
+                customer.full_clean()
+                customer.save()
+
+
+                # =================================================
+                # ORDER
+                # =================================================
+
+                order.lead_generated_through = request.POST.get(
+                    "lead_generated_through",
+                    ""
+                )
+
+                order.sales_closed_by = request.POST.get(
+                    "sales_closed_by",
+                    ""
+                ).strip()
+
+
+                # =================================================
+                # SHIPMENT
+                # =================================================
+
+                order.origin = request.POST.get(
+                    "origin",
+                    ""
+                ).strip()
+
+                order.destination = request.POST.get(
+                    "destination",
+                    ""
+                ).strip()
+
+                order.material = request.POST.get(
+                    "material",
+                    ""
+                ).strip()
+
+                order.packing_type = request.POST.get(
+                    "packing_type",
+                    ""
+                ).strip()
+
+                order.no_of_pieces = edit_int(
+                    request.POST.get("no_of_pieces")
+                )
+
+                order.weight_tons = edit_decimal(
+                    request.POST.get("weight_tons"),
+                    "0.000"
+                )
+
+
+                # =================================================
+                # VEHICLE
+                # =================================================
+
+                order.vehicle_type = request.POST.get(
+                    "vehicle_type",
+                    ""
+                ).strip()
+
+                order.vehicle_number = request.POST.get(
+                    "vehicle_number",
+                    ""
+                ).strip()
+
+                order.driver_number = request.POST.get(
+                    "driver_number",
+                    ""
+                ).strip()
+
+                order.owner_number = request.POST.get(
+                    "owner_number",
+                    ""
+                ).strip()
+
+                order.vehicle_sourced_by = request.POST.get(
+                    "vehicle_sourced_by",
+                    "Direct"
+                )
+
+                order.owner_broker_name = request.POST.get(
+                    "owner_broker_name",
+                    ""
+                ).strip()
+
+
+                # =================================================
+                # COMMERCIALS
+                # =================================================
+
+                order.freight_amount = edit_decimal(
+                    request.POST.get("freight_amount")
+                )
+
+                order.loading_unloading_charges = edit_decimal(
+                    request.POST.get(
+                        "loading_unloading_charges"
+                    )
+                )
+
+                order.halting_charges = edit_decimal(
+                    request.POST.get("halting_charges")
+                )
+
+                order.other_charges = edit_decimal(
+                    request.POST.get("other_charges")
+                )
+
+                order.selling_amount = edit_decimal(
+                    request.POST.get("selling_amount")
+                )
+
+                order.manager_approval = request.POST.get(
+                    "manager_approval",
+                    "Pending"
+                )
+
+                order.approved_by = request.POST.get(
+                    "approved_by",
+                    ""
+                ).strip()
+
+
+                # =================================================
+                # CUSTOMER PAYMENT
+                # =================================================
+
+                order.customer_billing_type = request.POST.get(
+                    "customer_billing_type",
+                    ""
+                )
+
+                order.customer_payment_type = request.POST.get(
+                    "customer_payment_type",
+                    ""
+                )
+
+                order.customer_advance_amount = edit_decimal(
+                    request.POST.get(
+                        "customer_advance_amount"
+                    )
+                )
+
+                order.customer_balance_amount = edit_decimal(
+                    request.POST.get(
+                        "customer_balance_amount"
+                    )
+                )
+
+                order.customer_payment_method = request.POST.get(
+                    "customer_payment_method",
+                    ""
+                )
+
+                order.promised_due_date = edit_date(
+                    request.POST.get(
+                        "promised_due_date"
+                    )
+                )
+
+
+                # =================================================
+                # CONTRACTED VEHICLE
+                # =================================================
+
+                order.vehicle_advance_amount = edit_decimal(
+                    request.POST.get(
+                        "vehicle_advance_amount"
+                    )
+                )
+
+                order.vehicle_balance_amount = edit_decimal(
+                    request.POST.get(
+                        "vehicle_balance_amount"
+                    )
+                )
+
+                order.vehicle_owner_name = request.POST.get(
+                    "vehicle_owner_name",
+                    ""
+                ).strip()
+
+                order.pan_card = request.POST.get(
+                    "pan_card",
+                    ""
+                ).strip()
+
+                order.account_name = request.POST.get(
+                    "account_name",
+                    ""
+                ).strip()
+
+                order.account_number = request.POST.get(
+                    "account_number",
+                    ""
+                ).strip()
+
+                order.ifsc_code = request.POST.get(
+                    "ifsc_code",
+                    ""
+                ).strip()
+
+                order.upi_number = request.POST.get(
+                    "upi_number",
+                    ""
+                ).strip()
+
+
+                # =================================================
+                # SAVE ORDER
+                # =================================================
+
+                order.full_clean()
+
+                # This recalculates total_trip_cost
+                order.save()
+
 
             messages.success(
                 request,
-                f"{order.trip_number} updated successfully.",
+                f"Order {order.trip_number} updated successfully."
             )
 
             return redirect(
                 "onepageorder_detail",
-                pk=order.pk,
+                pk=order.pk
             )
 
-        messages.error(
-            request,
-            "Please correct the errors in the form.",
-        )
 
-    else:
+        except Exception as e:
 
-        form = OrderForm(
-            instance=order,
-        )
+            print(
+                "ORDER UPDATE ERROR:",
+                repr(e)
+            )
+
+            messages.error(
+                request,
+                f"Unable to update order: {str(e)}"
+            )
+
+            return render(
+                request,
+                "onepage_order/order_edit.html",
+                {
+                    "order": order
+                }
+            )
+
 
     return render(
         request,
-        "onepageorders/order_edit.html",
+        "onepage_order/order_edit.html",
         {
-            "form": form,
-            "order": order,
-        },
+            "order": order
+        }
     )
-
 
 # ============================================================
 # VEHICLE PAYMENTS
 # ============================================================
-
 
 @login_required
 def vehicle_payments(request):
