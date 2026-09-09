@@ -398,7 +398,17 @@
 
 
 <div class="order-create-page">
+{% if customer_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {{ customer_form.non_field_errors }}
+    </div>
+{% endif %}
 
+{% if order_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {{ order_form.non_field_errors }}
+    </div>
+{% endif %}
 
     <!-- =====================================================
          HEADER
