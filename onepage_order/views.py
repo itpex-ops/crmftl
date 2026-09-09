@@ -129,6 +129,15 @@ def onepageorder_list(request):
 # ============================================================
 
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction, IntegrityError
+from django.shortcuts import render, redirect
+
+from .forms import CustomerForm, OrderForm
+from .models import Order
+
+
 @login_required
 def onepageorder_create(request):
 
@@ -137,24 +146,22 @@ def onepageorder_create(request):
         customer_form = CustomerForm(request.POST)
         order_form = OrderForm(request.POST)
 
-        if (
-            customer_form.is_valid()
-            and order_form.is_valid()
-        ):
+        if customer_form.is_valid() and order_form.is_valid():
 
             try:
 
                 with transaction.atomic():
 
-                    # -----------------------------
-                    # Create Customer
-                    # -----------------------------
+                    # -----------------------------------------
+                    # 1. SAVE CUSTOMER
+                    # -----------------------------------------
 
                     customer = customer_form.save()
 
-                    # -----------------------------
-                    # Create Order
-                    # -----------------------------
+
+                    # -----------------------------------------
+                    # 2. SAVE ORDER
+                    # -----------------------------------------
 
                     order = order_form.save(commit=False)
 
@@ -162,28 +169,43 @@ def onepageorder_create(request):
 
                     order.save()
 
-                messages.success(
-                    request,
-                    f"Order {order.trip_number} created successfully.",
-                )
+
+                    # -----------------------------------------
+                    # 3. SUCCESS
+                    # -----------------------------------------
+
+                    messages.success(
+                        request,
+                        f"Order {order.trip_number} created successfully."
+                    )
+
+                # IMPORTANT:
+                # This URL name must exist in onepageorder/urls.py
 
                 return redirect(
                     "onepageorder_detail",
-                    pk=order.pk,
+                    pk=order.pk
+                )
+
+            except IntegrityError as exc:
+
+                messages.error(
+                    request,
+                    f"Database error while saving order: {exc}"
                 )
 
             except Exception as exc:
 
                 messages.error(
                     request,
-                    f"Order was not saved: {exc}",
+                    f"Error while saving order: {exc}"
                 )
 
         else:
 
             messages.error(
                 request,
-                "Please correct the errors in the form.",
+                "Please correct the errors shown below."
             )
 
     else:
@@ -191,17 +213,17 @@ def onepageorder_create(request):
         customer_form = CustomerForm()
         order_form = OrderForm()
 
+
     return render(
         request,
         "onepageorders/order_create.html",
         {
             "customer_form": customer_form,
             "order_form": order_form,
-            "form": order_form,  # backward compatibility
+            "form": order_form,
             "title": "Create Order",
-        },
+        }
     )
-
 
 # ============================================================
 # ORDER DETAIL
