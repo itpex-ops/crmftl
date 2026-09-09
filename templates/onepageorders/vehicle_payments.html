@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h3>Vehicle Payments</h3>
-<div class="card p-4 mb-4">
+<div class="card p-4 mb-4 mt-4">
     <form method="post">
         {% csrf_token %}
         <div class="row g-3">{% for f in form %}
