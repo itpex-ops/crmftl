@@ -7,234 +7,10 @@
 <style>
 
 /* =========================================================
-   PAGE
-   ========================================================= */
-
-.cpay-page {
-    width: 100%;
-    padding: 22px 28px 40px;
-
-    background: #f8f9fb;
-
-    box-sizing: border-box;
-    min-height: calc(100vh - 70px);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.cpay-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-bottom: 18px;
-}
-
-.cpay-title {
-    margin: 0;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 22px;
-    font-weight: 600;
-
-    color: #212529;
-}
-
-.cpay-subtitle {
-    margin: 4px 0 0;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-    color: #8a9199;
-}
-
-
-/* =========================================================
-   MESSAGE
-   ========================================================= */
-
-.cpay-message {
-    margin-bottom: 15px;
-
-    padding: 10px 14px;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 6px;
-
-    background: #ffffff;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-    color: #495057;
-}
-
-
-/* =========================================================
-   FORM CARD
-   ========================================================= */
-
-.cpay-form-card {
-    width: 100%;
-
-    margin-bottom: 18px;
-
-    padding: 18px;
-
-    background: #ffffff;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 8px;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================================
-   FORM GRID
-   ========================================================= */
-
-.cpay-form-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap: 14px 18px;
-}
-
-
-/* =========================================================
-   FIELD
-   ========================================================= */
-
-.cpay-field {
-    min-width: 0;
-}
-
-.cpay-field label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-    font-weight: 500;
-
-    color: #495057;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-.cpay-field input,
-.cpay-field select {
-
-    width: 100%;
-
-    height: 38px;
-
-    padding: 6px 9px;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 6px;
-
-    background: #ffffff;
-
-    color: #343a40;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-    outline: none;
-
-    box-sizing: border-box;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.cpay-field input:focus,
-.cpay-field select:focus {
-
-    border-color: #FDB81B;
-
-    box-shadow:
-        0 0 0 3px rgba(253, 184, 27, 0.12);
-}
-
-
-/* =========================================================
-   PAYMENT BUTTON
-   ========================================================= */
-
-.cpay-form-actions {
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    margin-top: 16px;
-}
-
-.cpay-save-btn {
-
-    min-width: 140px;
-
-    height: 38px;
-
-    padding: 0 18px;
-
-    border: 1px solid #0d6efd;
-
-    border-radius: 6px;
-
-    background: #0d6efd;
-
-    color: #ffffff;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
-.cpay-save-btn:hover {
-
-    background: #0b5ed7;
-
-    border-color: #0a58ca;
-}
-
-
-/* =========================================================
    TABLE CARD
    ========================================================= */
 
 .cpay-card {
-
     width: 100%;
 
     background: #ffffff;
@@ -250,6 +26,16 @@
 
 
 /* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.cpay-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* =========================================================
    TABLE
    ========================================================= */
 
@@ -257,9 +43,13 @@
 
     width: 100%;
 
+    min-width: 950px;
+
     margin: 0;
 
     border-collapse: collapse;
+
+    table-layout: fixed;
 
     font-family: "Poppins", sans-serif;
 
@@ -268,12 +58,59 @@
 
 
 /* =========================================================
-   TABLE HEADER
+   COLUMN WIDTHS
+   ========================================================= */
+
+.cpay-table th:nth-child(1),
+.cpay-table td:nth-child(1) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(2),
+.cpay-table td:nth-child(2) {
+    width: 18%;
+}
+
+.cpay-table th:nth-child(3),
+.cpay-table td:nth-child(3) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(4),
+.cpay-table td:nth-child(4) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(5),
+.cpay-table td:nth-child(5) {
+    width: 16%;
+}
+
+.cpay-table th:nth-child(6),
+.cpay-table td:nth-child(6) {
+    width: 10%;
+}
+
+.cpay-table th:nth-child(7),
+.cpay-table td:nth-child(7) {
+    width: 10%;
+}
+
+.cpay-table th:nth-child(8),
+.cpay-table td:nth-child(8) {
+    width: 10%;
+}
+
+
+/* =========================================================
+   HEADER
    ========================================================= */
 
 .cpay-table thead th {
 
-    padding: 11px 10px;
+    height: 42px;
+
+    padding: 9px 12px;
 
     background: #f3f4f6;
 
@@ -285,29 +122,55 @@
 
     font-weight: 600;
 
+    text-align: left;
+
+    vertical-align: middle;
+
     white-space: nowrap;
-    align-items: center;
+
+    box-sizing: border-box;
+}
+
+
+/* Amount headers */
+
+.cpay-table thead th.amount-header {
+    text-align: right;
 }
 
 
 /* =========================================================
-   TABLE BODY
+   BODY
    ========================================================= */
 
 .cpay-table tbody td {
 
-    padding: 11px 10px;
+    height: 43px;
+
+    padding: 9px 12px;
 
     border-bottom: 1px solid #eef0f2;
 
     color: #555e68;
 
+    text-align: left;
+
     vertical-align: middle;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
 }
+
 
 .cpay-table tbody tr:last-child td {
     border-bottom: none;
 }
+
 
 .cpay-table tbody tr:hover {
     background: #fafafa;
@@ -318,9 +181,13 @@
    TRIP
    ========================================================= */
 
-.trip-number {
+.cpay-table .trip-number {
+
     font-weight: 600;
+
     color: #212529;
+
+    text-align: left;
 }
 
 
@@ -328,7 +195,7 @@
    AMOUNT
    ========================================================= */
 
-.amount {
+.cpay-table .amount {
 
     text-align: right;
 
@@ -344,39 +211,59 @@
    STATUS
    ========================================================= */
 
-.status {
+.cpay-table .status-cell {
+    text-align: left;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+   ========================================================= */
+
+.cpay-table .status {
 
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
 
+    max-width: 100%;
+
     padding: 4px 9px;
 
     border-radius: 20px;
 
-    font-size: 9.5px;
+    font-size: 9px;
 
     font-weight: 600;
 
     white-space: nowrap;
+
+    box-sizing: border-box;
 }
 
-.status-success {
+
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
+
+.cpay-table .status-success {
 
     background: #d1e7dd;
 
     color: #0f5132;
 }
 
-.status-warning {
+
+.cpay-table .status-warning {
 
     background: #fff3cd;
 
     color: #856404;
 }
 
-.status-info {
+
+.cpay-table .status-info {
 
     background: #cff4fc;
 
@@ -388,11 +275,13 @@
    EMPTY
    ========================================================= */
 
-.empty-row {
+.cpay-table .empty-row {
 
-    padding: 35px 20px !important;
+    height: 100px;
 
-    text-align: center;
+    padding: 30px 20px !important;
+
+    text-align: center !important;
 
     color: #8a9199 !important;
 
@@ -401,30 +290,13 @@
 
 
 /* =========================================================
-   RESPONSIVE
+   TABLE MOBILE
    ========================================================= */
 
 @media (max-width: 900px) {
 
-    .cpay-page {
-        padding: 18px 15px 30px;
-    }
-
-    .cpay-form-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-}
-
-@media (max-width: 600px) {
-
-    .cpay-form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .cpay-header {
-        align-items: flex-start;
-        gap: 10px;
+    .cpay-table {
+        min-width: 900px;
     }
 
 }
