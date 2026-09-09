@@ -1,18 +1,408 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<div class="container-fluid mt-4">
 
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+<style>
+
+/* =========================================================
+   ORDER CREATION PAGE
+   ========================================================= */
+
+.order-create-page {
+    width: 100%;
+    padding: 22px 28px 35px;
+    box-sizing: border-box;
+    background: #f8f9fb;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.order-create-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.order-create-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.edit-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #495057;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.edit-back-btn:hover {
+    background: #f4f5f7;
+    border-color: #cfd4da;
+    color: #212529;
+}
+
+
+/* =========================================================
+   TWO COLUMN GRID
+   ========================================================= */
+
+.order-two-columns {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    column-gap: 22px;
+    row-gap: 14px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.order-card {
+    width: 100%;
+
+    margin: 0;
+
+    border: 1px solid #8d8d8d;
+
+    background: #ffffff;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.order-card-title {
+    min-height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 10px;
+
+    background: #ffc000;
+
+    border-bottom: 1px solid #777;
+
+    color: #111111;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    text-align: center;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   FORM ROW
+   ========================================================= */
+
+.order-form-row {
+    display: grid;
+
+    grid-template-columns:
+        42%
+        58%;
+
+    min-height: 39px;
+
+    border-bottom: 1px solid #b8b8b8;
+
+    box-sizing: border-box;
+}
+
+.order-form-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
+.order-form-label {
+    display: flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-right: 1px solid #b8b8b8;
+
+    background: #ffffff;
+
+    color: #172033;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11.5px;
+
+    line-height: 1.25;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUT AREA
+   ========================================================= */
+
+.order-form-control {
+    min-width: 0;
+
+    padding: 3px 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+   ========================================================= */
+
+.order-form-control input,
+.order-form-control select,
+.order-form-control textarea {
+
+    width: 100%;
+    min-width: 0;
+
+    height: 30px;
+
+    padding: 4px 7px;
+
+    border: 1px solid #d5d5d5;
+
+    border-radius: 3px;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11.5px;
+
+    outline: none;
+
+    box-shadow: none;
+
+    box-sizing: border-box;
+}
+
+
+.order-form-control textarea {
+    min-height: 48px;
+    height: auto;
+    resize: vertical;
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.order-form-control input:focus,
+.order-form-control select:focus,
+.order-form-control textarea:focus {
+
+    border-color: #FDB81B;
+
+    background: #fffef0;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px rgba(253, 184, 27, 0.10);
+}
+
+
+/* =========================================================
+   READONLY
+   ========================================================= */
+
+.order-form-control input[readonly] {
+
+    background: #eef0f2;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.order-form-control input[type="checkbox"] {
+
+    width: 17px;
+    height: 17px;
+
+    margin: 5px 0 0 5px;
+
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.field-error {
+
+    margin-top: 2px;
+
+    color: #dc3545;
+
+    font-size: 9px;
+
+    line-height: 1.2;
+
+}
+
+
+/* =========================================================
+   CREATE BUTTON
+   ========================================================= */
+
+.create-order-container {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 14px 0 20px;
+}
+
+
+.create-order-button {
+
+    min-width: 125px;
+
+    height: 38px;
+
+    border-radius: 5px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .order-two-columns {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .order-create-page {
+        padding: 15px;
+    }
+
+    .order-create-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-form-row {
+        grid-template-columns:
+            44%
+            56%;
+    }
+
+    .order-form-label {
+        font-size: 10.5px;
+    }
+
+    .order-form-control input,
+    .order-form-control select,
+    .order-form-control textarea {
+        font-size: 10.5px;
+    }
+
+}
+
+</style>
+
+
 <div class="order-create-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
     <div class="order-create-header">
 
@@ -20,89 +410,145 @@
             Order Creation
         </h1>
 
+
         <a
             href="{% url 'onepageorder_list' %}"
             class="edit-back-btn"
         >
+
             <i class="bi bi-arrow-left me-1"></i>
+
             Back
+
         </a>
 
     </div>
 
 
-    <!-- =========================================================
+
+    <!-- =====================================================
          FORM
-         ========================================================= -->
+         ===================================================== -->
 
     <form method="POST">
 
         {% csrf_token %}
 
 
+
         <!-- =====================================================
-             NON-FIELD ERRORS
+             NON FIELD ERRORS
              ===================================================== -->
 
         {% if customer_form.non_field_errors %}
+
             <div class="alert alert-danger">
                 {{ customer_form.non_field_errors }}
             </div>
+
         {% endif %}
 
-        {% if form.non_field_errors %}
+
+        {% if order_form.non_field_errors %}
+
             <div class="alert alert-danger">
-                {{ form.non_field_errors }}
+                {{ order_form.non_field_errors }}
             </div>
+
         {% endif %}
+
+
+
         <!-- =====================================================
-             TWO COLUMN ORDER GRID
+             TWO COLUMN GRID
              ===================================================== -->
 
         <div class="order-two-columns">
+
+
             <!-- =================================================
-                 1. CUSTOMER DETAILS
+                 LEFT COLUMN - CUSTOMER
                  ================================================= -->
 
             <div class="order-card">
+
+
                 <div class="order-card-title">
                     Customer Details
                 </div>
+
+
                 <!-- Customer Name -->
+
                 <div class="order-form-row">
+
                     <div class="order-form-label">
                         Customer Name
                         <span class="text-danger ms-1">*</span>
                     </div>
+
                     <div class="order-form-control">
+
                         {{ customer_form.name }}
+
+                        {% for error in customer_form.name.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
-                <!-- Contact Number -->
+
+
+                <!-- Contact -->
+
                 <div class="order-form-row">
+
                     <div class="order-form-label">
                         Contact Number
                     </div>
+
                     <div class="order-form-control">
+
                         {{ customer_form.contact_number }}
+
+                        {% for error in customer_form.contact_number.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
+
                 </div>
+
+
                 <!-- Email -->
 
                 <div class="order-form-row">
+
                     <div class="order-form-label">
                         Email
                     </div>
 
                     <div class="order-form-control">
+
                         {{ customer_form.email }}
+
+                        {% for error in customer_form.email.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Customer Address -->
+                <!-- Address -->
 
                 <div class="order-form-row">
 
@@ -111,7 +557,15 @@
                     </div>
 
                     <div class="order-form-control">
+
                         {{ customer_form.address }}
+
+                        {% for error in customer_form.address.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
@@ -126,13 +580,21 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.lead_generated_through }}
+
+                        {{ order_form.lead_generated_through }}
+
+                        {% for error in order_form.lead_generated_through.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Sales Closed -->
+                <!-- Sales -->
 
                 <div class="order-form-row">
 
@@ -141,7 +603,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.sales_closed_by }}
+
+                        {{ order_form.sales_closed_by }}
+
+                        {% for error in order_form.sales_closed_by.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
@@ -149,18 +619,20 @@
             </div>
 
 
+
             <!-- =================================================
-                 2. COMMERCIALS
+                 RIGHT COLUMN - COMMERCIALS
                  ================================================= -->
 
             <div class="order-card">
+
 
                 <div class="order-card-title">
                     Commercials
                 </div>
 
 
-                <!-- Freight Amount -->
+                <!-- Freight -->
 
                 <div class="order-form-row">
 
@@ -169,13 +641,21 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.freight_amount }}
+
+                        {{ order_form.freight_amount }}
+
+                        {% for error in order_form.freight_amount.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Loading / Unloading -->
+                <!-- Loading -->
 
                 <div class="order-form-row">
 
@@ -184,7 +664,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.loading_unloading_charges }}
+
+                        {{ order_form.loading_unloading_charges }}
+
+                        {% for error in order_form.loading_unloading_charges.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
@@ -199,13 +687,21 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.halting_charges }}
+
+                        {{ order_form.halting_charges }}
+
+                        {% for error in order_form.halting_charges.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Other Charges -->
+                <!-- Other -->
 
                 <div class="order-form-row">
 
@@ -214,13 +710,21 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.other_charges }}
+
+                        {{ order_form.other_charges }}
+
+                        {% for error in order_form.other_charges.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Total Trip Cost -->
+                <!-- Total -->
 
                 <div class="order-form-row">
 
@@ -242,7 +746,7 @@
                 </div>
 
 
-                <!-- Selling Amount -->
+                <!-- Selling -->
 
                 <div class="order-form-row">
 
@@ -251,13 +755,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.selling_amount }}
+
+                        {{ order_form.selling_amount }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Manager Approval -->
+                <!-- Manager -->
 
                 <div class="order-form-row">
 
@@ -266,13 +772,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.manager_approval }}
+
+                        {{ order_form.manager_approval }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Approved By -->
+                <!-- Approved -->
 
                 <div class="order-form-row">
 
@@ -281,7 +789,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.approved_by }}
+
+                        {{ order_form.approved_by }}
+
                     </div>
 
                 </div>
@@ -289,11 +799,13 @@
             </div>
 
 
+
             <!-- =================================================
-                 3. SHIPMENT DETAILS
+                 LEFT COLUMN - SHIPMENT
                  ================================================= -->
 
             <div class="order-card">
+
 
                 <div class="order-card-title">
                     Shipment Details
@@ -309,7 +821,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.origin }}
+
+                        {{ order_form.origin }}
+
                     </div>
 
                 </div>
@@ -324,7 +838,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.destination }}
+
+                        {{ order_form.destination }}
+
                     </div>
 
                 </div>
@@ -339,7 +855,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.material }}
+
+                        {{ order_form.material }}
+
                     </div>
 
                 </div>
@@ -354,7 +872,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.packing_type }}
+
+                        {{ order_form.packing_type }}
+
                     </div>
 
                 </div>
@@ -369,7 +889,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.no_of_pieces }}
+
+                        {{ order_form.no_of_pieces }}
+
                     </div>
 
                 </div>
@@ -384,7 +906,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.weight_tons }}
+
+                        {{ order_form.weight_tons }}
+
                     </div>
 
                 </div>
@@ -392,11 +916,13 @@
             </div>
 
 
+
             <!-- =================================================
-                 4. PAYMENT TERMS BY CUSTOMER
+                 RIGHT COLUMN - CUSTOMER PAYMENT
                  ================================================= -->
 
             <div class="order-card">
+
 
                 <div class="order-card-title">
                     Payment Terms by Customer
@@ -412,7 +938,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.customer_billing_type }}
+
+                        {{ order_form.customer_billing_type }}
+
                     </div>
 
                 </div>
@@ -427,7 +955,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.customer_payment_type }}
+
+                        {{ order_form.customer_payment_type }}
+
                     </div>
 
                 </div>
@@ -442,7 +972,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.customer_advance_amount }}
+
+                        {{ order_form.customer_advance_amount }}
+
                     </div>
 
                 </div>
@@ -457,7 +989,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.customer_balance_amount }}
+
+                        {{ order_form.customer_balance_amount }}
+
                     </div>
 
                 </div>
@@ -472,7 +1006,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.customer_payment_method }}
+
+                        {{ order_form.customer_payment_method }}
+
                     </div>
 
                 </div>
@@ -487,7 +1023,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.promised_due_date }}
+
+                        {{ order_form.promised_due_date }}
+
                     </div>
 
                 </div>
@@ -495,18 +1033,20 @@
             </div>
 
 
+
             <!-- =================================================
-                 5. VEHICLE DETAILS
+                 LEFT COLUMN - VEHICLE
                  ================================================= -->
 
             <div class="order-card">
+
 
                 <div class="order-card-title">
                     Vehicle Details
                 </div>
 
 
-                <!-- Vehicle Type -->
+                <!-- Type -->
 
                 <div class="order-form-row">
 
@@ -515,13 +1055,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_type }}
+
+                        {{ order_form.vehicle_type }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Vehicle Number -->
+                <!-- Number -->
 
                 <div class="order-form-row">
 
@@ -530,13 +1072,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_number }}
+
+                        {{ order_form.vehicle_number }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Driver Number -->
+                <!-- Driver -->
 
                 <div class="order-form-row">
 
@@ -545,13 +1089,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.driver_number }}
+
+                        {{ order_form.driver_number }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Owner Number -->
+                <!-- Owner -->
 
                 <div class="order-form-row">
 
@@ -560,13 +1106,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.owner_number }}
+
+                        {{ order_form.owner_number }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Vehicle Sourced By -->
+                <!-- Source -->
 
                 <div class="order-form-row">
 
@@ -575,13 +1123,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_sourced_by }}
+
+                        {{ order_form.vehicle_sourced_by }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Owner / Broker -->
+                <!-- Broker -->
 
                 <div class="order-form-row">
 
@@ -590,7 +1140,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.owner_broker_name }}
+
+                        {{ order_form.owner_broker_name }}
+
                     </div>
 
                 </div>
@@ -598,18 +1150,20 @@
             </div>
 
 
+
             <!-- =================================================
-                 6. PAYMENT TERMS TO CONTRACTED VEHICLE
+                 RIGHT COLUMN - CONTRACTED VEHICLE
                  ================================================= -->
 
             <div class="order-card">
+
 
                 <div class="order-card-title">
                     Payment Terms to Contracted Vehicle
                 </div>
 
 
-                <!-- Vehicle Advance -->
+                <!-- Advance -->
 
                 <div class="order-form-row">
 
@@ -618,13 +1172,15 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_advance_amount }}
+
+                        {{ order_form.vehicle_advance_amount }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Vehicle Balance -->
+                <!-- Balance -->
 
                 <div class="order-form-row">
 
@@ -633,7 +1189,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_balance_amount }}
+
+                        {{ order_form.vehicle_balance_amount }}
+
                     </div>
 
                 </div>
@@ -648,7 +1206,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.vehicle_owner_name }}
+
+                        {{ order_form.vehicle_owner_name }}
+
                     </div>
 
                 </div>
@@ -663,7 +1223,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.pan_card }}
+
+                        {{ order_form.pan_card }}
+
                     </div>
 
                 </div>
@@ -678,7 +1240,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.account_name }}
+
+                        {{ order_form.account_name }}
+
                     </div>
 
                 </div>
@@ -693,7 +1257,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.account_number }}
+
+                        {{ order_form.account_number }}
+
                     </div>
 
                 </div>
@@ -708,7 +1274,9 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.ifsc_code }}
+
+                        {{ order_form.ifsc_code }}
+
                     </div>
 
                 </div>
@@ -723,14 +1291,17 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.upi_number }}
+
+                        {{ order_form.upi_number }}
+
                     </div>
 
                 </div>
 
 
-                <!-- Send SMS 
+                <!-- Send SMS -->
 
+                <!--
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -738,14 +1309,16 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.send_sms }}
+                        {{ order_form.send_sms }}
                     </div>
 
                 </div>
+                -->
 
 
-             Agreement 
+                <!-- Agreement -->
 
+                <!--
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -753,18 +1326,20 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ form.create_agreement_tds }}
+                        {{ order_form.create_agreement_tds }}
                     </div>
 
-                </div>-->
+                </div>
+                -->
 
             </div>
 
         </div>
 
 
+
         <!-- =====================================================
-             CREATE ORDER
+             CREATE ORDER BUTTON
              ===================================================== -->
 
         <div class="create-order-container">
@@ -773,585 +1348,130 @@
                 type="submit"
                 class="btn btn-primary create-order-button"
             >
+
                 <i class="bi bi-save me-1"></i>
+
                 Create Order
+
             </button>
 
         </div>
 
+
     </form>
 
 </div>
-</div>
 
-<!-- =========================================================
-     STYLES
-     ========================================================= -->
-
-<style>
-
-    /* =========================================================
-       PAGE
-       ========================================================= */
-/* =========================================================
-   ORDER CREATE HEADER
-   ========================================================= */
-
-.order-create-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-
-    margin-bottom: 20px;
-}
-
-.order-create-title {
-    margin: 0;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 22px;
-    font-weight: 600;
-
-    color: #212529;
-}
-
-.edit-back-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 38px;
-    padding: 0 16px;
-
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-
-    background: #ffffff;
-    color: #495057;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
-}
-
-.edit-back-btn:hover {
-    background: #f4f5f7;
-    border-color: #cfd4da;
-    color: #212529;
-}
-    .order-create-page {
-        width: 100%;
-        padding: 22px 28px 35px;
-        box-sizing: border-box;
-    }
-.edit-back-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 38px;
-    padding: 0 16px;
-
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-
-    background: #ffffff;
-    color: #495057;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
-}
-
-.edit-back-btn:hover {
-    background: #f4f5f7;
-    border-color: #cfd4da;
-    color: #212529;
-}
-
-
-
-    .order-create-title {
-        font-size: 23px;
-        font-weight: 600;
-        color: #1f2937;
-        margin: 0 0 20px 0;
-    }
-
-
-    /* =========================================================
-       MAIN TWO-COLUMN GRID
-       
-       IMPORTANT:
-       All six cards are direct grid items.
-       
-       Row 1:
-       Customer Details       Commercials
-       
-       Row 2:
-       Shipment Details       Payment Terms by Customer
-       
-       Row 3:
-       Vehicle Details        Contracted Vehicle Payment
-       ========================================================= */
-
-    .order-two-columns {
-        display: grid;
-
-        grid-template-columns:
-            minmax(0, 1fr)
-            minmax(0, 1fr);
-
-        column-gap: 22px;
-        row-gap: 14px;
-
-        width: 100%;
-
-        align-items: stretch;
-    }
-
-
-    /* =========================================================
-       CARD
-       ========================================================= */
-
-    .order-card {
-        width: 100%;
-
-        margin: 0;
-
-        border: 1px solid #8d8d8d;
-
-        background: #ffffff;
-
-        overflow: hidden;
-
-        box-sizing: border-box;
-
-        align-self: stretch;
-    }
-
-
-    /* =========================================================
-       CARD HEADER
-       ========================================================= */
-
-    .order-card-title {
-        min-height: 38px;
-
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-
-        padding: 7px 10px;
-
-        background: #ffc000;
-
-        border-bottom: 1px solid #777;
-
-        color: #111;
-
-        font-size: 14px;
-
-        font-weight: 700;
-
-        text-transform: uppercase;
-
-        text-align: center;
-
-        line-height: 1.2;
-
-        box-sizing: border-box;
-    }
-
-
-    /* =========================================================
-       FORM ROW
-       ========================================================= */
-
-    .order-form-row {
-        display: grid;
-
-        grid-template-columns:
-            42%
-            58%;
-
-        min-height: 39px;
-
-        border-bottom: 1px solid #b8b8b8;
-
-        box-sizing: border-box;
-    }
-
-
-    .order-form-row:last-child {
-        border-bottom: none;
-    }
-
-
-    /* =========================================================
-       LABEL
-       ========================================================= */
-
-    .order-form-label {
-        display: flex;
-
-        align-items: center;
-
-        padding: 5px 9px;
-
-        border-right: 1px solid #b8b8b8;
-
-        color: #172033;
-
-        font-size: 12.5px;
-
-        line-height: 1.2;
-
-        background: #ffffff;
-
-        box-sizing: border-box;
-    }
-
-
-    /* =========================================================
-       FORM CONTROL
-       ========================================================= */
-
-    .order-form-control {
-        min-width: 0;
-
-        display: flex;
-
-        align-items: center;
-
-        padding: 3px 5px;
-
-        box-sizing: border-box;
-    }
-
-
-    .order-form-control input,
-    .order-form-control select,
-    .order-form-control textarea {
-        width: 100%;
-
-        min-width: 0;
-
-        border: 1px solid #d5d5d5;
-
-        border-radius: 3px;
-
-        background: #ffffff;
-
-        color: #222;
-
-        font-size: 12.5px;
-
-        padding: 4px 7px;
-
-        outline: none;
-
-        box-shadow: none;
-
-        box-sizing: border-box;
-    }
-
-
-    .order-form-control input,
-    .order-form-control select {
-        height: 29px;
-    }
-
-
-    .order-form-control textarea {
-        height: 48px;
-
-        resize: vertical;
-    }
-
-
-    /* =========================================================
-       FOCUS
-       ========================================================= */
-
-    .order-form-control input:focus,
-    .order-form-control select:focus,
-    .order-form-control textarea:focus {
-        border-color: #9b9b9b;
-
-        box-shadow: none;
-
-        background: #fffef0;
-    }
-
-
-    /* =========================================================
-       READONLY
-       ========================================================= */
-
-    .order-form-control input[readonly] {
-        background: #eef0f2;
-
-        font-weight: 600;
-    }
-
-
-    /* =========================================================
-       CHECKBOX
-       ========================================================= */
-
-    .order-form-control input[type="checkbox"] {
-        width: 16px;
-
-        height: 16px;
-
-        margin: 0 0 0 6px;
-    }
-
-
-    /* =========================================================
-       ERRORS
-       ========================================================= */
-
-    .order-error {
-        color: #dc3545;
-
-        font-size: 10px;
-
-        padding: 2px 5px 0;
-    }
-
-
-    /* =========================================================
-       CREATE ORDER BUTTON
-       ========================================================= */
-
-    .create-order-container {
-        width: 100%;
-
-        display: flex;
-
-        justify-content: center;
-
-        align-items: center;
-
-        padding: 14px 0 20px;
-    }
-
-
-    .create-order-button {
-        min-width: 120px;
-
-        height: 38px;
-
-        border-radius: 4px;
-
-        font-size: 13px;
-
-        font-weight: 600;
-    }
-
-
-    /* =========================================================
-       LARGE DESKTOP
-       ========================================================= */
-
-    @media (min-width: 1400px) {
-
-        .order-create-page {
-            padding-left: 34px;
-            padding-right: 34px;
-        }
-
-        .order-two-columns {
-            column-gap: 24px;
-        }
-
-    }
-
-
-    /* =========================================================
-       TABLET
-       ========================================================= */
-
-    @media (max-width: 950px) {
-
-        .order-two-columns {
-            grid-template-columns: 1fr;
-        }
-
-    }
-
-
-    /* =========================================================
-       MOBILE
-       ========================================================= */
-
-    @media (max-width: 600px) {
-
-        .order-create-page {
-            padding: 15px;
-        }
-
-
-        .order-two-columns {
-            column-gap: 0;
-            row-gap: 12px;
-        }
-
-
-        .order-form-row {
-            grid-template-columns:
-                44%
-                56%;
-        }
-
-
-        .order-form-label,
-        .order-form-control input,
-        .order-form-control select,
-        .order-form-control textarea {
-            font-size: 11.5px;
-        }
-
-
-        .order-card-title {
-            font-size: 12px;
-        }
-
-    }
-
-</style>
 
 
 <!-- =========================================================
-     TOTAL TRIP COST CALCULATION
+     TOTAL TRIP COST
      ========================================================= -->
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
+        function getNumber(id) {
 
-    /* =========================================================
-       GET NUMERIC VALUE
-       ========================================================= */
+            const element =
+                document.getElementById(id);
 
-    function numberValue(id) {
+            if (!element) {
+                return 0;
+            }
 
-        const element = document.getElementById(id);
+            const value =
+                parseFloat(element.value);
 
-        if (!element) {
-            return 0;
+            return isNaN(value)
+                ? 0
+                : value;
         }
 
-        const value = parseFloat(element.value);
 
-        return isNaN(value) ? 0 : value;
+        function calculateTripCost() {
+
+            const freight =
+                getNumber("id_freight_amount");
+
+            const loading =
+                getNumber("id_loading_unloading_charges");
+
+            const halting =
+                getNumber("id_halting_charges");
+
+            const other =
+                getNumber("id_other_charges");
+
+
+            const total =
+                freight +
+                loading +
+                halting +
+                other;
+
+
+            const totalField =
+                document.getElementById(
+                    "total_trip_cost"
+                );
+
+
+            if (totalField) {
+
+                totalField.value =
+                    total.toFixed(2);
+
+            }
+
+        }
+
+
+        const fields = [
+
+            "id_freight_amount",
+
+            "id_loading_unloading_charges",
+
+            "id_halting_charges",
+
+            "id_other_charges"
+
+        ];
+
+
+        fields.forEach(function (id) {
+
+            const field =
+                document.getElementById(id);
+
+
+            if (!field) {
+                return;
+            }
+
+
+            field.addEventListener(
+                "input",
+                calculateTripCost
+            );
+
+
+            field.addEventListener(
+                "change",
+                calculateTripCost
+            );
+
+        });
+
+
+        calculateTripCost();
+
     }
-
-
-    /* =========================================================
-       CALCULATE TOTAL TRIP COST
-       ========================================================= */
-
-    function calculateTripCost() {
-
-        const freight =
-            numberValue("id_freight_amount");
-
-        const loading =
-            numberValue("id_loading_unloading_charges");
-
-        const halting =
-            numberValue("id_halting_charges");
-
-        const other =
-            numberValue("id_other_charges");
-
-
-        const total =
-            freight +
-            loading +
-            halting +
-            other;
-
-
-        const totalField =
-            document.getElementById("total_trip_cost");
-
-
-        if (totalField) {
-
-            totalField.value =
-                total.toFixed(2);
-
-        }
-
-    }
-
-
-    /* =========================================================
-       WATCH COMMERCIAL FIELDS
-       ========================================================= */
-
-    const fields = [
-
-        "id_freight_amount",
-
-        "id_loading_unloading_charges",
-
-        "id_halting_charges",
-
-        "id_other_charges"
-
-    ];
-
-
-    fields.forEach(function (id) {
-
-        const field =
-            document.getElementById(id);
-
-
-        if (!field) {
-            return;
-        }
-
-
-        field.addEventListener(
-            "input",
-            calculateTripCost
-        );
-
-
-        field.addEventListener(
-            "change",
-            calculateTripCost
-        );
-
-    });
-
-
-    /* =========================================================
-       INITIAL CALCULATION
-       ========================================================= */
-
-    calculateTripCost();
-
-});
+);
 
 </script>
 
