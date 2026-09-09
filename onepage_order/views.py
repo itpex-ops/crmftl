@@ -127,24 +127,54 @@ def onepageorder_list(request):
 # ============================================================
 # CREATE ORDER
 # ============================================================
-
+from decimal import Decimal
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import transaction, IntegrityError
-from django.shortcuts import render, redirect
-
-from .forms import CustomerForm, OrderForm
-from .models import Order
-
-
-from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 
-from .forms import CustomerForm, OrderForm
 from .models import Customer, Order
+
+
+def decimal_value(value, default="0.00"):
+    """
+    Convert empty/invalid numeric values safely to Decimal.
+    """
+    if value in (None, ""):
+        return Decimal(default)
+
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return Decimal(default)
+
+
+def int_value(value, default=0):
+    """
+    Convert empty/invalid integer values safely to int.
+    """
+    if value in (None, ""):
+        return default
+
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def date_value(value):
+    """
+    HTML <input type="date"> sends YYYY-MM-DD.
+    """
+    if not value:
+        return None
+
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
 
 
 @login_required
@@ -152,74 +182,265 @@ def onepageorder_create(request):
 
     if request.method == "POST":
 
-        customer_form = CustomerForm(request.POST, prefix="customer")
-        order_form = OrderForm(request.POST, prefix="order")
+        try:
+            with transaction.atomic():
 
-        if customer_form.is_valid() and order_form.is_valid():
+                # =====================================================
+                # CUSTOMER
+                # =====================================================
 
-            try:
-                with transaction.atomic():
+                customer_name = request.POST.get("customer_name", "").strip()
+                contact_number = request.POST.get(
+                    "contact_number", ""
+                ).strip()
+                email = request.POST.get(
+                    "email", ""
+                ).strip()
+                address = request.POST.get(
+                    "address", ""
+                ).strip()
 
-                    # -----------------------------
-                    # CREATE CUSTOMER
-                    # -----------------------------
-                    customer = customer_form.save()
+                if not customer_name:
+                    messages.error(
+                        request,
+                        "Customer Name is required."
+                    )
 
-                    # -----------------------------
-                    # CREATE ORDER
-                    # -----------------------------
-                    order = order_form.save(commit=False)
-                    order.customer = customer
-                    order.save()
+                    return render(
+                        request,
+                        "onepage_order/order_create.html"
+                    )
 
-                messages.success(
-                    request,
-                    f"Order {order.trip_number} created successfully."
+                customer = Customer(
+                    name=customer_name,
+                    contact_number=contact_number,
+                    email=email,
+                    address=address,
                 )
 
-                return redirect(
-                    "onepageorder_detail",
-                    pk=order.pk
+                customer.full_clean()
+                customer.save()
+
+                # =====================================================
+                # ORDER
+                # =====================================================
+
+                order = Order(
+                    customer=customer,
+
+                    # -------------------------------------------------
+                    # Customer / Sales
+                    # -------------------------------------------------
+                    lead_generated_through=request.POST.get(
+                        "lead_generated_through", ""
+                    ),
+                    sales_closed_by=request.POST.get(
+                        "sales_closed_by", ""
+                    ).strip(),
+
+                    # -------------------------------------------------
+                    # Shipment
+                    # -------------------------------------------------
+                    origin=request.POST.get(
+                        "origin", ""
+                    ).strip(),
+                    destination=request.POST.get(
+                        "destination", ""
+                    ).strip(),
+                    material=request.POST.get(
+                        "material", ""
+                    ).strip(),
+                    packing_type=request.POST.get(
+                        "packing_type", ""
+                    ).strip(),
+
+                    no_of_pieces=int_value(
+                        request.POST.get("no_of_pieces")
+                    ),
+
+                    weight_tons=decimal_value(
+                        request.POST.get("weight_tons"),
+                        "0.000"
+                    ),
+
+                    # -------------------------------------------------
+                    # Vehicle
+                    # -------------------------------------------------
+                    vehicle_type=request.POST.get(
+                        "vehicle_type", ""
+                    ).strip(),
+
+                    vehicle_number=request.POST.get(
+                        "vehicle_number", ""
+                    ).strip(),
+
+                    driver_number=request.POST.get(
+                        "driver_number", ""
+                    ).strip(),
+
+                    owner_number=request.POST.get(
+                        "owner_number", ""
+                    ).strip(),
+
+                    vehicle_sourced_by=request.POST.get(
+                        "vehicle_sourced_by", "Direct"
+                    ),
+
+                    owner_broker_name=request.POST.get(
+                        "owner_broker_name", ""
+                    ).strip(),
+
+                    # -------------------------------------------------
+                    # Commercials
+                    # -------------------------------------------------
+                    freight_amount=decimal_value(
+                        request.POST.get("freight_amount")
+                    ),
+
+                    loading_unloading_charges=decimal_value(
+                        request.POST.get(
+                            "loading_unloading_charges"
+                        )
+                    ),
+
+                    halting_charges=decimal_value(
+                        request.POST.get("halting_charges")
+                    ),
+
+                    other_charges=decimal_value(
+                        request.POST.get("other_charges")
+                    ),
+
+                    selling_amount=decimal_value(
+                        request.POST.get("selling_amount")
+                    ),
+
+                    manager_approval=request.POST.get(
+                        "manager_approval", "Pending"
+                    ),
+
+                    approved_by=request.POST.get(
+                        "approved_by", ""
+                    ).strip(),
+
+                    # -------------------------------------------------
+                    # Customer Payment
+                    # -------------------------------------------------
+                    customer_billing_type=request.POST.get(
+                        "customer_billing_type", ""
+                    ),
+
+                    customer_payment_type=request.POST.get(
+                        "customer_payment_type", ""
+                    ),
+
+                    customer_advance_amount=decimal_value(
+                        request.POST.get(
+                            "customer_advance_amount"
+                        )
+                    ),
+
+                    customer_balance_amount=decimal_value(
+                        request.POST.get(
+                            "customer_balance_amount"
+                        )
+                    ),
+
+                    customer_payment_method=request.POST.get(
+                        "customer_payment_method", ""
+                    ),
+
+                    promised_due_date=date_value(
+                        request.POST.get("promised_due_date")
+                    ),
+
+                    # -------------------------------------------------
+                    # Contracted Vehicle Payment
+                    # -------------------------------------------------
+                    vehicle_advance_amount=decimal_value(
+                        request.POST.get(
+                            "vehicle_advance_amount"
+                        )
+                    ),
+
+                    vehicle_balance_amount=decimal_value(
+                        request.POST.get(
+                            "vehicle_balance_amount"
+                        )
+                    ),
+
+                    vehicle_owner_name=request.POST.get(
+                        "vehicle_owner_name", ""
+                    ).strip(),
+
+                    pan_card=request.POST.get(
+                        "pan_card", ""
+                    ).strip(),
+
+                    account_name=request.POST.get(
+                        "account_name", ""
+                    ).strip(),
+
+                    account_number=request.POST.get(
+                        "account_number", ""
+                    ).strip(),
+
+                    ifsc_code=request.POST.get(
+                        "ifsc_code", ""
+                    ).strip(),
+
+                    upi_number=request.POST.get(
+                        "upi_number", ""
+                    ).strip(),
+
+                    # -------------------------------------------------
+                    # Other
+                    # -------------------------------------------------
+                    send_sms=(
+                        request.POST.get("send_sms") == "on"
+                    ),
+
+                    create_agreement_tds=(
+                        request.POST.get(
+                            "create_agreement_tds"
+                        ) == "on"
+                    ),
                 )
 
-            except Exception as e:
+                # Validate Django model choices/field values
+                order.full_clean()
 
-                messages.error(
-                    request,
-                    f"Error while saving order: {str(e)}"
-                )
+                # Order.save() calculates total_trip_cost
+                # and generates trip_number.
+                order.save()
 
-        else:
+            messages.success(
+                request,
+                f"Order {order.trip_number} created successfully."
+            )
 
-            # IMPORTANT: show exact validation errors
-            print("CUSTOMER FORM ERRORS:")
-            print(customer_form.errors)
+            return redirect(
+                "onepageorder_detail",
+                pk=order.pk
+            )
 
-            print("ORDER FORM ERRORS:")
-            print(order_form.errors)
+        except Exception as e:
+
+            print("ORDER SAVE ERROR:", repr(e))
 
             messages.error(
                 request,
-                "Please correct the errors shown below."
+                f"Unable to create order: {str(e)}"
             )
 
-    else:
-
-        customer_form = CustomerForm(
-            prefix="customer"
-        )
-
-        order_form = OrderForm(
-            prefix="order"
-        )
+            return render(
+                request,
+                "onepageorders/order_create.html"
+            )
 
     return render(
         request,
-        "onepageorders/order_create.html",
-        {
-            "customer_form": customer_form,
-            "order_form": order_form,
-        }
+        "onepageorders/order_create.html"
     )
 # ============================================================
 # ORDER DETAIL

@@ -597,5 +597,3 @@ class ApiLog(models.Model):
     response_body = models.JSONField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-
-

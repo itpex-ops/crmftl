@@ -22,21 +22,17 @@
 
 .order-create-header {
     width: 100%;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 20px;
 }
 
 .order-create-title {
     margin: 0;
-
     font-family: "Poppins", sans-serif;
     font-size: 22px;
     font-weight: 600;
-
     color: #212529;
 }
 
@@ -64,7 +60,6 @@
     font-weight: 500;
 
     text-decoration: none;
-
     transition: all 0.2s ease;
 }
 
@@ -101,15 +96,12 @@
 
 .order-card {
     width: 100%;
-
     margin: 0;
 
     border: 1px solid #8d8d8d;
-
     background: #ffffff;
 
     overflow: hidden;
-
     box-sizing: border-box;
 }
 
@@ -128,18 +120,15 @@
     padding: 7px 10px;
 
     background: #ffc000;
-
     border-bottom: 1px solid #777;
 
     color: #111111;
 
     font-family: "Poppins", sans-serif;
-
     font-size: 13px;
     font-weight: 700;
 
     text-transform: uppercase;
-
     text-align: center;
 
     line-height: 1.2;
@@ -175,7 +164,6 @@
 
 .order-form-label {
     display: flex;
-
     align-items: center;
 
     padding: 5px 9px;
@@ -183,13 +171,10 @@
     border-right: 1px solid #b8b8b8;
 
     background: #ffffff;
-
     color: #172033;
 
     font-family: "Poppins", sans-serif;
-
     font-size: 11.5px;
-
     line-height: 1.25;
 
     box-sizing: border-box;
@@ -229,24 +214,19 @@
     padding: 4px 7px;
 
     border: 1px solid #d5d5d5;
-
     border-radius: 3px;
 
     background: #ffffff;
-
     color: #222222;
 
     font-family: "Poppins", sans-serif;
-
     font-size: 11.5px;
 
     outline: none;
-
     box-shadow: none;
 
     box-sizing: border-box;
 }
-
 
 .order-form-control textarea {
     min-height: 48px;
@@ -264,7 +244,6 @@
 .order-form-control textarea:focus {
 
     border-color: #FDB81B;
-
     background: #fffef0;
 
     outline: none;
@@ -281,23 +260,7 @@
 .order-form-control input[readonly] {
 
     background: #eef0f2;
-
     font-weight: 600;
-
-}
-
-
-/* =========================================================
-   CHECKBOX
-   ========================================================= */
-
-.order-form-control input[type="checkbox"] {
-
-    width: 17px;
-    height: 17px;
-
-    margin: 5px 0 0 5px;
-
 }
 
 
@@ -312,9 +275,27 @@
     color: #dc3545;
 
     font-size: 9px;
-
     line-height: 1.2;
+}
 
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+.order-error-alert {
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+
+    background: #f8d7da;
+    color: #842029;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
 }
 
 
@@ -327,9 +308,7 @@
     width: 100%;
 
     display: flex;
-
     justify-content: center;
-
     align-items: center;
 
     padding: 14px 0 20px;
@@ -339,15 +318,12 @@
 .create-order-button {
 
     min-width: 125px;
-
     height: 38px;
 
     border-radius: 5px;
 
     font-family: "Poppins", sans-serif;
-
     font-size: 12px;
-
     font-weight: 600;
 }
 
@@ -396,19 +372,8 @@
 
 </style>
 
-
 <div class="order-create-page">
-{% if customer_form.non_field_errors %}
-    <div class="alert alert-danger">
-        {{ customer_form.non_field_errors }}
-    </div>
-{% endif %}
 
-{% if order_form.non_field_errors %}
-    <div class="alert alert-danger">
-        {{ order_form.non_field_errors }}
-    </div>
-{% endif %}
 
     <!-- =====================================================
          HEADER
@@ -420,20 +385,32 @@
             Order Creation
         </h1>
 
-
         <a
             href="{% url 'onepageorder_list' %}"
             class="edit-back-btn"
         >
-
             <i class="bi bi-arrow-left me-1"></i>
-
             Back
-
         </a>
 
     </div>
 
+
+    <!-- =====================================================
+         DJANGO MESSAGE
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="order-error-alert">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
 
 
     <!-- =====================================================
@@ -445,43 +422,18 @@
         {% csrf_token %}
 
 
-
-        <!-- =====================================================
-             NON FIELD ERRORS
-             ===================================================== -->
-
-        {% if customer_form.non_field_errors %}
-
-            <div class="alert alert-danger">
-                {{ customer_form.non_field_errors }}
-            </div>
-
-        {% endif %}
-
-
-        {% if order_form.non_field_errors %}
-
-            <div class="alert alert-danger">
-                {{ order_form.non_field_errors }}
-            </div>
-
-        {% endif %}
-
-
-
-        <!-- =====================================================
+        <!-- =================================================
              TWO COLUMN GRID
-             ===================================================== -->
+             ================================================= -->
 
         <div class="order-two-columns">
 
 
-            <!-- =================================================
-                 LEFT COLUMN - CUSTOMER
-                 ================================================= -->
+            <!-- =============================================
+                 CUSTOMER DETAILS
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Customer Details
@@ -499,20 +451,19 @@
 
                     <div class="order-form-control">
 
-                        {{ customer_form.name }}
-
-                        {% for error in customer_form.name.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="text"
+                            name="customer_name"
+                            value="{{ request.POST.customer_name|default:'' }}"
+                            required
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Contact -->
+                <!-- Contact Number -->
 
                 <div class="order-form-row">
 
@@ -522,13 +473,11 @@
 
                     <div class="order-form-control">
 
-                        {{ customer_form.contact_number }}
-
-                        {% for error in customer_form.contact_number.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="text"
+                            name="contact_number"
+                            value="{{ request.POST.contact_number|default:'' }}"
+                        >
 
                     </div>
 
@@ -545,13 +494,11 @@
 
                     <div class="order-form-control">
 
-                        {{ customer_form.email }}
-
-                        {% for error in customer_form.email.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ request.POST.email|default:'' }}"
+                        >
 
                     </div>
 
@@ -568,13 +515,10 @@
 
                     <div class="order-form-control">
 
-                        {{ customer_form.address }}
-
-                        {% for error in customer_form.address.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <textarea
+                            name="address"
+                            rows="2"
+                        >{{ request.POST.address|default:'' }}</textarea>
 
                     </div>
 
@@ -591,20 +535,65 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.lead_generated_through }}
+                        <select name="lead_generated_through">
 
-                        {% for error in order_form.lead_generated_through.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Social Media"
+                                {% if request.POST.lead_generated_through == "Social Media" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Social Media
+                            </option>
+
+                            <option
+                                value="Outbound Calls"
+                                {% if request.POST.lead_generated_through == "Outbound Calls" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Outbound Calls
+                            </option>
+
+                            <option
+                                value="Reference"
+                                {% if request.POST.lead_generated_through == "Reference" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Reference
+                            </option>
+
+                            <option
+                                value="Field Sales"
+                                {% if request.POST.lead_generated_through == "Field Sales" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Field Sales
+                            </option>
+
+                            <option
+                                value="Justdial"
+                                {% if request.POST.lead_generated_through == "Justdial" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Justdial
+                            </option>
+
+                        </select>
 
                     </div>
 
                 </div>
 
 
-                <!-- Sales -->
+                <!-- Sales Closed By -->
 
                 <div class="order-form-row">
 
@@ -614,13 +603,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.sales_closed_by }}
-
-                        {% for error in order_form.sales_closed_by.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="text"
+                            name="sales_closed_by"
+                            value="{{ request.POST.sales_closed_by|default:'' }}"
+                        >
 
                     </div>
 
@@ -629,13 +616,11 @@
             </div>
 
 
-
-            <!-- =================================================
-                 RIGHT COLUMN - COMMERCIALS
-                 ================================================= -->
+            <!-- =============================================
+                 COMMERCIALS
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Commercials
@@ -652,13 +637,14 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.freight_amount }}
-
-                        {% for error in order_form.freight_amount.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="number"
+                            id="id_freight_amount"
+                            name="freight_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.freight_amount|default:'0' }}"
+                        >
 
                     </div>
 
@@ -675,13 +661,14 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.loading_unloading_charges }}
-
-                        {% for error in order_form.loading_unloading_charges.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="number"
+                            id="id_loading_unloading_charges"
+                            name="loading_unloading_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.loading_unloading_charges|default:'0' }}"
+                        >
 
                     </div>
 
@@ -698,13 +685,14 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.halting_charges }}
-
-                        {% for error in order_form.halting_charges.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="number"
+                            id="id_halting_charges"
+                            name="halting_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.halting_charges|default:'0' }}"
+                        >
 
                     </div>
 
@@ -721,20 +709,21 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.other_charges }}
-
-                        {% for error in order_form.other_charges.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
+                        <input
+                            type="number"
+                            id="id_other_charges"
+                            name="other_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.other_charges|default:'0' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Total -->
+                <!-- Total Trip Cost -->
 
                 <div class="order-form-row">
 
@@ -756,7 +745,7 @@
                 </div>
 
 
-                <!-- Selling -->
+                <!-- Selling Amount -->
 
                 <div class="order-form-row">
 
@@ -766,14 +755,20 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.selling_amount }}
+                        <input
+                            type="number"
+                            name="selling_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.selling_amount|default:'0' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Manager -->
+                <!-- Manager Approval -->
 
                 <div class="order-form-row">
 
@@ -783,14 +778,43 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.manager_approval }}
+                        <select name="manager_approval">
+
+                            <option
+                                value="Pending"
+                                {% if request.POST.manager_approval == "Pending" or not request.POST.manager_approval %}
+                                    selected
+                                {% endif %}
+                            >
+                                Pending
+                            </option>
+
+                            <option
+                                value="Approved"
+                                {% if request.POST.manager_approval == "Approved" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Approved
+                            </option>
+
+                            <option
+                                value="Rejected"
+                                {% if request.POST.manager_approval == "Rejected" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Rejected
+                            </option>
+
+                        </select>
 
                     </div>
 
                 </div>
 
 
-                <!-- Approved -->
+                <!-- Approved By -->
 
                 <div class="order-form-row">
 
@@ -800,7 +824,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.approved_by }}
+                        <input
+                            type="text"
+                            name="approved_by"
+                            value="{{ request.POST.approved_by|default:'' }}"
+                        >
 
                     </div>
 
@@ -809,13 +837,11 @@
             </div>
 
 
-
-            <!-- =================================================
-                 LEFT COLUMN - SHIPMENT
-                 ================================================= -->
+            <!-- =============================================
+                 SHIPMENT DETAILS
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Shipment Details
@@ -832,7 +858,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.origin }}
+                        <input
+                            type="text"
+                            name="origin"
+                            value="{{ request.POST.origin|default:'' }}"
+                        >
 
                     </div>
 
@@ -849,7 +879,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.destination }}
+                        <input
+                            type="text"
+                            name="destination"
+                            value="{{ request.POST.destination|default:'' }}"
+                        >
 
                     </div>
 
@@ -866,7 +900,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.material }}
+                        <input
+                            type="text"
+                            name="material"
+                            value="{{ request.POST.material|default:'' }}"
+                        >
 
                     </div>
 
@@ -883,7 +921,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.packing_type }}
+                        <input
+                            type="text"
+                            name="packing_type"
+                            value="{{ request.POST.packing_type|default:'' }}"
+                        >
 
                     </div>
 
@@ -900,7 +942,12 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.no_of_pieces }}
+                        <input
+                            type="number"
+                            name="no_of_pieces"
+                            min="0"
+                            value="{{ request.POST.no_of_pieces|default:'0' }}"
+                        >
 
                     </div>
 
@@ -917,7 +964,13 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.weight_tons }}
+                        <input
+                            type="number"
+                            name="weight_tons"
+                            step="0.001"
+                            min="0"
+                            value="{{ request.POST.weight_tons|default:'0' }}"
+                        >
 
                     </div>
 
@@ -926,13 +979,11 @@
             </div>
 
 
-
-            <!-- =================================================
-                 RIGHT COLUMN - CUSTOMER PAYMENT
-                 ================================================= -->
+            <!-- =============================================
+                 PAYMENT TERMS BY CUSTOMER
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Payment Terms by Customer
@@ -949,7 +1000,31 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.customer_billing_type }}
+                        <select name="customer_billing_type">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Retail"
+                                {% if request.POST.customer_billing_type == "Retail" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Retail
+                            </option>
+
+                            <option
+                                value="Credit"
+                                {% if request.POST.customer_billing_type == "Credit" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Credit
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -966,7 +1041,40 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.customer_payment_type }}
+                        <select name="customer_payment_type">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Paid"
+                                {% if request.POST.customer_payment_type == "Paid" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Paid
+                            </option>
+
+                            <option
+                                value="Today"
+                                {% if request.POST.customer_payment_type == "Today" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Today
+                            </option>
+
+                            <option
+                                value="TBB"
+                                {% if request.POST.customer_payment_type == "TBB" %}
+                                    selected
+                                {% endif %}
+                            >
+                                TBB
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -983,7 +1091,13 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.customer_advance_amount }}
+                        <input
+                            type="number"
+                            name="customer_advance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.customer_advance_amount|default:'0' }}"
+                        >
 
                     </div>
 
@@ -1000,7 +1114,13 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.customer_balance_amount }}
+                        <input
+                            type="number"
+                            name="customer_balance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.customer_balance_amount|default:'0' }}"
+                        >
 
                     </div>
 
@@ -1017,7 +1137,40 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.customer_payment_method }}
+                        <select name="customer_payment_method">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Cash"
+                                {% if request.POST.customer_payment_method == "Cash" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Cash
+                            </option>
+
+                            <option
+                                value="Account"
+                                {% if request.POST.customer_payment_method == "Account" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Account
+                            </option>
+
+                            <option
+                                value="UPI"
+                                {% if request.POST.customer_payment_method == "UPI" %}
+                                    selected
+                                {% endif %}
+                            >
+                                UPI
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -1034,7 +1187,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.promised_due_date }}
+                        <input
+                            type="date"
+                            name="promised_due_date"
+                            value="{{ request.POST.promised_due_date|default:'' }}"
+                        >
 
                     </div>
 
@@ -1043,20 +1200,18 @@
             </div>
 
 
-
-            <!-- =================================================
-                 LEFT COLUMN - VEHICLE
-                 ================================================= -->
+            <!-- =============================================
+                 VEHICLE DETAILS
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Vehicle Details
                 </div>
 
 
-                <!-- Type -->
+                <!-- Vehicle Type -->
 
                 <div class="order-form-row">
 
@@ -1066,14 +1221,18 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_type }}
+                        <input
+                            type="text"
+                            name="vehicle_type"
+                            value="{{ request.POST.vehicle_type|default:'' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Number -->
+                <!-- Vehicle Number -->
 
                 <div class="order-form-row">
 
@@ -1083,14 +1242,18 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_number }}
+                        <input
+                            type="text"
+                            name="vehicle_number"
+                            value="{{ request.POST.vehicle_number|default:'' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Driver -->
+                <!-- Driver Number -->
 
                 <div class="order-form-row">
 
@@ -1100,14 +1263,18 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.driver_number }}
+                        <input
+                            type="text"
+                            name="driver_number"
+                            value="{{ request.POST.driver_number|default:'' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Owner -->
+                <!-- Owner Number -->
 
                 <div class="order-form-row">
 
@@ -1117,14 +1284,18 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.owner_number }}
+                        <input
+                            type="text"
+                            name="owner_number"
+                            value="{{ request.POST.owner_number|default:'' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Source -->
+                <!-- Vehicle Sourced By -->
 
                 <div class="order-form-row">
 
@@ -1134,14 +1305,34 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_sourced_by }}
+                        <select name="vehicle_sourced_by">
+
+                            <option
+                                value="Direct"
+                                {% if request.POST.vehicle_sourced_by == "Direct" or not request.POST.vehicle_sourced_by %}
+                                    selected
+                                {% endif %}
+                            >
+                                Direct
+                            </option>
+
+                            <option
+                                value="Broker"
+                                {% if request.POST.vehicle_sourced_by == "Broker" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Broker
+                            </option>
+
+                        </select>
 
                     </div>
 
                 </div>
 
 
-                <!-- Broker -->
+                <!-- Owner / Broker -->
 
                 <div class="order-form-row">
 
@@ -1151,7 +1342,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.owner_broker_name }}
+                        <input
+                            type="text"
+                            name="owner_broker_name"
+                            value="{{ request.POST.owner_broker_name|default:'' }}"
+                        >
 
                     </div>
 
@@ -1160,20 +1355,18 @@
             </div>
 
 
-
-            <!-- =================================================
-                 RIGHT COLUMN - CONTRACTED VEHICLE
-                 ================================================= -->
+            <!-- =============================================
+                 PAYMENT TERMS TO CONTRACTED VEHICLE
+                 ============================================= -->
 
             <div class="order-card">
-
 
                 <div class="order-card-title">
                     Payment Terms to Contracted Vehicle
                 </div>
 
 
-                <!-- Advance -->
+                <!-- Vehicle Advance -->
 
                 <div class="order-form-row">
 
@@ -1183,14 +1376,20 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_advance_amount }}
+                        <input
+                            type="number"
+                            name="vehicle_advance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Balance -->
+                <!-- Vehicle Balance -->
 
                 <div class="order-form-row">
 
@@ -1200,14 +1399,20 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_balance_amount }}
+                        <input
+                            type="number"
+                            name="vehicle_balance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_balance_amount|default:'0' }}"
+                        >
 
                     </div>
 
                 </div>
 
 
-                <!-- Owner Name -->
+                <!-- Vehicle Owner -->
 
                 <div class="order-form-row">
 
@@ -1217,7 +1422,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.vehicle_owner_name }}
+                        <input
+                            type="text"
+                            name="vehicle_owner_name"
+                            value="{{ request.POST.vehicle_owner_name|default:'' }}"
+                        >
 
                     </div>
 
@@ -1234,7 +1443,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.pan_card }}
+                        <input
+                            type="text"
+                            name="pan_card"
+                            value="{{ request.POST.pan_card|default:'' }}"
+                        >
 
                     </div>
 
@@ -1251,7 +1464,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.account_name }}
+                        <input
+                            type="text"
+                            name="account_name"
+                            value="{{ request.POST.account_name|default:'' }}"
+                        >
 
                     </div>
 
@@ -1268,7 +1485,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.account_number }}
+                        <input
+                            type="text"
+                            name="account_number"
+                            value="{{ request.POST.account_number|default:'' }}"
+                        >
 
                     </div>
 
@@ -1285,7 +1506,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.ifsc_code }}
+                        <input
+                            type="text"
+                            name="ifsc_code"
+                            value="{{ request.POST.ifsc_code|default:'' }}"
+                        >
 
                     </div>
 
@@ -1302,7 +1527,11 @@
 
                     <div class="order-form-control">
 
-                        {{ order_form.upi_number }}
+                        <input
+                            type="text"
+                            name="upi_number"
+                            value="{{ request.POST.upi_number|default:'' }}"
+                        >
 
                     </div>
 
@@ -1319,24 +1548,34 @@
                     </div>
 
                     <div class="order-form-control">
-                        {{ order_form.send_sms }}
+
+                        <input
+                            type="checkbox"
+                            name="send_sms"
+                        >
+
                     </div>
 
                 </div>
                 -->
 
 
-                <!-- Agreement -->
+                <!-- Agreement / TDS -->
 
                 <!--
                 <div class="order-form-row">
 
                     <div class="order-form-label">
-                        Create Agreement &amp; TDS Certificate
+                        Create Agreement & TDS Certificate
                     </div>
 
                     <div class="order-form-control">
-                        {{ order_form.create_agreement_tds }}
+
+                        <input
+                            type="checkbox"
+                            name="create_agreement_tds"
+                        >
+
                     </div>
 
                 </div>
@@ -1347,10 +1586,9 @@
         </div>
 
 
-
-        <!-- =====================================================
+        <!-- =================================================
              CREATE ORDER BUTTON
-             ===================================================== -->
+             ================================================= -->
 
         <div class="create-order-container">
 
@@ -1367,121 +1605,114 @@
 
         </div>
 
-
     </form>
 
 </div>
 
 
-
 <!-- =========================================================
-     TOTAL TRIP COST
+     TOTAL TRIP COST CALCULATION
      ========================================================= -->
 
 <script>
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        function getNumber(id) {
 
-            const element =
-                document.getElementById(id);
+    function getNumber(id) {
 
-            if (!element) {
-                return 0;
-            }
+        const element =
+            document.getElementById(id);
 
-            const value =
-                parseFloat(element.value);
-
-            return isNaN(value)
-                ? 0
-                : value;
+        if (!element) {
+            return 0;
         }
 
+        const value =
+            parseFloat(element.value);
 
-        function calculateTripCost() {
-
-            const freight =
-                getNumber("id_freight_amount");
-
-            const loading =
-                getNumber("id_loading_unloading_charges");
-
-            const halting =
-                getNumber("id_halting_charges");
-
-            const other =
-                getNumber("id_other_charges");
-
-
-            const total =
-                freight +
-                loading +
-                halting +
-                other;
-
-
-            const totalField =
-                document.getElementById(
-                    "total_trip_cost"
-                );
-
-
-            if (totalField) {
-
-                totalField.value =
-                    total.toFixed(2);
-
-            }
-
-        }
-
-
-        const fields = [
-
-            "id_freight_amount",
-
-            "id_loading_unloading_charges",
-
-            "id_halting_charges",
-
-            "id_other_charges"
-
-        ];
-
-
-        fields.forEach(function (id) {
-
-            const field =
-                document.getElementById(id);
-
-
-            if (!field) {
-                return;
-            }
-
-
-            field.addEventListener(
-                "input",
-                calculateTripCost
-            );
-
-
-            field.addEventListener(
-                "change",
-                calculateTripCost
-            );
-
-        });
-
-
-        calculateTripCost();
+        return isNaN(value)
+            ? 0
+            : value;
 
     }
-);
+
+
+    function calculateTripCost() {
+
+        const freight =
+            getNumber("id_freight_amount");
+
+        const loading =
+            getNumber("id_loading_unloading_charges");
+
+        const halting =
+            getNumber("id_halting_charges");
+
+        const other =
+            getNumber("id_other_charges");
+
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+
+        const totalField =
+            document.getElementById(
+                "total_trip_cost"
+            );
+
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+
+    }
+
+
+    const fields = [
+
+        "id_freight_amount",
+        "id_loading_unloading_charges",
+        "id_halting_charges",
+        "id_other_charges"
+
+    ];
+
+
+    fields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (!field) {
+            return;
+        }
+
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    calculateTripCost();
+
+});
 
 </script>
 
