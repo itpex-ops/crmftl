@@ -138,70 +138,65 @@ from .forms import CustomerForm, OrderForm
 from .models import Order
 
 
+from django.contrib import messages
+from django.db import transaction
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+from .forms import CustomerForm, OrderForm
+from .models import Customer, Order
+
+
 @login_required
 def onepageorder_create(request):
 
     if request.method == "POST":
 
-        customer_form = CustomerForm(request.POST)
-        order_form = OrderForm(request.POST)
+        customer_form = CustomerForm(request.POST, prefix="customer")
+        order_form = OrderForm(request.POST, prefix="order")
 
         if customer_form.is_valid() and order_form.is_valid():
 
             try:
-
                 with transaction.atomic():
 
-                    # -----------------------------------------
-                    # 1. SAVE CUSTOMER
-                    # -----------------------------------------
-
+                    # -----------------------------
+                    # CREATE CUSTOMER
+                    # -----------------------------
                     customer = customer_form.save()
 
-
-                    # -----------------------------------------
-                    # 2. SAVE ORDER
-                    # -----------------------------------------
-
+                    # -----------------------------
+                    # CREATE ORDER
+                    # -----------------------------
                     order = order_form.save(commit=False)
-
                     order.customer = customer
-
                     order.save()
 
-
-                    # -----------------------------------------
-                    # 3. SUCCESS
-                    # -----------------------------------------
-
-                    messages.success(
-                        request,
-                        f"Order {order.trip_number} created successfully."
-                    )
-
-                # IMPORTANT:
-                # This URL name must exist in onepageorder/urls.py
+                messages.success(
+                    request,
+                    f"Order {order.trip_number} created successfully."
+                )
 
                 return redirect(
                     "onepageorder_detail",
                     pk=order.pk
                 )
 
-            except IntegrityError as exc:
+            except Exception as e:
 
                 messages.error(
                     request,
-                    f"Database error while saving order: {exc}"
-                )
-
-            except Exception as exc:
-
-                messages.error(
-                    request,
-                    f"Error while saving order: {exc}"
+                    f"Error while saving order: {str(e)}"
                 )
 
         else:
+
+            # IMPORTANT: show exact validation errors
+            print("CUSTOMER FORM ERRORS:")
+            print(customer_form.errors)
+
+            print("ORDER FORM ERRORS:")
+            print(order_form.errors)
 
             messages.error(
                 request,
@@ -210,21 +205,22 @@ def onepageorder_create(request):
 
     else:
 
-        customer_form = CustomerForm()
-        order_form = OrderForm()
+        customer_form = CustomerForm(
+            prefix="customer"
+        )
 
+        order_form = OrderForm(
+            prefix="order"
+        )
 
     return render(
         request,
-        "onepageorders/order_create.html",
+        "onepage_order/order_create.html",
         {
             "customer_form": customer_form,
             "order_form": order_form,
-            "form": order_form,
-            "title": "Create Order",
         }
     )
-
 # ============================================================
 # ORDER DETAIL
 # ============================================================
