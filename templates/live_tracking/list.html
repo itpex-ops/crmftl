@@ -168,7 +168,7 @@
                                     <i class="bi bi-clock-history"></i>
                                 </a>
 
-                               {% if vehicle.tracking_session.entity_id and vehicle.tracking_session.status != "active" and vehicle.is_trip_completed %}
+                               {% if  vehicle.is_trip_completed %}
 
                                 <a href="{% url 'delete_tracking' vehicle.tracking_session.id %}"
                                 class="btn btn-danger btn-sm"
