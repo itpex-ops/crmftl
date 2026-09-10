@@ -1,20 +1,21 @@
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-
 from .models import (
     Customer,
     Order,
     VehiclePayment,
     CustomerPayment,
+    TrackingSession,
+    LiveLocation,
+    SMSLog,
+    ApiLog,
+    ApiToken,
 )
-
-
 # =============================================================
 # HELPER FUNCTIONS
 # =============================================================
@@ -478,7 +479,140 @@ def onepageorder_detail(request, pk):
         },
     )
 
+# =============================================================
+# LIVE TRACKING - CURRENT LOCATION API
+# =============================================================
 
+@login_required
+def order_live_location(request, pk):
+
+    order = get_object_or_404(
+        Order,
+        pk=pk,
+    )
+
+    tracking_session = getattr(
+        order,
+        "tracking_session",
+        None
+    )
+
+    # ---------------------------------------------------------
+    # No tracking session
+    # ---------------------------------------------------------
+
+    if not tracking_session:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "tracking": False,
+                "message": "Live tracking is not enabled for this order.",
+            },
+            status=404,
+        )
+
+    # ---------------------------------------------------------
+    # Latest location
+    # ---------------------------------------------------------
+
+    latest_location = (
+        LiveLocation.objects
+        .filter(
+            session=tracking_session
+        )
+        .order_by("-received_at")
+        .first()
+    )
+
+    # ---------------------------------------------------------
+    # No location received yet
+    # ---------------------------------------------------------
+
+    if not latest_location:
+
+        return JsonResponse(
+            {
+                "success": True,
+                "tracking": True,
+                "has_location": False,
+                "status": tracking_session.get_status_display(),
+                "tracking_reference": tracking_session.tracking_reference,
+                "driver_mobile": tracking_session.driver_mobile,
+                "message": "Waiting for vehicle location...",
+            }
+        )
+
+    # ---------------------------------------------------------
+    # Return latest location
+    # ---------------------------------------------------------
+
+    return JsonResponse(
+        {
+            "success": True,
+            "tracking": True,
+            "has_location": True,
+
+            "status": tracking_session.get_status_display(),
+
+            "tracking_enabled": (
+                tracking_session.tracking_enabled
+            ),
+
+            "consent_received": (
+                tracking_session.consent_received
+            ),
+
+            "tracking_reference": (
+                tracking_session.tracking_reference
+            ),
+
+            "driver_mobile": (
+                tracking_session.driver_mobile
+            ),
+
+            "latitude": float(
+                latest_location.latitude
+            ),
+
+            "longitude": float(
+                latest_location.longitude
+            ),
+
+            "accuracy": (
+                latest_location.accuracy
+            ),
+
+            "location_name": (
+                latest_location.location_name
+                or ""
+            ),
+
+            "address": (
+                latest_location.address
+                or ""
+            ),
+
+            "location_status": (
+                latest_location.location_status
+                or ""
+            ),
+
+            "tracked": (
+                latest_location.tracked
+            ),
+
+            "received_at": (
+                latest_location.received_at.isoformat()
+            ),
+
+            "session_last_updated": (
+                tracking_session.last_updated.isoformat()
+                if tracking_session.last_updated
+                else None
+            ),
+        }
+    )
 # =============================================================
 # EDIT ORDER
 # =============================================================
