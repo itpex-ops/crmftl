@@ -448,8 +448,6 @@
 </style>
 
 <div class="orders-page">
-
-
     <!-- =====================================================
          HEADER
          ===================================================== -->
@@ -568,19 +566,15 @@
                     {% for o in orders %}
 
                     <tr>
-
-
                         <!-- TRIP -->
-
                         <td>
-
-                            <span class="trip-number">
-                                {{ o.trip_number }}
-                            </span>
-
+                            <a href="{% url 'onepageorder_detail' o.pk %}" class="btn btn-sm btn-custom">
+                                <i class=" bi bi-eye me-1"></i>
+                                <span class="trip-number">
+                                   <strong>{{ o.trip_number }}</strong>
+                                </span>
+                            </a>
                         </td>
-
-
                         <!-- CUSTOMER -->
 
                         <td>
@@ -588,8 +582,6 @@
                             {{ o.customer.name }}
 
                         </td>
-
-
                         <!-- ROUTE -->
 
                         <td>
@@ -607,8 +599,6 @@
                             </span>
 
                         </td>
-
-
                         <!-- VEHICLE -->
 
                         <td>
@@ -671,7 +661,7 @@
                         <td class="text-center">
 
                             <a
-                                href="{% url 'onepageorder_detail' o.pk %}"
+                                href="#"
                                 class="view-order-btn"
                             >
 

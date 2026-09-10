@@ -180,7 +180,6 @@ class Vehicle(models.Model):
             if not was_settled and self.settled:
                 self.auto_close_live_tracking()
     
-    
 
     def save(self, *args, **kwargs):
         self.total_freight = (

@@ -377,6 +377,7 @@ class VehiclePayment(models.Model):
     amount=models.DecimalField(max_digits=12,decimal_places=2)
     transaction_reference=models.CharField(max_length=100,blank=True)
     paid_at=models.DateTimeField(auto_now_add=True)
+
     def __str__(self): return f'{self.order.trip_number} - {self.payment_type}'
 
 class CustomerPayment(models.Model):
@@ -595,3 +596,131 @@ class ApiLog(models.Model):
     response_body = models.JSONField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Tracking(models.Model):
+
+    # =========================
+    # ORDER RELATION
+    # =========================
+
+    STATUS_CHOICES = [
+    ("vehicle_placed", "Vehicle Placed"),
+    ("live_tracking", "Live Tracking Enabled"),
+    ("vehicle_document", "Vehicle Document"),
+    ("invoice_eway", "Invoice / E-way"),
+    ("advance_to_fleet", "Advance To Fleet"),
+    ("fleet_departed", "Fleet Departed"),
+    ("balance_trans_fleet", "Balance Transfer To Fleet"),
+    ("arrived", "Arrived"),
+    ("delivered", "Delivered"),
+    ("pod_received", "POD Received"),
+    ("settled", "Settled"),
+    ("lr_generated", "LR Generated"),
+    ]
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="vehicle_placed"
+    )
+
+    order = models.OneToOneField(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tracking",
+        null=True,
+        blank=True
+    )
+    # =========================
+    # STATUS
+    # =========================
+
+    vehicle_placed = models.BooleanField(default=False)
+    vehicle_document = models.BooleanField(default=False)
+    invoice_eway = models.BooleanField(default=False)
+    advance_to_fleet = models.BooleanField(default=False)
+    balance_to_fleet = models.BooleanField(default=False)
+    fleet_departed = models.BooleanField(default=False)
+    advance_received = models.BooleanField(default=False)
+    arrived = models.BooleanField(default=False)
+    delivered = models.BooleanField(default=False)
+    pod_received = models.BooleanField(default=False)
+    balance_paid = models.BooleanField(default=False)
+    lr_no_b = models.BooleanField(default=False)
+
+    lr_no = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
+    transporter_paid = models.BooleanField(default=False)
+    customer_paid = models.BooleanField(default=False)
+    settled = models.BooleanField(default=False)
+
+    # =========================
+    # DATES
+    # =========================
+
+    vehicle_placed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    live_tracking_at = models.DateTimeField(
+    null=True,
+    blank=True
+)
+
+    fleet_departed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    arrived_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    delivered_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    # =========================
+    # OTHER
+    # =========================
+
+    remarks = models.TextField(blank=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    # =========================
+    # STRING
+    # =========================
+
+    def __str__(self):
+        if self.order:
+            return f"Tracking - {self.order.order_no}"
+        return "Tracking"
+
+class TrackingDocument(models.Model):
+
+    tracking = models.ForeignKey(
+        Tracking,
+        related_name="documents",
+        on_delete=models.CASCADE
+    )
+
+    file = models.FileField(
+        upload_to="tracking_docs/"
+    )
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.file.name
