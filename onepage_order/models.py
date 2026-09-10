@@ -305,71 +305,69 @@ class Order(models.Model):
 
     @property
     def customer_selling_amount(self):
-
-        if self.customer_payments.exists():
-
-            return sum(
-                (
-                    x.amount
-                    for x in self.customer_payments.all()
-                ),
-                Decimal("0.00")
-            )
-
+        """
+        Customer selling amount comes from the Order itself.
+        CustomerPayment records are receipts against this amount.
+        """
         return self.selling_amount
+
 
     @property
     def vehicle_cost(self):
-
+        """
+        Total amount paid to the vehicle for this order.
+        """
         return sum(
             (
-                x.amount
-                for x in self.vehicle_payments.all()
+                payment.amount
+                for payment in self.vehicle_payments.all()
             ),
             Decimal("0.00")
         )
 
+
     @property
     def margin(self):
-
+        """
+        Margin = Customer Selling Amount - Total Vehicle Cost
+        """
         return (
             self.customer_selling_amount
             - self.vehicle_cost
         )
+        # =====================================================
+        # SAVE
+        # =====================================================
 
-    # =====================================================
-    # SAVE
-    # =====================================================
+        def save(self, *args, **kwargs):
 
-    def save(self, *args, **kwargs):
-
-        self.total_trip_cost = (
-            self.freight_amount +
-            self.loading_unloading_charges +
-            self.halting_charges +
-            self.other_charges
-        )
-
-        if not self.trip_number:
-
-            last = Order.objects.order_by("-id").first()
-
-            number = (
-                last.id + 2101
-                if last
-                else 2101
+            self.total_trip_cost = (
+                self.freight_amount +
+                self.loading_unloading_charges +
+                self.halting_charges +
+                self.other_charges
             )
 
-            self.trip_number = f"TRIP{number}"
+            if not self.trip_number:
 
-        super().save(*args, **kwargs)
+                last = Order.objects.order_by("-id").first()
 
-    def __str__(self):
+                number = (
+                    last.id + 2101
+                    if last
+                    else 2101
+                )
 
-        return (
-            f"{self.trip_number} - "
-            f"{self.origin} to {self.destination}"
-        )
+                self.trip_number = f"TRIP{number}"
+
+            super().save(*args, **kwargs)
+
+        def __str__(self):
+
+            return (
+                f"{self.trip_number} - "
+                f"{self.origin} to {self.destination}"
+            )
 
 class VehiclePayment(models.Model):
     PAYMENT_TYPES=[('Advance','Advance'),('Balance','Balance'),('Others','Others')]
