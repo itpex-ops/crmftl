@@ -1,329 +1,816 @@
+
 {% extends 'layouts/base.html' %}
+
 {% block content %}
+
 <div class="container-fluid mt-1">
-    <!-- Header -->
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
     <div class="card shadow-sm border-0 p-3 mb-2">
+
         <div class="d-flex justify-content-between align-items-center flex-wrap">
+
             <div>
-                <h4 class="fw-bold mb-1">📍 Vehicle Tracking</h4>
+
+                <h4 class="fw-bold mb-1">
+                    📍 Vehicle Tracking
+                </h4>
+
                 <small class="text-muted">
-                    {{ order.vehicle_number }} |
+                    {{ order.vehicle_number }}
+                    |
                     {{ order.trip_number }}
                 </small>
+
             </div>
-            <a href="javascript:history.back()" class="btn btn-light border">
+
+            <a href="javascript:history.back()"
+               class="btn btn-light border">
                 ← Back
             </a>
+
         </div>
+
     </div>
+
+
     <form method="POST" enctype="multipart/form-data">
+
         {% csrf_token %}
+
         <div class="tracking-grid">
-            <!-- LEFT SIDE -->
+
+
+            <!-- =================================================
+                 LEFT SIDE
+            ================================================== -->
             <div>
+
                 <div class="card shadow-sm border-0">
+
                     <div class="card-header bg-primary text-white fw-bold">
                         🚚 Operational Tracking
                     </div>
+
+
                     <div class="card-body">
-                       <!-- Vehicle Document -->
+
+
+                        <!-- =====================================
+                             VEHICLE DOCUMENT
+                        ====================================== -->
                         <div class="track-item">
+
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_document" 
-                                {% if tracking.vehicle_document%}checked{% endif %}>
+
+                                <input
+                                    type="checkbox"
+                                    name="vehicle_document"
+                                    {% if tracking.vehicle_document %}
+                                        checked
+                                    {% endif %}
+                                >
+
                                 Vehicle Document Collected
+
                             </label>
+
                         </div>
-                        <!-- Vehicle Placed -->
-                         <div class="track-item">
+
+
+                        <!-- =====================================
+                             VEHICLE PLACED
+                        ====================================== -->
+                        <div class="track-item">
+
                             <label class="track-label">
-                                <input type="checkbox" name="vehicle_placed" {% if tracking.vehicle_placed %}checked
-                                {% endif %}>
+
+                                <input
+                                    type="checkbox"
+                                    name="vehicle_placed"
+                                    {% if tracking.vehicle_placed %}
+                                        checked
+                                    {% endif %}
+                                >
+
                                 Vehicle Placed
+
                             </label>
+
                         </div>
-                        <!-- Live Tracking -->
-<div class="track-item">
 
-    <label class="track-label">
 
-        <input
-            type="checkbox"
-            id="liveTracking"
-            name="live_tracking"
-            {% if tracking.live_tracking %}checked{% endif %}
-        >
-
-        Live Tracking Enabled
-
-    </label>
-
-    {% if tracking.live_tracking %}
-
-        {% if vehicle.tracking_session %}
-
-            <div class="mt-2">
-
-                <a
-                    href="{% url 'vehicle_live' vehicle.tracking_session.pk %}"
-                    class="btn btn-primary btn-sm"
-                    id="liveTrackingBtn"
-                >
-                    <i class="bi bi-broadcast-pin me-1"></i>
-                    Open Live Tracking
-                </a>
-
-            </div>
-
-        {% else %}
-
-            <div class="mt-2">
-
-                <span class="text-muted small">
-                    Live tracking enabled. Save to start tracking.
-                </span>
-
-            </div>
-
-        {% endif %}
-
-    {% endif %}
-
-</div>
+                        <!-- =====================================
+                             LIVE TRACKING
+                        ====================================== -->
                         <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="invoice_eway" {% if tracking.invoice_eway %}checked
-                                {% endif %}>
-                                Invoice / E-Way
-                            </label>
-                        </div>
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" id="lrCheck" name="lr_no_b" 
-                                {% if tracking.lr_no_b %}checked{% endif %}>
-                                LR Generated
-                            </label>
-                            <div id="lrBox" class="mt-3" {% if not tracking.lr_no_b %} style="display:none;" 
-                            {% endif %}>
-                                <input type="text" name="lr_no" value="{{ tracking.lr_no }}" class="form-control"
-                                    placeholder="Enter LR Number">
-                            </div>
-                        </div>
 
-                        <div class="track-item">
                             <label class="track-label">
-                                <input type="checkbox" name="advance_to_fleet" 
-                                {% if tracking.advance_to_fleet%}checked{% endif %}>
-                                Advance Paid To Fleet
-                            </label>
-                        </div>
 
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="fleet_departed" {% if tracking.fleet_departed %}checked
-                                {% endif %}>
-                                Fleet Departed
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- RIGHT SIDE -->
-            <div>
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-success text-white fw-bold">
-                        💰 Delivery & Settlement
-                    </div>
-                    <div class="card-body">
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="arrived" {% if tracking.arrived %}checked{% endif %}>
-                                Arrived
-                            </label>
-                        </div>
+                                <input
+                                    type="checkbox"
+                                    id="liveTracking"
+                                    name="live_tracking"
+                                    {% if tracking.status == "live_tracking" %}
+                                        checked
+                                    {% endif %}
+                                >
 
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" name="delivered" {% if tracking.delivered %}checked{% endif %}>
-                                Delivered
-                            </label>
-                        </div>
+                                Live Tracking Enabled
 
-                        <!-- POD -->
-                        <div class="track-item">
-                            <label class="track-label">
-                                <input type="checkbox" id="podCheck" name="pod_received"
-                                {% if tracking.pod_received%}checked{% endif %}>
-                                POD Received
                             </label>
-                            <div id="podBox" style="display:none;">
-                                <input type="file" name="documents" multiple class="form-control">
-                            </div>
-                        </div>
-                        <div class="mt-10">
-                            {% with tracking.documents.last as pod %}
-                            {% if pod %}
-                            <div class="mt-2">
-                                <button type="button" onclick="showPOD('{{ pod.file.url }}')"
-                                    class="btn btn-success btn-sm">
-                                    👁 View POD
-                                </button>
-                            </div>
+
+
+                            <!-- =================================
+                                 LIVE TRACKING CARD
+                            ================================== -->
+
+                            {% if tracking.status == "live_tracking" %}
+
+                                <div class="live-tracking-card mt-3">
+
+                                    <div class="live-tracking-header">
+
+                                        <div>
+                                            <div class="fw-bold">
+                                                📡 Live Vehicle Tracking
+                                            </div>
+
+                                            <small class="text-muted">
+                                                Real-time vehicle location
+                                            </small>
+                                        </div>
+
+
+                                        <span class="tracking-live-badge">
+                                            <span class="live-dot"></span>
+                                            LIVE
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="row g-3 mt-1">
+
+
+                                        <!-- VEHICLE NUMBER -->
+                                        <div class="col-md-6">
+
+                                            <div class="tracking-info">
+
+                                                <small class="text-muted">
+                                                    Vehicle Number
+                                                </small>
+
+                                                <div class="fw-semibold">
+                                                    {{ order.vehicle_number|default:"—" }}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- DRIVER NUMBER -->
+                                        <div class="col-md-6">
+
+                                            <div class="tracking-info">
+
+                                                <small class="text-muted">
+                                                    Driver Number
+                                                </small>
+
+                                                <div class="fw-semibold">
+
+                                                    {% if order.driver_number %}
+
+                                                        <a
+                                                            href="tel:{{ order.driver_number }}"
+                                                            class="text-decoration-none"
+                                                        >
+                                                            📞 {{ order.driver_number }}
+                                                        </a>
+
+                                                    {% else %}
+
+                                                        —
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- TRACKING REFERENCE -->
+                                        <div class="col-md-6">
+
+                                            <div class="tracking-info">
+
+                                                <small class="text-muted">
+                                                    Tracking Reference
+                                                </small>
+
+                                                <div class="fw-semibold">
+
+                                                    {% if order.tracking_session %}
+
+                                                        {{ order.tracking_session.tracking_reference }}
+
+                                                    {% else %}
+
+                                                        —
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- TRACKING STATUS -->
+                                        <div class="col-md-6">
+
+                                            <div class="tracking-info">
+
+                                                <small class="text-muted">
+                                                    Tracking Status
+                                                </small>
+
+                                                <div class="fw-semibold">
+
+                                                    {% if order.tracking_session %}
+
+                                                        {{ order.tracking_session.get_status_display }}
+
+                                                    {% else %}
+
+                                                        Not Enabled
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <!-- =================================
+                                         OPEN LIVE TRACKING
+                                    ================================== -->
+
+                                    {% if order.tracking_session %}
+
+                                        <div class="mt-3">
+
+                                            <a
+                                                href="{% url 'vehicle_live' order.tracking_session.pk %}"
+                                                class="btn btn-primary btn-sm"
+                                            >
+
+                                                <i class="bi bi-broadcast-pin me-1"></i>
+
+                                                Open Live Tracking
+
+                                            </a>
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="mt-3">
+
+                                            <span class="text-muted small">
+
+                                                Live tracking is enabled,
+                                                but the tracking session has
+                                                not been created yet.
+
+                                            </span>
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
                             {% endif %}
-                            {% endwith %}
+
                         </div>
 
-                       <div class="modal fade" id="podModal" tabindex="-5" aria-labelledby="podModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-l modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content mt-5">
 
-            <div class="modal-header">
-                <h5 class="modal-title">POD Preview</h5>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body p-0">
-                <iframe id="podFrame"
-                        style="width:100%; height:80vh; border:none;">
-                </iframe>
-            </div>
-
-        </div>
-    </div>
-</div>
+                        <!-- =====================================
+                             INVOICE / E-WAY
+                        ====================================== -->
                         <div class="track-item">
+
                             <label class="track-label">
-                                <input type="checkbox" name="balance_trans_fleet" 
-                                {% if tracking.balance_trans_fleet%}checked{% endif %}>
-                                Balance Transfer To Fleet
+
+                                <input
+                                    type="checkbox"
+                                    name="invoice_eway"
+                                    {% if tracking.invoice_eway %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Invoice / E-Way
+
                             </label>
+
                         </div>
 
+
+                        <!-- =====================================
+                             LR GENERATED
+                        ====================================== -->
                         <div class="track-item">
+
                             <label class="track-label">
-                                <input type="checkbox" name="settled" {% if tracking.settled %}checked{% endif %}>
-                                Settled
+
+                                <input
+                                    type="checkbox"
+                                    id="lrCheck"
+                                    name="lr_no_b"
+                                    {% if tracking.lr_no_b %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                LR Generated
+
                             </label>
+
+
+                            <div
+                                id="lrBox"
+                                class="mt-3"
+                                {% if not tracking.lr_no_b %}
+                                    style="display:none;"
+                                {% endif %}
+                            >
+
+                                <input
+                                    type="text"
+                                    name="lr_no"
+                                    value="{{ tracking.lr_no|default:'' }}"
+                                    class="form-control"
+                                    placeholder="Enter LR Number"
+                                >
+
+                            </div>
+
                         </div>
+
+
+                        <!-- =====================================
+                             ADVANCE TO FLEET
+                        ====================================== -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="advance_to_fleet"
+                                    {% if tracking.advance_to_fleet %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Advance Paid To Fleet
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- =====================================
+                             FLEET DEPARTED
+                        ====================================== -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="fleet_departed"
+                                    {% if tracking.fleet_departed %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Fleet Departed
+
+                            </label>
+
+                        </div>
+
 
                     </div>
+
                 </div>
 
-                <!-- REMARKS -->
+            </div>
+
+
+            <!-- =================================================
+                 RIGHT SIDE
+            ================================================== -->
+            <div>
+
+
+                <!-- =============================================
+                     DELIVERY & SETTLEMENT
+                ============================================== -->
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-success text-white fw-bold">
+
+                        💰 Delivery & Settlement
+
+                    </div>
+
+
+                    <div class="card-body">
+
+
+                        <!-- ARRIVED -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="arrived"
+                                    {% if tracking.arrived %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Arrived
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- DELIVERED -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="delivered"
+                                    {% if tracking.delivered %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Delivered
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- =====================================
+                             POD
+                        ====================================== -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    id="podCheck"
+                                    name="pod_received"
+                                    {% if tracking.pod_received %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                POD Received
+
+                            </label>
+
+
+                            <div
+                                id="podBox"
+                                class="mt-3"
+                                {% if not tracking.pod_received %}
+                                    style="display:none;"
+                                {% endif %}
+                            >
+
+                                <input
+                                    type="file"
+                                    name="documents"
+                                    multiple
+                                    class="form-control"
+                                >
+
+                            </div>
+
+
+                            {% with tracking.documents.last as pod %}
+
+                                {% if pod %}
+
+                                    <div class="mt-2">
+
+                                        <button
+                                            type="button"
+                                            onclick="showPOD('{{ pod.file.url }}')"
+                                            class="btn btn-success btn-sm"
+                                        >
+
+                                            👁 View POD
+
+                                        </button>
+
+                                    </div>
+
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             POD MODAL
+                        ====================================== -->
+
+                        <div
+                            class="modal fade"
+                            id="podModal"
+                            tabindex="-1"
+                            aria-labelledby="podModalLabel"
+                            aria-hidden="true"
+                        >
+
+                            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+                                <div class="modal-content mt-5">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            POD Preview
+                                        </h5>
+
+                                        <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                        ></button>
+
+                                    </div>
+
+
+                                    <div class="modal-body p-0">
+
+                                        <iframe
+                                            id="podFrame"
+                                            style="width:100%; height:80vh; border:none;"
+                                        ></iframe>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- BALANCE TRANSFER -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="balance_trans_fleet"
+                                    {% if tracking.balance_trans_fleet %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Balance Transfer To Fleet
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- SETTLED -->
+                        <div class="track-item">
+
+                            <label class="track-label">
+
+                                <input
+                                    type="checkbox"
+                                    name="settled"
+                                    {% if tracking.settled %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                Settled
+
+                            </label>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     REMARKS
+                ============================================== -->
 
                 <div class="card shadow-sm border-0 mt-3">
 
                     <div class="card-header bg-secondary text-white fw-bold">
+
                         📝 Remarks
+
                     </div>
+
+
                     <div class="card-body">
-                        <textarea name="remarks" rows="4" class="form-control"
-                            placeholder="Enter remarks...">{{ tracking.remarks }}</textarea>
+
+                        <textarea
+                            name="remarks"
+                            rows="4"
+                            class="form-control"
+                            placeholder="Enter remarks..."
+                        >{{ tracking.remarks }}</textarea>
+
                     </div>
+
                 </div>
+
+
+                <!-- =============================================
+                     SAVE
+                ============================================== -->
 
                 <div class="mt-3 text-end">
 
                     {% if tracking.settled %}
 
-                    <button class="btn btn-success" disabled>
-                        🔒 Trip Settled
-                    </button>
+                        <button
+                            class="btn btn-success"
+                            disabled
+                        >
+
+                            🔒 Trip Settled
+
+                        </button>
 
                     {% else %}
 
-                    <button type="submit" class="btn btn-primary px-4">
-                        💾 Save Tracking
-                    </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary px-4"
+                        >
+
+                            💾 Save Tracking
+
+                        </button>
 
                     {% endif %}
 
                 </div>
+
+
             </div>
+
         </div>
+
     </form>
+
 </div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
 <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const lrCheck = document.getElementById("lrCheck");
-        const lrBox = document.getElementById("lrBox");
-
-        const podCheck = document.getElementById("podCheck");
-        const podBox = document.getElementById("podBox");
-
-        function toggleLR() {
-            if (lrCheck) {
-                lrBox.style.display =
-                    lrCheck.checked ? "block" : "none";
-            }
-        }
-
-        function togglePOD() {
-            if (podCheck) {
-                podBox.style.display =
-                    podCheck.checked ? "block" : "none";
-            }
-        }
-
-        if (lrCheck) {
-            lrCheck.addEventListener("change", toggleLR);
-            toggleLR();
-        }
-
-        if (podCheck) {
-            podCheck.addEventListener("change", togglePOD);
-            togglePOD();
-        }
-
-        const isSettled =
-            "{{ tracking.settled|yesno:'true,false' }}" === "true";
-
-        if (isSettled) {
-            document.querySelectorAll(
-                'input, textarea, button'
-            ).forEach(el => {
-                el.disabled = true;
-            });
-        }
-
-    });
-
-</script>
-<script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    function toggle(checkId, boxId) {
-        const c = document.getElementById(checkId);
-        const b = document.getElementById(boxId);
 
-        if (!c || !b) return;
+    /* =====================================================
+       LR BOX
+    ====================================================== */
 
-        function update() {
-            b.style.display = c.checked ? "block" : "none";
-        }
+    const lrCheck = document.getElementById("lrCheck");
+    const lrBox = document.getElementById("lrBox");
 
-        c.addEventListener("change", update);
-        update();
+
+    function toggleLR() {
+
+        if (!lrCheck || !lrBox) return;
+
+        lrBox.style.display =
+            lrCheck.checked ? "block" : "none";
+
     }
 
-    toggle("lrCheck", "lrBox");
-    toggle("podCheck", "podBox");
+
+    if (lrCheck) {
+
+        lrCheck.addEventListener("change", toggleLR);
+
+        toggleLR();
+
+    }
+
+
+    /* =====================================================
+       POD BOX
+    ====================================================== */
+
+    const podCheck = document.getElementById("podCheck");
+    const podBox = document.getElementById("podBox");
+
+
+    function togglePOD() {
+
+        if (!podCheck || !podBox) return;
+
+        podBox.style.display =
+            podCheck.checked ? "block" : "none";
+
+    }
+
+
+    if (podCheck) {
+
+        podCheck.addEventListener("change", togglePOD);
+
+        togglePOD();
+
+    }
+
+
+    /* =====================================================
+       POD PREVIEW
+    ====================================================== */
 
     window.showPOD = function (url) {
-        document.getElementById("podFrame").src = url;
 
-        const modal = new bootstrap.Modal(
-            document.getElementById("podModal")
-        );
+        const frame =
+            document.getElementById("podFrame");
 
-        modal.show();
+        if (frame) {
+
+            frame.src = url;
+
+        }
+
+
+        const modalElement =
+            document.getElementById("podModal");
+
+
+        if (modalElement) {
+
+            const modal =
+                new bootstrap.Modal(modalElement);
+
+            modal.show();
+
+        }
+
     };
 
+
+    /* =====================================================
+       WORKFLOW
+    ====================================================== */
+
     const names = [
+
         "vehicle_document",
         "vehicle_placed",
         "live_tracking",
@@ -336,81 +823,250 @@ document.addEventListener("DOMContentLoaded", function () {
         "pod_received",
         "balance_trans_fleet",
         "settled"
+
     ];
 
+
     const boxes = names
-        .map(n => document.querySelector(`[name="${n}"]`))
+
+        .map(function (name) {
+
+            return document.querySelector(
+                `[name="${name}"]`
+            );
+
+        })
+
         .filter(Boolean);
 
-    function updateWorkflow() {
-        let firstUnchecked = boxes.findIndex(b => !b.checked);
 
-        boxes.forEach((b, i) => {
-            b.disabled = (firstUnchecked !== -1 && i > firstUnchecked);
+    function updateWorkflow() {
+
+        const firstUnchecked =
+            boxes.findIndex(function (box) {
+
+                return !box.checked;
+
+            });
+
+
+        boxes.forEach(function (box, index) {
+
+            box.disabled =
+                (
+                    firstUnchecked !== -1 &&
+                    index > firstUnchecked
+                );
+
         });
+
     }
 
-    boxes.forEach(b => b.addEventListener("change", updateWorkflow));
+
+    boxes.forEach(function (box) {
+
+        box.addEventListener(
+            "change",
+            updateWorkflow
+        );
+
+    });
+
+
     updateWorkflow();
 
-    const settled = "{{ tracking.settled|yesno:'true,false' }}" === "true";
+
+    /* =====================================================
+       SETTLED LOCK
+    ====================================================== */
+
+    const settled =
+        "{{ tracking.settled|yesno:'true,false' }}"
+        === "true";
+
 
     if (settled) {
-        document.querySelectorAll("input,textarea,select,button").forEach(el => {
-            el.disabled = true;
-        });
-    }
 
-    // ===== Live Tracking Button =====
+        document
+            .querySelectorAll(
+                "input, textarea, select, button"
+            )
+            .forEach(function (element) {
 
-    const liveTracking = document.getElementById("liveTracking");
-    const liveTrackingBtn = document.getElementById("liveTrackingBtn");
+                element.disabled = true;
 
-    function toggleLiveTrackingButton() {
+            });
 
-        if (!liveTracking || !liveTrackingBtn) return;
-
-        liveTrackingBtn.style.display =
-            liveTracking.checked ? "inline-block" : "none";
-    }
-
-    if (liveTracking) {
-        liveTracking.addEventListener("change", toggleLiveTrackingButton);
-        toggleLiveTrackingButton();
     }
 
 });
+
 </script>
 
+
+<!-- =========================================================
+     STYLE
+========================================================= -->
+
 <style>
-    .tracking-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px
-    }
 
-    .track-item {
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 8px 12px;
-        margin-bottom: 8px
-    }
+.tracking-grid {
 
-    @media(max-width:991px) {
-        .tracking-grid {
-            grid-template-columns: 1fr
-        }
-    }
-    .modal {
-    z-index: 1100;
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 24px;
+
 }
+
+
+.track-item {
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    padding: 8px 12px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.track-label {
+
+    cursor: pointer;
+
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   LIVE TRACKING CARD
+========================================================= */
+
+.live-tracking-card {
+
+    background: #f8fafc;
+
+    border: 1px solid #dbeafe;
+
+    border-radius: 12px;
+
+    padding: 14px;
+
+}
+
+
+.live-tracking-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    padding-bottom: 10px;
+
+}
+
+
+.tracking-live-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.live-dot {
+
+    width: 8px;
+
+    height: 8px;
+
+    background: #22c55e;
+
+    border-radius: 50%;
+
+    display: inline-block;
+
+}
+
+
+.tracking-info {
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    padding: 9px 11px;
+
+}
+
+
+.tracking-info small {
+
+    display: block;
+
+    margin-bottom: 2px;
+
+}
+
+
+@media(max-width:991px) {
+
+    .tracking-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+.modal {
+
+    z-index: 1100;
+
+}
+
 
 .modal-backdrop {
+
     z-index: 1055;
+
 }
 
+
 .sidebar {
+
     z-index: 1030;
+
 }
+
 </style>
+
 {% endblock %}
+

@@ -8,6 +8,6 @@ path('onepageorders/<int:pk>/edit/',views.onepageorder_edit,name='onepageorder_e
 path('vehicle-payments/',views.vehicle_payments,name='vehicle_payments'), 
 path('customer-payments/',views.customer_payments,name='customer_payments'), 
 path('admin-margin/',views.admin_margin,name='admin_margin'),
- path("orders/<int:pk>/live-location/",views.order_live_location,name="order_live_location"),
-
+path("vehicle-live/<int:pk>/",views.vehicle_live,name="vehicle_live"),
+path("vehicle-live/<int:pk>/location/",views.vehicle_live_location,name="vehicle_live_location"),
 ]

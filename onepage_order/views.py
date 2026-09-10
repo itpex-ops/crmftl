@@ -17,9 +17,128 @@ from .models import (
     ApiToken,
 )
 from django.http import JsonResponse
+
+@login_required
+def vehicle_live(request, pk):
+    tracking_session = get_object_or_404(
+        TrackingSession.objects.select_related("order"),
+        pk=pk
+    )
+
+    order = tracking_session.order
+
+    latest_location = (
+        tracking_session.locations
+        .order_by("-received_at")
+        .first()
+    )
+
+    context = {
+        "tracking_session": tracking_session,
+        "order": order,
+        "latest_location": latest_location,
+    }
+
+    return render(
+        request,
+        "onepageorders/tracking_page.html",
+        context
+    )
+
+@login_required
+def vehicle_live_location(request, pk):
+
+    tracking_session = get_object_or_404(
+        TrackingSession,
+        pk=pk
+    )
+
+    order = tracking_session.order
+
+    latest_location = (
+        LiveLocation.objects
+        .filter(session=tracking_session)
+        .order_by("-received_at")
+        .first()
+    )
+
+    if not latest_location:
+
+        return JsonResponse({
+            "success": True,
+            "has_location": False,
+
+            "vehicle_number": order.vehicle_number or "",
+            "driver_number": order.driver_number or "",
+
+            "tracking_reference":
+                tracking_session.tracking_reference,
+
+            "status":
+                tracking_session.get_status_display(),
+
+            "message":
+                "Waiting for vehicle location..."
+        })
+
+
+    return JsonResponse({
+
+        "success": True,
+        "has_location": True,
+
+        "vehicle_number":
+            order.vehicle_number or "",
+
+        "driver_number":
+            order.driver_number or "",
+
+        "trip_number":
+            order.trip_number or "",
+
+        "tracking_reference":
+            tracking_session.tracking_reference,
+
+        "status":
+            tracking_session.get_status_display(),
+
+        "tracking_enabled":
+            tracking_session.tracking_enabled,
+
+        "consent_received":
+            tracking_session.consent_received,
+
+        "latitude":
+            float(latest_location.latitude),
+
+        "longitude":
+            float(latest_location.longitude),
+
+        "accuracy":
+            latest_location.accuracy,
+
+        "location_name":
+            latest_location.location_name or "",
+
+        "address":
+            latest_location.address or "",
+
+        "location_status":
+            latest_location.location_status or "",
+
+        "tracked":
+            latest_location.tracked,
+
+        "received_at":
+            latest_location.received_at.isoformat(),
+
+    })
 # =============================================================
 # HELPER FUNCTIONS
 # =============================================================
+
+
+
 
 def to_decimal(value, default="0.00"):
     """
