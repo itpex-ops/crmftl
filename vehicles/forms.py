@@ -25,4 +25,4 @@ class VehicleForm(forms.ModelForm):
             'account_number': forms.TextInput(attrs={'class': 'form-control'}),
             'ifsc': forms.TextInput(attrs={'class': 'form-control'}),
             'ac_type': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+        }# vehicles/forms.py
