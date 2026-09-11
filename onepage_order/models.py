@@ -182,11 +182,21 @@ class Order(models.Model):
         decimal_places=2,
         default=Decimal("0.00")
     )
+    gst_percent = models.DecimalField(
+        max_digits=5,       
+        decimal_places=2,
+        default=Decimal("0.00") 
+    )
 
     manager_approval = models.CharField(
         max_length=20,
         choices=APPROVAL_CHOICES,
         default="Pending"
+    )
+    total_selling_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00") 
     )
 
     approved_by = models.CharField(

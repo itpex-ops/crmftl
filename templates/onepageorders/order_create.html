@@ -591,7 +591,7 @@
 
                 </div>
 
-z
+
                 <!-- Sales Closed By -->
 
                 <div class="order-form-row">
@@ -742,10 +742,22 @@ z
                     </div>
 
                 </div>
-
-
                 <!-- Selling Amount -->
 
+                 <!-- GST -->
+                        <label class="form-label">
+                            GST %
+                        </label>
+
+                        <select name="gst_percent" id="gst_percent" class="form-select mb-3">
+                            <option value="">Select GST %</option>
+                            <option value="7">7%</option>
+                            <option value="8">8%</option>
+                            <option value="10">10%</option>
+                            <option value="13">13%</option>
+                        </select>
+
+                        <input type="hidden" id="saved_gst" value="{{ order.gst_percent|default_if_none:'' }}">
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -775,7 +787,7 @@ z
                         Manager Approval
                     </div>
 
-                    <div class="order-form-control">
+                    <!-- <div class="order-form-control">
 
                         <select name="manager_approval">
 
@@ -808,7 +820,7 @@ z
 
                         </select>
 
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -818,20 +830,42 @@ z
                 <div class="order-form-row">
 
                     <div class="order-form-label">
-                        Approved By
+                        Approval Manager
+                    </div>
+
+                    <div class="order-form-control">
+                        <input
+                            type="text"
+                            name="approved_by"
+                            value="{{ request.POST.approved_by|default:'' }}">
+                    </div>
+                </div>
+                <div class="order-form-row">
+                    <div class="order-form-label">
+                        Total Selling Amount
+                    </div>
+                    <div class="order-form-control">
+                        <input
+                            type="number"
+                            name="total_selling_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.total_selling_amount|default:'0' }}">
+                    </div>
+                </div>
+                <div class="order-form-row">
+                    <div class="order-form-label">
+                        Remarks
                     </div>
 
                     <div class="order-form-control">
 
-                        <input
-                            type="text"
-                            name="approved_by"
-                            value="{{ request.POST.approved_by|default:'' }}"
-                        >
+                        <textarea
+                            name="remarks"
+                            rows="2"
+                        >{{ request.POST.remarks|default:'' }}</textarea>
 
                     </div>
-
-                </div>
 
             </div>
 
