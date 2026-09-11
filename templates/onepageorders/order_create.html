@@ -591,7 +591,6 @@
 
                 </div>
 
-
                 <!-- Sales Closed By -->
 
                 <div class="order-form-row">
@@ -772,9 +771,9 @@
                 <div class="order-form-row">
 
                     <div class="order-form-label">
-                        Manager Approval
+                        Approval Manager 
                     </div>
-
+<!-- 
                     <div class="order-form-control">
 
                         <select name="manager_approval">
@@ -808,11 +807,9 @@
 
                         </select>
 
-                    </div>
+                    </div> -->
 
                 </div>
-
-
                 <!-- Approved By -->
 
                 <div class="order-form-row">
@@ -826,13 +823,9 @@
                         <input
                             type="text"
                             name="approved_by"
-                            value="{{ request.POST.approved_by|default:'' }}"
-                        >
-
+                            value="{{ request.POST.approved_by|default:'' }}">
                     </div>
-
                 </div>
-
             </div>
 
 
@@ -1056,17 +1049,17 @@
                             </option>
 
                             <option
-                                value="Today"
-                                {% if request.POST.customer_payment_type == "Today" %}
+                                value="Topay"
+                                {% if request.POST.customer_payment_type == "Topay" %}
                                     selected
                                 {% endif %}
                             >
-                                Today
+                                Topay
                             </option>
 
                             <option
                                 value="TBB"
-                                {% if request.POST.customer_payment_type == "TBB" %}
+                                {% if request.POST.customer_billing_type == "Credit" %}
                                     selected
                                 {% endif %}
                             >
@@ -1177,7 +1170,7 @@
 
 
                 <!-- Due Date -->
-
+                {% if request.POST.customer_payment_type == "Credit" %}
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -1193,9 +1186,8 @@
                         >
 
                     </div>
-
                 </div>
-
+                {% endif %}
             </div>
 
 
@@ -1272,7 +1264,6 @@
 
                 </div>
 
-
                 <!-- Owner Number -->
 
                 <div class="order-form-row">
@@ -1292,7 +1283,6 @@
                     </div>
 
                 </div>
-
 
                 <!-- Vehicle Sourced By -->
 
@@ -1382,7 +1372,6 @@
                             min="0"
                             value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
                         >
-
                     </div>
 
                 </div>

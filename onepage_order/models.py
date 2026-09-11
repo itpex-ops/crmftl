@@ -31,7 +31,7 @@ class Order(models.Model):
 
     CUSTOMER_PAYMENT_CHOICES = [
         ("Paid", "Paid"),
-        ("Today", "Today"),
+        ("Topay", "Topay"),
         ("TBB", "TBB"),
     ]
 

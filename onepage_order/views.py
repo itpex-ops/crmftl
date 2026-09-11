@@ -137,9 +137,6 @@ def vehicle_live_location(request, pk):
 # HELPER FUNCTIONS
 # =============================================================
 
-
-
-
 def to_decimal(value, default="0.00"):
     """
     Safely convert POST value to Decimal.
@@ -180,7 +177,6 @@ def to_date(value):
         ).date()
     except ValueError:
         return None
-
 
 # =============================================================
 # ORDER LIST
