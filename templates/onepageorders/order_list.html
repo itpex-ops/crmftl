@@ -7,177 +7,6 @@
 <style>
 
 /* =========================================================
-   ORDERS PAGE
-   ========================================================= */
-
-.orders-page {
-    width: 100%;
-    padding: 24px 28px 40px;
-    box-sizing: border-box;
-    background: #f8f9fb;
-    min-height: calc(100vh - 70px);
-}
-
-
-/* =========================================================
-   PAGE HEADER
-   ========================================================= */
-
-.orders-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.orders-title {
-    margin: 0;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 22px;
-    font-weight: 600;
-
-    color: #212529;
-}
-
-.orders-subtitle {
-    margin-top: 4px;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-
-    color: #8a9199;
-}
-
-
-/* =========================================================
-   CREATE BUTTON
-   ========================================================= */
-
-.create-order-btn {
-    height: 40px;
-    padding: 0 18px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid #FDB81B;
-    border-radius: 7px;
-
-    background: #FDB81B;
-    color: #212529;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
-}
-
-.create-order-btn:hover {
-    background: #e7a900;
-    border-color: #e7a900;
-    color: #ffffff;
-}
-
-
-/* =========================================================
-   SEARCH AREA
-   ========================================================= */
-
-.orders-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom: 18px;
-}
-
-.orders-search {
-    display: flex;
-
-    width: 100%;
-    max-width: 620px;
-
-    height: 42px;
-}
-
-
-/* Input */
-
-.orders-search input {
-    flex: 1;
-
-    min-width: 0;
-
-    height: 42px;
-
-    padding: 0 13px;
-
-    border: 1px solid #dfe3e8;
-    border-right: none;
-
-    border-radius: 7px 0 0 7px;
-
-    background: #ffffff;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-
-    color: #343a40;
-
-    outline: none;
-
-    box-sizing: border-box;
-}
-
-.orders-search input::placeholder {
-    color: #9aa0a6;
-}
-
-.orders-search input:focus {
-    border-color: #FDB81B;
-
-    box-shadow:
-        0 0 0 3px rgba(253, 184, 27, 0.10);
-}
-
-
-/* Search button */
-
-.orders-search button {
-    width: 90px;
-    height: 42px;
-
-    border: 1px solid #FDB81B;
-
-    border-radius: 0 7px 7px 0;
-
-    background: #FDB81B;
-    color: #212529;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
-.orders-search button:hover {
-    background: #e7a900;
-    color: #ffffff;
-}
-
-
-/* =========================================================
    TABLE CARD
    ========================================================= */
 
@@ -204,13 +33,17 @@
 .orders-table {
     width: 100%;
 
+    margin: 0;
+
     border-collapse: collapse;
 
-    margin: 0;
+    table-layout: fixed;
 }
 
 
-/* Header */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .orders-table thead th {
     padding: 12px 14px;
@@ -226,10 +59,18 @@
     font-weight: 600;
 
     white-space: nowrap;
+
+    vertical-align: middle;
+
+    text-align: left;
+
+    box-sizing: border-box;
 }
 
 
-/* Body */
+/* =========================================================
+   BODY
+   ========================================================= */
 
 .orders-table tbody td {
     padding: 12px 14px;
@@ -242,17 +83,25 @@
     font-size: 11px;
 
     vertical-align: middle;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
 }
 
 
-/* Last row */
+/* =========================================================
+   LAST ROW
+   ========================================================= */
 
 .orders-table tbody tr:last-child td {
     border-bottom: none;
 }
 
 
-/* Hover */
+/* =========================================================
+   HOVER
+   ========================================================= */
 
 .orders-table tbody tr:hover {
     background: #fffdf4;
@@ -260,41 +109,77 @@
 
 
 /* =========================================================
-   COLUMN ALIGNMENT
+   COLUMN WIDTHS + ALIGNMENT
    ========================================================= */
 
+/* 1. TRIP */
 .orders-table th:nth-child(1),
 .orders-table td:nth-child(1) {
-    width: 100px;
+    width: 15%;
+    text-align: left;
 }
 
+
+/* 2. CUSTOMER */
 .orders-table th:nth-child(2),
 .orders-table td:nth-child(2) {
-    min-width: 200px;
+    width: 18%;
+    text-align: left;
 }
 
+
+/* 3. ROUTE */
 .orders-table th:nth-child(3),
 .orders-table td:nth-child(3) {
-    min-width: 190px;
+    width: 20%;
+    text-align: left;
 }
 
+
+/* 4. VEHICLE */
 .orders-table th:nth-child(4),
 .orders-table td:nth-child(4) {
-    min-width: 200px;
+    width: 19%;
+    text-align: left;
 }
 
+
+/* 5. FREIGHT */
 .orders-table th:nth-child(5),
-.orders-table td:nth-child(5),
+.orders-table td:nth-child(5) {
+    width: 10%;
+    text-align: right;
+}
+
+
+/* 6. MARGIN */
 .orders-table th:nth-child(6),
 .orders-table td:nth-child(6) {
-    width: 120px;
+    width: 10%;
+    text-align: right;
+}
+
+
+/* 7. ACTION */
+.orders-table th:nth-child(7),
+.orders-table td:nth-child(7) {
+    width: 8%;
     text-align: center;
 }
 
-.orders-table th:nth-child(7),
-.orders-table td:nth-child(7) {
-    width: 90px;
-    text-align: center;
+
+/* =========================================================
+   REMOVE BOOTSTRAP ALIGNMENT CONFLICTS
+   ========================================================= */
+
+.orders-table td.text-end,
+.orders-table th.text-end {
+    text-align: right !important;
+}
+
+.orders-table td.text-center,
+.orders-table th.text-center {
+    text-align: center !important;
 }
 
 
@@ -304,7 +189,10 @@
 
 .trip-number {
     font-weight: 600;
+
     color: #1f2937;
+
+    white-space: nowrap;
 }
 
 
@@ -314,7 +202,10 @@
 
 .vehicle-number {
     font-weight: 500;
+
     color: #343a40;
+
+    white-space: nowrap;
 }
 
 .vehicle-type {
@@ -323,7 +214,23 @@
     margin-top: 2px;
 
     font-size: 9px;
+
     color: #8a9199;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ROUTE
+   ========================================================= */
+
+.orders-table td:nth-child(3) {
+    white-space: nowrap;
 }
 
 
@@ -341,12 +248,18 @@
 
 .margin-positive {
     color: #198754;
+
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 .margin-negative {
     color: #dc3545;
+
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 
@@ -365,22 +278,29 @@
     padding: 0 12px;
 
     border: 1px solid #0d6efd;
+
     border-radius: 5px;
 
     background: #ffffff;
+
     color: #0d6efd;
 
     font-family: "Poppins", sans-serif;
+
     font-size: 10px;
+
     font-weight: 500;
 
     text-decoration: none;
+
+    white-space: nowrap;
 
     transition: all 0.2s ease;
 }
 
 .view-order-btn:hover {
     background: #0d6efd;
+
     color: #ffffff;
 }
 
@@ -392,7 +312,7 @@
 .empty-orders {
     padding: 45px 20px !important;
 
-    text-align: center;
+    text-align: center !important;
 
     color: #8a9199 !important;
 }
@@ -412,41 +332,19 @@
 
 @media (max-width: 900px) {
 
-    .orders-header {
-        align-items: flex-start;
-        flex-direction: column;
+    .orders-table {
+        min-width: 900px;
+        table-layout: fixed;
     }
 
-    .create-order-btn {
-        width: 100%;
-    }
-
-    .orders-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .orders-search {
-        max-width: 100%;
-    }
-
-}
-
-
-@media (max-width: 650px) {
-
-    .orders-page {
-        padding: 18px 14px 30px;
-    }
-
-    .orders-title {
-        font-size: 19px;
+    .orders-table th,
+    .orders-table td {
+        padding: 11px 12px;
     }
 
 }
 
 </style>
-
 <div class="orders-page">
     <!-- =====================================================
          HEADER
