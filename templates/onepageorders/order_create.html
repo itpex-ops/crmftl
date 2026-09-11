@@ -742,9 +742,8 @@
                     </div>
 
                 </div>
-                <!-- Selling Amount -->
-
                  <!-- GST -->
+                  <div class="order-form-row">
                         <label class="form-label">
                             GST %
                         </label>
@@ -758,6 +757,7 @@
                         </select>
 
                         <input type="hidden" id="saved_gst" value="{{ order.gst_percent|default_if_none:'' }}">
+                  </div>
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -777,9 +777,7 @@
                     </div>
 
                 </div>
-
-
-                <!-- Manager Approval -->
+                <!-- Manager Approval 
 
                 <div class="order-form-row">
 
@@ -787,7 +785,7 @@
                         Manager Approval
                     </div>
 
-                    <!-- <div class="order-form-control">
+                     <div class="order-form-control">
 
                         <select name="manager_approval">
 
@@ -820,10 +818,9 @@
 
                         </select>
 
-                    </div> -->
+                    </div>
 
-                </div>
-
+                </div>-->
 
                 <!-- Approved By -->
 
