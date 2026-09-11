@@ -7,6 +7,177 @@
 <style>
 
 /* =========================================================
+   ORDERS PAGE
+   ========================================================= */
+
+.orders-page {
+    width: 100%;
+    padding: 24px 28px 40px;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.orders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.orders-title {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.orders-subtitle {
+    margin-top: 4px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+
+    color: #8a9199;
+}
+
+
+/* =========================================================
+   CREATE BUTTON
+   ========================================================= */
+
+.create-order-btn {
+    height: 40px;
+    padding: 0 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #FDB81B;
+    border-radius: 7px;
+
+    background: #FDB81B;
+    color: #212529;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.create-order-btn:hover {
+    background: #e7a900;
+    border-color: #e7a900;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   SEARCH AREA
+   ========================================================= */
+
+.orders-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+.orders-search {
+    display: flex;
+
+    width: 100%;
+    max-width: 620px;
+
+    height: 42px;
+}
+
+
+/* Input */
+
+.orders-search input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 42px;
+
+    padding: 0 13px;
+
+    border: 1px solid #dfe3e8;
+    border-right: none;
+
+    border-radius: 7px 0 0 7px;
+
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+
+    color: #343a40;
+
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+.orders-search input::placeholder {
+    color: #9aa0a6;
+}
+
+.orders-search input:focus {
+    border-color: #FDB81B;
+
+    box-shadow:
+        0 0 0 3px rgba(253, 184, 27, 0.10);
+}
+
+
+/* Search button */
+
+.orders-search button {
+    width: 90px;
+    height: 42px;
+
+    border: 1px solid #FDB81B;
+
+    border-radius: 0 7px 7px 0;
+
+    background: #FDB81B;
+    color: #212529;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.orders-search button:hover {
+    background: #e7a900;
+    color: #ffffff;
+}
+
+
+/* =========================================================
    TABLE CARD
    ========================================================= */
 
@@ -344,7 +515,126 @@
 
 }
 
+/* =========================================================
+   MONEY
+   ========================================================= */
+
+.amount {
+    white-space: nowrap;
+
+    font-weight: 500;
+
+    color: #343a40;
+}
+
+.margin-positive {
+    color: #198754;
+    font-weight: 600;
+}
+
+.margin-negative {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.view-order-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 31px;
+
+    padding: 0 12px;
+
+    border: 1px solid #0d6efd;
+    border-radius: 5px;
+
+    background: #ffffff;
+    color: #0d6efd;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.view-order-btn:hover {
+    background: #0d6efd;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-orders {
+    padding: 45px 20px !important;
+
+    text-align: center;
+
+    color: #8a9199 !important;
+}
+
+.empty-orders i {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 28px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .orders-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .create-order-btn {
+        width: 100%;
+    }
+
+    .orders-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .orders-search {
+        max-width: 100%;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .orders-page {
+        padding: 18px 14px 30px;
+    }
+
+    .orders-title {
+        font-size: 19px;
+    }
+
+}
+
 </style>
+
 <div class="orders-page">
     <!-- =====================================================
          HEADER
