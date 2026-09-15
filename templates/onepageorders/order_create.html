@@ -747,14 +747,30 @@ html
                                 <input
                                     type="checkbox"
                                     name="gst_percent"
-                                    value="7"
+                                    value="0"
                                     class="gst-option"
-                                    {% if request.POST.gst_percent == "7" or not request.POST.gst_percent %}
+                                    {% if request.POST.gst_percent == "0" or not request.POST.gst_percent %}
                                         checked
                                     {% endif %}
                                 >
 
-                                <span>7%</span>
+                                <span>0%</span>
+
+                            </label>
+
+                            <label class="gst-checkbox">
+
+                                <input
+                                    type="checkbox"
+                                    name="gst_percent"
+                                    value="5"
+                                    class="gst-option"
+                                    {% if request.POST.gst_percent == "5" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span>5%</span>
 
                             </label>
 
@@ -764,36 +780,18 @@ html
                                 <input
                                     type="checkbox"
                                     name="gst_percent"
-                                    value="8"
+                                    value="18"
                                     class="gst-option"
-                                    {% if request.POST.gst_percent == "8" %}
+                                    {% if request.POST.gst_percent == "18" %}
                                         checked
                                     {% endif %}
                                 >
-
-                                <span>8%</span>
+                                <span>18%</span>
 
                             </label>
 
 
-                            <label class="gst-checkbox">
-
-                                <input
-                                    type="checkbox"
-                                    name="gst_percent"
-                                    value="10"
-                                    class="gst-option"
-                                    {% if request.POST.gst_percent == "10" %}
-                                        checked
-                                    {% endif %}
-                                >
-
-                                <span>10%</span>
-
-                            </label>
-
-
-                            <label class="gst-checkbox">
+                            <!-- <label class="gst-checkbox">
 
                                 <input
                                     type="checkbox"
@@ -807,7 +805,7 @@ html
 
                                 <span>13%</span>
 
-                            </label>
+                            </label> -->
 
                         </div>
 
