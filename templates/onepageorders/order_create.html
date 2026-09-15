@@ -1,11 +1,11 @@
+html
 {% extends "layouts/base.html" %}
 
 {% block content %}
 
 <style>
-
 /* =========================================================
-   GST CHECKBOX OPTIONS
+   GST OPTIONS
    ========================================================= */
 
 .gst-options {
@@ -19,18 +19,14 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-
     padding: 4px 8px;
-
     border: 1px solid #d5d5d5;
     border-radius: 4px;
-
     background: #ffffff;
-
+    color: #333;
     font-family: "Poppins", sans-serif;
     font-size: 11px;
     font-weight: 500;
-
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -38,10 +34,8 @@
 .gst-checkbox input {
     width: 14px !important;
     height: 14px !important;
-
     margin: 0;
     padding: 0;
-
     accent-color: #ffc000;
     cursor: pointer;
 }
@@ -51,6 +45,8 @@
     border-color: #ffc000;
     font-weight: 600;
 }
+
+
 /* =========================================================
    ORDER CREATION PAGE
    ========================================================= */
@@ -77,10 +73,10 @@
 
 .order-create-title {
     margin: 0;
+    color: #212529;
     font-family: "Poppins", sans-serif;
     font-size: 22px;
     font-weight: 600;
-    color: #212529;
 }
 
 
@@ -92,20 +88,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     height: 38px;
     padding: 0 16px;
-
     border: 1px solid #dfe3e8;
     border-radius: 8px;
-
     background: #ffffff;
     color: #495057;
-
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 500;
-
     text-decoration: none;
     transition: all 0.2s ease;
 }
@@ -123,16 +114,10 @@
 
 .order-two-columns {
     width: 100%;
-
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        minmax(0, 1fr);
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 22px;
     row-gap: 14px;
-
     align-items: start;
 }
 
@@ -144,10 +129,8 @@
 .order-card {
     width: 100%;
     margin: 0;
-
     border: 1px solid #8d8d8d;
     background: #ffffff;
-
     overflow: hidden;
     box-sizing: border-box;
 }
@@ -159,25 +142,18 @@
 
 .order-card-title {
     min-height: 38px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 7px 10px;
-
     background: #ffc000;
     border-bottom: 1px solid #777;
-
     color: #111111;
-
     font-family: "Poppins", sans-serif;
     font-size: 13px;
     font-weight: 700;
-
-    text-transform: uppercase;
     text-align: center;
-
+    text-transform: uppercase;
     line-height: 1.2;
 }
 
@@ -188,15 +164,9 @@
 
 .order-form-row {
     display: grid;
-
-    grid-template-columns:
-        42%
-        58%;
-
+    grid-template-columns: 42% 58%;
     min-height: 39px;
-
     border-bottom: 1px solid #b8b8b8;
-
     box-sizing: border-box;
 }
 
@@ -212,18 +182,13 @@
 .order-form-label {
     display: flex;
     align-items: center;
-
     padding: 5px 9px;
-
     border-right: 1px solid #b8b8b8;
-
     background: #ffffff;
     color: #172033;
-
     font-family: "Poppins", sans-serif;
     font-size: 11.5px;
     line-height: 1.25;
-
     box-sizing: border-box;
 }
 
@@ -234,13 +199,10 @@
 
 .order-form-control {
     min-width: 0;
-
     padding: 3px 5px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
-
     box-sizing: border-box;
 }
 
@@ -252,26 +214,18 @@
 .order-form-control input,
 .order-form-control select,
 .order-form-control textarea {
-
     width: 100%;
     min-width: 0;
-
     height: 30px;
-
     padding: 4px 7px;
-
     border: 1px solid #d5d5d5;
     border-radius: 3px;
-
     background: #ffffff;
     color: #222222;
-
     font-family: "Poppins", sans-serif;
     font-size: 11.5px;
-
     outline: none;
     box-shadow: none;
-
     box-sizing: border-box;
 }
 
@@ -289,14 +243,10 @@
 .order-form-control input:focus,
 .order-form-control select:focus,
 .order-form-control textarea:focus {
-
-    border-color: #FDB81B;
+    border-color: #fdb81b;
     background: #fffef0;
-
     outline: none;
-
-    box-shadow:
-        0 0 0 2px rgba(253, 184, 27, 0.10);
+    box-shadow: 0 0 0 2px rgba(253, 184, 27, 0.10);
 }
 
 
@@ -305,7 +255,6 @@
    ========================================================= */
 
 .order-form-control input[readonly] {
-
     background: #eef0f2;
     font-weight: 600;
 }
@@ -316,11 +265,8 @@
    ========================================================= */
 
 .field-error {
-
     margin-top: 2px;
-
     color: #dc3545;
-
     font-size: 9px;
     line-height: 1.2;
 }
@@ -332,15 +278,11 @@
 
 .order-error-alert {
     margin-bottom: 15px;
-
     padding: 10px 14px;
-
     border: 1px solid #f5c2c7;
     border-radius: 6px;
-
     background: #f8d7da;
     color: #842029;
-
     font-family: "Poppins", sans-serif;
     font-size: 11px;
 }
@@ -351,24 +293,17 @@
    ========================================================= */
 
 .create-order-container {
-
     width: 100%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     padding: 14px 0 20px;
 }
 
-
 .create-order-button {
-
     min-width: 125px;
     height: 38px;
-
     border-radius: 5px;
-
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 600;
@@ -380,16 +315,12 @@
    ========================================================= */
 
 @media (max-width: 950px) {
-
     .order-two-columns {
         grid-template-columns: 1fr;
     }
-
 }
 
-
 @media (max-width: 600px) {
-
     .order-create-page {
         padding: 15px;
     }
@@ -400,9 +331,7 @@
     }
 
     .order-form-row {
-        grid-template-columns:
-            44%
-            56%;
+        grid-template-columns: 44% 56%;
     }
 
     .order-form-label {
@@ -414,13 +343,11 @@
     .order-form-control textarea {
         font-size: 10.5px;
     }
-
 }
-
 </style>
 
-<div class="order-create-page">
 
+<div class="order-create-page">
 
     <!-- =====================================================
          HEADER
@@ -432,19 +359,19 @@
             Order Creation
         </h1>
 
-        <a
-            href="{% url 'onepageorder_list' %}"
-            class="edit-back-btn"
-        >
+        <a href="{% url 'onepageorder_list' %}"
+           class="edit-back-btn">
+
             <i class="bi bi-arrow-left me-1"></i>
             Back
+
         </a>
 
     </div>
 
 
     <!-- =====================================================
-         DJANGO MESSAGE
+         DJANGO MESSAGES
          ===================================================== -->
 
     {% if messages %}
@@ -463,21 +390,18 @@
     <!-- =====================================================
          FORM
          ===================================================== -->
+
     <form method="POST">
 
         {% csrf_token %}
 
 
-        <!-- =================================================
-             TWO COLUMN GRID
-             ================================================= -->
-
         <div class="order-two-columns">
 
 
-            <!-- =============================================
+            <!-- =================================================
                  CUSTOMER DETAILS
-                 ============================================= -->
+                 ================================================= -->
 
             <div class="order-card">
 
@@ -571,7 +495,7 @@
                 </div>
 
 
-                <!-- Lead -->
+                <!-- Lead Generated Through -->
 
                 <div class="order-form-row">
 
@@ -587,48 +511,38 @@
                                 Select
                             </option>
 
-                            <option
-                                value="Social Media"
+                            <option value="Social Media"
                                 {% if request.POST.lead_generated_through == "Social Media" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Social Media
                             </option>
 
-                            <option
-                                value="Outbound Calls"
+                            <option value="Outbound Calls"
                                 {% if request.POST.lead_generated_through == "Outbound Calls" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Outbound Calls
                             </option>
 
-                            <option
-                                value="Reference"
+                            <option value="Reference"
                                 {% if request.POST.lead_generated_through == "Reference" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Reference
                             </option>
 
-                            <option
-                                value="Field Sales"
+                            <option value="Field Sales"
                                 {% if request.POST.lead_generated_through == "Field Sales" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Field Sales
                             </option>
 
-                            <option
-                                value="Justdial"
+                            <option value="Justdial"
                                 {% if request.POST.lead_generated_through == "Justdial" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Justdial
                             </option>
 
@@ -662,9 +576,10 @@
             </div>
 
 
-            <!-- =============================================
+
+            <!-- =================================================
                  COMMERCIALS
-                 ============================================= -->
+                 ================================================= -->
 
             <div class="order-card">
 
@@ -697,7 +612,7 @@
                 </div>
 
 
-                <!-- Loading -->
+                <!-- Loading / Unloading -->
 
                 <div class="order-form-row">
 
@@ -767,6 +682,8 @@
                     </div>
 
                 </div>
+
+
                 <!-- Total Trip Cost -->
 
                 <div class="order-form-row">
@@ -788,264 +705,196 @@
 
                 </div>
 
-                 <!-- GST -->
-                 <!-- =====================================================
-     SELLING AMOUNT + GST
-     ===================================================== -->
 
-<!-- Selling Amount -->
-<div class="order-form-row">
+                <!-- Selling Amount -->
 
-    <div class="order-form-label">
-        Selling Amount
-    </div>
-
-    <div class="order-form-control">
-
-        <input
-            type="number"
-            id="id_selling_amount"
-            name="selling_amount"
-            step="0.01"
-            min="0"
-            value="{{ request.POST.selling_amount|default:'0' }}"
-        >
-
-    </div>
-
-</div>
-
-
-<!-- GST -->
-<div class="order-form-row">
-
-    <div class="order-form-label">
-        GST
-    </div>
-
-    <div class="order-form-control">
-
-        <div class="gst-options">
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="7"
-                    class="gst-option"
-                    checked     
-                >
-                <span>7%</span>
-            </label>
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="8"
-                    class="gst-option"
-                >
-                <span>8%</span>
-            </label>
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="10"
-                    class="gst-option"
-                >
-                <span>10%</span>
-            </label>
-           <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="13"
-                    class="gst-option">
-                <span>13%</span>
-            </label>
-
-        </div>
-
-        <!-- GST calculated amount -->
-        <input
-            type="hidden"
-            id="gst_amount"
-            name="gst_amount"
-            value="0"
-        >
-
-    </div>
-
-</div>
-
-
-<!-- Total Selling Amount -->
-<!-- =====================================================
-     SELLING AMOUNT
-     ===================================================== -->
-
-<div class="order-form-row">
-
-    <div class="order-form-label">
-        Selling Amount
-    </div>
-
-    <div class="order-form-control">
-
-        <input
-            type="number"
-            id="id_selling_amount"
-            name="selling_amount"
-            step="0.01"
-            min="0"
-            value="{{ request.POST.selling_amount|default:'0' }}"
-        >
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     GST
-     ===================================================== -->
-
-<div class="order-form-row">
-
-    <div class="order-form-label">
-        GST
-    </div>
-
-    <div class="order-form-control">
-
-        <div class="gst-options">
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="7"
-                    class="gst-option"
-                    {% if request.POST.gst_percent == "7" or not request.POST.gst_percent %}
-                        checked
-                    {% endif %}
-                >
-                <span>7%</span>
-            </label>
-
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="8"
-                    class="gst-option"
-                    {% if request.POST.gst_percent == "8" %}
-                        checked
-                    {% endif %}
-                >
-                <span>8%</span>
-            </label>
-
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="10"
-                    class="gst-option"
-                    {% if request.POST.gst_percent == "10" %}
-                        checked
-                    {% endif %}
-                >
-                <span>10%</span>
-            </label>
-
-
-            <label class="gst-checkbox">
-                <input
-                    type="checkbox"
-                    name="gst_percent"
-                    value="13"
-                    class="gst-option"
-                    {% if request.POST.gst_percent == "13" %}
-                        checked
-                    {% endif %}
-                >
-                <span>13%</span>
-            </label>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     GST AMOUNT
-     ===================================================== -->
-
-<div class="order-form-row">
-
-    <div class="order-form-label">
-        GST Amount
-    </div>
-
-    <div class="order-form-control">
-
-        <input
-            type="text"
-            id="gst_amount"
-            value="0.00"
-            readonly
-        >
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     TOTAL SELLING AMOUNT
-     ===================================================== -->
-
-<div class="order-form-row">
-
-    <div class="order-form-label">
-        Total Selling Amount
-    </div>
-
-    <div class="order-form-control">
-
-        <input
-            type="text"
-            id="id_total_selling_amount"
-            value="0.00"
-            readonly
-        >
-
-    </div>
-
-</div>
-                <!-- Manager Approval -->
                 <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Selling Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            id="id_selling_amount"
+                            name="selling_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.selling_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- GST -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        GST
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <div class="gst-options">
+
+                            <label class="gst-checkbox">
+
+                                <input
+                                    type="checkbox"
+                                    name="gst_percent"
+                                    value="7"
+                                    class="gst-option"
+                                    {% if request.POST.gst_percent == "7" or not request.POST.gst_percent %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span>7%</span>
+
+                            </label>
+
+
+                            <label class="gst-checkbox">
+
+                                <input
+                                    type="checkbox"
+                                    name="gst_percent"
+                                    value="8"
+                                    class="gst-option"
+                                    {% if request.POST.gst_percent == "8" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span>8%</span>
+
+                            </label>
+
+
+                            <label class="gst-checkbox">
+
+                                <input
+                                    type="checkbox"
+                                    name="gst_percent"
+                                    value="10"
+                                    class="gst-option"
+                                    {% if request.POST.gst_percent == "10" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span>10%</span>
+
+                            </label>
+
+
+                            <label class="gst-checkbox">
+
+                                <input
+                                    type="checkbox"
+                                    name="gst_percent"
+                                    value="13"
+                                    class="gst-option"
+                                    {% if request.POST.gst_percent == "13" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span>13%</span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GST Amount -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        GST Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            id="gst_amount_display"
+                            value="0.00"
+                            readonly
+                        >
+
+                        <!-- Value submitted to Django -->
+
+                        <input
+                            type="hidden"
+                            id="gst_amount"
+                            name="gst_amount"
+                            value="0.00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Total Selling Amount -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Total Selling Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            id="id_total_selling_amount"
+                            name="total_selling_amount"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Approval Manager -->
+
+                <div class="order-form-row">
+
                     <div class="order-form-label">
                         Approval Manager
                     </div>
 
                     <div class="order-form-control">
+
                         <input
                             type="text"
                             name="approved_by"
                             value="{{ request.POST.approved_by|default:'' }}"
                         >
+
                     </div>
+
                 </div>
 
+
+                <!-- Remarks -->
+
                 <div class="order-form-row">
+
                     <div class="order-form-label">
                         Remarks
                     </div>
@@ -1058,12 +907,16 @@
                         >{{ request.POST.remarks|default:'' }}</textarea>
 
                     </div>
-            </div>
+
+                </div>
+
             </div>
 
-            <!-- =============================================
+
+
+            <!-- =================================================
                  SHIPMENT DETAILS
-                 ============================================= -->
+                 ================================================= -->
 
             <div class="order-card">
 
@@ -1203,9 +1056,10 @@
             </div>
 
 
-            <!-- =============================================
+
+            <!-- =================================================
                  PAYMENT TERMS BY CUSTOMER
-                 ============================================= -->
+                 ================================================= -->
 
             <div class="order-card">
 
@@ -1230,21 +1084,17 @@
                                 Select
                             </option>
 
-                            <option
-                                value="Retail"
+                            <option value="Retail"
                                 {% if request.POST.customer_billing_type == "Retail" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Retail
                             </option>
 
-                            <option
-                                value="Credit"
+                            <option value="Credit"
                                 {% if request.POST.customer_billing_type == "Credit" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Credit
                             </option>
 
@@ -1271,30 +1121,24 @@
                                 Select
                             </option>
 
-                            <option
-                                value="Paid"
+                            <option value="Paid"
                                 {% if request.POST.customer_payment_type == "Paid" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Paid
                             </option>
 
-                            <option
-                                value="Today"
+                            <option value="Today"
                                 {% if request.POST.customer_payment_type == "Today" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Today
                             </option>
 
-                            <option
-                                value="TBB"
+                            <option value="TBB"
                                 {% if request.POST.customer_payment_type == "TBB" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 TBB
                             </option>
 
@@ -1367,30 +1211,24 @@
                                 Select
                             </option>
 
-                            <option
-                                value="Cash"
+                            <option value="Cash"
                                 {% if request.POST.customer_payment_method == "Cash" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Cash
                             </option>
 
-                            <option
-                                value="Account"
+                            <option value="Account"
                                 {% if request.POST.customer_payment_method == "Account" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Account
                             </option>
 
-                            <option
-                                value="UPI"
+                            <option value="UPI"
                                 {% if request.POST.customer_payment_method == "UPI" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 UPI
                             </option>
 
@@ -1424,9 +1262,10 @@
             </div>
 
 
-            <!-- =============================================
+
+            <!-- =================================================
                  VEHICLE DETAILS
-                 ============================================= -->
+                 ================================================= -->
 
             <div class="order-card">
 
@@ -1531,21 +1370,17 @@
 
                         <select name="vehicle_sourced_by">
 
-                            <option
-                                value="Direct"
+                            <option value="Direct"
                                 {% if request.POST.vehicle_sourced_by == "Direct" or not request.POST.vehicle_sourced_by %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Direct
                             </option>
 
-                            <option
-                                value="Broker"
+                            <option value="Broker"
                                 {% if request.POST.vehicle_sourced_by == "Broker" %}
                                     selected
-                                {% endif %}
-                            >
+                                {% endif %}>
                                 Broker
                             </option>
 
@@ -1566,625 +1401,3 @@
 
                     <div class="order-form-control">
 
-                        <input
-                            type="text"
-                            name="owner_broker_name"
-                            value="{{ request.POST.owner_broker_name|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 PAYMENT TERMS TO CONTRACTED VEHICLE
-                 ============================================= -->
-
-            <div class="order-card">
-
-                <div class="order-card-title">
-                    Payment Terms to Contracted Vehicle
-                </div>
-
-
-                <!-- Vehicle Advance -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Vehicle Advance Amount
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="number"
-                            name="vehicle_advance_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- Vehicle Balance -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Vehicle Balance Amount
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="number"
-                            name="vehicle_balance_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.vehicle_balance_amount|default:'0' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- Vehicle Owner -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Vehicle Owner Name
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="vehicle_owner_name"
-                            value="{{ request.POST.vehicle_owner_name|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- PAN -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        PAN Card
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="pan_card"
-                            value="{{ request.POST.pan_card|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- Account Name -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Account Name
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="account_name"
-                            value="{{ request.POST.account_name|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- Account Number -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Account Number
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="account_number"
-                            value="{{ request.POST.account_number|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- IFSC -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        IFSC Code
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="ifsc_code"
-                            value="{{ request.POST.ifsc_code|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- UPI -->
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        UPI Number
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="text"
-                            name="upi_number"
-                            value="{{ request.POST.upi_number|default:'' }}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- Send SMS 
-
-            
-                <div class="order-form-row">
-
-                   <div class="mt-2">
-
-    
-
-            </div>
-
-                </div>
-            
-
-
-         Agreement / TDS -->
-
-                <!--
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Create Agreement & TDS Certificate
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="checkbox"
-                            name="create_agreement_tds"
-                        >
-
-                    </div>
-
-                </div>
-                -->
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             CREATE ORDER BUTTON
-             ================================================= -->
-
-        <div class="create-order-container">
-
-            <button
-                type="submit"
-                class="btn btn-primary create-order-button"
-            >
-
-                <i class="bi bi-save me-1"></i>
-
-                Create Order
-
-            </button>
-
-        </div>
-
-    </form>
-
-</div>
-
-
-<!-- =========================================================
-     TOTAL TRIP COST CALCULATION
-     ========================================================= -->
-
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-
-    function getNumber(id) {
-
-        const element =
-            document.getElementById(id);
-
-        if (!element) {
-            return 0;
-        }
-
-        const value =
-            parseFloat(element.value);
-
-        return isNaN(value)
-            ? 0
-            : value;
-
-    }
-
-
-    function calculateTripCost() {
-
-        const freight =
-            getNumber("id_freight_amount");
-
-        const loading =
-            getNumber("id_loading_unloading_charges");
-
-        const halting =
-            getNumber("id_halting_charges");
-
-        const other =
-            getNumber("id_other_charges");
-
-
-        const total =
-            freight +
-            loading +
-            halting +
-            other;
-
-
-        const totalField =
-            document.getElementById(
-                "total_trip_cost"
-            );
-
-
-        if (totalField) {
-
-            totalField.value =
-                total.toFixed(2);
-
-        }
-
-    }
-
-
-    const fields = [
-
-        "id_freight_amount",
-        "id_loading_unloading_charges",
-        "id_halting_charges",
-        "id_other_charges"
-
-    ];
-
-
-    fields.forEach(function (id) {
-
-        const field =
-            document.getElementById(id);
-
-        if (!field) {
-            return;
-        }
-
-
-        field.addEventListener(
-            "input",
-            calculateTripCost
-        );
-
-
-        field.addEventListener(
-            "change",
-            calculateTripCost
-        );
-
-    });
-
-
-    calculateTripCost();
-
-});
-
-</script>
-
-
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    function getNumber(id) {
-
-        const element = document.getElementById(id);
-
-        if (!element) {
-            return 0;
-        }
-
-        const value = parseFloat(element.value);
-
-        return isNaN(value) ? 0 : value;
-    }
-
-
-    /* =====================================================
-       TOTAL TRIP COST
-       ===================================================== */
-
-    function calculateTripCost() {
-
-        const freight =
-            getNumber("id_freight_amount");
-
-        const loading =
-            getNumber("id_loading_unloading_charges");
-
-        const halting =
-            getNumber("id_halting_charges");
-
-        const other =
-            getNumber("id_other_charges");
-
-
-        const total =
-            freight +
-            loading +
-            halting +
-            other;
-
-
-        const totalField =
-            document.getElementById("total_trip_cost");
-
-
-        if (totalField) {
-
-            totalField.value =
-                total.toFixed(2);
-
-        }
-
-    }
-
-
-    /* =====================================================
-       GST + TOTAL SELLING AMOUNT
-       ===================================================== */
-
-    function calculateSellingAmount() {
-
-        const sellingAmount =
-            getNumber("id_selling_amount");
-
-
-        /* Find selected GST */
-
-        const selectedGST =
-            document.querySelector(
-                ".gst-option:checked"
-            );
-
-
-        const gstPercent =
-            selectedGST
-                ? parseFloat(selectedGST.value)
-                : 0;
-
-
-        /* Calculate GST */
-
-        const gstAmount =
-            sellingAmount *
-            gstPercent /
-            100;
-
-
-        /* Calculate total */
-
-        const totalSellingAmount =
-            sellingAmount +
-            gstAmount;
-
-
-        /* Update hidden GST amount */
-
-        const gstAmountField =
-            document.getElementById("gst_amount");
-
-
-        if (gstAmountField) {
-
-            gstAmountField.value =
-                gstAmount.toFixed(2);
-
-        }
-
-
-        /* Update Total Selling Amount */
-
-        const totalSellingField =
-            document.getElementById(
-                "id_total_selling_amount"
-            );
-
-
-        if (totalSellingField) {
-
-            totalSellingField.value =
-                totalSellingAmount.toFixed(2);
-
-        }
-
-    }
-
-
-    /* =====================================================
-       TRIP COST EVENTS
-       ===================================================== */
-
-    const tripCostFields = [
-
-        "id_freight_amount",
-        "id_loading_unloading_charges",
-        "id_halting_charges",
-        "id_other_charges"
-
-    ];
-
-
-    tripCostFields.forEach(function (id) {
-
-        const field =
-            document.getElementById(id);
-
-        if (!field) {
-            return;
-        }
-
-
-        field.addEventListener(
-            "input",
-            calculateTripCost
-        );
-
-
-        field.addEventListener(
-            "change",
-            calculateTripCost
-        );
-
-    });
-
-
-    /* =====================================================
-       SELLING AMOUNT EVENTS
-       ===================================================== */
-
-    const sellingAmountField =
-        document.getElementById(
-            "id_selling_amount"
-        );
-
-
-    if (sellingAmountField) {
-
-        sellingAmountField.addEventListener(
-            "input",
-            calculateSellingAmount
-        );
-
-        sellingAmountField.addEventListener(
-            "change",
-            calculateSellingAmount
-        );
-
-    }
-
-
-    /* =====================================================
-       GST CHECKBOX
-       Only one GST can be selected
-       ===================================================== */
-
-    const gstOptions =
-        document.querySelectorAll(
-            ".gst-option"
-        );
-
-
-    gstOptions.forEach(function (checkbox) {
-
-        checkbox.addEventListener(
-            "change",
-            function () {
-
-                /*
-                 * Allow only one GST option
-                 * to be selected.
-                 */
-
-                if (this.checked) {
-
-                    gstOptions.forEach(
-                        function (otherCheckbox) {
-
-                            if (
-                                otherCheckbox !== checkbox
-                            ) {
-
-                                otherCheckbox.checked =
-                                    false;
-
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                calculateSellingAmount();
-
-            }
-        );
-
-    });
-
-
-    /* =====================================================
-       INITIAL CALCULATION
-       ===================================================== */
-
-    calculateTripCost();
-
-    calculateSellingAmount();
-
-});
-
-</script>
-{% endblock %}
