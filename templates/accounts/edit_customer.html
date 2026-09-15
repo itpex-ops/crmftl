@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<h4>Edit Customer Account</h4>
+
+<form method="post">
+{% csrf_token %}
+
+<label>Total</label>
+<input type="number" name="total" value="{{ order.total_rate }}" class="form-control mb-2">
+
+<label>Advance</label>
+<input type="number" name="advance" value="{{ order.advance }}" class="form-control mb-2">
+
+<label>Balance</label>
+<input type="number" name="balance" value="{{ order.balance }}" class="form-control mb-3">
+
+<button class="btn btn-primary">Update</button>
+
+</form>
+
+{% endblock %}

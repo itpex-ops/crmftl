@@ -1,0 +1,277 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        font-size: 13px;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .badge-soft {
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-ok {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-warn {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .amount {
+        font-weight: 600;
+    }
+
+    .search-box {
+        max-width: 260px;
+    }
+
+    .table-scroll {
+        max-height: 520px;
+        overflow: auto;
+        border-radius: 12px;
+    }
+
+    .table td {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+        <div>
+            <div class="page-title">Customer Accounts</div>
+        </div>
+
+        <div>
+            <input type="text" id="searchInput" class="form-control form-control-sm search-box"
+                placeholder="Search customer...">
+        </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Total Customers</small>
+                <h5 class="mb-0">{{ data|length }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Receivable</small>
+                <h5 class="mb-0 text-danger" id="sumBalance">₹ 0</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Total Received</small>
+                <h5 class="mb-0 text-success" id="sumAdvance">₹ 0</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Outstanding Amount</small>
+                <h5 class="mb-0 text-warning" id="overDueCount">0</h5>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-box">
+
+        <div class="table-scroll">
+
+            <table class="table table-bordered align-middle mb-0" id="accountsTable">
+
+              <thead class="custom-table-head">
+                    <tr class="main-head-row">
+                        <th>FTL No</th>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Selling Rate</th>
+                        <th>Received</th>
+                        <th>Advance</th>
+                        <th>Balance</th>
+                        <th>Pending</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    {% if row.ftl_no %}
+                    <tr>
+
+                        <td>{{ row.ftl_no }}</td>
+
+                        <td>
+                            {{ row.customer }}
+                        </td>
+
+                        <td>
+                            {{ row.contact }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ row.total_freight }}
+                        </td>
+
+                        <td class="amount text-success received">
+                            ₹{{ row.received }}
+                        </td>
+
+                        <td class="amount advance text-primary">
+                            ₹{{ row.advance }}
+                        </td>
+
+                        <td class="amount balance text-info">
+                            ₹{{ row.balance }}
+                        </td>
+
+                        <td class="amount pending text-danger">
+                            ₹{{ row.pending }}
+                        </td>
+
+                        <td>
+                            {% if row.pending <= 0 %} <span class="badge-soft badge-ok">
+                                Paid
+                                </span>
+                                {% else %}
+                                <span class="badge-soft badge-warn">
+                                    Pending
+                                </span>
+                                {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'customer_payment' row.enquiry_id %}" class="btn btn-sm btn-success">
+                                Receipt
+                            </a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // remove None
+        document.querySelectorAll("td").forEach(td => {
+            if (td.innerText.trim() === "None") {
+                td.innerText = "";
+            }
+        });
+
+        // search
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+
+            let val = this.value.toLowerCase();
+
+            document.querySelectorAll("#accountsTable tbody tr").forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+            });
+
+        });
+
+        // summary
+        let bal = 0;
+        let adv = 0;
+        let due = 0;
+
+        document.querySelectorAll("#accountsTable tbody tr").forEach(row => {
+
+            let b = parseFloat(
+                row.querySelector(".balance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            let a = parseFloat(
+                row.querySelector(".advance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            bal += b;
+            adv += a;
+
+            let pending = 0;
+            let received = 0;
+
+            document.querySelectorAll("#accountsTable tbody tr").forEach(row => {
+
+                let p = parseFloat(
+                    row.querySelector(".pending").innerText.replace(/[₹,]/g, '')
+                ) || 0;
+
+                let r = parseFloat(
+                    row.querySelector(".received").innerText.replace(/[₹,]/g, '')
+                ) || 0;
+
+                pending += p;
+                received += r;
+
+            });
+
+            document.getElementById("sumBalance").innerText =
+                "₹" + pending.toLocaleString("en-IN");
+
+            document.getElementById("sumAdvance").innerText =
+                "₹" + received.toLocaleString("en-IN");
+
+            document.getElementById("overDueCount").innerText =
+                document.querySelectorAll(".badge-warn").length;
+
+        });
+
+        document.getElementById("sumBalance").innerText =
+            "₹" + bal.toLocaleString("en-IN");
+
+        document.getElementById("sumAdvance").innerText =
+            "₹" + adv.toLocaleString("en-IN");
+
+        document.getElementById("overDueCount").innerText = due;
+
+    });
+</script>
+{% endblock %}

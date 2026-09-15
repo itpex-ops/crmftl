@@ -1,0 +1,494 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid mt-1">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h5 class="fw-bold mb-0">
+            📦 Orders Management
+        </h5>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-1 mb-1">
+        <div class="col-md-3">
+            <div class="kpi-card primary">
+                <small>Total Orders</small>
+                <h4>{{ total_orders }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card success">
+
+                <small>Assigned</small>
+
+                <h4>{{ assigned_count }}</h4>
+
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="kpi-card info">
+                <small>Not Assigned</small>
+                <h4>{{ not_assigned_count }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="kpi-card danger">
+
+                <small>Pending</small>
+
+                <h4>{{ pending_count }}</h4>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="card premium-card p-1 mb-1">
+        <input type="text" id="searchInput" class="form-control search-box"
+            placeholder="🔍 Search order / customer / route">
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="card table-card p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="custom-table-head">
+                    <tr class="main-head-row">
+                        <th>Date</th>
+                        <th>Order No</th>
+                        <th>Customer</th>
+                        <th>Route</th>
+                        <th>Vehicle</th>
+                        <th>Selling Rate ₹</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+
+                    {% for order in orders %}
+
+                    <tr class="order-row">
+
+                        <!-- DATE -->
+                        <td>
+
+                            {{ order.created_at|date:"d M Y h:i a" }}
+
+                        </td>
+
+                        <!-- ORDER NO -->
+                        <td>
+                            {% if request.user.role == 'sales' %}
+                            <span class="fw-semibold">
+                                {{ order.order_no }}
+                            </span>
+
+                            {% elif order.vehicles.all %}
+                            <span class="fw-semibold text-success">
+                                {{ order.order_no }}
+                            </span>
+
+                            {% else %}
+                            <a href="{% url 'view_order' order.id %}" class="fw-semibold text-decoration-none">
+                                {{ order.order_no }}
+                            </a>
+                            {% endif %}<br>
+                            <small> Created By : {{ order.created_by }} </small>
+                        </td>
+
+                        <!-- CUSTOMER -->
+                        <td>
+                            <div class="fw-semibold">
+
+                                {{ order.customer_name }}
+
+                            </div>
+                            <small class="text-muted">
+
+                                {{ order.customer_contact }}
+
+                            </small>
+                        </td>
+
+                        <!-- ROUTE -->
+                        <td>
+                            {% if order.routes %}
+                            <div class="route-modern">
+
+                                <!-- PICKUPS -->
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+
+                                    {% for r in order.routes %}
+                                    <span class="route-chip">
+                                        {{ r.origin }}
+                                        {% if r.origin_pin %}
+                                        [ {{ r.origin_pin }} ]
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- DROPS -->
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+
+                                    {% for r in order.routes %}
+                                    <span class="route-chip">
+                                        {% if r.destivation %}
+
+                                        {{ r.destination }}
+                                        {% endif %}
+                                        {% if r.destination_pin %}
+                                        [ {{ r.destination_pin }} ]
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- VEHICLE -->
+
+                        <td>
+                            {% with vehicle=order.vehicles.first %}
+                            {% if vehicle %}
+                            <span class="badge bg-success mb-1">
+                                Assigned
+                            </span>
+
+                            <div class="small fw-semibold">
+                                🚚 {{ vehicle.vehicle_number }}
+                            </div>
+                            {% else %}
+                            <span class="badge bg-danger">
+                                Not Assigned
+                            </span>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <!-- RATE -->
+                        <td class="fw-semibold text-success">
+                            ₹ {{ order.total_rate|default:"0" }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if order.tracking %}
+
+                            {% if order.tracking.settled %}
+                            <span class="badge bg-dark">
+                                Settled
+                            </span>
+
+                            {% elif order.tracking.pod_received %}
+                            <span class="badge bg-primary">
+                                POD Received
+                            </span>
+
+                            {% elif order.tracking.delivered %}
+                            <span class="badge bg-success">
+                                Delivered
+                            </span>
+
+                            {% elif order.tracking.advance_received %}
+                            <span class="badge bg-primary">
+                                Advance Received
+                            </span>
+
+                            {% elif order.tracking.arrived %}
+                            <span class="badge bg-info">
+                                Arrived
+                            </span>
+
+                            {% elif order.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">
+                                Fleet Departed
+                            </span>
+
+                            {% elif order.tracking.invoice_eway %}
+                            <span class="badge bg-secondary">
+                                Invoice / Eway
+                            </span>
+
+                            {% elif order.tracking.lr_no %}
+                            <span class="badge bg-secondary d-inline-flex align-items-center">
+                                <i class="bi bi-receipt me-1"></i>
+                                LR Generated
+                                <span class="ms-2 px-2 py-1 bg-white text-dark rounded">
+                                    {{ order.tracking.lr_no }}
+                                </span>
+                            </span>
+
+
+
+
+                            {% elif order.tracking.vehicle_document %}
+                            <span class="badge bg-info">
+                                Vehicle Document
+                            </span>
+
+                            {% elif order.tracking.vehicle_placed %}
+                            <span class="badge bg-primary">
+                                Vehicle Placed
+                            </span>
+
+                            {% else %}
+                            <span class="badge bg-warning text-dark">
+                                Tracking Started
+                            </span>
+                            {% endif %}
+
+                            {% elif order.vehicles.exists %}
+
+                            <span class="badge bg-info">
+                                Vehicle Assigned
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-secondary">
+                                Pending
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+                        <!-- Action -->
+                        <td class="text-center">
+                            {% with vehicle=order.vehicles.first %}
+                            {% if vehicle %}
+                            <a href="{% url 'edit_vehicle' vehicle.id %}" class="text-warning" title="Edit Vehicle">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No Orders Found </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<style>
+    :root {
+        --primary: #0d6efd;
+        --success: #198754;
+        --light-bg: #f5f7fb;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: var(--light-bg);
+    }
+
+    .page-header {
+        background: #fff;
+        padding: 18px 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        margin-bottom: 20px;
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: rgb(101, 67, 33);
+
+    }
+
+    .page-header small {
+        color: #FDB81B;
+    }
+
+    .small {
+        color: black;
+    }
+
+    .status-badge {
+        background: #e8f5e9;
+        color: #198754;
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 12px;
+        padding: 7px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+        border: none;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d6efd;
+        border-bottom: 1px solid #edf2f7;
+        padding-bottom: 7px;
+        margin-bottom: 18px;
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        min-height: 28px;
+        font-size: 13px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #0d6efd;
+    }
+
+    .form-control[readonly],
+    .form-control:disabled {
+        background: #f8fafc;
+        color: #495057;
+    }
+
+    .route-box {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #fafafa;
+    }
+
+    .btn-save {
+        height: 48px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 9px;
+        margin-bottom: 15px;
+    }
+
+    .info-title {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .sticky-panel {
+        position: sticky;
+        top: 15px;
+    }
+
+    route-modern {
+        max-width: 180px;
+        min-height: 80px;
+        text-align: left;
+        /* Left align everything */
+    }
+
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
+        text-align: left;
+        /* Left align content */
+    }
+
+
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-align: left;
+    }
+
+    @media (max-width:768px) {
+
+        .route-modern {
+            min-width: auto;
+            max-width: 100%;
+        }
+
+        .route-card {
+            padding: 6px;
+        }
+
+        .route-title {
+            font-size: 6px;
+            margin-bottom: 4px;
+        }
+
+        .route-chip {
+            font-size: 9px;
+            padding: 2px 6px;
+            margin: 1px;
+        }
+
+        .sticky-panel {
+            position: static;
+        }
+    }
+</style>
+
+<script>
+
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+
+        let value = this.value.toLowerCase();
+
+        document.querySelectorAll(".order-row").forEach(row => {
+
+            row.style.display =
+                row.innerText.toLowerCase().includes(value)
+                    ? ""
+                    : "none";
+
+        });
+
+    });
+
+</script>
+
+{% endblock %}

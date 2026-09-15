@@ -1,0 +1,766 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Parcelex</title>
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: #f3f6fb;
+            overflow-x: hidden;
+        }
+
+        .main-wrapper {
+            min-height: 100vh;
+        }
+
+        /* =========================
+       LEFT PANEL
+    ========================= */
+
+        .left-panel {
+            background: linear-gradient(rgba(15, 23, 42, 0.78),
+                rgba(30, 41, 59, 0.82)),
+            url("{% static 'assets/images/login_page.jpg' %}");
+
+            background-size: cover;
+            background-position: center;
+
+            color: #fff;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            padding: 60px 40px;
+
+            position: relative;
+        }
+
+        .brand-logo {
+            width: 85px;
+            height: 85px;
+
+            border-radius: 22px;
+
+            background: rgba(255, 255, 255, 0.15);
+
+            backdrop-filter: blur(10px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 18px;
+
+            font-size: 38px;
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .left-panel h1 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        /* TAGLINE */
+        .left-panel .tagline {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 18px;
+        }
+
+        .left-panel p {
+            max-width: 460px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.88);
+            margin-bottom: 0;
+        }
+
+        /* FEATURES */
+
+        .feature-list {
+            margin-top: 28px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.10);
+
+            backdrop-filter: blur(10px);
+
+            border: 1px solid rgba(255, 255, 255, 0.14);
+
+            border-radius: 16px;
+
+            padding: 14px 16px;
+
+            margin-bottom: 12px;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            text-align: left;
+
+            transition: 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-item i {
+            font-size: 18px;
+        }
+
+        .feature-item div {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+       RIGHT PANEL
+    ========================= */
+
+        .right-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 35px 18px;
+
+            background: #f8fafc;
+        }
+
+        /* AUTH CARD */
+
+        .auth-card {
+            width: 100%;
+            max-width: 385px;
+
+            background: #fff;
+
+            border-radius: 24px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 10px 35px rgba(15, 23, 42, 0.08);
+
+            border: 1px solid #edf2f7;
+        }
+
+        /* HEADINGS */
+
+        .welcome-title {
+            font-size: 23px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #0f172a;
+        }
+
+        .welcome-sub {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        /* =========================
+       TABS
+    ========================= */
+
+        .nav-tabs {
+            border: none;
+
+            gap: 8px;
+
+            margin-bottom: 20px;
+
+            flex-wrap: nowrap;
+
+            overflow-x: auto;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+
+            border-radius: 10px;
+
+            padding: 8px 14px;
+
+            background: #f1f5f9;
+
+            color: #475569;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+            transition: 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+        }
+
+        /* =========================
+       FORM ELEMENTS
+    ========================= */
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+
+        .form-control,
+        .form-select,
+        textarea {
+            border-radius: 12px !important;
+
+            min-height: 40px;
+
+            border: 1px solid #dbe2ea;
+
+            padding: 8px 12px;
+
+            font-size: 13px;
+
+            transition: 0.2s ease;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: none;
+        }
+
+        .form-control:focus,
+        .form-select:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        }
+
+        /* PASSWORD */
+
+        .password-input {
+            border-right: 0;
+        }
+
+        .input-group-text {
+            border-radius: 0 12px 12px 0 !important;
+
+            cursor: pointer;
+
+            background: #f8fafc;
+
+            border-left: 0;
+
+            padding: 0 14px;
+        }
+
+        /* BUTTONS */
+
+        .btn-custom {
+            height: 42px;
+
+            border-radius: 12px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            border: none;
+
+            transition: 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        /* LOGIN BUTTON SMALL + GRADIENT */
+
+        /* REMOVE GLASS EFFECT */
+
+        .btn-login {
+            background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
+
+            color: #fff !important;
+
+            border: none !important;
+
+            height: 38px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            border-radius: 10px;
+
+            letter-spacing: 0.3px;
+
+            backdrop-filter: none !important;
+
+            -webkit-backdrop-filter: none !important;
+
+            box-shadow: none !important;
+
+            opacity: 1 !important;
+
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #1d4ed8, #4338ca) !important;
+
+            transform: translateY(-1px);
+
+            box-shadow: none !important;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+        }
+
+        .btn-forgot {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        /* ALERTS */
+
+        .alert {
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            padding: 10px 12px;
+        }
+
+        /* =========================
+       RESPONSIVE
+    ========================= */
+
+        @media (max-width: 991px) {
+
+            .left-panel {
+                min-height: 360px;
+                padding: 45px 24px;
+            }
+
+            .left-panel h1 {
+                font-size: 32px;
+            }
+
+            .feature-list {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 767px) {
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                min-height: auto;
+                padding: 38px 20px;
+            }
+
+            .right-panel {
+                padding: 22px 14px;
+            }
+
+            .auth-card {
+                padding: 22px 18px;
+                border-radius: 20px;
+            }
+
+            .left-panel h1 {
+                font-size: 28px;
+            }
+
+            .left-panel p {
+                font-size: 14px;
+            }
+
+            .feature-item {
+                padding: 12px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .brand-logo {
+                width: 72px;
+                height: 72px;
+                font-size: 30px;
+            }
+
+            .left-panel h1 {
+                font-size: 24px;
+            }
+
+            .left-panel .tagline {
+                font-size: 13px;
+            }
+
+            .auth-card {
+                padding: 18px 15px;
+            }
+
+            .form-control,
+            .form-select,
+            textarea {
+                min-height: 38px;
+                font-size: 12px;
+            }
+
+            .btn-custom {
+                height: 40px;
+                font-size: 12px;
+            }
+
+            .nav-tabs .nav-link {
+                font-size: 12px;
+                padding: 7px 12px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+
+            .left-panel {
+                padding: 80px;
+            }
+
+            .left-panel h1 {
+                font-size: 50px;
+            }
+
+            .auth-card {
+                max-width: 420px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row main-wrapper">
+
+            <!-- LEFT -->
+            <div class="col-lg-7 left-panel">
+
+                <div class="brand-logo">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <h1>Parcelex</h1>
+
+                <p>
+                    Integrated Logistics, Optimized Results
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+                        <i class="bi bi-truck"></i>
+                        <div>
+                            Real-time shipment & vehicle monitoring
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <div>
+                            Smart logistics analytics & operations dashboard
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            Secure centralized employee access system
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-lg-5 right-panel">
+
+                <div class="auth-card">
+
+                    <div class="welcome-title">
+                        Welcome Back
+                    </div>
+
+                    <div class="welcome-sub">
+                        Login to continue managing your logistics operations
+                    </div>
+
+                    <!-- TABS -->
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">
+                                Login
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">
+                                Register
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#forgot">
+                                Forgot
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+
+                        <!-- LOGIN -->
+                        <div class="tab-pane fade show active" id="login">
+
+                            <form method="POST" action="{% url 'auth' %}">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="login">
+
+                                {% if login_error %}
+                                <div class="alert alert-danger">
+                                    {{ login_error }}
+                                </div>
+                                {% endif %}
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Username
+                                    </label>
+
+                                    <input type="text" name="username" class="form-control" placeholder="Enter username"
+                                        required>
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <label class="form-label">
+                                        Password
+                                    </label>
+
+                                    <div class="input-group">
+
+                                        <input type="password" class="form-control password-input" name="password"
+                                            id="loginPassword" placeholder="Enter password" required>
+
+                                        <span class="input-group-text" onclick="togglePassword('loginPassword')">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <button class="btn btn-custom btn-login w-100">
+                                    Login
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        <!-- REGISTER -->
+                        <div class="tab-pane fade" id="register">
+
+                            <form method="POST" action="{% url 'auth' %}">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="register">
+
+                                {% if register_error %}
+                                <div class="alert alert-danger">
+                                    {{ register_error }}
+                                </div>
+                                {% endif %}
+
+                                {% if register_success %}
+                                <div class="alert alert-success">
+                                    {{ register_success }}
+                                </div>
+                                {% endif %}
+
+                                <div class="mb-2">
+                                    <input type="text" name="emp_code" class="form-control" placeholder="Employee Code"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text" name="username" class="form-control" placeholder="Username"
+                                        required>
+                                </div>
+
+                                <div class="mb-2">
+                                    <input type="text" name="role" class="form-control" placeholder="Role" required>
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <div class="input-group">
+
+                                        <input type="password" name="password" id="regPassword"
+                                            class="form-control password-input" placeholder="Password" required>
+
+                                        <span class="input-group-text" onclick="togglePassword('regPassword')">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <button class="btn btn-custom btn-register w-100">
+                                    Register
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        <!-- FORGOT -->
+                        <div class="tab-pane fade" id="forgot">
+
+                            <form method="POST" action="{% url 'auth' %}">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="forgot">
+
+                                {% if forgot_error %}
+                                <div class="alert alert-danger">
+                                    {{ forgot_error }}
+                                </div>
+                                {% endif %}
+
+                                {% if forgot_success %}
+                                <div class="alert alert-success">
+                                    {{ forgot_success }}
+                                </div>
+                                {% endif %}
+
+                                <div class="mb-3">
+                                    <input type="text" name="username" class="form-control" placeholder="Username"
+                                        required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <textarea name="reason" class="form-control"
+                                        placeholder="Reason for password reset"></textarea>
+                                </div>
+
+                                <button class="btn btn-custom btn-forgot w-100">
+                                    Request Reset
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+        function togglePassword(id) {
+
+            const input = document.getElementById(id);
+
+            input.type =
+                input.type === "password"
+                    ? "text"
+                    : "password";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var activeTab = "{{ active_tab }}";
+
+            if (activeTab) {
+
+                var triggerEl =
+                    document.querySelector(
+                        '[data-bs-target="#' + activeTab + '"]'
+                    );
+
+                if (triggerEl) {
+                    new bootstrap.Tab(triggerEl).show();
+                }
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

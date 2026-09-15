@@ -1,0 +1,796 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="container-fluid py-1">
+    <div class="summary-card mb-1">
+        <div class="row g-0 align-items-left">
+            <div class="col-md-2 col-sm-3 summary-item border-end">
+                <div class="summary-label">
+                    Order Status
+                </div>
+                <div class="summary-value text-primary">
+                    Assign Vehicle
+                </div>
+                <div class="summary-sub">
+                    Pending
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-3 summary-item border-end">
+                <div class="summary-label">
+                    Selling Rate
+                </div>
+
+                <div class="summary-value">
+                    {% if order.finalized_rate %}
+                    ₹
+                    {{ selling_rate }}
+                    {% else %}
+                    ₹ 0
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-3 summary-item border-end">
+                <div class="summary-label">
+                    Expected Freight
+                </div>
+                <div class="summary-value text-warning" id="expectedFreight">
+                    ₹ 0
+                </div>
+                <small class="summary-small">
+                    Margin :
+                    <span id="expectedMargin">
+                        25%
+                    </span>
+                </small>
+            </div>
+
+            <div class="col-md-2 col-sm-3 summary-item border-end">
+                <div class="summary-label">
+                    Final Freight
+                </div>
+                <div class="summary-value text-danger" id="finalFreightView">
+                    ₹ 0
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-8 summary-item">
+                <div class="summary-label">
+                    Margin Percentage
+                </div>
+                <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+
+                    <span class="badge rounded-pill bg-danger" id="minMargin">
+                        Min 13%
+                    </span>
+
+                    <span class="badge rounded-pill bg-success" id="currentMargin">
+                        0%
+                    </span>
+
+                </div>
+
+                <!-- <div class="profit-box" id="profitAmount">
+                    Profit ₹ 0
+                </div> -->
+
+                <div id="marginText" class="mt-2 small text-muted fw-semibold">
+                    Waiting for freight calculation...
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <form method="POST" autocomplete="off">
+        {% csrf_token %}
+
+        <div class="erp-grid">
+            <div class="erp-left">
+                <div class="saas-card">
+                    <div class="card-title-bar">
+                        🚚 Vehicle & Freight Details
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-1">
+                            <div class="col-sm-2">
+                                <label class="form-label">
+                                    Vehicle Number
+                                </label>
+                                <input type="text" name="vehicle_number" class="form-control form-input" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Driver Number
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" name="driver_number" id="driver_number" maxlength="10"
+                                        class="form-control form-input" required>
+                                    <!-- <button type="button" class="btn btn-outline-primary" id="sendOtpBtn">
+                                        OTP
+                                    </button> -->
+                                </div>
+                                <small id="driverMsg"></small>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Owner Number
+                                </label>
+                                <input type="text" name="owner_number" maxlength="10" class="form-control form-input">
+                            </div>
+
+                            <!-- <div class="col-sm-3">
+                                <label class="form-label">
+                                    Source
+                                </label>
+                                <select name="source" id="source_select" class="form-select form-input">
+
+                                    <option value="">
+                                        Select Source
+                                    </option>
+
+                                    <option value="direct">
+                                        Direct
+                                    </option>
+
+                                    <option value="transporters">
+                                        Transporters
+                                    </option>
+
+                                    <option value="brokers">
+                                        Brokers
+                                    </option>
+
+                                    <option value="drivers">
+                                        Drivers
+                                    </option>
+
+                                    <option value="others">
+                                        Others
+                                    </option>
+
+                                </select> -->
+                            <div class="col-sm-3">
+                                <label class="form-label">Source</label>
+
+                                <select name="source" id="source_select" class="form-select form-input">
+                                    <option value="">Select Source</option>
+                                    <option value="direct">Direct</option>
+                                    <option value="transporters">Transporters</option>
+                                    <option value="brokers">Brokers</option>
+                                    <option value="drivers">Drivers</option>
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+
+                            <div class="col-sm-3 d-none" id="source_other_div">
+                                <label class="form-label">Other Source</label>
+                                <input type="text" id="source_other" name="source_other" class="form-control form-input"
+                                    placeholder="Enter source name">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-body  p-3">
+
+                        <div class="row g-1">
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Freight
+                                </label>
+
+                                <input type="number" step="0.01" name="freight_amount" id="freight_amount"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Halting
+                                </label>
+
+                                <input type="number" step="0.01" name="halting" id="halting"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Loading / Unloading
+                                </label>
+
+                                <input type="number" step="0.01" name="loading_unloading" id="loading_unloading"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Brokerage
+                                </label>
+
+                                <input type="number" step="0.01" name="brokerage" id="brokerage"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Total Freight
+                                </label>
+
+                                <input type="number" readonly id="total_freight"
+                                    class="form-control form-input bg-light">
+
+                            </div>
+                            <input type="text" style="display:none">
+                            <input type="password" style="display:none">
+                            <div class="card border-0 shadow-sm mb-4 approval-card" id="approvalSection"
+                                style="display:none;">
+                                <div class="card-header approval-header">
+                                    🔒 Manager Approval Required
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-1">
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Manager Name
+                                            </label>
+                                            <input type="text" name="approval_name" id="approvalName"
+                                                class="form-control form-input" placeholder="Enter manager name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Reason
+                                            </label>
+                                            <input type="text" name="approval_reason" class="form-control form-input"
+                                                placeholder="Enter approval reason">
+                                        </div>
+                                        <div class="col-12">
+                                            <small id="approvalError" class="text-danger fw-semibold">
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Advance
+                                </label>
+
+                                <input type="number" step="0.01" name="advance" id="advance"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-sm-3">
+
+                                <label class="form-label">
+                                    Balance
+                                </label>
+
+                                <input type="number" readonly id="balance" class="form-control form-input bg-light">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="erp-right">
+
+                <!-- UPI -->
+                <div class="saas-card">
+
+                    <div class="card-title-bar info-bar">
+                        💳 Payment & Bank Details
+                    </div>
+
+                    <div class="card-body  p-3">
+
+                        <div class="row g-1">
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    UPI App
+                                </label>
+                                <select name="upi_app" class="form-select form-input">
+                                    <option value="">
+                                        Select
+                                    </option>
+
+                                    <option value="phonepe">
+                                        PhonePe
+                                    </option>
+
+                                    <option value="gpay">
+                                        GPay
+                                    </option>
+
+                                    <option value="paytm">
+                                        Paytm
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    UPI ID
+                                </label>
+                                <input type="text" name="upi_id" class="form-control form-input">
+                                <label class="form-label">UPI Number</label>
+                                <input type="text" name="upi_number" class="form-control form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body  p-3">
+                        <div class="row g-1">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Account Number
+                                </label>
+                                <input type="text" name="account_number" id="account_number"
+                                    class="form-control form-input">
+                            </div>
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Account Name
+                                </label>
+
+                                <input type="text" name="account_name" id="account_name"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Retype Account
+                                </label>
+
+                                <input type="password" id="re_account_number" class="form-control form-input">
+
+                                <small id="accMsg"></small>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    IFSC
+                                </label>
+
+                                <input type="text" name="ifsc" id="ifsc" class="form-control form-input">
+
+                            </div>
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Beneficary_Name
+                                </label>
+
+                                <input type="text" name="beneficiary_name" id="beneficiary_name"
+                                    class="form-control form-input">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Account Type
+                                </label>
+
+                                <select name="ac_type" class="form-select form-input">
+
+                                    <option value="saving">
+                                        Saving
+                                    </option>
+
+                                    <option value="current">
+                                        Current
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="action-bar">
+                    <a href="javascript:history.back()" class="btn btn-light border px-4">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn">
+                        💾 Save Vehicle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sourceSelect = document.getElementById("source_select");
+        const otherDiv = document.getElementById("source_other_div");
+        const otherInput = document.getElementById("source_other");
+        sourceSelect.addEventListener("change", function () {
+
+            if (this.value === "others") {
+                otherDiv.classList.remove("d-none");
+                otherInput.focus();
+            } else {
+                otherDiv.classList.add("d-none");
+                otherInput.value = "";
+            }
+
+        });
+        const freight = document.getElementById("freight_amount");
+        const halting = document.getElementById("halting");
+        const loading = document.getElementById("loading_unloading");
+        const brokerage = document.getElementById("brokerage");
+        const advance = document.getElementById("advance");
+
+        const total = document.getElementById("total_freight");
+        const balance = document.getElementById("balance");
+
+        const approvalSection = document.getElementById("approvalSection");
+        const approvalName = document.getElementById("approvalName");
+        const saveBtn = document.getElementById("saveBtn");
+        const approvalError = document.getElementById("approvalError");
+
+        const marginText = document.getElementById("marginText");
+        const profitBox = document.getElementById("profitAmount");
+
+        const finalFreightView = document.getElementById("finalFreightView");
+        const expectedFreight = document.getElementById("expectedFreight");
+        const currentMargin = document.getElementById("currentMargin");
+
+        const sellingRate = Number("{{ order.total_rate|default:'0' }}");
+
+        function getValue(el) {
+            return parseFloat(el?.value) || 0;
+        }
+
+        function calcFreight() {
+
+            const f = getValue(freight);
+            const h = getValue(halting);
+            const l = getValue(loading);
+            const b = getValue(brokerage);
+            const a = getValue(advance);
+
+            const totalFreight = f + h + l + b;
+            const balanceAmount = totalFreight - a;
+
+            const profit = sellingRate - totalFreight;
+
+            const margin = sellingRate > 0
+                ? (profit / sellingRate) * 100
+                : 0;
+
+            // totals
+            if (total) total.value = totalFreight.toFixed(2);
+            if (totalFreight) balance.value = balanceAmount.toFixed(2);
+
+            if (finalFreightView)
+                finalFreightView.innerHTML = `₹ ${totalFreight.toFixed(2)}`;
+
+            if (expectedFreight)
+                expectedFreight.innerHTML = `₹ ${(sellingRate * 0.75).toFixed(2)}`;
+
+            if (currentMargin)
+                currentMargin.innerHTML = `${margin.toFixed(2)}%`;
+
+            // profit/loss
+            //if (profitBox) {
+            //   if (profit >= 0) {
+            //     profitBox.innerHTML = `Profit ₹ ${profit.toFixed(2)}`;
+            //   profitBox.className = "profit-box text-success";
+            //} else {
+            //profitBox.innerHTML = `Loss ₹ ${Math.abs(profit).toFixed(2)}`;
+            //profitBox.className = "profit-box text-danger";
+            //}
+            //}
+
+            // approval
+            if (margin < 13) {
+
+                if (approvalSection)
+                    approvalSection.style.display = "block";
+
+                if (approvalSection)
+                    marginText.innerHTML =
+                        "⚠ Approval required.";
+
+                if (currentMargin)
+                    currentMargin.className =
+                        "badge rounded-pill bg-danger";
+
+                const approved =
+                    approvalName &&
+                    approvalName.value.trim() !== "";
+
+                if (saveBtn)
+                    saveBtn.disabled = !approved;
+
+                if (approvalError)
+                    approvalError.innerHTML = approved
+                        ? ""
+                        : "Approval required.";
+
+            } else {
+
+                if (approvalSection)
+                    approvalSection.style.display = "none";
+
+                if (saveBtn)
+                    saveBtn.disabled = false;
+
+                if (approvalError)
+                    approvalError.innerHTML = "";
+
+                if (approvalSection)
+                    marginText.innerHTML =
+                        "✅No approval needed.";
+
+                if (currentMargin)
+                    currentMargin.className =
+                        "badge rounded-pill bg-success";
+            }
+        }
+
+        [freight, halting, loading, brokerage, advance]
+            .filter(Boolean)
+            .forEach(el => el.addEventListener("input", calcFreight));
+
+        if (approvalName) {
+            approvalName.addEventListener("input", calcFreight);
+        }
+
+        calcFreight();
+    });
+</script>
+<style>
+    body {
+        background: #f4f7fb;
+    }
+
+    .summary-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        padding: 0;
+        margin: 0;
+    }
+
+    .summary-item {
+        padding: 8px 10px;
+        text-align: center;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .summary-item:not(:last-child) {
+        border-right: 1px solid #ececec;
+    }
+
+    .summary-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 5px;
+    }
+
+    .summary-sub {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .summary-small {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 5px;
+    }
+
+    .badge {
+        font-size: 13px;
+        padding: 7px 12px;
+    }
+
+    #marginText {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b7280;
+        margin-top: 12px;
+    }
+
+    .profit-box {
+        font-size: 18px;
+        font-weight: 700;
+        color: #198754;
+        margin-top: 10px;
+    }
+
+    /* Tablet */
+    @media (max-width: 991px) {
+
+        .summary-item {
+            min-height: auto;
+            padding: 16px;
+        }
+
+        .summary-item:nth-child(even) {
+            border-right: none;
+        }
+
+        .summary-item {
+            border-bottom: 1px solid #ececec;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+
+        .summary-item {
+            text-align: left;
+            align-items: flex-start;
+        }
+
+        .summary-value {
+            font-size: 20px;
+        }
+
+        .badge {
+            font-size: 12px;
+        }
+
+        .d-flex {
+            justify-content: flex-start !important;
+        }
+    }
+
+    .erp-grid {
+        display: grid;
+        grid-template-columns: 1.3fr .7fr;
+        gap: 18px;
+    }
+
+    .erp-left,
+    .erp-right {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .saas-card {
+        background: #fff;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+    }
+
+    .card-title-bar {
+        padding: 16px 20px;
+        background: linear-gradient(90deg, #0f172a, #1e293b);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .success-bar {
+        background: linear-gradient(90deg, #047857, #10b981);
+    }
+
+    .info-bar {
+        background: linear-gradient(90deg, #0369a1, #0ea5e9);
+    }
+
+    .warning-bar {
+        background: linear-gradient(90deg, #b45309, #f59e0b);
+    }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    /* .input-group #sendOtpBtn {
+        height: 27px;
+        font-size: 12px;
+        padding: 0 8px;
+    } */
+
+    .form-input {
+        height: 26px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 12px;
+    }
+
+    .form-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    }
+
+    .approval-card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .approval-header {
+        background: #dc2626;
+        color: #fff;
+        font-weight: 700;
+        padding: 16px 20px;
+    }
+
+    .action-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, .06);
+    }
+
+    @media(max-width:991px) {
+
+        .erp-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-item {
+            border-right: none !important;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-bar .btn {
+            width: 100%;
+        }
+
+    }
+</style>
+
+{% endblock %}

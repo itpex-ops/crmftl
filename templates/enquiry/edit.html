@@ -1,0 +1,505 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="container-fluid mt-1">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+        {% if messages %}
+        {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} alert-dismissible fade show shadow-sm" role="alert">
+            {% if m.tags == 'success' %}
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {% elif m.tags == 'error' %}
+            <i class="bi bi-x-circle-fill me-2"></i>
+            {% elif m.tags == 'warning' %}
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {% elif m.tags == 'info' %}
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {% endif %}
+            {{ m }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-pencil-square me-2 text-primary"></i>
+                Edit Enquiry
+            </h4>
+
+            <span class="badge bg-light text-dark border">
+                {{ enquiry.enquiry_no }}
+            </span>
+        </div>
+        <div>
+            <span class="status-badge">
+                {{ enquiry.status|default:"Pending" }}
+            </span>
+        </div>
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <!-- LEFT SECTION -->
+                <div class="col-lg-8">
+                    <!-- Customer Information -->
+                    <div class="card-box">
+                        <div class="section-title">
+                            Customer Information
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <label>Customer Name</label>
+                                <input type="text" name="customer_name" class="form-control"
+                                    value="{{ enquiry.customer_name|default_if_none:'' }}" disabled>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Customer Contact</label>
+                                <input type="text" name="customer_contact" class="form-control"
+                                    value="{{ enquiry.customer_contact|default_if_none:'' }}" disabled>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control"
+                                    value="{{ enquiry.email|default_if_none:'' }}" disabled>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Lead Source</label>
+                                <input type="text" name="lead_source" class="form-control"
+                                    value="{{ enquiry.lead_source|default_if_none:'' }}" disabled>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Reference Name</label>
+                                <input type="text" name="reference_name" class="form-control"
+                                    value="{{ enquiry.reference_name|default_if_none:'' }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Vehicle Information -->
+                    <div class="card-box">
+                        <div class="section-title">
+                            Vehicle Information
+                        </div>
+                        <div class="row g-2">
+
+                            <div class="col-md-3">
+                                <label>Vehicle Type</label>
+                               
+                                <select id="vehicle_type" name="vehicle_type" class="form-select vehicle-select"
+                                    required>
+                                    <option value="">
+                                        Select Vehicle
+                                        </optform-labelion>
+                                        {% for value, label in vehicle_types %}
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Vehicle Description</label>
+                                <textarea name="vehicle_description" class="form-control"
+                                    >{{ enquiry.vehicle_description|default_if_none:'' }}</textarea>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>KMS</label>
+                                <input type="text" name="kms" class="form-control"
+                                    value="{{ enquiry.kms|default_if_none:'' }}" readonly>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Pickups</label>
+                                <input type="number" name="pickups" class="form-control"
+                                    value="{{ enquiry.pickups|default_if_none:'' }}" readonly>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Deliveries</label>
+                                <input type="number" name="deliveries" class="form-control"
+                                    value="{{ enquiry.deliveries|default_if_none:'' }}" readonly>
+                            </div>
+                        </div>
+                        {% if enquiry.routes %}
+                        <div class="row mt-3">
+
+                            <!-- PICKUPS -->
+                            <div class="col-md-6">
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>
+                                        PICKUPS
+                                    </div>
+
+                                    {% for r in enquiry.routes %}
+                                    {% if r.origin or r.origin_pin %}
+                                    <span class="route-chip">
+                                        {{ r.origin }}
+                                        {% if r.origin_pin %}
+                                        [{{ r.origin_pin }}]
+                                        {% endif %}
+                                    </span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- DROPS -->
+                            <div class="col-md-6">
+                                <div class="route-card drop-card">
+                                    <div class="route-title">
+                                        <i class="bi bi-flag-fill me-1"></i>
+                                        DROPS
+                                    </div>
+
+                                    {% for r in enquiry.routes %}
+                                    {% if r.destination or r.destination_pin %}
+                                    <span class="route-chip">
+                                        {{ r.destination }}
+                                        {% if r.destination_pin %}
+                                        [{{ r.destination_pin }}]
+                                        {% endif %}
+                                    </span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Material Details -->
+                    <div class="card-box">
+                        <div class="section-title">
+                            Material Details
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <label>Material</label>
+                                <input type="text" name="material" class="form-control"
+                                    value="{{ enquiry.material|default_if_none:'' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Pieces</label>
+                                <input type="number" name="pieces" class="form-control"
+                                    value="{{ enquiry.pieces|default_if_none:'' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Tonnage</label>
+                                <input type="number" step="0.01" name="tonnage" class="form-control"
+                                    value="{{ enquiry.tonnage|default_if_none:'' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>KG</label>
+                                <input type="number" step="0.01" name="kg" class="form-control"
+                                    value="{{ enquiry.kg|default_if_none:'' }}">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- RIGHT SECTION -->
+                <div class="col-lg-4">
+                    <div class="sticky-panel">
+                        <!-- Pitch Status -->
+                        <div class="card-box">
+                            <div class="section-title">
+                                Pitch Status
+                            </div>
+                            <div class="mb-3">
+                                <label>Status</label>
+                                <input type="text" name="status" class="form-control"
+                                    value="{{ enquiry.status|default_if_none:'' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>Cancel Reason</label>
+                                <textarea name="cancel_reason" rows="3"
+                                    class="form-control">{{ enquiry.cancel_reason|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                        <!-- Pricing -->
+                        <div class="card-box">
+                            <div class="section-title">
+                                Pricing Details
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label>Expected Rate</label>
+                                    <input type="number" step="0.01" name="expected_rate" class="form-control"
+                                        value="{{ enquiry.expected_rate|default_if_none:'' }}" >
+                                </div>
+
+                                <div class="col-6">
+                                    <label>Approval Rate</label>
+                                    <input type="number" step="0.01" name="approval_rate" class="form-control"
+                                        value="{{ enquiry.approval_rate|default_if_none:'' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="card-box">
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary btn-save" id="submitBtn">
+            <i class="bi bi-save me-1"></i>
+            <span id="btnText">Update Enquiry</span>
+        </button>
+
+        <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </div>
+</div>
+
+<script>
+document.querySelector("form").addEventListener("submit", function () {
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    document.getElementById("btnText").textContent = "Confirm Order";
+});
+</script>
+                    </div>
+                </div>
+            </div>
+
+</div>
+</form>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let selected = $(this).val();
+
+        if (selected) {
+
+            $('#customerFoundMsg').removeClass('d-none');
+            $('#customerNotFoundMsg').addClass('d-none');
+
+        } else {
+
+            $('#customerFoundMsg').addClass('d-none');
+            $('#customerNotFoundMsg').removeClass('d-none');
+        }
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#vehicle_type').select2({
+            placeholder: "Select Vehicle Type",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+<style>
+    :root {
+        --primary: #0d6efd;
+        --success: #198754;
+        --light-bg: #f5f7fb;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: var(--light-bg);
+    }
+
+    .page-header {
+        background: #fff;
+        padding: 18px 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        margin-bottom: 20px;
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: black;
+    }
+
+    .small {
+        color: black;
+    }
+
+    .status-badge {
+        background: #e8f5e9;
+        color: #198754;
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 12px;
+        padding: 7px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+        border: none;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d6efd;
+        border-bottom: 1px solid #edf2f7;
+        padding-bottom: 7px;
+        margin-bottom: 18px;
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        min-height: 28px;
+        font-size: 13px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #0d6efd;
+    }
+
+    .form-control[readonly],
+    .form-control:disabled {
+        background: #f8fafc;
+        color: #495057;
+    }
+
+    .route-box {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #fafafa;
+    }
+
+    .btn-save {
+        height: 48px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 9px;
+        margin-bottom: 15px;
+    }
+
+    .info-title {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .sticky-panel {
+        position: sticky;
+        top: 15px;
+    }
+
+    .route-modern {
+        max-width: 180px;
+        min-height: 80px;
+    }
+
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
+    }
+
+    .pickup-card {
+        background: #eef3fa;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .drop-card {
+        background: #eef7f1;
+        border-left: 4px solid #198754;
+    }
+
+    .route-title {
+        font-size: 9px;
+        font-weight: 700;
+        margin-bottom: 2x;
+        text-transform: uppercase;
+    }
+
+    .pickup-card .route-title {
+        color: #0d6efd;
+    }
+
+    .drop-card .route-title {
+        color: #198754;
+    }
+
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    @media (max-width:768px) {
+
+        .route-modern {
+            min-width: auto;
+            max-width: 100%;
+        }
+
+        .route-card {
+            padding: 6px;
+        }
+
+        .route-title {
+            font-size: 6px;
+            margin-bottom: 4px;
+        }
+
+        .route-chip {
+            font-size: 9px;
+            padding: 2px 6px;
+            margin: 1px;
+        }
+
+        .sticky-panel {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,810 @@
+{% extends 'layouts/base.html' %}
+{% load group_tags %}
+{% block content %}
+{% load static %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="container-fluid mt-1">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-person-lines-fill me-2"></i>
+            Leads Management
+        </h5>
+    </div>
+    <!-- KPI -->
+    {% if messages %}
+    <div class="toast-container-custom">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-lg rounded-3 border-0 custom-alert"
+            role="alert">
+
+            <div class="d-flex align-items-center">
+
+                {% if message.tags == 'success' %}
+                <i class="bi bi-check-circle-fill fs-3 text-success me-3"></i>
+                {% elif message.tags == 'error' %}
+                <i class="bi bi-x-circle-fill fs-3 text-danger me-3"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+                {% else %}
+                <i class="bi bi-info-circle-fill fs-3 text-primary me-3"></i>
+                {% endif %}
+
+                <div class="flex-grow-1">
+                    <strong>{{ message.tags|title }}</strong><br>
+                    {{ message }}
+                </div>
+
+                <button type="button" class="btn-close ms-3" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="progress mt-2" style="height:3px;">
+                <div class="progress-bar bg-{{ message.tags }} progress-time"></div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="row">
+
+        <div class="{% if is_sales %}col-md-3{% else %}col-md-4{% endif %} col-sm-6 mb-3">
+            <div class="kpi-card primary">
+                <small>New Enquiries</small>
+                <h5>{{ enquiries|length }}</h5>
+            </div>
+        </div>
+
+        <div class="{% if is_sales %}col-md-3{% else %}col-md-4{% endif %} col-sm-6 mb-3">
+            <div class="kpi-card success">
+                <small>Confirmed</small>
+                <h5>{{ confirmed_count }}</h5>
+            </div>
+        </div>
+
+        {% if is_sales %}
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="kpi-card warning">
+                <small>Pending</small>
+                <h5>{{ pending_count }}</h5>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if is_sales %}col-md-3{% else %}col-md-4{% endif %} col-sm-6 mb-3">
+            <div class="kpi-card danger">
+                <small>Cancelled</small>
+                <h5>{{ cancelled_count }}</h5>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="card toolbar-card  mt-1">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <input type="text" id="searchInput" class="form-control search-box"
+                placeholder="🔍 Search enquiry, customer...">
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card table-card p-1">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="custom-table-head">
+                    <!-- TOP HEADER -->
+                    <tr class="main-head-row">
+                        <th rowspan="2" class="main-th">
+                            Lead ID
+                        </th>
+
+                        <th rowspan="2" class="main-th">
+                            Customer
+                        </th>
+
+                        <th colspan="4" class="vehicle-group-header">
+                            <div class="vehicle-head-wrap">
+                                <i class="bi bi-truck"></i>
+                                <span>Vehicle Details</span>
+                            </div>
+                        </th>
+
+                        <th rowspan="2" class="main-th">
+                            Expected<br>
+                            Rate ₹
+                        </th>
+
+                        <th rowspan="2" class="main-th">
+                            Approval <br>
+                            Rate ₹
+                        </th>
+
+                        <th rowspan="2" class="main-th">
+                            Status
+                        </th>
+
+                        <th rowspan="2" class="main-th">
+                            Action
+                        </th>
+                    </tr>
+
+                    <!-- SUB HEADER -->
+                    <tr class="sub-head-row">
+
+                        <th class="sub-th route-col">
+                            Route
+                        </th>
+
+                        <th class="sub-th type-col">
+                            Type
+                        </th>
+
+                        <th class="sub-th desc-col">
+                            Description
+                        </th>
+
+                        <th class="sub-th km-col">
+                            KMs
+                        </th>
+
+                    </tr>
+
+                </thead>
+                <tbody id="tableBody">
+                    {% for e in enquiries %}
+                    <tr class="row-card" data-id="{{ e.id }}" data-status="{{ e.status|lower }}">
+                        <td>
+                            <a href="{% url 'edit_enquiry' e.id %}" class="btn btn-sm btn-custom
+                                {% if not e.status or e.status == 'disagree' or e.status == 'waiting for rate approval' %}
+                                    btn-warning
+                                {% elif e.status == 'pending_pitch1' or e.status == 'pending_pitch2' or e.status == 'pending_pitch3' %}
+                                    btn-success
+                                {% else %}
+                                    btn-primary
+                                {% endif %}
+                                <i class=" bi bi-eye me-1"></i>
+                                <strong>{{ e.enquiry_no }}</strong>
+                            </a>
+                            <br>
+                            <small class="text-muted date-nowrap">
+                                {{ e.created_at|date:"d M Y h:i a" }}
+                            </small>
+                        </td>
+
+                        <!-- CUSTOMER -->
+                        <td>
+                            <div class="fw-semibold">
+                                {{ e.customer_name }}
+                            </div>
+                            <small class="text-muted">
+                                {{ e.customer_contact }}
+                            </small>
+                        </td>
+                        <!-- Routes -->
+                        <td>
+                            {% if e.routes %}
+                            <div class="route-modern">
+                                <!-- PICKUPS -->
+                                {% for r in e.routes %}
+                                {% if r.origin or r.origin_pin %}
+                                {% if forloop.first %}
+                                <div class="route-card pickup-card">
+                                    <div class="route-title">PICKUPS</div>
+                                    {% endif %}
+
+                                    <span class="route-chip">
+                                        {{ r.origin }}
+                                        {% if r.origin_pin %}[ {{ r.origin_pin }} ]{% endif %}
+                                    </span>
+
+                                    {% if forloop.last %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                <!-- DROPS -->
+                                {% for r in e.routes %}
+                                {% if r.destination or r.destination_pin %}
+                                {% if forloop.first %}
+                                <div class="route-card drop-card">
+                                    <div class="route-title">DROPS</div>
+                                    {% endif %}
+
+                                    <span class="route-chip">
+                                        {{ r.destination }}
+                                        {% if r.destination_pin %}[ {{ r.destination_pin }} ]{% endif %}
+                                    </span>
+
+                                    {% if forloop.last %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                            </div>
+                            {% endif %}
+                        </td>
+                        <!-- VEHICLE Types -->
+                        <td>
+                            {{ e.vehicle_type }}
+                        </td>
+                        <!-- Vehicle Desc-->
+                        <td>
+                            {{e.vehicle_description}}
+
+                        </td>
+                        <!-- kms -->
+                        <td>
+                            {{ e.kms }}
+                        </td>
+
+                        <td>
+                            {% if e.expected_rate %}
+                            <div class="fw-bold text-warning">
+                                ₹ {{ e.expected_rate }}
+                            </div>
+
+                            {% elif e.disagree_rate %}
+                            <div>
+                                <span class="badge bg-danger">
+                                    Exp. Rate ₹ {{ e.disagree_rate }}
+                                </span>
+                            </div>
+
+                            {% if e.disagree_reason %}
+                            <small class="text-muted">
+                                Disagree: {{ e.disagree_reason }}
+                            </small>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        <!-- APPROVAL -->
+                        <td class="text-success fw-semibold">
+                            {{ e.approval_rate|default_if_none:"" }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            <span class="status-pill
+                                {% if e.status == 'pitch3' %}
+                                    success
+                                {% elif 'pitch2' in e.status %}
+                                    info
+                                {% elif 'pitch1' in e.status %}
+                                    warning
+                                {% elif 'disagree' in e.status %}
+                               
+                                    secondary
+                                {% elif 'waiting for rate approval' in e.status %}
+                                    warning
+                                {% else %}
+                                    danger
+                                {% endif %}">
+                                <span class="dot"></span>
+                                {% if 'waiting for rate approval' in e.status %}
+                                Waiting For<br>Rate Approval
+                                {% else %}
+                                {{ e.status|capfirst }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <!-- ACTION -->
+                        <td>
+                            {% if is_admin or is_superadmin and e.status != 'pending_pitch3' %}
+                            <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                <button type="button" class="icon-btn text-info open-pitch-modal" data-id="{{ e.id }}"
+                                    data-p1="{{ e.pitch1|default:'' }}" data-p1r="{{ e.pitch1_remarks|default:'' }}"
+                                    data-p2="{{ e.pitch2|default:'' }}" data-p2r="{{ e.pitch2_remarks|default:'' }}"
+                                    data-p3="{{ e.pitch3|default:'' }}" data-p3r="{{ e.pitch3_remarks|default:'' }}"
+                                    data-status="{{ e.status }}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+
+                            {% if is_sales %}
+                            {% if not e.status == 'waiting for rate approval' %}
+                            <div class="d-flex gap-2 justify-content-center">
+                                <!-- Disagree -->
+
+                                {% if e.status != "disagree" %}
+                                <button type="button" class="btn btn-warning btn-sm action-btn" data-id="{{ e.id }}"
+                                    data-action="disagree">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </button>
+                                {% endif %}
+
+                                <!-- Cancel -->
+                                <button type="button" class="btn btn-danger btn-sm action-btn" data-id="{{ e.id }}"
+                                    data-action="cancel">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+
+                            <div class="modal fade" id="disagree-box-{{ e.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form method="POST" action="{% url 'update_enquiry_status' e.id 'disagree' %}">
+                                            {% csrf_token %}
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Disagree Rate</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+
+                                                <input type="number" name="disagree_rate" class="form-control mb-3"
+                                                    placeholder="Disagree Rate" required>
+
+                                                <textarea name="disagree_reason" class="form-control" rows="2"
+                                                    placeholder="Reason"></textarea>
+
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                                <button type="submit" class="btn btn-warning">
+                                                    Submit
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cancel-box-{{ e.id }}" style="display:none;">
+                                <form method="POST" action="{% url 'update_enquiry_status' e.id 'cancel' %}">
+                                    {% csrf_token %}
+                                    <textarea name="cancel_reason" class="form-control mb-2"
+                                        placeholder="Cancel reason"></textarea>
+                                    <button class="btn btn-danger btn-sm">
+                                        Cancel
+                                    </button>
+                                </form>
+                                9p
+                            </div>
+                        </td>
+                        {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No enquiries found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- PITCH MODAL -->
+<div class="modal fade" id="pitchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+
+            <h5 class="fw-bold mb-3">Pitch History</h5>
+
+            <!-- History will be inserted here -->
+            <div id="pitchHistoryList" class="mb-3"></div>
+
+            <form method="POST" id="pitchForm">
+                {% csrf_token %}
+
+                <div class="row g-2 align-items-end">
+                    {% if is_admin or is_superadmin %}
+                    <div class="col-md-5">
+                        <label class="form-label small">Remarks</label>
+                        <input type="text" name="remarks" id="remarks" class="form-control" placeholder="Remarks">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small">Rate</label>
+                        <input type="number" name="pitch_rate" id="pitch_rate" class="form-control"
+                            placeholder="Enter Rate" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" name="is_approved" value="false" class="btn btn-success w-100">
+                            Rate Revision
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    {% if is_superadmin %}
+                    <div class="col-md-2">
+                        <button type="submit" name="is_approved" value="true" class="btn btn-primary w-100">
+                            Confirm
+                        </button>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<style>
+    :root {
+        --primary: #0d6efd;
+        --success: #198754;
+        --light-bg: #f5f7fb;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: var(--light-bg);
+    }
+
+    .page-header {
+        background: #fff;
+        padding: 18px 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        margin-bottom: 20px;
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: black;
+    }
+
+    .table tbody td {
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .small {
+        color: black;
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        min-height: 28px;
+        font-size: 13px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #0d6efd;
+    }
+
+    .form-control[readonly],
+    .form-control:disabled {
+        background: #f8fafc;
+        color: #495057;
+    }
+
+    .sticky-panel {
+        position: sticky;
+        top: 15px;
+    }
+
+    .route-modern {
+        max-width: 180px;
+        min-height: 80px;
+        text-align: left;
+        /* Left align everything */
+    }
+
+    .route-card {
+        padding: 3px 4px;
+        margin-bottom: 3px;
+        text-align: left;
+        /* Left align content */
+    }
+
+    .route-title {
+        font-size: 9px;
+        font-weight: 700;
+        margin-bottom: 2px;
+        /* Fix typo: 2x -> 2px */
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    .route-chip {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 2px 8px;
+        margin: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-align: left;
+    }
+
+    @media (max-width:768px) {
+
+        .route-modern {
+            min-width: auto;
+            max-width: 100%;
+        }
+
+        .route-card {
+            padding: 6px;
+        }
+
+        .route-title {
+            font-size: 6px;
+            margin-bottom: 4px;
+        }
+
+        .route-chip {
+            font-size: 9px;
+            padding: 2px 6px;
+            margin: 1px;
+        }
+
+        .sticky-panel {
+            position: static;
+        }
+    }
+
+    .custom-alert {
+        animation: slideIn .4s ease;
+        margin-bottom: 10px;
+    }
+
+    .progress-time {
+        animation: progress 5s linear forwards;
+    }
+
+    .toast-container-custom {
+        position: fixed;
+        top: 80px;
+        /* Below navbar */
+        right: 20px;
+        z-index: 9999;
+        min-width: 350px;
+        max-width: 450px;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes progress {
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0;
+        }
+    }
+</style>
+
+<!-- SEARCH -->
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+
+        let value = this.value.toLowerCase();
+
+        document.querySelectorAll("#tableBody tr").forEach(row => {
+
+            row.style.display =
+                row.innerText.toLowerCase().includes(value)
+                    ? ""
+                    : "none";
+
+        });
+
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            document.querySelectorAll(".custom-alert").forEach(function (alert) {
+                bootstrap.Alert.getOrCreateInstance(alert).close();
+            });
+        }, 5000);
+    });
+</script>
+<!-- PITCH MODAL -->
+<script>
+    document.querySelectorAll(".open-pitch-modal").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const id = this.dataset.id;
+            const p1 = this.dataset.p1;
+            const p1r = this.dataset.p1r;
+            const p2 = this.dataset.p2;
+            const p2r = this.dataset.p2r;
+            const p3 = this.dataset.p3;
+            const p3r = this.dataset.p3r;
+            const status = (this.dataset.status || "").toLowerCase();
+            document.getElementById("pitchForm").action =
+                `/enquiry/update-pitch/${id}/`;
+
+            let html = "";
+
+            function row(label, rate, remarks, active) {
+
+                if (!rate && !remarks) return "";
+
+                return `
+                <div class="card mb-2 ${active ? 'border-primary' : ''}">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>${label}</strong>
+                            <span class="badge bg-secondary">
+                                ₹ ${rate || '-'}
+                            </span>
+                        </div>
+
+                        ${remarks ?
+                        `<small class="text-muted">${remarks}</small>`
+                        : ''
+                    }
+                    </div>
+                </div>
+                `;
+            }
+
+            html += row("Pitch 1", p1, p1r, status === "pending_pitch1");
+            html += row("Pitch 2", p2, p2r, status === "pending_pitch2");
+            html += row("Pitch 3", p3, p3r, status === "pending_pitch3");
+
+            if (!html) {
+                html = "<small class='text-muted'>No previous pitches</small>";
+            }
+
+            document.getElementById("pitchHistoryList").innerHTML = html;
+
+            const remarks = document.getElementById("remarks");
+            const pitchRate = document.getElementById("pitch_rate");
+
+            if (remarks) remarks.value = "";
+            if (pitchRate) pitchRate.value = "";
+
+            new bootstrap.Modal(
+                document.getElementById("pitchModal")
+            ).show();
+
+        });
+
+    });
+
+</script>
+<script>
+    document.querySelector("form").addEventListener("submit", function () {
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        document.getElementById("btnText").textContent = "Confirm Order";
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // REMOVE NONE
+        document.querySelectorAll("td, input, textarea").forEach(el => {
+
+            if (el.tagName === "TD" && el.innerText.trim() === "None") {
+                el.innerText = "";
+            }
+
+            if (
+                (el.tagName === "INPUT" || el.tagName === "TEXTAREA") &&
+                el.value === "None"
+            ) {
+                el.value = "";
+            }
+
+        });
+
+        // ACTION BUTTONS
+        document.querySelectorAll(".action-btn").forEach(btn => {
+
+            btn.addEventListener("click", function () {
+
+                const id = this.dataset.id;
+                const action = this.dataset.action;
+                const rate = this.dataset.rate;
+
+                // Hide all boxes
+                ["confirm", "disagree", "cancel"].forEach(type => {
+
+                    const el =
+                        document.getElementById(`${type}-box-${id}`);
+
+                    if (el) {
+                        el.style.display = "none";
+                    }
+
+                });
+
+                // Disagree Modal
+                if (action === "disagree") {
+
+                    const modalEl =
+                        document.getElementById(`disagree-box-${id}`);
+
+                    if (modalEl) {
+                        new bootstrap.Modal(modalEl).show();
+                    }
+
+                    return;
+                }
+
+                // Confirm / Cancel Inline Box
+                const activeBox =
+                    document.getElementById(`${action}-box-${id}`);
+
+                if (activeBox) {
+
+                    activeBox.style.display =
+                        activeBox.style.display === "block"
+                            ? "none"
+                            : "block";
+
+                }
+
+                // Auto-fill approval rate
+                if (action === "confirm" && activeBox) {
+
+                    const input =
+                        activeBox.querySelector(
+                            "input[name='approve_rate']"
+                        );
+
+                    if (input && rate) {
+                        input.value = rate;
+                    }
+
+                }
+
+            });
+
+        });
+
+        // DISABLE SUBMIT BUTTONS
+        document.querySelectorAll("form").forEach(form => {
+
+            form.addEventListener("submit", function () {
+
+                const btn =
+                    this.querySelector("button[type='submit']");
+
+                if (btn) {
+
+                    btn.disabled = true;
+                    btn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm"></span> Processing...';
+
+                }
+
+            });
+
+        });
+
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<style>
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .05);
+    }
+
+    .label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="mb-3">
+        <div class="page-title">Edit Vehicle Account</div>
+        <div class="sub-title">
+            Update freight / advance / charges and auto recalculate balance
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        <!-- LEFT INFO -->
+        <div class="col-lg-4">
+
+            <div class="card-box">
+
+                <p><strong>FTL No:</strong> {{ vehicle.ftl_no }}</p>
+                <p><strong>Vehicle:</strong> {{ vehicle.vehicle_number }}</p>
+                <p><strong>Driver:</strong> {{ vehicle.driver_number }}</p>
+
+                <div class="info-box mt-3">
+                    <div><small class="text-muted">Current Balance</small></div>
+                    <h4 class="text-danger mb-0">₹{{ vehicle.balance }}</h4>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FORM -->
+        <div class="col-lg-8">
+
+            <div class="card-box">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="label">Freight Amount</label>
+                            <input type="number" step="0.01" name="freight_amount" value="{{ vehicle.freight_amount }}"
+                                class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="label">Advance Paid</label>
+                            <input type="number" step="0.01" name="advance" value="{{ vehicle.advance }}"
+                                class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="label">Brokerage</label>
+                            <input type="number" step="0.01" name="brokerage" value="{{ vehicle.brokerage }}"
+                                class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="label">loading_unloading Charges</label>
+                            <input type="number" step="0.01" name="loading_unloading" value="{{ vehicle.loading_unloading }}"
+                                class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="info-box mb-3">
+                        <small class="text-muted">
+                            Balance = Freight Amount - Advance Paid
+                        </small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            Update Account
+                        </button>
+
+                        <a href="{% url 'vehicle_accounts' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll("*").forEach(el => {
+            if (el.children.length === 0 && el.textContent.trim() === "None") {
+                el.textContent = "";
+            }
+        });
+
+    });
+</script>
+
+{% endblock %}

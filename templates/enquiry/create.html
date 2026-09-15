@@ -1,0 +1,680 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+<title>Create Enquiry</title>
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<div class="container-fluid">
+    <form method="POST">
+        {% csrf_token %}
+        <!-- HEADER -->
+        <div class="page-header">
+            <h5>🚚 Create Enquiry</h5>
+            <small>Fill all required details</small>
+        </div>
+        <div class="row">
+            <!-- ================= LEFT SIDE ================= -->
+            <!-- CUSTOMER DETAILS -->
+            <div class="col-lg-6">
+                <div class="card mb-2 section-card">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <label class="form-label">
+                                Search Customer
+                            </label>
+                            <select id="customerSelect" name="customer_id" class="form-select">
+                                <option value="">
+                                    Select Customer
+                                </option>
+                                {% for c in customers %}
+                                <option value="{{ c.id }}" data-name="{{ c.name }}" data-phone="{{ c.phone1 }}"
+                                    data-email="{{ c.email }}" data-gst="{{ c.gst_number }}" data-city="{{ c.city }}"
+                                    data-state="{{ c.state }}" data-pincode="{{ c.pincode }}">
+
+                                    {{ c.customer_code }} -
+                                    {{ c.name }} -
+                                    {{ c.phone1 }}
+
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="customerFoundMsg" class="alert alert-success mt-3 d-none">
+                        <strong>✓ Customer Found</strong>
+                    </div>
+                    <div id="customerNotFoundMsg" class="alert alert-warning mt-3 d-none">
+                        Customer not found. Please refer Customer List.
+                    </div>
+                    <br>
+                    <div class="card-header">
+                        👤 Customer Details
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Customer Name
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text" id="customer_name" name="customer_name" class="form-control"
+                                    value="{{ customer.name|default:'' }}" required>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Mobile Number
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" id="customer_contact" name="customer_contact" class="form-control"
+                                    maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                                    value="{{ customer.phone1|default:'' }}" required>
+
+                            </div>
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Email
+                                </label>
+
+                                <input type="email" id="email" name="email" class="form-control"
+                                    value="{{ customer.email|default:'' }}">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Lead Source
+                                </label>
+                                <select name="lead_source" class="form-select">
+
+                                    <option value="">Select</option>
+                                    <option value="justdial">Just Dial</option>
+                                    <option value="inbound">Inbound</option>
+                                    <option value="outbound">Outbound</option>
+                                    <option value="social media">Social Media</option>
+                                    <option value="reference">Reference</option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Reference / Social Media
+                                </label>
+                                <input type="text" name="reference_name" class="form-control">
+                            </div>
+                        </div>
+
+                        <div id="customerExtraInfo" class="row g-3 mt-2 d-none">
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    GST Number
+                                </label>
+
+                                <input type="text" id="gst_number" name="gst_number" class="form-control" readonly>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    City
+                                </label>
+
+                                <input type="text" id="city" name="city" class="form-control" readonly>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    State
+                                </label>
+
+                                <input type="text" id="state" name="state" class="form-control" readonly>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <!-- VEHICLE DETAILS -->
+                <div class="card mb-2 section-card">
+                    <div class="card-header">
+                        🚚 Vehicle 📍 Route Details
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Vehicle Type
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select id="vehicle_type" name="vehicle_type" class="form-select vehicle-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Vehicle
+                                        </optform-labelion>
+
+                                        {% for value, label in vehicle_types %}
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Vehicle Description
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text" name="vehicle_description" class="form-control" required>
+
+                            </div>
+                            <div class="col-sm-4">
+
+                                <label class="form-label">
+                                    Distance (KMs)
+                                </label>
+
+                                <input type="number" step="any" name="kms" class="form-control" required>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">
+                                    No. of Pickups
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="number" id="pickups" name="pickups" class="form-control" min="1" max="10"
+                                    value="1" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">
+                                    No. of Deliveries
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" id="deliveries" name="deliveries" class="form-control" min="1"
+                                    max="10" value="1" required>
+                            </div>
+                            <div id="origin-container" class="col-sm-6">
+                                <label class="form-label">
+                                    Pickup PIN Code
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" name="origin_pin[]" class="form-control" maxlength="6"
+                                    pattern="[0-9]{6}" inputmode="numeric" required>
+
+                            </div>
+
+                            <div id="destination-container" class="col-sm-6">
+
+                                <label class="form-label">
+                                    Delivery PIN Code
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="tel" name="destination_pin[]" class="form-control" maxlength="6"
+                                    pattern="[0-9]{6}" inputmode="numeric" required>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <!-- ================= LOAD DETAILS ================= -->
+                <div class="card mb-2 section-card">
+                    <div class="card-header">
+                        📦 Load Details
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">
+                                    Material
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="material" class="form-control" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Pieces
+                                </label>
+                                <input type="number" step="any" name="pieces" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Tonnage
+                                </label>
+                                <input type="number" step="any" name="tonnage" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    KG
+                                </label>
+                                <input type="number" step="any" name="kg" class="form-control">
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label">
+                                    Dimension Unit
+                                </label>
+
+                                <select name="dimension_unit" class="form-select">
+
+                                    <option value="">Select</option>
+                                    <option value="cm">CM</option>
+                                    <option value="inch">Inch</option>
+                                    <option value="feet">Feet</option>
+                                    <option value="meter">Meter</option>
+
+                                </select>
+
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Length
+                                </label>
+
+                                <input type="number" step="any" name="length" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Breadth
+                                </label>
+
+                                <input type="number" step="any" name="breadth" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Height
+                                </label>
+
+                                <input type="number" step="any" name="height" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+
+                            <div class="col-md-12 d-none" id="dimensionBox">
+
+                                <div class="dimension-result-box">
+
+                                    <div class="result-title">
+                                        📐 Dimension Calculation
+                                    </div>
+
+                                    <div class="result-row">
+
+                                        <span>
+                                            Converted Size
+                                        </span>
+
+                                        <strong id="convertedDimension">
+                                            0 × 0 × 0 CM
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="result-row volumetric-highlight">
+
+                                        <span>
+                                            Volumetric Weight
+                                        </span>
+
+                                        <strong id="volumetric_weight">
+                                            0 KG
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="result-row">
+
+                                        <span>
+                                            Volume
+                                        </span>
+
+                                        <small id="volumeResult">
+                                            0 CM³
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= RATE DETAILS ================= -->
+                <div class="card mb-2 section-card">
+
+                    <div class="card-header">
+                        💰 Rate Details
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Expected Rate ₹
+                                </label>
+
+                                <input type="number" step="any" name="expected_rate" class="form-control">
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label">
+                                    Approval Rate ₹
+                                </label>
+
+                                <input type="number" step="any" name="approval_rate" class="form-control">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= ENQUIRY GENERATED BY ================= -->
+
+                    <div class="card mb-2 section-card">
+
+                        <div class="card-header">
+                            👤 Enquiry Generated By
+                        </div>
+
+                        <div class="card-body">
+
+                            <label class="form-label">
+                                User Name
+                            </label>
+
+                            <div class="form-control bg-light">
+
+                                <strong>
+                                    {{ request.user.username }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ================= SAVE BUTTON ================= -->
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-outline-primary btn-save">
+                            <i class="bi bi-save me-2"></i>
+                            Save Enquiry
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Right Column -->
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'assets/enquiry/js/enquiry.js' %}"></script>
+
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let selected = $(this).val();
+
+        if (selected) {
+
+            $('#customerFoundMsg').removeClass('d-none');
+            $('#customerNotFoundMsg').addClass('d-none');
+
+        } else {
+
+            $('#customerFoundMsg').addClass('d-none');
+            $('#customerNotFoundMsg').removeClass('d-none');
+        }
+
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#customerSelect').select2({
+            placeholder: "Search by Customer Code / Name / Mobile",
+            allowClear: true,
+            width: '90%'
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#vehicle_type').select2({
+            placeholder: "Select Vehicle Type",
+            allowClear: true,
+            width: '100%'
+        });
+
+    });
+</script>
+<script>
+    $('#customerSelect').on('change', function () {
+
+        let option = $(this).find(':selected');
+
+        if ($(this).val()) {
+
+            $('#customer_name').val(option.data('name'));
+            $('#customer_contact').val(option.data('phone'));
+            $('#email').val(option.data('email'));
+
+            $('#gst_number').val(option.data('gst'));
+            $('#city').val(option.data('city'));
+            $('#state').val(option.data('state'));
+            $('#pincode').val(option.data('pincode'));
+
+            $('#customerExtraInfo').removeClass('d-none');
+
+        } else {
+
+            $('#customer_name').val('');
+            $('#customer_contact').val('');
+            $('#email').val('');
+
+            $('#customerExtraInfo').addClass('d-none');
+
+        }
+
+    });
+</script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const lengthInput =
+            document.querySelector('[name="length"]');
+
+        const breadthInput =
+            document.querySelector('[name="breadth"]');
+
+        const heightInput =
+            document.querySelector('[name="height"]');
+
+        const unitInput =
+            document.querySelector('[name="dimension_unit"]');
+
+        const dimensionBox =
+            document.getElementById("dimensionBox");
+
+        function calculateDimension() {
+
+            const unit = unitInput.value;
+
+            // =========================
+            // SHOW / HIDE
+            // =========================
+
+            if (unit !== "") {
+
+                dimensionBox.classList.remove("d-none");
+
+            } else {
+
+                dimensionBox.classList.add("d-none");
+
+                return;
+            }
+
+            // =========================
+            // INPUT VALUES
+            // =========================
+
+            let length =
+                parseFloat(lengthInput.value) || 0;
+
+            let breadth =
+                parseFloat(breadthInput.value) || 0;
+
+            let height =
+                parseFloat(heightInput.value) || 0;
+
+            // =========================
+            // CALCULATIONS
+            // =========================
+
+            const volume =
+                length * breadth * height;
+
+            let volumetric = 0;
+
+            if (unit === "cm") {
+
+                volumetric = volume / 4500;
+            }
+
+            else if (unit === "inch") {
+
+                volumetric = volume / 274.6;
+            }
+
+            else if (unit === "feet") {
+
+                volumetric = volume / 0.1589;
+            }
+
+            else if (unit === "meter") {
+
+                volumetric = volume / 0.0045;
+            }
+
+            // =========================
+            // DISPLAY
+            // =========================
+
+            document
+                .getElementById("convertedDimension")
+                .innerText =
+
+                `${length.toFixed(2)} × ${breadth.toFixed(2)} × ${height.toFixed(2)} ${unit.toUpperCase()}`;
+
+            document
+                .getElementById("volumeResult")
+                .innerText =
+
+                volume.toFixed(3);
+
+            document
+                .getElementById("volumetric_weight")
+                .innerText =
+
+                volumetric.toFixed(3) + " KG";
+        }
+
+        // =========================
+        // EVENTS
+        // =========================
+
+        unitInput.addEventListener(
+            "change",
+            calculateDimension
+        );
+
+        lengthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
+
+        breadthInput.addEventListener(
+            "input",
+            calculateDimension
+        );
+
+        heightInput.addEventListener(
+            "input",
+            calculateDimension
+        );
+
+        // =========================
+        // LOAD EXISTING VALUES
+        // =========================
+
+        calculateDimension();
+
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll('input[type="text"]').forEach(function (input) {
+
+            input.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+
+        });
+
+    });
+</script>
+
+{% endblock %}

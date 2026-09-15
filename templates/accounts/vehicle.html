@@ -1,0 +1,376 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .05);
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        white-space: nowrap;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .badge-soft {
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-due {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-partial {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-doc {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .action-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .search-box {
+        max-width: 260px;
+    }
+
+    .amount {
+        font-weight: 600;
+    }
+
+    .timeline {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .lock-card {
+        background: linear-gradient(135deg, #ff4d4d, #c0392b);
+        color: #fff;
+        border-radius: 12px;
+        width: 90px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+    }
+
+    .lock-icon {
+        font-size: 32px;
+    }
+
+    /* content */
+    .lock-content {
+        position: relative;
+        z-index: 2;
+        align-items: center;
+        text-align: center;
+    }
+
+    .lock-icon {
+        font-size: 20px;
+        animation: pulse 1.5s infinite;
+    }
+
+    /* swipe layer */
+    .swipe-layer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.15);
+        transition: 0.4s ease;
+        z-index: 1;
+    }
+
+    /* hover animation (desktop) */
+    .lock-card:hover .swipe-layer {
+        left: 0;
+    }
+
+    /* pulse animation */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.2);
+            opacity: 0.6;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <div class="page-title">Vehicle Accounts</div>
+            <div class="sub-title">
+                Vehicle Accounts | Advance Payment | Delivery Stage Payment | Document Clearance Balance
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <input type="text" id="searchInput" class="form-control form-control-sm search-box"
+                placeholder="Search vehicle / FTL">
+        </div>
+
+    </div>
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Total Trips</small>
+                <div class="stat-value">{{ data|length }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Freight Amount</small>
+                <div class="stat-value text-primary" id="sumFreight">₹0</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Advance Paid</small>
+                <div class="stat-value text-success" id="sumAdvance">₹0</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-box">
+                <small class="text-muted">Pending Balance</small>
+                <div class="stat-value text-danger" id="sumBalance">₹0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-box">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="vehicleTable">
+               <thead class="custom-table-head">
+                    <tr class="main-head-row">
+                        <th>FTL No</th>
+                        <th>Vehicle</th>
+                        <!-- <th>Order</th> -->
+                        <th>Freight</th>
+                        <th>Advance</th>
+                        <th>Balance</th>
+                        <th>Vehicle Status</th>
+                        <th>Payment Status</th>
+                        <th width="240">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in data %}
+                    {% if v.ftlno %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'vehicle_ledger' v.vehicle_id %}" class="fw-semibold text-decoration-none">
+                                {{ v.ftlno }}
+                            </a>
+                        </td>
+
+                        <td>{{ v.vehicle|default_if_none:"" }}</td>
+                        <!-- <td>{{ v.order_no|default_if_none:"" }}</td> -->
+
+                        <td class="amount freight">₹{{ v.freight|default:0 }}</td>
+                        <td class="amount advance text-success">₹{{ v.total_advance_paid|default:0 }}</td>
+                        <td class="amount balance text-danger">₹{{ v.balance|default:0 }}</td>
+
+                        <!-- FULL PROCESS -->
+                        <td>
+
+                            {% if v.tracking %}
+
+                            {% if v.tracking.settled %}
+                            <span class="badge bg-dark">Settled</span>
+
+                            {% elif v.tracking.pod_received %}
+                            <span class="badge bg-primary">POD Received</span>
+
+                            {% elif v.tracking.delivered %}
+                            <span class="badge bg-success">Delivered</span>
+
+                            {% elif v.tracking.arrived %}
+                            <span class="badge bg-info">Arrived</span>
+
+                            {% elif v.tracking.fleet_departed %}
+                            <span class="badge bg-warning text-dark">Fleet Departed</span>
+
+                            {% elif v.tracking.invoice_eway %}
+                            <span class="badge bg-secondary">Invoice / Eway</span>
+
+                            {% elif v.tracking.lr_no_b %}
+                            <span class="badge bg-secondary">LR Generated</span>
+
+                            {% elif v.tracking.vehicle_document %}
+                            <span class="badge bg-info">Vehicle Document</span>
+
+                            {% elif v.tracking.vehicle_placed %}
+                            <span class="badge bg-primary">Vehicle Placed</span>
+
+                            {% elif v.tracking.advance_received %}
+                            <span class="badge bg-success">Advance Received</span>
+
+                            {% else %}
+                            <span class="badge bg-secondary">Tracking Started</span>
+                            {% endif %}
+
+                            {% else %}
+
+                            <span class="badge bg-secondary">
+                                Vehicle Assigned
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if v.is_locked %}
+
+                            <span class="badge-soft badge-paid">Completed</span>
+
+                            {% elif v.total_advance_paid > 0 %}
+
+                            <span class="badge-soft badge-partial">Running</span>
+
+                            {% else %}
+
+                            <span class="badge-soft badge-due">Pending</span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+                            {% if v.is_locked %}
+
+                            <div class="lock-card">
+                                <i class="bi bi-lock-fill lock-icon"></i>
+                            </div>
+
+                            {% else %}
+
+                            <div class="flex-wrap">
+                                <a href="{% url 'vehicle_payments' v.vehicle_id %}"
+                                    class="btn btn-sm btn-outline-success">
+                                    Payments
+                                </a>
+                            </div>
+
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Remove None
+        document.querySelectorAll("td").forEach(td => {
+            if (td.innerText.trim() === "None") td.innerText = "";
+        });
+
+        // Search
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+
+            let val = this.value.toLowerCase();
+
+            document.querySelectorAll("#vehicleTable tbody tr").forEach(row => {
+                row.style.display =
+                    row.innerText.toLowerCase().includes(val) ? "" : "none";
+            });
+
+        });
+
+        // Totals
+        let freight = 0, adv = 0, bal = 0;
+
+        document.querySelectorAll("#vehicleTable tbody tr").forEach(row => {
+
+            freight += parseFloat(
+                row.querySelector(".freight").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            adv += parseFloat(
+                row.querySelector(".advance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+            bal += parseFloat(
+                row.querySelector(".balance").innerText.replace(/[₹,]/g, '')
+            ) || 0;
+
+        });
+
+        document.getElementById("sumFreight").innerText =
+            "₹" + freight.toLocaleString('en-IN');
+
+        document.getElementById("sumAdvance").innerText =
+            "₹" + adv.toLocaleString('en-IN');
+
+        document.getElementById("sumBalance").innerText =
+            "₹" + bal.toLocaleString('en-IN');
+
+    });
+</script>
+
+{% endblock %}

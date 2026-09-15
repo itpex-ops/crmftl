@@ -1,0 +1,1163 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ order.trip_number }}{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   ORDER DETAIL PAGE
+   ========================================================= */
+
+.order-detail-page {
+    width: 100%;
+    padding: 22px 28px 40px;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.order-detail-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.order-detail-heading {
+    margin: 0;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.order-detail-subtitle {
+    margin-top: 4px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #8a9199;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+   ========================================================= */
+
+.detail-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.detail-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+
+    padding: 0 16px;
+
+    border-radius: 7px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+
+/* Edit */
+
+.detail-edit-btn {
+    border: 1px solid #FDB81B;
+
+    background: #FDB81B;
+
+    color: #212529;
+}
+
+.detail-edit-btn:hover {
+    background: #e7a800;
+    border-color: #e7a800;
+    color: #ffffff;
+}
+
+
+/* Back */
+
+.detail-back-btn {
+    border: 1px solid #dfe3e8;
+
+    background: #ffffff;
+
+    color: #495057;
+}
+
+.detail-back-btn:hover {
+    background: #f4f5f7;
+
+    border-color: #cfd4da;
+
+    color: #212529;
+}
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.detail-message {
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #d9dde2;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    color: #495057;
+}
+
+
+/* =========================================================
+   SIX SECTION GRID
+   ========================================================= */
+
+.order-detail-grid {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    column-gap: 22px;
+
+    row-gap: 14px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   DETAIL CARD
+   ========================================================= */
+
+.order-detail-card {
+
+    width: 100%;
+
+    border: 1px solid #8d8d8d;
+
+    background: #ffffff;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.order-detail-card-title {
+
+    min-height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 7px 10px;
+
+    background: #ffc000;
+
+    border-bottom: 1px solid #777;
+
+    color: #111111;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    text-align: center;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   DETAIL ROW
+   ========================================================= */
+
+.detail-row {
+
+    display: grid;
+
+    grid-template-columns:
+        42%
+        58%;
+
+    min-height: 39px;
+
+    border-bottom: 1px solid #b8b8b8;
+
+    box-sizing: border-box;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
+.detail-label {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 6px 9px;
+
+    border-right: 1px solid #b8b8b8;
+
+    background: #ffffff;
+
+    color: #172033;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11.5px;
+
+    line-height: 1.25;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   VALUE
+   ========================================================= */
+
+.detail-value {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    padding: 6px 9px;
+
+    background: #ffffff;
+
+    color: #343a40;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11.5px;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   IMPORTANT VALUES
+   ========================================================= */
+
+.detail-value.strong {
+    font-weight: 600;
+    color: #212529;
+}
+
+
+.detail-value.amount {
+    justify-content: flex-end;
+
+    font-weight: 600;
+
+    color: #212529;
+}
+
+
+.detail-value.total {
+    justify-content: flex-end;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: #212529;
+
+    background: #f5f6f7;
+}
+
+
+.detail-value.margin-positive {
+    justify-content: flex-end;
+
+    font-weight: 700;
+
+    color: #198754;
+
+    background: #f7fbf9;
+}
+
+
+.detail-value.margin-negative {
+    justify-content: flex-end;
+
+    font-weight: 700;
+
+    color: #dc3545;
+
+    background: #fff8f8;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.detail-status {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 3px 9px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+
+.status-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+
+.status-rejected {
+    background: #f8d7da;
+    color: #842029;
+}
+
+
+/* =========================================================
+   EMPTY VALUE
+   ========================================================= */
+
+.empty-value {
+    color: #adb5bd;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .order-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .order-detail-page {
+        padding: 15px;
+    }
+
+    .order-detail-header {
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+    .detail-header-actions {
+        width: 100%;
+    }
+
+    .detail-btn {
+        flex: 1;
+    }
+
+    .detail-row {
+        grid-template-columns:
+            44%
+            56%;
+    }
+
+    .detail-label,
+    .detail-value {
+        font-size: 10.5px;
+    }
+
+}
+
+</style>
+
+
+<div class="order-detail-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="order-detail-header">
+
+        <div>
+
+            <h1 class="order-detail-heading">
+                {{ order.trip_number }}
+            </h1>
+
+            <div class="order-detail-subtitle">
+                Order details and commercial information
+            </div>
+
+        </div>
+
+
+        <div class="detail-header-actions">
+
+            <a
+                href="{% url 'onepageorder_list' %}"
+                class="detail-btn detail-back-btn"
+            >
+                <i class="bi bi-arrow-left me-1"></i>
+                Back
+            </a>
+
+
+            <a
+                href="{% url 'onepageorder_edit' order.pk %}"
+                class="detail-btn detail-edit-btn"
+            >
+                <i class="bi bi-pencil-square me-1"></i>
+                Edit Order
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="detail-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         DETAILS GRID
+         ===================================================== -->
+
+    <div class="order-detail-grid">
+
+
+        <!-- =================================================
+             CUSTOMER DETAILS
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Customer Details
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Name
+                </div>
+
+                <div class="detail-value strong">
+                    {{ order.customer.name|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Contact Number
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer.contact_number|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Email
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer.email|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Address
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer.address|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Lead Generated Through
+                </div>
+
+                <div class="detail-value">
+                    {{ order.lead_generated_through|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Sales Closed By
+                </div>
+
+                <div class="detail-value">
+                    {{ order.sales_closed_by|default:"-" }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             COMMERCIALS
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Commercials
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Freight Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.freight_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Loading / Unloading
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.loading_unloading_charges|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Halting Charges
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.halting_charges|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Other Charges
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.other_charges|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Total Trip Cost
+                </div>
+
+                <div class="detail-value total">
+                    ₹{{ order.total_trip_cost|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Selling Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.selling_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Manager Approval
+                </div>
+
+                <div class="detail-value">
+
+                    {% if order.manager_approval == "Approved" %}
+
+                        <span class="detail-status status-approved">
+                            Approved
+                        </span>
+
+                    {% elif order.manager_approval == "Rejected" %}
+
+                        <span class="detail-status status-rejected">
+                            Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span class="detail-status status-pending">
+                            Pending
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Approved By
+                </div>
+
+                <div class="detail-value">
+                    {{ order.approved_by|default:"-" }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SHIPMENT DETAILS
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Shipment Details
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Origin
+                </div>
+
+                <div class="detail-value strong">
+                    {{ order.origin|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Destination
+                </div>
+
+                <div class="detail-value strong">
+                    {{ order.destination|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Material
+                </div>
+
+                <div class="detail-value">
+                    {{ order.material|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Packing Type
+                </div>
+
+                <div class="detail-value">
+                    {{ order.packing_type|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    No of Pieces
+                </div>
+
+                <div class="detail-value">
+                    {{ order.no_of_pieces|default:"0" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Weight in Tons
+                </div>
+
+                <div class="detail-value">
+                    {{ order.weight_tons|default:"0.000" }} tons
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CUSTOMER PAYMENT
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Payment Terms by Customer
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Billing Type
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer_billing_type|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Payment Type
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer_payment_type|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Advance Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.customer_advance_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Balance Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.customer_balance_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Customer Payment Method
+                </div>
+
+                <div class="detail-value">
+                    {{ order.customer_payment_method|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Promised Due Date
+                </div>
+
+                <div class="detail-value">
+
+                    {% if order.promised_due_date %}
+
+                        {{ order.promised_due_date|date:"d/m/Y" }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             VEHICLE DETAILS
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Vehicle Details
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Type
+                </div>
+
+                <div class="detail-value">
+                    {{ order.vehicle_type|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Number
+                </div>
+
+                <div class="detail-value strong">
+                    {{ order.vehicle_number|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Driver Number
+                </div>
+
+                <div class="detail-value">
+                    {{ order.driver_number|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Owner Number
+                </div>
+
+                <div class="detail-value">
+                    {{ order.owner_number|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Sourced By
+                </div>
+
+                <div class="detail-value">
+                    {{ order.vehicle_sourced_by|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Owner / Broker Name
+                </div>
+
+                <div class="detail-value">
+                    {{ order.owner_broker_name|default:"-" }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTRACTED VEHICLE
+             ================================================= -->
+
+        <div class="order-detail-card">
+
+            <div class="order-detail-card-title">
+                Payment Terms to Contracted Vehicle
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Advance Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.vehicle_advance_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Balance Amount
+                </div>
+
+                <div class="detail-value amount">
+                    ₹{{ order.vehicle_balance_amount|default:"0.00" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Vehicle Owner Name
+                </div>
+
+                <div class="detail-value">
+                    {{ order.vehicle_owner_name|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    PAN Card
+                </div>
+
+                <div class="detail-value">
+                    {{ order.pan_card|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Account Name
+                </div>
+
+                <div class="detail-value">
+                    {{ order.account_name|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Account Number
+                </div>
+
+                <div class="detail-value">
+                    {{ order.account_number|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    IFSC Code
+                </div>
+
+                <div class="detail-value">
+                    {{ order.ifsc_code|default:"-" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    UPI Number
+                </div>
+
+                <div class="detail-value">
+                    {{ order.upi_number|default:"-" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

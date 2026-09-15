@@ -1,0 +1,89 @@
+<!-- templates/accounts/add_transaction.html -->
+
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-dark text-white">
+            Add Transaction
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Party</label>
+                        <select name="party" class="form-control" required>
+                            <option value="customer">Customer</option>
+                            <option value="vehicle">Vehicle</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Type</label>
+                        <select name="transaction_type" class="form-control" required>
+                            <option value="credit">Credit</option>
+                            <option value="debit">Debit</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Stage</label>
+                        <select name="stage" class="form-control">
+                            <option value="advance">Advance</option>
+                            <option value="balance">Balance</option>
+                            <option value="after_delivery">After Delivery</option>
+                            <option value="after_document">After Document</option>
+                            <option value="full">Full</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Vehicle</label>
+                        <select name="vehicle" class="form-control">
+                            <option value="">----------</option>
+
+                            {% for v in vehicles %}
+                            <option value="{{ v.id }}">
+                                {{ v.vehicle_no }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Amount</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Remarks</label>
+                        <input type="text" name="remarks" class="form-control">
+                    </div>
+
+                </div>
+
+                <button class="btn btn-success">
+                    Save Entry
+                </button>
+
+                <a href="{% url 'ledger' account.id %}" class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

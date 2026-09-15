@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <h4 class="fw-bold mb-3">📍 Tracking Update - {{ order.order_no }}</h4>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card p-4 shadow-sm border-0 rounded-4">
+
+            <!-- STEP PROGRESS -->
+            <div class="mb-4">
+                <h6 class="fw-semibold mb-3">Tracking Steps</h6>
+                <div class="row g-3">
+
+                    {% comment %} Left Column {% endcomment %}
+                    <div class="col-md-6 d-flex flex-column gap-2">
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="vehicle_placed"
+                                {% if tracking.vehicle_placed %}checked{% endif %}>
+                            🚚 Vehicle Placed
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="vehicle_document"
+                                {% if tracking.vehicle_document %}checked{% endif %}>
+                            📄 Vehicle Document
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="invoice_eway"
+                                {% if tracking.invoice_eway %}checked{% endif %}>
+                            🧾 Invoice / E-way
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="advance_to_fleet"
+                                {% if tracking.advance_to_fleet %}checked{% endif %}>
+                            💰 Advance to Fleet
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="fleet_departed"
+                                {% if tracking.fleet_departed %}checked{% endif %}>
+                            🚛 Fleet Departed
+                        </label>
+                    </div>
+
+                    {% comment %} Right Column {% endcomment %}
+                    <div class="col-md-6 d-flex flex-column gap-2">
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="advance_received"
+                                {% if tracking.advance_received %}checked{% endif %}>
+                            💵 Advance Received
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="arrived"
+                                {% if tracking.arrived %}checked{% endif %}>
+                            📍 Arrived
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="delivered"
+                                {% if tracking.delivered %}checked{% endif %}>
+                            ✅ Delivered
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="pod_received"
+                                {% if tracking.pod_received %}checked{% endif %}>
+                            📦 POD Received
+                        </label>
+
+                        <label class="form-check form-check-inline p-2 rounded-3 bg-light cursor-pointer">
+                            <input class="form-check-input" type="checkbox" name="settled"
+                                {% if tracking.settled %}checked{% endif %}>
+                            🧮 Settled
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- REMARKS -->
+            <div class="mb-3">
+                <textarea name="remarks" class="form-control rounded-3"
+                          placeholder="Remarks..." rows="4">{{ tracking.remarks }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success rounded-3 px-4 py-2 fw-semibold">
+                💾 Save Tracking
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<style>
+    /* Cursor and hover effects for checkboxes */
+    .form-check-input {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+    .form-check label {
+        cursor: pointer;
+    }
+
+    /* Card styling */
+    .card {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    /* Route Pills */
+    .route-pill {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 15px;
+        background: #e0f0ff;
+        margin-bottom: 4px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    /* Smooth fade for checkboxes */
+    .form-check-input:checked + label,
+    .form-check-input:checked {
+        transition: 0.3s;
+    }
+
+    /* Scrollable for mobile view */
+    @media(max-width: 768px) {
+        .row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+{% endblock %}

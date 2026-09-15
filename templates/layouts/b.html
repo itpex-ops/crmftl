@@ -1,0 +1,69 @@
+<!-- ================= ORDERS ================= -->
+    {% if request.user.role == "admin" or request.user.role == "sales" %}
+    <a data-bs-toggle="collapse" href="#orderMenu">
+        <i class="bi bi-receipt"></i> Orders
+        <i class="bi bi-chevron-down float-end"></i>
+    </a>
+
+    <div class="collapse submenu {% if 'order' in request.path %}show{% endif %}" id="orderMenu">
+        <a href="{% url 'create_order' %}">
+            <i class="bi bi-plus-circle"></i> Create Order
+        </a>
+        <a href="{% url 'orders_list' %}">
+            <i class="bi bi-list"></i> Order List
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ================= VEHICLE ================= -->
+    {% if request.user.role == "fleet" %}
+    <a data-bs-toggle="collapse" href="#vehicleMenu">
+        <i class="bi bi-truck"></i> Vehicle
+        <i class="bi bi-chevron-down float-end"></i>
+    </a>
+
+    <div class="collapse submenu {% if 'vehicle' in request.path %}show{% endif %}" id="vehicleMenu">
+        <a href="{% url 'assign_vehicle' %}">
+            <i class="bi bi-plus-circle"></i> Assign Vehicle
+        </a>
+        <a href="{% url 'vehicle_list' %}">
+            <i class="bi bi-list"></i> Vehicle List
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ================= TRACKING ================= -->
+    <a data-bs-toggle="collapse" href="#trackingMenu">
+        <i class="bi bi-search"></i> Tracking
+        <i class="bi bi-chevron-down float-end"></i>
+    </a>
+
+    <div class="collapse submenu {% if 'track' in request.path %}show{% endif %}" id="trackingMenu">
+        <a href="{% url 'track_order' %}">
+            <i class="bi bi-geo-alt"></i> Track Order
+        </a>
+        <a href="{% url 'tracking_history' %}">
+            <i class="bi bi-clock-history"></i> Tracking History
+        </a>
+    </div>
+
+    <!-- ================= ACCOUNTS ================= -->
+    {% if request.user.role == "accounts" %}
+    <a data-bs-toggle="collapse" href="#accountsMenu">
+        <i class="bi bi-cash-stack"></i> Accounts
+        <i class="bi bi-chevron-down float-end"></i>
+    </a>
+
+    <div class="collapse submenu {% if 'accounts' in request.path %}show{% endif %}" id="accountsMenu">
+        <a href="{% url 'accounts_dashboard' %}">
+            <i class="bi bi-check-circle"></i> Payment Check
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ================= ADMIN ================= -->
+    {% if request.user.role == "admin" or request.user.role == "it" %}
+    <a href="{% url 'admin_reset_requests' %}">
+        <i class="bi bi-shield-lock"></i> Password Requests
+    </a>
+    {% endif %}

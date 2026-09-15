@@ -1,0 +1,146 @@
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+    background: linear-gradient(135deg, #eb9525, #e4632c);
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 10px;
+}
+
+.page-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.page-header small {
+    font-size: 12px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.section-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+}
+
+.section-title {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-body {
+    padding: 10px !important;
+}
+
+/* =========================
+   ROW SPACING
+========================= */
+
+.row {
+    --bs-gutter-x: .6rem;
+    --bs-gutter-y: .35rem;
+}
+
+/* =========================
+   LABELS
+========================= */
+
+.form-label {
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.form-control,
+.form-select {
+    height: 32px;
+    min-height: 32px;
+    padding: 3px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: none;
+    border-color: #2563eb;
+}
+
+textarea.form-control {
+    min-height: 55px;
+    resize: none;
+}
+
+/* =========================
+   READONLY
+========================= */
+
+.readonly-box {
+    background: #f8fafc !important;
+    font-weight: 600;
+}
+
+/* =========================
+   USER BOX
+========================= */
+
+.user-box {
+    padding: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.btn-save {
+    height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* =========================
+   ALERT
+========================= */
+
+.alert {
+    padding: .5rem .75rem;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px) {
+
+    .page-header {
+        text-align: center;
+    }
+
+    .col-lg-4 {
+        margin-top: 10px;
+    }
+
+}

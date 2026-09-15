@@ -1,0 +1,362 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Live Tracking Setup{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-broadcast-pin text-primary"></i>
+                Live Tracking Setup
+            </h4>
+            <small class="text-muted">
+                Configure SmartTrail / Telenity Live Tracking
+            </small>
+        </div>
+
+        <a href="{% url 'live_tracking_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="row">
+
+        <!-- ================= Vehicle Details ================= -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-truck"></i>
+                    Vehicle Details
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-borderless table-sm mb-0">
+
+                        <tr>
+                            <th width="45%">FTL No</th>
+                            <td>{{ vehicle.ftl_no }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Vehicle No</th>
+                            <td>{{ vehicle.vehicle_number }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Driver Mobile</th>
+                            <td>{{ vehicle.driver_number }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Owner Mobile</th>
+                            <td>{{ vehicle.owner_number }}</td>
+                        </tr>
+
+                        {% if session %}
+                        <tr>
+                            <th>Entity ID</th>
+                            <td>
+                                <span class="badge bg-dark">
+                                    {{ session.entity_id }}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Tracking Status</th>
+                            <td>
+
+                                {% if session.status == "active" %}
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+
+                                {% elif session.status == "pending" %}
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+
+                                {% elif session.status == "failed" %}
+                                    <span class="badge bg-danger">
+                                        Failed
+                                    </span>
+
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ session.status|title }}
+                                    </span>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                        {% endif %}
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= Setup ================= -->
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-gear-fill"></i>
+                    SmartTrail Setup
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover align-middle">
+                <thead class="custom-table-head">
+                    <tr class="main-head-row">
+                                <th width="45%">Step</th>
+                                <th width="20%">Status</th>
+                                <th width="35%">Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        <!-- ================================================= -->
+                        <!-- STEP 1 -->
+                        <!-- ================================================= -->
+
+                        <tr>
+                            
+
+                            <td>
+
+                                <strong>1. Import Driver</strong><br>
+
+                                <small class="text-muted">
+                                    Register driver in SmartTrail / Telenity
+                                </small>
+
+                            </td>
+
+                            <td>
+
+                                {% if session %}
+
+                                    <span class="badge bg-success">
+                                        Imported
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if not session %}
+
+                                    <a href="{% url 'import_driver' vehicle.id %}"
+                                       class="btn btn-primary btn-sm">
+
+                                        <i class="bi bi-cloud-upload"></i>
+                                        Import Driver
+
+                                    </a>
+
+                                {% else %}
+
+                                    <button class="btn btn-success btn-sm" disabled>
+
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Imported
+
+                                    </button>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr
+
+                        <tr>
+
+                            <td>
+
+                                <strong>2. Send Consent SMS</strong><br>
+
+                                <small class="text-muted">
+                                    Driver must approve live tracking.
+                                </small>
+
+                            </td>
+
+                            <td>
+
+                                {% if session %}
+
+                                    {% if session.consent_received %}
+
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        Waiting
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if session %}
+
+                                    {% if session.consent_received %}
+
+                                        <button class="btn btn-success btn-sm" disabled>
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            Consent Received
+
+                                        </button>
+
+                                    {% else %}
+
+                                        <a href="{% url 'send_consent' session.id %}"
+                                           class="btn btn-warning btn-sm">
+
+                                            <i class="bi bi-chat-dots"></i>
+
+                                            Send Consent
+
+                                        </a>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <button class="btn btn-secondary btn-sm" disabled>
+
+                                        Import Driver First
+
+                                    </button>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                                               <!-- ================================================= -->
+                        <!-- STEP 4 -->
+                        <!-- ================================================= -->
+
+                        <tr>
+
+                            <td>
+
+                                <strong>4. View Live Map</strong><br>
+
+                                <small class="text-muted">
+                                    Open the driver's current location on the map.
+                                </small>
+
+                            </td>
+
+                            <td>
+
+                                {% if session and session.latitude and session.longitude %}
+
+                                    <span class="badge bg-success">
+                                        Ready
+                                    </span>
+
+                                {% elif session %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        No Location
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        Waiting
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if session and session.last_latitude and session.last_longitude %}
+
+                                    <a href="{% url 'vehicle_live' session.id %}"
+                                       class="btn btn-info btn-sm">
+
+                                        <i class="bi bi-geo-alt-fill"></i>
+
+                                        View Live Map
+
+                                    </a>
+
+                                {% else %}
+
+                                    <button class="btn btn-secondary btn-sm" disabled>
+
+                                        <i class="bi bi-geo-alt"></i>
+
+                                        No Location Yet
+
+                                    </button>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

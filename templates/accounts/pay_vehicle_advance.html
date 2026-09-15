@@ -1,0 +1,342 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .recent-payments-scroll {
+        max-height: 250px;
+        /* adjust as needed */
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar-thumb {
+        background: #c5c5c5;
+        border-radius: 9px;
+    }
+
+    .recent-payments-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+
+    .history-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 9px;
+        margin-bottom: 12px;
+        border: 1px solid #ececec;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+        transition: .2s;
+    }
+
+    .history-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .history-type {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+    }
+
+    .history-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .advance-icon {
+        background: #00a651;
+    }
+
+    .balance-icon {
+        background: #2962ff;
+    }
+
+    .other-icon {
+        background: #9c27b0;
+    }
+
+    .history-label {
+        font-weight: 600;
+        font-size: small;
+    }
+
+    .history-date {
+        color: #888;
+        font-size: 13px;
+    }
+
+    .history-amount {
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .history-bottom {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .history-divider {
+        height: 1px;
+        background: #eee;
+        margin: 10px 0;
+    }
+
+    .payment-wrapper {
+        max-width: 350px;
+        margin: auto;
+    }
+
+    .payment-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .payment-header {
+        background: linear-gradient(135deg, #198754, #28a745);
+        color: white;
+        padding: 3px;
+        font-weight: 500;
+        font-size: small;
+        text-align: center;
+    }
+
+    .vehicle-info {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .vehicle-number {
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: #333;
+        word-break: break-word;
+    }
+
+    .balance-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 3px;
+        margin-top: 15px;
+    }
+
+    .balance-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .balance-amount {
+        color: #198754;
+        font-size: 1.0rem;
+        font-weight: 500;
+    }
+
+    .form-label {
+        font-weight: 400;
+        margin-bottom: 8px;
+        font-size: smaller;
+    }
+
+    .form-control {
+        height: 52px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .pay-btn {
+        width: 100%;
+        height: 32px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .vehicle-number {
+            font-size: 1.25rem;
+        }
+
+        .balance-amount {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-body {
+            padding: 18px;
+        }
+
+        .vehicle-number {
+            font-size: 1.1rem;
+        }
+
+        .balance-amount {
+            font-size: 1.3rem;
+        }
+
+        .form-control,
+        .pay-btn {
+            height: 38px;
+        }
+    }
+
+    .history-title {
+        font-weight: 500;
+        color: #6a1b9a;
+        margin-bottom: 15px;
+        font-size: small;
+    }
+</style>
+
+<div class="container py-1">
+
+    <div class="payment-wrapper">
+
+        <div class="card payment-card shadow">
+
+            <div class="payment-header">
+                Advance Payment
+            </div>
+
+            <div class="card-body">
+                <div class="vehicle-info">
+
+                    <div class="vehicle-number">
+                        {{ vehicle.vehicle_number }}
+                    </div>
+
+                    <div class="balance-box">
+                        <div class="balance-label">
+                            Remaining Balance
+                        </div>
+
+                        <div class="balance-amount">
+                            ₹ {{ vehicle.remaining_balance_amount }}
+                        </div>
+                    </div>
+
+                </div>
+                <hr class="my-2">
+
+                <h5 class="history-title">
+                    <i class="bi bi-clock-history"></i>
+                    Recent Payments
+                </h5>
+
+                <div class="recent-payments-scroll">
+
+                    {% for p in transactions %}
+
+                    <div class="history-card">
+
+                        <div class="history-top">
+
+                            <div class="history-type">
+
+                                {% if p.transaction_type == 'advance' %}
+                                <div class="history-icon advance-icon">
+                                    <i class="bi bi-arrow-up"></i>
+                                </div>
+
+                                {% elif p.transaction_type == 'balance' %}
+                                <div class="history-icon balance-icon">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+
+                                {% else %}
+                                <div class="history-icon other-icon">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                                {% endif %}
+
+                                <div>
+                                    <div class="history-label">
+                                        {{ p.label }}
+                                    </div>
+
+                                    <div class="history-date">
+                                        {{ p.date|date:"d M Y h:i a" }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="history-amount">
+                                ₹{{ p.amount|floatformat:2 }}
+                            </div>
+
+                        </div>
+
+                        <div class="history-divider"></div>
+
+                        <div class="history-bottom">
+                            <strong>Mode:</strong> {{ p.payment_mode|upper }}
+
+                            {% if p.transaction_no %}
+                            <br>
+                            <strong>UTR:</strong> {{ p.transaction_no }}
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="alert alert-light text-center">
+                        No payment history available
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Advance Amount
+                        </label>
+
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success pay-btn">
+                        Pay
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1742 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   ORDER CREATION PAGE
+   ========================================================= */
+
+.order-create-page {
+    width: 100%;
+    padding: 22px 28px 35px;
+    box-sizing: border-box;
+    background: #f8f9fb;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.order-create-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.order-create-title {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #212529;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.edit-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #495057;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.edit-back-btn:hover {
+    background: #f4f5f7;
+    border-color: #cfd4da;
+    color: #212529;
+}
+
+
+/* =========================================================
+   TWO COLUMN GRID
+   ========================================================= */
+
+.order-two-columns {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    column-gap: 22px;
+    row-gap: 14px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.order-card {
+    width: 100%;
+    margin: 0;
+
+    border: 1px solid #8d8d8d;
+    background: #ffffff;
+
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.order-card-title {
+    min-height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 10px;
+
+    background: #ffc000;
+    border-bottom: 1px solid #777;
+
+    color: #111111;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    text-align: center;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   FORM ROW
+   ========================================================= */
+
+.order-form-row {
+    display: grid;
+
+    grid-template-columns:
+        42%
+        58%;
+
+    min-height: 39px;
+
+    border-bottom: 1px solid #b8b8b8;
+
+    box-sizing: border-box;
+}
+
+.order-form-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
+.order-form-label {
+    display: flex;
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-right: 1px solid #b8b8b8;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11.5px;
+    line-height: 1.25;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUT AREA
+   ========================================================= */
+
+.order-form-control {
+    min-width: 0;
+
+    padding: 3px 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+   ========================================================= */
+
+.order-form-control input,
+.order-form-control select,
+.order-form-control textarea {
+
+    width: 100%;
+    min-width: 0;
+
+    height: 30px;
+
+    padding: 4px 7px;
+
+    border: 1px solid #d5d5d5;
+    border-radius: 3px;
+
+    background: #ffffff;
+    color: #222222;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11.5px;
+
+    outline: none;
+    box-shadow: none;
+
+    box-sizing: border-box;
+}
+
+.order-form-control textarea {
+    min-height: 48px;
+    height: auto;
+    resize: vertical;
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.order-form-control input:focus,
+.order-form-control select:focus,
+.order-form-control textarea:focus {
+
+    border-color: #FDB81B;
+    background: #fffef0;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px rgba(253, 184, 27, 0.10);
+}
+
+
+/* =========================================================
+   READONLY
+   ========================================================= */
+
+.order-form-control input[readonly] {
+
+    background: #eef0f2;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.field-error {
+
+    margin-top: 2px;
+
+    color: #dc3545;
+
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+.order-error-alert {
+    margin-bottom: 15px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+
+    background: #f8d7da;
+    color: #842029;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CREATE BUTTON
+   ========================================================= */
+
+.create-order-container {
+
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 14px 0 20px;
+}
+
+
+.create-order-button {
+
+    min-width: 125px;
+    height: 38px;
+
+    border-radius: 5px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .order-two-columns {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .order-create-page {
+        padding: 15px;
+    }
+
+    .order-create-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-form-row {
+        grid-template-columns:
+            44%
+            56%;
+    }
+
+    .order-form-label {
+        font-size: 10.5px;
+    }
+
+    .order-form-control input,
+    .order-form-control select,
+    .order-form-control textarea {
+        font-size: 10.5px;
+    }
+
+}
+
+</style>
+
+<div class="order-create-page">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="order-create-header">
+
+        <h1 class="order-create-title">
+            Order Creation
+        </h1>
+
+        <a
+            href="{% url 'onepageorder_list' %}"
+            class="edit-back-btn"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         DJANGO MESSAGE
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="order-error-alert">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         FORM
+         ===================================================== -->
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- =================================================
+             TWO COLUMN GRID
+             ================================================= -->
+
+        <div class="order-two-columns">
+
+
+            <!-- =============================================
+                 CUSTOMER DETAILS
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Customer Details
+                </div>
+
+
+                <!-- Customer Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Name
+                        <span class="text-danger ms-1">*</span>
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="customer_name"
+                            value="{{ request.POST.customer_name|default:'' }}"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Contact Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Contact Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="contact_number"
+                            value="{{ request.POST.contact_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Email
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ request.POST.email|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Address -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Address
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <textarea
+                            name="address"
+                            rows="2"
+                        >{{ request.POST.address|default:'' }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Lead -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Lead Generated Through
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <select name="lead_generated_through">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Social Media"
+                                {% if request.POST.lead_generated_through == "Social Media" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Social Media
+                            </option>
+
+                            <option
+                                value="Outbound Calls"
+                                {% if request.POST.lead_generated_through == "Outbound Calls" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Outbound Calls
+                            </option>
+
+                            <option
+                                value="Reference"
+                                {% if request.POST.lead_generated_through == "Reference" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Reference
+                            </option>
+
+                            <option
+                                value="Field Sales"
+                                {% if request.POST.lead_generated_through == "Field Sales" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Field Sales
+                            </option>
+
+                            <option
+                                value="Justdial"
+                                {% if request.POST.lead_generated_through == "Justdial" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Justdial
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Sales Closed By -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Sales Closed By
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="sales_closed_by"
+                            value="{{ request.POST.sales_closed_by|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 COMMERCIALS
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Commercials
+                </div>
+
+
+                <!-- Freight -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Freight Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            id="id_freight_amount"
+                            name="freight_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.freight_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Loading -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Loading / Unloading Charges
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            id="id_loading_unloading_charges"
+                            name="loading_unloading_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.loading_unloading_charges|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Halting -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Halting Charges
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            id="id_halting_charges"
+                            name="halting_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.halting_charges|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Other -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Other Charges
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            id="id_other_charges"
+                            name="other_charges"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.other_charges|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Total Trip Cost -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Total Trip Cost
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            id="total_trip_cost"
+                            value="0.00"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+                 <!-- GST -->
+                  <div class="order-form-row">
+                        <label class="form-label">
+                            GST %
+                        </label>
+
+                        <select name="gst_percent" id="gst_percent" class="form-select mb-3">
+                            <option value="">Select GST %</option>
+                            <option value="7">7%</option>
+                            <option value="8">8%</option>
+                            <option value="10">10%</option>
+                            <option value="13">13%</option>
+                        </select>
+
+                        <input type="hidden" id="saved_gst" value="{{ order.gst_percent|default_if_none:'' }}">
+                  </div>
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Selling Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="selling_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.selling_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+                <!-- Manager Approval 
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Manager Approval
+                    </div>
+
+                     <div class="order-form-control">
+
+                        <select name="manager_approval">
+
+                            <option
+                                value="Pending"
+                                {% if request.POST.manager_approval == "Pending" or not request.POST.manager_approval %}
+                                    selected
+                                {% endif %}
+                            >
+                                Pending
+                            </option>
+
+                            <option
+                                value="Approved"
+                                {% if request.POST.manager_approval == "Approved" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Approved
+                            </option>
+
+                            <option
+                                value="Rejected"
+                                {% if request.POST.manager_approval == "Rejected" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>-->
+
+                <!-- Approved By -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Approval Manager
+                    </div>
+
+                    <div class="order-form-control">
+                        <input
+                            type="text"
+                            name="approved_by"
+                            value="{{ request.POST.approved_by|default:'' }}">
+                    </div>
+                </div>
+                <div class="order-form-row">
+                    <div class="order-form-label">
+                        Total Selling Amount
+                    </div>
+                    <div class="order-form-control">
+                        <input
+                            type="number"
+                            name="total_selling_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.total_selling_amount|default:'0' }}">
+                    </div>
+                </div>
+                <div class="order-form-row">
+                    <div class="order-form-label">
+                        Remarks
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <textarea
+                            name="remarks"
+                            rows="2"
+                        >{{ request.POST.remarks|default:'' }}</textarea>
+
+                    </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 SHIPMENT DETAILS
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Shipment Details
+                </div>
+
+
+                <!-- Origin -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Origin Pincode / Area Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="origin"
+                            value="{{ request.POST.origin|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Destination -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Destination Pincode / Area Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="destination"
+                            value="{{ request.POST.destination|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Material -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Material
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="material"
+                            value="{{ request.POST.material|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Packing -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Packing Type
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="packing_type"
+                            value="{{ request.POST.packing_type|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Pieces -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        No of Pieces
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="no_of_pieces"
+                            min="0"
+                            value="{{ request.POST.no_of_pieces|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Weight -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Weight in Tons
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="weight_tons"
+                            step="0.001"
+                            min="0"
+                            value="{{ request.POST.weight_tons|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 PAYMENT TERMS BY CUSTOMER
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Payment Terms by Customer
+                </div>
+
+
+                <!-- Billing Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Billing Type
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <select name="customer_billing_type">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Retail"
+                                {% if request.POST.customer_billing_type == "Retail" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Retail
+                            </option>
+
+                            <option
+                                value="Credit"
+                                {% if request.POST.customer_billing_type == "Credit" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Credit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Payment Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Payment Type
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <select name="customer_payment_type">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Paid"
+                                {% if request.POST.customer_payment_type == "Paid" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Paid
+                            </option>
+
+                            <option
+                                value="Today"
+                                {% if request.POST.customer_payment_type == "Today" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Today
+                            </option>
+
+                            <option
+                                value="TBB"
+                                {% if request.POST.customer_payment_type == "TBB" %}
+                                    selected
+                                {% endif %}
+                            >
+                                TBB
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Advance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Advance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="customer_advance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.customer_advance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Balance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Balance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="customer_balance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.customer_balance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Payment Method -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Customer Payment Method
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <select name="customer_payment_method">
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="Cash"
+                                {% if request.POST.customer_payment_method == "Cash" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Cash
+                            </option>
+
+                            <option
+                                value="Account"
+                                {% if request.POST.customer_payment_method == "Account" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Account
+                            </option>
+
+                            <option
+                                value="UPI"
+                                {% if request.POST.customer_payment_method == "UPI" %}
+                                    selected
+                                {% endif %}
+                            >
+                                UPI
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Due Date -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Promised Due Date
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="date"
+                            name="promised_due_date"
+                            value="{{ request.POST.promised_due_date|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 VEHICLE DETAILS
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Vehicle Details
+                </div>
+
+
+                <!-- Vehicle Type -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Type
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="vehicle_type"
+                            value="{{ request.POST.vehicle_type|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="vehicle_number"
+                            value="{{ request.POST.vehicle_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Driver Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Driver Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="driver_number"
+                            value="{{ request.POST.driver_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Owner Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Owner Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="owner_number"
+                            value="{{ request.POST.owner_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Sourced By -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Sourced By
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <select name="vehicle_sourced_by">
+
+                            <option
+                                value="Direct"
+                                {% if request.POST.vehicle_sourced_by == "Direct" or not request.POST.vehicle_sourced_by %}
+                                    selected
+                                {% endif %}
+                            >
+                                Direct
+                            </option>
+
+                            <option
+                                value="Broker"
+                                {% if request.POST.vehicle_sourced_by == "Broker" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Broker
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Owner / Broker -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Owner / Broker Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="owner_broker_name"
+                            value="{{ request.POST.owner_broker_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 PAYMENT TERMS TO CONTRACTED VEHICLE
+                 ============================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Payment Terms to Contracted Vehicle
+                </div>
+
+
+                <!-- Vehicle Advance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Advance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="vehicle_advance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Balance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Balance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="vehicle_balance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_balance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Owner -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Owner Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="vehicle_owner_name"
+                            value="{{ request.POST.vehicle_owner_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAN -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        PAN Card
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="pan_card"
+                            value="{{ request.POST.pan_card|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Account Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="account_name"
+                            value="{{ request.POST.account_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Account Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="account_number"
+                            value="{{ request.POST.account_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- IFSC -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        IFSC Code
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="ifsc_code"
+                            value="{{ request.POST.ifsc_code|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- UPI -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        UPI Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="upi_number"
+                            value="{{ request.POST.upi_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Send SMS 
+
+            
+                <div class="order-form-row">
+
+                   <div class="mt-2">
+
+    
+
+            </div>
+
+                </div>
+            
+
+
+         Agreement / TDS -->
+
+                <!--
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Create Agreement & TDS Certificate
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="checkbox"
+                            name="create_agreement_tds"
+                        >
+
+                    </div>
+
+                </div>
+                -->
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CREATE ORDER BUTTON
+             ================================================= -->
+
+        <div class="create-order-container">
+
+            <button
+                type="submit"
+                class="btn btn-primary create-order-button"
+            >
+
+                <i class="bi bi-save me-1"></i>
+
+                Create Order
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     TOTAL TRIP COST CALCULATION
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    function getNumber(id) {
+
+        const element =
+            document.getElementById(id);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value =
+            parseFloat(element.value);
+
+        return isNaN(value)
+            ? 0
+            : value;
+
+    }
+
+
+    function calculateTripCost() {
+
+        const freight =
+            getNumber("id_freight_amount");
+
+        const loading =
+            getNumber("id_loading_unloading_charges");
+
+        const halting =
+            getNumber("id_halting_charges");
+
+        const other =
+            getNumber("id_other_charges");
+
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+
+        const totalField =
+            document.getElementById(
+                "total_trip_cost"
+            );
+
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+
+    }
+
+
+    const fields = [
+
+        "id_freight_amount",
+        "id_loading_unloading_charges",
+        "id_halting_charges",
+        "id_other_charges"
+
+    ];
+
+
+    fields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (!field) {
+            return;
+        }
+
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    calculateTripCost();
+
+});
+
+</script>
+
+{% endblock %}
