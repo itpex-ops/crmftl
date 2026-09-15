@@ -1210,25 +1210,210 @@ html
 
     </div>
 
+<!-- Promised Due Date -->
+<div
+    class="order-form-row"
+    id="promised_due_date_row"
+    style="display: none;"
+>
 
-    <!-- Promised Due Date -->
-    <div class="order-form-row">
+    <div class="order-form-label">
+        Promised Due Date
+    </div>
 
-        <div class="order-form-label">
-            Promised Due Date
-        </div>
+    <div class="order-form-control">
 
-        <div class="order-form-control">
-
-            <input
-                type="date"
-                name="promised_due_date"
-                value="{{ request.POST.promised_due_date|default:'' }}"
-            >
-
-        </div>
+        <input
+            type="date"
+            name="promised_due_date"
+            id="promised_due_date"
+            value="{{ request.POST.promised_due_date|default:'' }}"
+        >
 
     </div>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const billingType =
+        document.getElementById("customer_billing_type");
+
+    const paymentType =
+        document.getElementById("customer_payment_type");
+
+    const dueDateRow =
+        document.getElementById("promised_due_date_row");
+
+    const dueDate =
+        document.getElementById("promised_due_date");
+
+
+    // Previous values after form validation error
+    const previousPaymentType =
+        "{{ request.POST.customer_payment_type|default:'' }}";
+
+
+    // ==========================================
+    // UPDATE PAYMENT TYPE
+    // ==========================================
+
+    function updatePaymentTypes() {
+
+        const selectedBillingType =
+            billingType.value;
+
+        // Clear existing options
+        paymentType.innerHTML = "";
+
+
+        // Default option
+        const defaultOption =
+            document.createElement("option");
+
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+
+        paymentType.appendChild(defaultOption);
+
+
+        let options = [];
+
+
+        // ==========================================
+        // RETAIL
+        // ==========================================
+
+        if (selectedBillingType === "Retail") {
+
+            options = [
+                {
+                    value: "Paid",
+                    text: "Paid"
+                },
+                {
+                    value: "To Pay",
+                    text: "To Pay"
+                }
+            ];
+
+        }
+
+
+        // ==========================================
+        // CREDIT
+        // ==========================================
+
+        else if (selectedBillingType === "Credit") {
+
+            options = [
+                {
+                    value: "TBB",
+                    text: "TBB"
+                }
+            ];
+
+        }
+
+
+        // Add options
+        options.forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item.value;
+            option.textContent = item.text;
+
+
+            // Restore previous value
+            if (item.value === previousPaymentType) {
+                option.selected = true;
+            }
+
+
+            paymentType.appendChild(option);
+
+        });
+
+
+        // Check Due Date visibility
+        updateDueDate();
+
+    }
+
+
+    // ==========================================
+    // SHOW / HIDE DUE DATE
+    // ==========================================
+
+    function updateDueDate() {
+
+        const isCredit =
+            billingType.value === "Credit";
+
+        const isTBB =
+            paymentType.value === "TBB";
+
+
+        if (isCredit && isTBB) {
+
+            // Show Due Date
+            dueDateRow.style.display = "";
+
+            dueDate.required = true;
+
+        } else {
+
+            // Hide Due Date
+            dueDateRow.style.display = "none";
+
+            dueDate.required = false;
+
+            // Clear date when hidden
+            dueDate.value = "";
+
+        }
+
+    }
+
+
+    // ==========================================
+    // BILLING TYPE CHANGE
+    // ==========================================
+
+    billingType.addEventListener("change", function () {
+
+        paymentType.value = "";
+
+        updatePaymentTypes();
+
+    });
+
+
+    // ==========================================
+    // PAYMENT TYPE CHANGE
+    // ==========================================
+
+    paymentType.addEventListener("change", function () {
+
+        updateDueDate();
+
+    });
+
+
+    // ==========================================
+    // INITIAL LOAD
+    // ==========================================
+
+    updatePaymentTypes();
+
+});
+
+</script>
+
 
 </div>
 
