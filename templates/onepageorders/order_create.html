@@ -1055,43 +1055,304 @@ html
 
 
 
-            <!-- =================================================
-                 PAYMENT TERMS BY CUSTOMER
-                 ================================================= -->
+  
+<!-- =================================================
+     PAYMENT TERMS BY CUSTOMER
+     ================================================= -->
 
-          
-<!-- CUSTOMER BILLING TYPE -->
-<div class="order-form-row">
-    <div class="order-form-label">
-        Customer Billing Type
+<div class="order-card">
+
+    <div class="order-card-title">
+        Payment Terms by Customer
     </div>
 
-    <div class="order-form-control">
-        <select
-            name="customer_billing_type"
-            id="customer_billing_type"
-        >
-            <option value="">Select</option>
 
-            <option value="Retail"
-                {% if request.POST.customer_billing_type == "Retail" %}
-                    selected
-                {% endif %}>
-                Retail
-            </option>
+    <!-- Customer Billing Type -->
+    <div class="order-form-row">
 
-            <option value="Credit"
-                {% if request.POST.customer_billing_type == "Credit" %}
-                    selected
-                {% endif %}>
-                Credit
-            </option>
-        </select>
+        <div class="order-form-label">
+            Customer Billing Type
+        </div>
+
+        <div class="order-form-control">
+
+            <select
+                name="customer_billing_type"
+                id="customer_billing_type"
+            >
+                <option value="">Select</option>
+
+                <option value="Retail"
+                    {% if request.POST.customer_billing_type == "Retail" %}
+                        selected
+                    {% endif %}>
+                    Retail
+                </option>
+
+                <option value="Credit"
+                    {% if request.POST.customer_billing_type == "Credit" %}
+                        selected
+                    {% endif %}>
+                    Credit
+                </option>
+
+            </select>
+
+        </div>
+
     </div>
+
+
+    <!-- Customer Payment Type -->
+    <div class="order-form-row">
+
+        <div class="order-form-label">
+            Payment Type
+        </div>
+
+        <div class="order-form-control">
+
+            <select
+                name="customer_payment_type"
+                id="customer_payment_type"
+            >
+                <option value="">Select</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- Customer Advance -->
+    <div class="order-form-row">
+
+        <div class="order-form-label">
+            Customer Advance Amount
+        </div>
+
+        <div class="order-form-control">
+
+            <input
+                type="number"
+                name="customer_advance_amount"
+                step="0.01"
+                min="0"
+                value="{{ request.POST.customer_advance_amount|default:'0' }}"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- Customer Balance -->
+    <div class="order-form-row">
+
+        <div class="order-form-label">
+            Customer Balance Amount
+        </div>
+
+        <div class="order-form-control">
+
+            <input
+                type="number"
+                name="customer_balance_amount"
+                step="0.01"
+                min="0"
+                value="{{ request.POST.customer_balance_amount|default:'0' }}"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- Customer Payment Method -->
+    <div class="order-form-row">
+
+        <div class="order-form-label">
+            Customer Payment Method
+        </div>
+
+        <div class="order-form-control">
+
+            <select
+                name="customer_payment_method"
+            >
+
+                <option value="">Select</option>
+
+                <option value="Cash"
+                    {% if request.POST.customer_payment_method == "Cash" %}
+                        selected
+                    {% endif %}>
+                    Cash
+                </option>
+
+                <option value="Account"
+                    {% if request.POST.customer_payment_method == "Account" %}
+                        selected
+                    {% endif %}>
+                    Account
+                </option>
+
+                <option value="UPI"
+                    {% if request.POST.customer_payment_method == "UPI" %}
+                        selected
+                    {% endif %}>
+                    UPI
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- Promised Due Date -->
+    <div class="order-form-row">
+
+        <div class="order-form-label">
+            Promised Due Date
+        </div>
+
+        <div class="order-form-control">
+
+            <input
+                type="date"
+                name="promised_due_date"
+                value="{{ request.POST.promised_due_date|default:'' }}"
+            >
+
+        </div>
+
+    </div>
+
 </div>
 
 
+<!-- =================================================
+     CUSTOMER PAYMENT TYPE SCRIPT
+     ================================================= -->
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const billingType =
+        document.getElementById("customer_billing_type");
+
+    const paymentType =
+        document.getElementById("customer_payment_type");
+
+    // Previous value after form validation error
+    const previousPaymentType =
+        "{{ request.POST.customer_payment_type|default:'' }}";
+
+
+    function updatePaymentTypes() {
+
+        const selectedBillingType =
+            billingType.value;
+
+        // Clear existing options
+        paymentType.innerHTML = "";
+
+
+        // Default option
+        const defaultOption =
+            document.createElement("option");
+
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+
+        paymentType.appendChild(defaultOption);
+
+
+        let options = [];
+
+
+        // ==========================================
+        // RETAIL
+        // ==========================================
+
+        if (selectedBillingType === "Retail") {
+
+            options = [
+                {
+                    value: "Paid",
+                    text: "Paid"
+                },
+                {
+                    value: "To Pay",
+                    text: "To Pay"
+                }
+            ];
+
+        }
+
+
+        // ==========================================
+        // CREDIT
+        // ==========================================
+
+        else if (selectedBillingType === "Credit") {
+
+            options = [
+                {
+                    value: "TBB",
+                    text: "TBB"
+                }
+            ];
+
+        }
+
+
+        // ==========================================
+        // ADD OPTIONS
+        // ==========================================
+
+        options.forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item.value;
+            option.textContent = item.text;
+
+
+            // Restore previous value
+            if (item.value === previousPaymentType) {
+                option.selected = true;
+            }
+
+
+            paymentType.appendChild(option);
+
+        });
+
+    }
+
+
+    // Billing Type changed
+    billingType.addEventListener("change", function () {
+
+        // Reset payment type
+        paymentType.value = "";
+
+        updatePaymentTypes();
+
+    });
+
+
+    // Initial page load
+    updatePaymentTypes();
+
+});
+
+</script>
 
             <!-- =================================================
                  VEHICLE DETAILS
