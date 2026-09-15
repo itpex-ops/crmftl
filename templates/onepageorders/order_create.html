@@ -1059,7 +1059,7 @@ html
                  PAYMENT TERMS BY CUSTOMER
                  ================================================= -->
 
-           html
+          
 <!-- CUSTOMER BILLING TYPE -->
 <div class="order-form-row">
     <div class="order-form-label">
@@ -1091,107 +1091,9 @@ html
 </div>
 
 
-<!-- PAYMENT TYPE -->
-<div class="order-form-row">
-    <div class="order-form-label">
-        Payment Type
-    </div>
-
-    <div class="order-form-control">
-        <select
-            name="customer_payment_type"
-            id="customer_payment_type"
-        >
-            <option value="">Select</option>
-        </select>
-    </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const billingType = document.getElementById("customer_billing_type");
-    const paymentType = document.getElementById("customer_payment_type");
-
-    const previousPaymentType =
-        "{{ request.POST.customer_payment_type|default:'' }}";
-
-    function updatePaymentTypes() {
-
-        const selectedBillingType = billingType.value;
-
-        // Clear existing options
-        paymentType.innerHTML = "";
-
-        // Default option
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = "Select";
-        paymentType.appendChild(defaultOption);
-
-        let options = [];
-
-        // RETAIL
-        if (selectedBillingType === "Retail") {
-
-            options = [
-                {
-                    value: "Paid",
-                    text: "Paid"
-                },
-                {
-                    value: "To Pay",
-                    text: "To Pay"
-                }
-            ];
-        }
-
-        // CREDIT
-        else if (selectedBillingType === "Credit") {
-
-            options = [
-                {
-                    value: "TBB",
-                    text: "TBB"
-                }
-            ];
-        }
-
-        // Add options
-        options.forEach(function (item) {
-
-            const option = document.createElement("option");
-
-            option.value = item.value;
-            option.textContent = item.text;
-
-            // Restore previous selection after validation error
-            if (item.value === previousPaymentType) {
-                option.selected = true;
-            }
-
-            paymentType.appendChild(option);
-        });
-    }
 
 
-    // When Customer Billing Type changes
-    billingType.addEventListener("change", function () {
-
-        // Reset Payment Type
-        paymentType.value = "";
-
-        updatePaymentTypes();
-    });
-
-
-    // Load correct options when page opens
-    updatePaymentTypes();
-
-});
-</script>
-
-  <!-- =================================================
+            <!-- =================================================
                  VEHICLE DETAILS
                  ================================================= -->
 
