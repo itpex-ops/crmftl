@@ -5,6 +5,53 @@
 <style>
 
 /* =========================================================
+   GST CHECKBOX OPTIONS
+   ========================================================= */
+
+.gst-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gst-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 4px 8px;
+
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.gst-checkbox input {
+    width: 14px !important;
+    height: 14px !important;
+
+    margin: 0;
+    padding: 0;
+
+    accent-color: #ffc000;
+    cursor: pointer;
+}
+
+.gst-checkbox:has(input:checked) {
+    background: #fff4c7;
+    border-color: #ffc000;
+    font-weight: 600;
+}
+/* =========================================================
    ORDER CREATION PAGE
    ========================================================= */
 
@@ -720,8 +767,6 @@
                     </div>
 
                 </div>
-
-
                 <!-- Total Trip Cost -->
 
                 <div class="order-form-row">
@@ -742,90 +787,124 @@
                     </div>
 
                 </div>
+
                  <!-- GST -->
-                  <div class="order-form-row">
-                        <label class="form-label">
-                            GST %
-                        </label>
+                 <!-- =====================================================
+     SELLING AMOUNT + GST
+     ===================================================== -->
 
-                        <select name="gst_percent" id="gst_percent" class="form-select mb-3">
-                            <option value="">Select GST %</option>
-                            <option value="7">7%</option>
-                            <option value="8">8%</option>
-                            <option value="10">10%</option>
-                            <option value="13">13%</option>
-                        </select>
+<!-- Selling Amount -->
+<div class="order-form-row">
 
-                        <input type="hidden" id="saved_gst" value="{{ order.gst_percent|default_if_none:'' }}">
-                  </div>
+    <div class="order-form-label">
+        Selling Amount
+    </div>
+
+    <div class="order-form-control">
+
+        <input
+            type="number"
+            id="id_selling_amount"
+            name="selling_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.selling_amount|default:'0' }}"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- GST -->
+<div class="order-form-row">
+
+    <div class="order-form-label">
+        GST
+    </div>
+
+    <div class="order-form-control">
+
+        <div class="gst-options">
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="7"
+                    class="gst-option"
+                    checked     
+                >
+                <span>7%</span>
+            </label>
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="8"
+                    class="gst-option"
+                >
+                <span>8%</span>
+            </label>
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="10"
+                    class="gst-option"
+                >
+                <span>10%</span>
+            </label>
+           <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="13"
+                    class="gst-option">
+                <span>13%</span>
+            </label>
+
+        </div>
+
+        <!-- GST calculated amount -->
+        <input
+            type="hidden"
+            id="gst_amount"
+            name="gst_amount"
+            value="0"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- Total Selling Amount -->
+<div class="order-form-row">
+
+    <div class="order-form-label">
+        Total Selling Amount
+    </div>
+
+    <div class="order-form-control">
+
+        <input
+            type="number"
+            id="id_total_selling_amount"
+            name="total_selling_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.total_selling_amount|default:'0' }}"
+            readonly
+        >
+
+    </div>
+
+</div>
+                <!-- Manager Approval -->
                 <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Selling Amount
-                    </div>
-
-                    <div class="order-form-control">
-
-                        <input
-                            type="number"
-                            name="selling_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.selling_amount|default:'0' }}"
-                        >
-
-                    </div>
-
-                </div>
-                <!-- Manager Approval 
-
-                <div class="order-form-row">
-
-                    <div class="order-form-label">
-                        Manager Approval
-                    </div>
-
-                     <div class="order-form-control">
-
-                        <select name="manager_approval">
-
-                            <option
-                                value="Pending"
-                                {% if request.POST.manager_approval == "Pending" or not request.POST.manager_approval %}
-                                    selected
-                                {% endif %}
-                            >
-                                Pending
-                            </option>
-
-                            <option
-                                value="Approved"
-                                {% if request.POST.manager_approval == "Approved" %}
-                                    selected
-                                {% endif %}
-                            >
-                                Approved
-                            </option>
-
-                            <option
-                                value="Rejected"
-                                {% if request.POST.manager_approval == "Rejected" %}
-                                    selected
-                                {% endif %}
-                            >
-                                Rejected
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>-->
-
-                <!-- Approved By -->
-
-                <div class="order-form-row">
-
                     <div class="order-form-label">
                         Approval Manager
                     </div>
@@ -834,22 +913,11 @@
                         <input
                             type="text"
                             name="approved_by"
-                            value="{{ request.POST.approved_by|default:'' }}">
+                            value="{{ request.POST.approved_by|default:'' }}"
+                        >
                     </div>
                 </div>
-                <div class="order-form-row">
-                    <div class="order-form-label">
-                        Total Selling Amount
-                    </div>
-                    <div class="order-form-control">
-                        <input
-                            type="number"
-                            name="total_selling_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.total_selling_amount|default:'0' }}">
-                    </div>
-                </div>
+
                 <div class="order-form-row">
                     <div class="order-form-label">
                         Remarks
@@ -863,9 +931,8 @@
                         >{{ request.POST.remarks|default:'' }}</textarea>
 
                     </div>
-
             </div>
-
+            </div>
 
             <!-- =============================================
                  SHIPMENT DETAILS
@@ -1738,5 +1805,257 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
+<script>
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    function getNumber(id) {
+
+        const element = document.getElementById(id);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value = parseFloat(element.value);
+
+        return isNaN(value) ? 0 : value;
+    }
+
+
+    /* =====================================================
+       TOTAL TRIP COST
+       ===================================================== */
+
+    function calculateTripCost() {
+
+        const freight =
+            getNumber("id_freight_amount");
+
+        const loading =
+            getNumber("id_loading_unloading_charges");
+
+        const halting =
+            getNumber("id_halting_charges");
+
+        const other =
+            getNumber("id_other_charges");
+
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+
+        const totalField =
+            document.getElementById("total_trip_cost");
+
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+
+    }
+
+
+    /* =====================================================
+       GST + TOTAL SELLING AMOUNT
+       ===================================================== */
+
+    function calculateSellingAmount() {
+
+        const sellingAmount =
+            getNumber("id_selling_amount");
+
+
+        /* Find selected GST */
+
+        const selectedGST =
+            document.querySelector(
+                ".gst-option:checked"
+            );
+
+
+        const gstPercent =
+            selectedGST
+                ? parseFloat(selectedGST.value)
+                : 0;
+
+
+        /* Calculate GST */
+
+        const gstAmount =
+            sellingAmount *
+            gstPercent /
+            100;
+
+
+        /* Calculate total */
+
+        const totalSellingAmount =
+            sellingAmount +
+            gstAmount;
+
+
+        /* Update hidden GST amount */
+
+        const gstAmountField =
+            document.getElementById("gst_amount");
+
+
+        if (gstAmountField) {
+
+            gstAmountField.value =
+                gstAmount.toFixed(2);
+
+        }
+
+
+        /* Update Total Selling Amount */
+
+        const totalSellingField =
+            document.getElementById(
+                "id_total_selling_amount"
+            );
+
+
+        if (totalSellingField) {
+
+            totalSellingField.value =
+                totalSellingAmount.toFixed(2);
+
+        }
+
+    }
+
+
+    /* =====================================================
+       TRIP COST EVENTS
+       ===================================================== */
+
+    const tripCostFields = [
+
+        "id_freight_amount",
+        "id_loading_unloading_charges",
+        "id_halting_charges",
+        "id_other_charges"
+
+    ];
+
+
+    tripCostFields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (!field) {
+            return;
+        }
+
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    /* =====================================================
+       SELLING AMOUNT EVENTS
+       ===================================================== */
+
+    const sellingAmountField =
+        document.getElementById(
+            "id_selling_amount"
+        );
+
+
+    if (sellingAmountField) {
+
+        sellingAmountField.addEventListener(
+            "input",
+            calculateSellingAmount
+        );
+
+        sellingAmountField.addEventListener(
+            "change",
+            calculateSellingAmount
+        );
+
+    }
+
+
+    /* =====================================================
+       GST CHECKBOX
+       Only one GST can be selected
+       ===================================================== */
+
+    const gstOptions =
+        document.querySelectorAll(
+            ".gst-option"
+        );
+
+
+    gstOptions.forEach(function (checkbox) {
+
+        checkbox.addEventListener(
+            "change",
+            function () {
+
+                /*
+                 * Allow only one GST option
+                 * to be selected.
+                 */
+
+                if (this.checked) {
+
+                    gstOptions.forEach(
+                        function (otherCheckbox) {
+
+                            if (
+                                otherCheckbox !== checkbox
+                            ) {
+
+                                otherCheckbox.checked =
+                                    false;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                calculateSellingAmount();
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       INITIAL CALCULATION
+       ===================================================== */
+
+    calculateTripCost();
+
+    calculateSellingAmount();
+
+});
+
+</script>
 {% endblock %}
