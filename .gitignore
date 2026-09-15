@@ -47,7 +47,7 @@ orders/migrations/
 accounts/migrations/
 live_tracking/migrations/
 banking/migrations/
-
+onepage_order/migrations/
 
 # Celery / Redis (if used)
 celerybeat-schedule
