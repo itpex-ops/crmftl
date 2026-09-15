@@ -1053,215 +1053,145 @@ html
 
             </div>
 
-<!-- =================================================
-     CUSTOMER BILLING TYPE
-     ================================================= -->
 
+
+            <!-- =================================================
+                 PAYMENT TERMS BY CUSTOMER
+                 ================================================= -->
+
+           html
+<!-- CUSTOMER BILLING TYPE -->
 <div class="order-form-row">
-
     <div class="order-form-label">
         Customer Billing Type
     </div>
 
     <div class="order-form-control">
-
         <select
             name="customer_billing_type"
             id="customer_billing_type"
         >
+            <option value="">Select</option>
 
-            <option value="">
-                Select
-            </option>
-
-            <option
-                value="Retail"
+            <option value="Retail"
                 {% if request.POST.customer_billing_type == "Retail" %}
                     selected
-                {% endif %}
-            >
+                {% endif %}>
                 Retail
             </option>
 
-            <option
-                value="Credit"
+            <option value="Credit"
                 {% if request.POST.customer_billing_type == "Credit" %}
                     selected
-                {% endif %}
-            >
+                {% endif %}>
                 Credit
             </option>
-
         </select>
-
     </div>
-
 </div>
 
 
-<!-- =================================================
-     CUSTOMER PAYMENT TYPE
-     ================================================= -->
-
+<!-- PAYMENT TYPE -->
 <div class="order-form-row">
-
     <div class="order-form-label">
         Payment Type
     </div>
 
     <div class="order-form-control">
-
         <select
             name="customer_payment_type"
             id="customer_payment_type"
         >
-
-            <option value="">
-                Select
-            </option>
-
-            <!-- Options will be loaded by JavaScript -->
-
+            <option value="">Select</option>
         </select>
-
     </div>
-
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const billingType =
-        document.getElementById("customer_billing_type");
+    const billingType = document.getElementById("customer_billing_type");
+    const paymentType = document.getElementById("customer_payment_type");
 
-    const paymentType =
-        document.getElementById("customer_payment_type");
-
-
-    /* =====================================================
-       CUSTOMER PAYMENT TYPE OPTIONS
-       ===================================================== */
-
-    const paymentOptions = {
-        Retail: [
-            {
-                value: "Paid",
-                text: "Paid"
-            },
-            {
-                value: "To Pay",
-                text: "To Pay"
-            }
-        ],
-
-        Credit: [
-            {
-                value: "TBB",
-                text: "TBB"
-            }
-        ]
-    };
-
-
-    /* =====================================================
-       UPDATE PAYMENT TYPE
-       ===================================================== */
+    const previousPaymentType =
+        "{{ request.POST.customer_payment_type|default:'' }}";
 
     function updatePaymentTypes() {
 
-        const selectedBillingType =
-            billingType.value;
+        const selectedBillingType = billingType.value;
 
-        const currentPaymentType =
-            "{{ request.POST.customer_payment_type|default:'' }}";
+        // Clear existing options
+        paymentType.innerHTML = "";
 
+        // Default option
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+        paymentType.appendChild(defaultOption);
 
-        /* Clear existing options */
+        let options = [];
 
-        paymentType.innerHTML =
-            '<option value="">Select</option>';
+        // RETAIL
+        if (selectedBillingType === "Retail") {
 
+            options = [
+                {
+                    value: "Paid",
+                    text: "Paid"
+                },
+                {
+                    value: "To Pay",
+                    text: "To Pay"
+                }
+            ];
+        }
 
-        /* Get options */
+        // CREDIT
+        else if (selectedBillingType === "Credit") {
 
-        const options =
-            paymentOptions[selectedBillingType] || [];
+            options = [
+                {
+                    value: "TBB",
+                    text: "TBB"
+                }
+            ];
+        }
 
+        // Add options
+        options.forEach(function (item) {
 
-        /* Add options */
+            const option = document.createElement("option");
 
-        options.forEach(function (option) {
+            option.value = item.value;
+            option.textContent = item.text;
 
-            const optionElement =
-                document.createElement("option");
-
-            optionElement.value =
-                option.value;
-
-            optionElement.textContent =
-                option.text;
-
-
-            /* Restore previously selected value */
-
-            if (
-                option.value === currentPaymentType
-            ) {
-
-                optionElement.selected = true;
-
+            // Restore previous selection after validation error
+            if (item.value === previousPaymentType) {
+                option.selected = true;
             }
 
-
-            paymentType.appendChild(
-                optionElement
-            );
-
+            paymentType.appendChild(option);
         });
-
     }
 
 
-    /* =====================================================
-       BILLING TYPE CHANGE
-       ===================================================== */
+    // When Customer Billing Type changes
+    billingType.addEventListener("change", function () {
 
-    if (billingType) {
-
-        billingType.addEventListener(
-            "change",
-            function () {
-
-                /*
-                 * Clear old payment selection
-                 * when billing type changes.
-                 */
-
-                paymentType.value = "";
-
-                updatePaymentTypes();
-
-            }
-        );
-
-
-        /*
-         * Load correct options when page opens
-         * after Django validation error.
-         */
+        // Reset Payment Type
+        paymentType.value = "";
 
         updatePaymentTypes();
+    });
 
-    }
+
+    // Load correct options when page opens
+    updatePaymentTypes();
 
 });
 </script>
 
-
-
-
-
-            <!-- =================================================
+  <!-- =================================================
                  VEHICLE DETAILS
                  ================================================= -->
 
