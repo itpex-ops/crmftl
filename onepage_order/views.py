@@ -182,13 +182,17 @@ def to_date(value):
 # ORDER LIST
 # =============================================================
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import render
+
+from .models import Order
+
+
 @login_required
 def onepageorder_list(request):
 
-    search = request.GET.get(
-        "q",
-        ""
-    ).strip()
+    search = request.GET.get("q", "").strip()
 
     orders = (
         Order.objects
@@ -201,7 +205,6 @@ def onepageorder_list(request):
     )
 
     if search:
-
         orders = orders.filter(
             Q(trip_number__icontains=search)
             | Q(customer__name__icontains=search)
@@ -219,11 +222,10 @@ def onepageorder_list(request):
             "q": search,
         },
     )
-
-
 # =============================================================
 # CREATE ORDER
 # =============================================================
+
 
 @login_required
 def onepageorder_create(request):
