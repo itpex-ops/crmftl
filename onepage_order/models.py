@@ -188,6 +188,11 @@ class Order(models.Model):
         default=Decimal("0.00") 
     )
 
+    gst_amount = models.DecimalField(
+    max_digits=12,
+    decimal_places=2,
+    default=Decimal("0.00")
+)
     manager_approval = models.CharField(
         max_length=20,
         choices=APPROVAL_CHOICES,
@@ -312,20 +317,22 @@ class Order(models.Model):
     # =====================================================
     # CALCULATIONS
     # =====================================================
+# =====================================================
+# CALCULATIONS
+# =====================================================
 
-    @property
-    def customer_selling_amount(self):
-        """
-        Customer selling amount comes from the Order itself.
-        CustomerPayment records are receipts against this amount.
-        """
-        return self.selling_amount
+@property
+def customer_selling_amount(self):
+    """
+    Customer selling amount before GST.
+    """
+    return self.selling_amount
 
 
     @property
     def vehicle_cost(self):
         """
-        Total amount paid to the vehicle for this order.
+        Total amount paid to the contracted vehicle.
         """
         return sum(
             (
@@ -339,45 +346,85 @@ class Order(models.Model):
     @property
     def margin(self):
         """
-        Margin = Customer Selling Amount - Total Vehicle Cost
+        Margin based on total customer selling amount
+        including GST minus vehicle cost.
         """
+
         return (
-            self.customer_selling_amount
+            self.total_selling_amount
             - self.vehicle_cost
         )
-        # =====================================================
+
+
+    # =====================================================
+    # SAVE
+    # =====================================================
+
+    def save(self, *args, **kwargs):
+
+        # -------------------------------------------------
+        # Total Trip Cost
+        # -------------------------------------------------
+
+        self.total_trip_cost = (
+            self.freight_amount +
+            self.loading_unloading_charges +
+            self.halting_charges +
+            self.other_charges
+        )
+
+        # -------------------------------------------------
+        # GST
+        # -------------------------------------------------
+
+        self.gst_amount = (
+            self.selling_amount *
+            self.gst_percent /
+            Decimal("100")
+        )
+
+        # -------------------------------------------------
+        # Total Selling Amount
+        # -------------------------------------------------
+
+        self.total_selling_amount = (
+            self.selling_amount +
+            self.gst_amount
+        )
+
+        # -------------------------------------------------
+        # Trip Number
+        # -------------------------------------------------
+
+        if not self.trip_number:
+
+            last = (
+                Order.objects
+                .order_by("-id")
+                .first()
+            )
+
+            number = (
+                last.id + 2101
+                if last
+                else 2101
+            )
+
+            self.trip_number = f"TRIP{number}"
+
+        # -------------------------------------------------
         # SAVE
-        # =====================================================
+        # -------------------------------------------------
 
-        def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
-            self.total_trip_cost = (
-                self.freight_amount +
-                self.loading_unloading_charges +
-                self.halting_charges +
-                self.other_charges
-            )
 
-            if not self.trip_number:
+    def __str__(self):
 
-                last = Order.objects.order_by("-id").first()
-
-                number = (
-                    last.id + 2101
-                    if last
-                    else 2101
-                )
-
-                self.trip_number = f"TRIP{number}"
-
-            super().save(*args, **kwargs)
-
-        def __str__(self):
-
-            return (
-                f"{self.trip_number} - "
-                f"{self.origin} to {self.destination}"
-            )
+        return (
+            f"{self.trip_number} - "
+            f"{self.origin} to {self.destination}"
+        )
 
 class VehiclePayment(models.Model):
     PAYMENT_TYPES=[('Advance','Advance'),('Balance','Balance'),('Others','Others')]

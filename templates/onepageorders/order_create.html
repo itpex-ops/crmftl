@@ -882,6 +882,136 @@
 
 
 <!-- Total Selling Amount -->
+<!-- =====================================================
+     SELLING AMOUNT
+     ===================================================== -->
+
+<div class="order-form-row">
+
+    <div class="order-form-label">
+        Selling Amount
+    </div>
+
+    <div class="order-form-control">
+
+        <input
+            type="number"
+            id="id_selling_amount"
+            name="selling_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.selling_amount|default:'0' }}"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     GST
+     ===================================================== -->
+
+<div class="order-form-row">
+
+    <div class="order-form-label">
+        GST
+    </div>
+
+    <div class="order-form-control">
+
+        <div class="gst-options">
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="7"
+                    class="gst-option"
+                    {% if request.POST.gst_percent == "7" or not request.POST.gst_percent %}
+                        checked
+                    {% endif %}
+                >
+                <span>7%</span>
+            </label>
+
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="8"
+                    class="gst-option"
+                    {% if request.POST.gst_percent == "8" %}
+                        checked
+                    {% endif %}
+                >
+                <span>8%</span>
+            </label>
+
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="10"
+                    class="gst-option"
+                    {% if request.POST.gst_percent == "10" %}
+                        checked
+                    {% endif %}
+                >
+                <span>10%</span>
+            </label>
+
+
+            <label class="gst-checkbox">
+                <input
+                    type="checkbox"
+                    name="gst_percent"
+                    value="13"
+                    class="gst-option"
+                    {% if request.POST.gst_percent == "13" %}
+                        checked
+                    {% endif %}
+                >
+                <span>13%</span>
+            </label>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     GST AMOUNT
+     ===================================================== -->
+
+<div class="order-form-row">
+
+    <div class="order-form-label">
+        GST Amount
+    </div>
+
+    <div class="order-form-control">
+
+        <input
+            type="text"
+            id="gst_amount"
+            value="0.00"
+            readonly
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOTAL SELLING AMOUNT
+     ===================================================== -->
+
 <div class="order-form-row">
 
     <div class="order-form-label">
@@ -891,12 +1021,9 @@
     <div class="order-form-control">
 
         <input
-            type="number"
+            type="text"
             id="id_total_selling_amount"
-            name="total_selling_amount"
-            step="0.01"
-            min="0"
-            value="{{ request.POST.total_selling_amount|default:'0' }}"
+            value="0.00"
             readonly
         >
 
@@ -1805,6 +1932,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
+
+
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
