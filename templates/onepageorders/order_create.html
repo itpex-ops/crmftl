@@ -1401,3 +1401,487 @@ html
 
                     <div class="order-form-control">
 
+                        <input
+                            type="text"
+                            name="owner_broker_name"
+                            value="{{ request.POST.owner_broker_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PAYMENT TERMS TO CONTRACTED VEHICLE
+                 ================================================= -->
+
+            <div class="order-card">
+
+                <div class="order-card-title">
+                    Payment Terms to Contracted Vehicle
+                </div>
+
+
+                <!-- Vehicle Advance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Advance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="vehicle_advance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Balance -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Balance Amount
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="number"
+                            name="vehicle_balance_amount"
+                            step="0.01"
+                            min="0"
+                            value="{{ request.POST.vehicle_balance_amount|default:'0' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Vehicle Owner -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Vehicle Owner Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="vehicle_owner_name"
+                            value="{{ request.POST.vehicle_owner_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAN -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        PAN Card
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="pan_card"
+                            value="{{ request.POST.pan_card|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Account Name -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Name
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="account_name"
+                            value="{{ request.POST.account_name|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Account Number -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        Account Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="account_number"
+                            value="{{ request.POST.account_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- IFSC -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        IFSC Code
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="ifsc_code"
+                            value="{{ request.POST.ifsc_code|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- UPI -->
+
+                <div class="order-form-row">
+
+                    <div class="order-form-label">
+                        UPI Number
+                    </div>
+
+                    <div class="order-form-control">
+
+                        <input
+                            type="text"
+                            name="upi_number"
+                            value="{{ request.POST.upi_number|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CREATE ORDER BUTTON
+             ===================================================== -->
+
+        <div class="create-order-container">
+
+            <button
+                type="submit"
+                class="btn btn-primary create-order-button"
+            >
+
+                <i class="bi bi-save me-1"></i>
+                Create Order
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     TRIP COST + GST CALCULATION
+     ========================================================= -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       HELPER
+       ===================================================== */
+
+    function getNumber(id) {
+
+        const element = document.getElementById(id);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value = parseFloat(element.value);
+
+        return Number.isFinite(value) ? value : 0;
+    }
+
+
+    /* =====================================================
+       TOTAL TRIP COST
+       Freight + Loading + Halting + Other
+       ===================================================== */
+
+    function calculateTripCost() {
+
+        const freight =
+            getNumber("id_freight_amount");
+
+        const loading =
+            getNumber("id_loading_unloading_charges");
+
+        const halting =
+            getNumber("id_halting_charges");
+
+        const other =
+            getNumber("id_other_charges");
+
+        const total =
+            freight +
+            loading +
+            halting +
+            other;
+
+        const totalField =
+            document.getElementById("total_trip_cost");
+
+        if (totalField) {
+
+            totalField.value =
+                total.toFixed(2);
+
+        }
+    }
+
+
+    /* =====================================================
+       GST + TOTAL SELLING AMOUNT
+       ===================================================== */
+
+    function calculateSellingAmount() {
+
+        const sellingAmount =
+            getNumber("id_selling_amount");
+
+
+        /* Get selected GST */
+
+        const selectedGST =
+            document.querySelector(".gst-option:checked");
+
+
+        const gstPercent =
+            selectedGST
+                ? parseFloat(selectedGST.value)
+                : 0;
+
+
+        /* Calculate GST */
+
+        const gstAmount =
+            sellingAmount * gstPercent / 100;
+
+
+        /* Calculate total selling amount */
+
+        const totalSellingAmount =
+            sellingAmount + gstAmount;
+
+
+        /* Visible GST amount */
+
+        const gstDisplay =
+            document.getElementById("gst_amount_display");
+
+        if (gstDisplay) {
+
+            gstDisplay.value =
+                gstAmount.toFixed(2);
+
+        }
+
+
+        /* Hidden GST amount submitted to Django */
+
+        const gstHidden =
+            document.getElementById("gst_amount");
+
+        if (gstHidden) {
+
+            gstHidden.value =
+                gstAmount.toFixed(2);
+
+        }
+
+
+        /* Total Selling Amount */
+
+        const totalSellingField =
+            document.getElementById(
+                "id_total_selling_amount"
+            );
+
+        if (totalSellingField) {
+
+            totalSellingField.value =
+                totalSellingAmount.toFixed(2);
+
+        }
+    }
+
+
+    /* =====================================================
+       TRIP COST EVENTS
+       ===================================================== */
+
+    const tripCostFields = [
+
+        "id_freight_amount",
+
+        "id_loading_unloading_charges",
+
+        "id_halting_charges",
+
+        "id_other_charges"
+
+    ];
+
+
+    tripCostFields.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (!field) {
+            return;
+        }
+
+        field.addEventListener(
+            "input",
+            calculateTripCost
+        );
+
+        field.addEventListener(
+            "change",
+            calculateTripCost
+        );
+
+    });
+
+
+    /* =====================================================
+       SELLING AMOUNT EVENTS
+       ===================================================== */
+
+    const sellingAmountField =
+        document.getElementById(
+            "id_selling_amount"
+        );
+
+
+    if (sellingAmountField) {
+
+        sellingAmountField.addEventListener(
+            "input",
+            calculateSellingAmount
+        );
+
+        sellingAmountField.addEventListener(
+            "change",
+            calculateSellingAmount
+        );
+
+    }
+
+
+    /* =====================================================
+       GST CHECKBOXES
+       Only ONE GST percentage can be selected
+       ===================================================== */
+
+    const gstOptions =
+        document.querySelectorAll(
+            ".gst-option"
+        );
+
+
+    gstOptions.forEach(function (checkbox) {
+
+        checkbox.addEventListener(
+            "change",
+            function () {
+
+                if (this.checked) {
+
+                    gstOptions.forEach(
+                        function (otherCheckbox) {
+
+                            if (
+                                otherCheckbox !== checkbox
+                            ) {
+
+                                otherCheckbox.checked =
+                                    false;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+                calculateSellingAmount();
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       INITIAL CALCULATIONS
+       ===================================================== */
+
+    calculateTripCost();
+
+    calculateSellingAmount();
+
+});
+</script>
+
+{% endblock %}
+
