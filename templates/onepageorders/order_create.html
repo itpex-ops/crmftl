@@ -1053,211 +1053,211 @@ html
 
             </div>
 
+<!-- =================================================
+     CUSTOMER BILLING TYPE
+     ================================================= -->
 
+<div class="order-form-row">
 
-            <!-- =================================================
-                 PAYMENT TERMS BY CUSTOMER
-                 ================================================= -->
+    <div class="order-form-label">
+        Customer Billing Type
+    </div>
 
-            <div class="order-card">
+    <div class="order-form-control">
 
-                <div class="order-card-title">
-                    Payment Terms by Customer
-                </div>
+        <select
+            name="customer_billing_type"
+            id="customer_billing_type"
+        >
 
+            <option value="">
+                Select
+            </option>
 
-                <!-- Billing Type -->
+            <option
+                value="Retail"
+                {% if request.POST.customer_billing_type == "Retail" %}
+                    selected
+                {% endif %}
+            >
+                Retail
+            </option>
 
-                <div class="order-form-row">
+            <option
+                value="Credit"
+                {% if request.POST.customer_billing_type == "Credit" %}
+                    selected
+                {% endif %}
+            >
+                Credit
+            </option>
 
-                    <div class="order-form-label">
-                        Customer Billing Type
-                    </div>
+        </select>
 
-                    <div class="order-form-control">
+    </div>
 
-                        <select name="customer_billing_type">
+</div>
 
-                            <option value="">
-                                Select
-                            </option>
 
-                            <option value="Retail"
-                                {% if request.POST.customer_billing_type == "Retail" %}
-                                    selected
-                                {% endif %}>
-                                Retail
-                            </option>
+<!-- =================================================
+     CUSTOMER PAYMENT TYPE
+     ================================================= -->
 
-                            <option value="Credit"
-                                {% if request.POST.customer_billing_type == "Credit" %}
-                                    selected
-                                {% endif %}>
-                                Credit
-                            </option>
+<div class="order-form-row">
 
-                        </select>
+    <div class="order-form-label">
+        Payment Type
+    </div>
 
-                    </div>
+    <div class="order-form-control">
 
-                </div>
+        <select
+            name="customer_payment_type"
+            id="customer_payment_type"
+        >
 
+            <option value="">
+                Select
+            </option>
 
-                <!-- Payment Type -->
+            <!-- Options will be loaded by JavaScript -->
 
-                <div class="order-form-row">
+        </select>
 
-                    <div class="order-form-label">
-                        Payment Type
-                    </div>
+    </div>
 
-                    <div class="order-form-control">
+</div>
 
-                        <select name="customer_payment_type">
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-                            <option value="">
-                                Select
-                            </option>
+    const billingType =
+        document.getElementById("customer_billing_type");
 
-                            <option value="Paid"
-                                {% if request.POST.customer_payment_type == "Paid" %}
-                                    selected
-                                {% endif %}>
-                                Paid
-                            </option>
+    const paymentType =
+        document.getElementById("customer_payment_type");
 
-                            <option value="Today"
-                                {% if request.POST.customer_payment_type == "Today" %}
-                                    selected
-                                {% endif %}>
-                                Today
-                            </option>
 
-                            <option value="TBB"
-                                {% if request.POST.customer_payment_type == "TBB" %}
-                                    selected
-                                {% endif %}>
-                                TBB
-                            </option>
+    /* =====================================================
+       CUSTOMER PAYMENT TYPE OPTIONS
+       ===================================================== */
 
-                        </select>
+    const paymentOptions = {
+        Retail: [
+            {
+                value: "Paid",
+                text: "Paid"
+            },
+            {
+                value: "To Pay",
+                text: "To Pay"
+            }
+        ],
 
-                    </div>
+        Credit: [
+            {
+                value: "TBB",
+                text: "TBB"
+            }
+        ]
+    };
 
-                </div>
 
+    /* =====================================================
+       UPDATE PAYMENT TYPE
+       ===================================================== */
 
-                <!-- Advance -->
+    function updatePaymentTypes() {
 
-                <div class="order-form-row">
+        const selectedBillingType =
+            billingType.value;
 
-                    <div class="order-form-label">
-                        Customer Advance Amount
-                    </div>
+        const currentPaymentType =
+            "{{ request.POST.customer_payment_type|default:'' }}";
 
-                    <div class="order-form-control">
 
-                        <input
-                            type="number"
-                            name="customer_advance_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.customer_advance_amount|default:'0' }}"
-                        >
+        /* Clear existing options */
 
-                    </div>
+        paymentType.innerHTML =
+            '<option value="">Select</option>';
 
-                </div>
 
+        /* Get options */
 
-                <!-- Balance -->
+        const options =
+            paymentOptions[selectedBillingType] || [];
 
-                <div class="order-form-row">
 
-                    <div class="order-form-label">
-                        Customer Balance Amount
-                    </div>
+        /* Add options */
 
-                    <div class="order-form-control">
+        options.forEach(function (option) {
 
-                        <input
-                            type="number"
-                            name="customer_balance_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.customer_balance_amount|default:'0' }}"
-                        >
+            const optionElement =
+                document.createElement("option");
 
-                    </div>
+            optionElement.value =
+                option.value;
 
-                </div>
+            optionElement.textContent =
+                option.text;
 
 
-                <!-- Payment Method -->
+            /* Restore previously selected value */
 
-                <div class="order-form-row">
+            if (
+                option.value === currentPaymentType
+            ) {
 
-                    <div class="order-form-label">
-                        Customer Payment Method
-                    </div>
+                optionElement.selected = true;
 
-                    <div class="order-form-control">
+            }
 
-                        <select name="customer_payment_method">
 
-                            <option value="">
-                                Select
-                            </option>
+            paymentType.appendChild(
+                optionElement
+            );
 
-                            <option value="Cash"
-                                {% if request.POST.customer_payment_method == "Cash" %}
-                                    selected
-                                {% endif %}>
-                                Cash
-                            </option>
+        });
 
-                            <option value="Account"
-                                {% if request.POST.customer_payment_method == "Account" %}
-                                    selected
-                                {% endif %}>
-                                Account
-                            </option>
+    }
 
-                            <option value="UPI"
-                                {% if request.POST.customer_payment_method == "UPI" %}
-                                    selected
-                                {% endif %}>
-                                UPI
-                            </option>
 
-                        </select>
+    /* =====================================================
+       BILLING TYPE CHANGE
+       ===================================================== */
 
-                    </div>
+    if (billingType) {
 
-                </div>
+        billingType.addEventListener(
+            "change",
+            function () {
 
+                /*
+                 * Clear old payment selection
+                 * when billing type changes.
+                 */
 
-                <!-- Due Date -->
+                paymentType.value = "";
 
-                <div class="order-form-row">
+                updatePaymentTypes();
 
-                    <div class="order-form-label">
-                        Promised Due Date
-                    </div>
+            }
+        );
 
-                    <div class="order-form-control">
 
-                        <input
-                            type="date"
-                            name="promised_due_date"
-                            value="{{ request.POST.promised_due_date|default:'' }}"
-                        >
+        /*
+         * Load correct options when page opens
+         * after Django validation error.
+         */
 
-                    </div>
+        updatePaymentTypes();
 
-                </div>
+    }
 
-            </div>
+});
+</script>
+
+
 
 
 
