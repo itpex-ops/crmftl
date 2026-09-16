@@ -470,7 +470,6 @@ django
 
     </div>
 
-
     <!-- =====================================================
          MESSAGES
          ===================================================== -->
@@ -617,7 +616,7 @@ django
                         name="received_amount"
                         step="0.01"
                         min="0"
-                        value="{{ order.received_amount|default:'' }}"
+                        value="{{ order.customer_advance_amount|default:'' }}"
                         placeholder="0.00"
                         required
                     >
