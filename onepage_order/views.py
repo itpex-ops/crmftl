@@ -1512,13 +1512,26 @@ def customer_payments(request):
     # Orders for dropdown
     # ---------------------------------------------------------
 
+    search = request.GET.get("q", "").strip()
     orders = (
-        Order.objects
-        .select_related("customer")
-        .order_by("-id")
-    )
-
-
+                Order.objects
+                .select_related("customer")
+                .prefetch_related(
+                    "vehicle_payments",
+                    "customer_payments",
+                )
+                .order_by("-id")
+            )
+    if search:
+                orders = orders.filter(
+                    Q(trip_number__icontains=search)
+                    | Q(customer__name__icontains=search)
+                    | Q(origin__icontains=search)
+                    | Q(destination__icontains=search)
+                    | Q(vehicle_number__icontains=search)
+                    | Q(vehicle_type__icontains=search)
+                )
+    
     # ---------------------------------------------------------
     # Receipt history
     # ---------------------------------------------------------
