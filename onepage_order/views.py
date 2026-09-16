@@ -1505,6 +1505,7 @@ def vehicle_payments(request):
 # CUSTOMER PAYMENTS
 # =============================================================
 
+
 @login_required
 def customer_payments(request):
 
@@ -1513,25 +1514,27 @@ def customer_payments(request):
     # ---------------------------------------------------------
 
     search = request.GET.get("q", "").strip()
+
     orders = (
-                Order.objects
-                .select_related("customer")
-                .prefetch_related(
-                    "vehicle_payments",
-                    "customer_payments",
-                )
-                .order_by("-id")
-            )
+        Order.objects
+        .select_related("customer")
+        .prefetch_related(
+            "vehicle_payments",
+            "customer_payments",
+        )
+        .order_by("-id")
+    )
+
     if search:
-                orders = orders.filter(
-                    Q(trip_number__icontains=search)
-                    | Q(customer__name__icontains=search)
-                    | Q(origin__icontains=search)
-                    | Q(destination__icontains=search)
-                    | Q(vehicle_number__icontains=search)
-                    | Q(vehicle_type__icontains=search)
-                )
-    
+        orders = orders.filter(
+            Q(trip_number__icontains=search)
+            | Q(customer__name__icontains=search)
+            | Q(origin__icontains=search)
+            | Q(destination__icontains=search)
+            | Q(vehicle_number__icontains=search)
+            | Q(vehicle_type__icontains=search)
+        )
+
     # ---------------------------------------------------------
     # Receipt history
     # ---------------------------------------------------------
@@ -1548,7 +1551,6 @@ def customer_payments(request):
         )
     )
 
-
     # ---------------------------------------------------------
     # SAVE
     # ---------------------------------------------------------
@@ -1559,11 +1561,6 @@ def customer_payments(request):
 
             order_id = request.POST.get(
                 "order",
-                ""
-            ).strip()
-
-            selling_amount_value = request.POST.get(
-                "selling_amount",
                 ""
             ).strip()
 
@@ -1581,7 +1578,6 @@ def customer_payments(request):
                 "utr_details",
                 ""
             ).strip()
-
 
             # =================================================
             # ORDER
@@ -1603,32 +1599,26 @@ def customer_payments(request):
                     }
                 )
 
-
             order = get_object_or_404(
                 Order,
                 pk=order_id
             )
 
-
             # =================================================
             # SELLING AMOUNT
             # =================================================
+            # IMPORTANT:
+            # Get selling amount directly from Order.
+            # Do not trust the value submitted by browser.
 
-            try:
+            selling_amount = order.selling_amount
 
-                selling_amount = Decimal(
-                    selling_amount_value
-                )
-
-            except (
-                InvalidOperation,
-                ValueError,
-                TypeError,
-            ):
+            if selling_amount is None or selling_amount <= 0:
 
                 messages.error(
                     request,
-                    "Please enter a valid Selling Amount."
+                    f"Selling amount is not available for Trip "
+                    f"{order.trip_number}."
                 )
 
                 return render(
@@ -1639,24 +1629,6 @@ def customer_payments(request):
                         "payments": payments,
                     }
                 )
-
-
-            if selling_amount <= 0:
-
-                messages.error(
-                    request,
-                    "Selling Amount must be greater than zero."
-                )
-
-                return render(
-                    request,
-                    "onepageorders/customer_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
 
             # =================================================
             # RECEIVED AMOUNT
@@ -1688,7 +1660,6 @@ def customer_payments(request):
                     }
                 )
 
-
             if received_amount < 0:
 
                 messages.error(
@@ -1705,7 +1676,6 @@ def customer_payments(request):
                     }
                 )
 
-
             # =================================================
             # PAYMENT MODE
             # =================================================
@@ -1720,7 +1690,6 @@ def customer_payments(request):
 
             if received_through not in valid_modes:
                 received_through = ""
-
 
             # =================================================
             # SAVE
@@ -1741,7 +1710,6 @@ def customer_payments(request):
                     utr_details=utr_details,
                 )
 
-
             messages.success(
                 request,
                 (
@@ -1754,7 +1722,6 @@ def customer_payments(request):
             return redirect(
                 "customer_payments"
             )
-
 
         except Exception as e:
 
@@ -1777,6 +1744,9 @@ def customer_payments(request):
                 }
             )
 
+    # ---------------------------------------------------------
+    # GET
+    # ---------------------------------------------------------
 
     return render(
         request,
@@ -1786,7 +1756,6 @@ def customer_payments(request):
             "payments": payments,
         }
     )
-
 
 # =============================================================
 # ADMIN MARGIN
