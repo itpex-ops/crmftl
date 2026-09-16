@@ -617,7 +617,7 @@ django
                         name="received_amount"
                         step="0.01"
                         min="0"
-                        value="{{ request.POST.received_amount|default:'' }}"
+                        value="{{ order.received_amount|default:'' }}"
                         placeholder="0.00"
                         required
                     >
