@@ -1,15 +1,49 @@
 from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 
+
+# ============================================================
+# CUSTOMER
+# ============================================================
+
 class Customer(models.Model):
-    name=models.CharField(max_length=150)
-    contact_number=models.CharField(max_length=20, blank=True)
-    email=models.EmailField(blank=True)
-    address=models.TextField(blank=True)
-    created_at=models.DateTimeField(auto_now_add=True)
-    def __str__(self): return self.name
-    
+
+    name = models.CharField(
+        max_length=150
+    )
+
+    contact_number = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    email = models.EmailField(
+        blank=True
+    )
+
+    address = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
+# ============================================================
+# ORDER
+# ============================================================
+
 class Order(models.Model):
+
+    # --------------------------------------------------------
+    # CHOICES
+    # --------------------------------------------------------
 
     LEAD_CHOICES = [
         ("Social Media", "Social Media"),
@@ -47,554 +81,780 @@ class Order(models.Model):
         ("Rejected", "Rejected"),
     ]
 
+    # --------------------------------------------------------
+    # IDENTIFICATION
+    # --------------------------------------------------------
+
     trip_number = models.CharField(
         max_length=30,
         unique=True,
-        editable=False
+        editable=False,
     )
 
     customer = models.ForeignKey(
-        Customer,
+        "Customer",
         on_delete=models.PROTECT,
-        related_name="orders"
+        related_name="orders",
     )
 
-    # =====================================================
-    # CUSTOMER DETAILS
-    # =====================================================
+    # ========================================================
+    # CUSTOMER / SALES
+    # ========================================================
 
     lead_generated_through = models.CharField(
         max_length=40,
         choices=LEAD_CHOICES,
-        blank=True
+        blank=True,
     )
 
     sales_closed_by = models.CharField(
         max_length=120,
-        blank=True
+        blank=True,
     )
 
-    # =====================================================
-    # SHIPMENT DETAILS
-    # =====================================================
+    # ========================================================
+    # SHIPMENT
+    # ========================================================
 
     origin = models.CharField(
         max_length=120,
-        blank=True
+        blank=True,
     )
 
     destination = models.CharField(
         max_length=120,
-        blank=True
+        blank=True,
     )
 
     material = models.CharField(
         max_length=150,
-        blank=True
+        blank=True,
     )
 
     packing_type = models.CharField(
         max_length=100,
-        blank=True
+        blank=True,
     )
 
     no_of_pieces = models.PositiveIntegerField(
-        default=0
+        default=0,
     )
 
     weight_tons = models.DecimalField(
         max_digits=10,
         decimal_places=3,
-        default=0
+        default=Decimal("0.000"),
+        validators=[
+            MinValueValidator(Decimal("0.000"))
+        ],
     )
 
-    # =====================================================
-    # VEHICLE DETAILS
-    # =====================================================
+    # ========================================================
+    # VEHICLE
+    # ========================================================
 
     vehicle_type = models.CharField(
         max_length=80,
-        blank=True
+        blank=True,
     )
 
     vehicle_number = models.CharField(
         max_length=30,
-        blank=True
+        blank=True,
     )
 
     driver_number = models.CharField(
         max_length=20,
-        blank=True
+        blank=True,
     )
 
     owner_number = models.CharField(
         max_length=20,
-        blank=True
+        blank=True,
     )
 
     vehicle_sourced_by = models.CharField(
         max_length=20,
         choices=SOURCE_CHOICES,
-        default="Direct"
+        default="Direct",
     )
 
     owner_broker_name = models.CharField(
         max_length=150,
-        blank=True
+        blank=True,
     )
 
-    # =====================================================
+    # ========================================================
     # COMMERCIALS
-    # =====================================================
+    # ========================================================
 
     freight_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     loading_unloading_charges = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     halting_charges = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     other_charges = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     total_trip_cost = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     selling_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
+
     gst_percent = models.DecimalField(
-        max_digits=5,       
+        max_digits=5,
         decimal_places=2,
-        default=Decimal("0.00") 
+        default=Decimal("0.00"),
     )
 
     gst_amount = models.DecimalField(
-    max_digits=12,
-    decimal_places=2,
-    default=Decimal("0.00")
-)
-    manager_approval = models.CharField(
-        max_length=20,
-        choices=APPROVAL_CHOICES,
-        default="Pending"
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
     )
+
     total_selling_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00") 
+        default=Decimal("0.00"),
+    )
+
+    manager_approval = models.CharField(
+        max_length=20,
+        choices=APPROVAL_CHOICES,
+        default="Pending",
     )
 
     approved_by = models.CharField(
         max_length=120,
-        blank=True
+        blank=True,
     )
 
-    # =====================================================
-    # PAYMENT TERMS BY CUSTOMER
-    # =====================================================
+    # ========================================================
+    # CUSTOMER PAYMENT TERMS
+    # ========================================================
 
     customer_billing_type = models.CharField(
         max_length=20,
         choices=BILLING_CHOICES,
-        blank=True
+        blank=True,
     )
 
     customer_payment_type = models.CharField(
         max_length=20,
         choices=CUSTOMER_PAYMENT_CHOICES,
-        blank=True
+        blank=True,
     )
 
     customer_advance_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     customer_balance_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     customer_payment_method = models.CharField(
         max_length=20,
         choices=CUSTOMER_METHOD_CHOICES,
-        blank=True
+        blank=True,
     )
 
     promised_due_date = models.DateField(
         null=True,
-        blank=True
+        blank=True,
     )
 
-    # =====================================================
-    # PAYMENT TERMS TO CONTRACTED VEHICLE
-    # =====================================================
+    # ========================================================
+    # CONTRACTED VEHICLE PAYMENT
+    # ========================================================
 
     vehicle_advance_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     vehicle_balance_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        default=Decimal("0.00")
+        default=Decimal("0.00"),
     )
 
     vehicle_owner_name = models.CharField(
         max_length=150,
-        blank=True
+        blank=True,
     )
 
     pan_card = models.CharField(
         max_length=20,
-        blank=True
+        blank=True,
     )
 
     account_name = models.CharField(
         max_length=150,
-        blank=True
+        blank=True,
     )
 
     account_number = models.CharField(
         max_length=50,
-        blank=True
+        blank=True,
     )
 
     ifsc_code = models.CharField(
         max_length=20,
-        blank=True
+        blank=True,
     )
 
     upi_number = models.CharField(
         max_length=100,
-        blank=True
+        blank=True,
     )
 
+    # ========================================================
+    # OPTIONS
+    # ========================================================
+
     send_sms = models.BooleanField(
-        default=False
+        default=False,
     )
 
     create_agreement_tds = models.BooleanField(
-        default=False
+        default=False,
     )
 
-    # =====================================================
+    # ========================================================
     # AUDIT
-    # =====================================================
+    # ========================================================
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
 
-    # =====================================================
+    # ========================================================
     # CALCULATIONS
-    # =====================================================
+    # ========================================================
 
     @property
     def customer_selling_amount(self):
         """
-        Customer selling amount before GST.
+        Selling amount before GST.
         """
         return self.selling_amount
 
     @property
     def vehicle_cost(self):
         """
-        Total amount paid to the contracted vehicle.
+        Total amount paid to contracted vehicles.
         """
         return sum(
             (
                 payment.amount
                 for payment in self.vehicle_payments.all()
             ),
-            Decimal("0.00")
+            Decimal("0.00"),
+        )
+
+    @property
+    def customer_received_amount(self):
+        """
+        Total amount received from customer.
+        """
+        return sum(
+            (
+                payment.received_amount
+                for payment in self.customer_payments.all()
+            ),
+            Decimal("0.00"),
+        )
+
+    @property
+    def customer_balance_due(self):
+        """
+        Outstanding customer balance.
+        """
+        balance = (
+            self.total_selling_amount
+            - self.customer_received_amount
+        )
+
+        return max(
+            balance,
+            Decimal("0.00"),
         )
 
     @property
     def margin(self):
         """
-        Margin based on total customer selling amount
-        including GST minus vehicle cost.
+        Margin = GST-inclusive customer selling amount
+        minus contracted vehicle cost.
         """
         return (
             self.total_selling_amount
             - self.vehicle_cost
         )
 
-    # =====================================================
+    @property
+    def margin_percentage(self):
+        """
+        Margin percentage based on total selling amount.
+        """
+        if self.total_selling_amount <= 0:
+            return Decimal("0.00")
+
+        return (
+            self.margin
+            / self.total_selling_amount
+        ) * Decimal("100")
+
+    # ========================================================
+    # TRIP NUMBER
+    # ========================================================
+
+    @classmethod
+    def generate_trip_number(cls):
+        """
+        Generate the next TRIP number.
+
+        Existing numbering format:
+        TRIP2101
+        TRIP2102
+        TRIP2103
+        """
+
+        last_order = (
+            cls.objects
+            .order_by("-id")
+            .first()
+        )
+
+        if not last_order:
+            return "TRIP2101"
+
+        try:
+            last_number = int(
+                last_order.trip_number.replace(
+                    "TRIP",
+                    ""
+                )
+            )
+        except (
+            ValueError,
+            AttributeError,
+        ):
+            last_number = 2100
+
+        return f"TRIP{last_number + 1}"
+
+    # ========================================================
     # SAVE
-    # =====================================================
+    # ========================================================
 
     def save(self, *args, **kwargs):
 
-        # -------------------------------------------------
-        # Total Trip Cost
-        # -------------------------------------------------
-
-        self.total_trip_cost = (
-            self.freight_amount +
-            self.loading_unloading_charges +
-            self.halting_charges +
-            self.other_charges
-        )
-
-        # -------------------------------------------------
-        # GST
-        # -------------------------------------------------
-
-        self.gst_amount = (
-            self.selling_amount *
-            self.gst_percent /
-            Decimal("100")
-        )
-
-        # -------------------------------------------------
-        # Total Selling Amount
-        # -------------------------------------------------
-
-        self.total_selling_amount = (
-            self.selling_amount +
-            self.gst_amount
-        )
-
-        # -------------------------------------------------
-        # Trip Number
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Generate trip number
+        # ----------------------------------------------------
 
         if not self.trip_number:
+            self.trip_number = self.generate_trip_number()
 
-            last = (
-                Order.objects
-                .order_by("-id")
-                .first()
-            )
+        # ----------------------------------------------------
+        # Total trip cost
+        # ----------------------------------------------------
 
-            number = (
-                last.id + 2101
-                if last
-                else 2101
-            )
-
-            self.trip_number = f"TRIP{number}"
-
-        # -------------------------------------------------
-        # SAVE
-        # -------------------------------------------------
-
-        super().save(*args, **kwargs)
-
-
-    def __str__(self):
-
-        return (
-            f"{self.trip_number} - "
-            f"{self.origin} to {self.destination}"
+        self.total_trip_cost = (
+            self.freight_amount
+            + self.loading_unloading_charges
+            + self.halting_charges
+            + self.other_charges
         )
 
-class VehiclePayment(models.Model):
-    PAYMENT_TYPES=[('Advance','Advance'),('Balance','Balance'),('Others','Others')]
-    order=models.ForeignKey(Order,on_delete=models.CASCADE,related_name='vehicle_payments')
-    vehicle_number=models.CharField(max_length=30)
-    payment_type=models.CharField(max_length=20,choices=PAYMENT_TYPES)
-    amount=models.DecimalField(max_digits=12,decimal_places=2)
-    transaction_reference=models.CharField(max_length=100,blank=True)
-    paid_at=models.DateTimeField(auto_now_add=True)
+        # ----------------------------------------------------
+        # GST
+        # ----------------------------------------------------
 
-    def __str__(self): return f'{self.order.trip_number} - {self.payment_type}'
+        self.gst_amount = (
+            self.selling_amount
+            * self.gst_percent
+            / Decimal("100")
+        )
+
+        # ----------------------------------------------------
+        # Total selling amount
+        # ----------------------------------------------------
+
+        self.total_selling_amount = (
+            self.selling_amount
+            + self.gst_amount
+        )
+
+        super().save(
+            *args,
+            **kwargs
+        )
+
+    # ========================================================
+    # STRING
+    # ========================================================
+
+    def __str__(self):
+        return (
+            f"{self.trip_number} - "
+            f"{self.origin} to "
+            f"{self.destination}"
+        )
+
+
+# ============================================================
+# VEHICLE PAYMENT
+# ============================================================
+
+class VehiclePayment(models.Model):
+
+    PAYMENT_TYPES = [
+        ("Advance", "Advance"),
+        ("Balance", "Balance"),
+        ("Others", "Others"),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="vehicle_payments",
+    )
+
+    vehicle_number = models.CharField(
+        max_length=30,
+    )
+
+    payment_type = models.CharField(
+        max_length=20,
+        choices=PAYMENT_TYPES,
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+    )
+
+    transaction_reference = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    paid_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def __str__(self):
+        return (
+            f"{self.order.trip_number} - "
+            f"{self.payment_type}"
+        )
+
+
+# ============================================================
+# CUSTOMER PAYMENT
+# ============================================================
 
 class CustomerPayment(models.Model):
-    PAYMENT_MODES=[('RTGS','RTGS'),('NEFT','NEFT'),('CASH','CASH'),('IMPS','IMPS'),('UPI','UPI')]
-    order=models.ForeignKey(Order,on_delete=models.CASCADE,related_name='customer_payments')
-    selling_amount=models.DecimalField(max_digits=12,decimal_places=2)
-    received_amount=models.DecimalField(max_digits=12,decimal_places=2,default=0)
-    received_through=models.CharField(max_length=20,choices=PAYMENT_MODES,blank=True)
-    utr_details=models.CharField(max_length=150,blank=True)
-    received_at=models.DateTimeField(auto_now_add=True)
+
+    PAYMENT_MODES = [
+        ("RTGS", "RTGS"),
+        ("NEFT", "NEFT"),
+        ("CASH", "CASH"),
+        ("IMPS", "IMPS"),
+        ("UPI", "UPI"),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="customer_payments",
+    )
+
+    selling_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+    )
+
+    received_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+
+    received_through = models.CharField(
+        max_length=20,
+        choices=PAYMENT_MODES,
+        blank=True,
+    )
+
+    utr_details = models.CharField(
+        max_length=150,
+        blank=True,
+    )
+
+    received_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
     @property
     def status(self):
-        if self.received_amount<=0: return 'Pending'
-        if self.received_amount>=self.selling_amount: return 'Payment Cleared'
-        return 'Part Amount Received'
-    def __str__(self): return f'{self.order.trip_number} - Customer Payment'
+
+        if self.received_amount <= 0:
+            return "Pending"
+
+        if self.received_amount >= self.selling_amount:
+            return "Payment Cleared"
+
+        return "Part Amount Received"
+
+    def __str__(self):
+        return (
+            f"{self.order.trip_number} - "
+            "Customer Payment"
+        )
+
+
+# ============================================================
+# TRACKING SESSION
+# ============================================================
 
 class TrackingSession(models.Model):
 
     STATUS_CHOICES = [
-    ("not_enabled", "Not Enabled"),
-    ("imported", "Imported"),
-    ("sms_sent", "SMS Sent"),
-    ("consent_received", "Consent Received"),
-    ("waiting_location", "Waiting Location"),
-    ("active", "Live Tracking"),
-    ("paused", "Paused"),
-    ("stopped", "Stopped"),
-    ("deleted", "Deleted"),
-    ("license_hold", "License Hold"),
-    ("expired", "Consent Expired"),
-    ("error", "Error"),
-]
+        ("not_enabled", "Not Enabled"),
+        ("imported", "Imported"),
+        ("sms_sent", "SMS Sent"),
+        ("consent_received", "Consent Received"),
+        ("waiting_location", "Waiting Location"),
+        ("active", "Live Tracking"),
+        ("paused", "Paused"),
+        ("stopped", "Stopped"),
+        ("deleted", "Deleted"),
+        ("license_hold", "License Hold"),
+        ("expired", "Consent Expired"),
+        ("error", "Error"),
+    ]
+
     order = models.OneToOneField(
         Order,
         on_delete=models.CASCADE,
-        related_name="tracking_session"
+        related_name="tracking_session",
     )
 
     tracking_reference = models.CharField(
         max_length=100,
-        unique=True
+        unique=True,
     )
 
-    driver_mobile = models.CharField(max_length=15 )
+    driver_mobile = models.CharField(
+        max_length=15,
+    )
 
     status = models.CharField(
-    max_length=20,
-    choices=STATUS_CHOICES,
-    default="not_enabled"
-)
-    consent_received = models.BooleanField(default=False)
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="not_enabled",
+    )
+
+    consent_received = models.BooleanField(
+        default=False,
+    )
+
     latitude = models.DecimalField(
-    max_digits=10,
-    decimal_places=7,
-    null=True,
-    blank=True
-)
+        max_digits=10,
+        decimal_places=7,
+        null=True,
+        blank=True,
+    )
 
     longitude = models.DecimalField(
-    max_digits=10,
-    decimal_places=7,
-    null=True,
-    blank=True
-)
+        max_digits=10,
+        decimal_places=7,
+        null=True,
+        blank=True,
+    )
 
-    last_location = models.TextField(blank=True, null=True)
+    last_location = models.TextField(
+        blank=True,
+        null=True,
+    )
 
     last_updated = models.DateTimeField(
-    null=True,
-    blank=True
-)
-    location_status = models.CharField(max_length=100, blank=True, null=True)
+        null=True,
+        blank=True,
+    )
+
+    location_status = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+
     entity_id = models.BigIntegerField(
-    null=True,
-    blank=True,
-    unique=True
-)
+        null=True,
+        blank=True,
+        unique=True,
+    )
+
     operator = models.CharField(
         max_length=20,
         blank=True,
-        null=True
+        null=True,
     )
 
     consent_reference = models.CharField(
         max_length=100,
         blank=True,
-        null=True
+        null=True,
     )
 
-    tracking_enabled = models.BooleanField(default=False)
+    tracking_enabled = models.BooleanField(
+        default=False,
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
-   
     def __str__(self):
-        return f"{self.order.trip_number}"
-  
+        return self.order.trip_number
+
+
+# ============================================================
+# LIVE LOCATION
+# ============================================================
+
 class LiveLocation(models.Model):
 
-    tracked = models.BooleanField(default=False)
-
-    location_status = models.CharField(
-        max_length=50,
-        blank=True
-    )
-
-    address = models.TextField(blank=True)
     session = models.ForeignKey(
         TrackingSession,
         on_delete=models.CASCADE,
-        related_name="locations"
+        related_name="locations",
+    )
+
+    tracked = models.BooleanField(
+        default=False,
+    )
+
+    location_status = models.CharField(
+        max_length=50,
+        blank=True,
+    )
+
+    address = models.TextField(
+        blank=True,
     )
 
     latitude = models.DecimalField(
         max_digits=10,
-        decimal_places=7
+        decimal_places=7,
+        null=True,
+        blank=True,
     )
 
     longitude = models.DecimalField(
         max_digits=10,
-        decimal_places=7
+        decimal_places=7,
+        null=True,
+        blank=True,
     )
 
-    accuracy = models.FloatField(default=0)
+    accuracy = models.FloatField(
+        default=0,
+    )
 
     location_name = models.CharField(
         max_length=300,
-        blank=True
+        blank=True,
     )
 
     received_at = models.DateTimeField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     class Meta:
         ordering = ["-received_at"]
+
+
+# ============================================================
+# SMS LOG
+# ============================================================
 
 class SMSLog(models.Model):
 
     session = models.ForeignKey(
         TrackingSession,
         on_delete=models.CASCADE,
-        related_name="sms_logs"
+        related_name="sms_logs",
     )
 
-    mobile = models.CharField(max_length=15)
+    mobile = models.CharField(
+        max_length=15,
+    )
 
     sms_reference = models.CharField(
         max_length=100,
         blank=True,
-        null=True
+        null=True,
     )
 
     message = models.TextField()
 
     delivery_status = models.CharField(
         max_length=50,
-        default="Pending"
+        default="Pending",
     )
 
     api_response = models.JSONField(
         blank=True,
-        null=True
+        null=True,
     )
 
-    sent_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+
+# ============================================================
+# API TOKEN
+# ============================================================
 
 class ApiToken(models.Model):
 
@@ -606,171 +866,238 @@ class ApiToken(models.Model):
     token_type = models.CharField(
         max_length=20,
         choices=TOKEN_TYPES,
-        unique=True
+        unique=True,
     )
 
     access_token = models.TextField()
 
     response_json = models.JSONField(
-    blank=True,
-    null=True
-)
+        blank=True,
+        null=True,
+    )
+
     last_used = models.DateTimeField(
-    null=True,
-    blank=True
-)
+        null=True,
+        blank=True,
+    )
 
     expires_at = models.DateTimeField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     def __str__(self):
         return self.token_type
-    
+
+
+# ============================================================
+# API LOG
+# ============================================================
+
 class ApiLog(models.Model):
 
-    api_name = models.CharField(max_length=100)
+    api_name = models.CharField(
+        max_length=100,
+    )
 
     request_url = models.TextField()
 
-    request_method = models.CharField(max_length=10)
+    request_method = models.CharField(
+        max_length=10,
+    )
 
-    request_headers = models.JSONField(blank=True, null=True)
+    request_headers = models.JSONField(
+        blank=True,
+        null=True,
+    )
 
-    request_body = models.JSONField(blank=True, null=True)
+    request_body = models.JSONField(
+        blank=True,
+        null=True,
+    )
 
     response_code = models.IntegerField()
 
-    response_body = models.JSONField(blank=True, null=True)
+    response_body = models.JSONField(
+        blank=True,
+        null=True,
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+
+# ============================================================
+# TRACKING WORKFLOW
+# ============================================================
 
 class Tracking(models.Model):
 
-    # =========================
-    # ORDER RELATION
-    # =========================
-
     STATUS_CHOICES = [
-    ("vehicle_placed", "Vehicle Placed"),
-    ("live_tracking", "Live Tracking Enabled"),
-    ("vehicle_document", "Vehicle Document"),
-    ("invoice_eway", "Invoice / E-way"),
-    ("advance_to_fleet", "Advance To Fleet"),
-    ("fleet_departed", "Fleet Departed"),
-    ("balance_trans_fleet", "Balance Transfer To Fleet"),
-    ("arrived", "Arrived"),
-    ("delivered", "Delivered"),
-    ("pod_received", "POD Received"),
-    ("settled", "Settled"),
-    ("lr_generated", "LR Generated"),
+        ("vehicle_placed", "Vehicle Placed"),
+        ("live_tracking", "Live Tracking Enabled"),
+        ("vehicle_document", "Vehicle Document"),
+        ("invoice_eway", "Invoice / E-way"),
+        ("advance_to_fleet", "Advance To Fleet"),
+        ("fleet_departed", "Fleet Departed"),
+        ("balance_trans_fleet", "Balance Transfer To Fleet"),
+        ("arrived", "Arrived"),
+        ("delivered", "Delivered"),
+        ("pod_received", "POD Received"),
+        ("settled", "Settled"),
+        ("lr_generated", "LR Generated"),
     ]
-
-    status = models.CharField(
-        max_length=50,
-        choices=STATUS_CHOICES,
-        default="vehicle_placed"
-    )
 
     order = models.OneToOneField(
         Order,
         on_delete=models.CASCADE,
         related_name="tracking",
         null=True,
-        blank=True
+        blank=True,
     )
-    # =========================
-    # STATUS
-    # =========================
 
-    vehicle_placed = models.BooleanField(default=False)
-    vehicle_document = models.BooleanField(default=False)
-    invoice_eway = models.BooleanField(default=False)
-    advance_to_fleet = models.BooleanField(default=False)
-    balance_to_fleet = models.BooleanField(default=False)
-    fleet_departed = models.BooleanField(default=False)
-    advance_received = models.BooleanField(default=False)
-    arrived = models.BooleanField(default=False)
-    delivered = models.BooleanField(default=False)
-    pod_received = models.BooleanField(default=False)
-    balance_paid = models.BooleanField(default=False)
-    lr_no_b = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="vehicle_placed",
+    )
+
+    vehicle_placed = models.BooleanField(
+        default=False,
+    )
+
+    vehicle_document = models.BooleanField(
+        default=False,
+    )
+
+    invoice_eway = models.BooleanField(
+        default=False,
+    )
+
+    advance_to_fleet = models.BooleanField(
+        default=False,
+    )
+
+    balance_to_fleet = models.BooleanField(
+        default=False,
+    )
+
+    fleet_departed = models.BooleanField(
+        default=False,
+    )
+
+    advance_received = models.BooleanField(
+        default=False,
+    )
+
+    arrived = models.BooleanField(
+        default=False,
+    )
+
+    delivered = models.BooleanField(
+        default=False,
+    )
+
+    pod_received = models.BooleanField(
+        default=False,
+    )
+
+    balance_paid = models.BooleanField(
+        default=False,
+    )
+
+    lr_no_b = models.BooleanField(
+        default=False,
+    )
 
     lr_no = models.CharField(
         max_length=200,
         blank=True,
-        null=True
+        null=True,
     )
 
-    transporter_paid = models.BooleanField(default=False)
-    customer_paid = models.BooleanField(default=False)
-    settled = models.BooleanField(default=False)
+    transporter_paid = models.BooleanField(
+        default=False,
+    )
 
-    # =========================
-    # DATES
-    # =========================
+    customer_paid = models.BooleanField(
+        default=False,
+    )
+
+    settled = models.BooleanField(
+        default=False,
+    )
 
     vehicle_placed_at = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     live_tracking_at = models.DateTimeField(
-    null=True,
-    blank=True
-)
+        null=True,
+        blank=True,
+    )
 
     fleet_departed_at = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     arrived_at = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     delivered_at = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
-    # =========================
-    # OTHER
-    # =========================
-
-    remarks = models.TextField(blank=True)
+    remarks = models.TextField(
+        blank=True,
+    )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
 
-    # =========================
-    # STRING
-    # =========================
-
     def __str__(self):
+
         if self.order:
-            return f"Tracking - {self.order.order_no}"
+            return (
+                f"Tracking - "
+                f"{self.order.trip_number}"
+            )
+
         return "Tracking"
+
+
+# ============================================================
+# TRACKING DOCUMENT
+# ============================================================
 
 class TrackingDocument(models.Model):
 
     tracking = models.ForeignKey(
         Tracking,
         related_name="documents",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     file = models.FileField(
-        upload_to="tracking_docs/"
+        upload_to="tracking_docs/",
     )
 
     uploaded_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     def __str__(self):
         return self.file.name
+
