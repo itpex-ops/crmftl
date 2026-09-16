@@ -317,17 +317,13 @@ class Order(models.Model):
     # =====================================================
     # CALCULATIONS
     # =====================================================
-# =====================================================
-# CALCULATIONS
-# =====================================================
 
-@property
-def customer_selling_amount(self):
-    """
-    Customer selling amount before GST.
-    """
-    return self.selling_amount
-
+    @property
+    def customer_selling_amount(self):
+        """
+        Customer selling amount before GST.
+        """
+        return self.selling_amount
 
     @property
     def vehicle_cost(self):
@@ -342,19 +338,16 @@ def customer_selling_amount(self):
             Decimal("0.00")
         )
 
-
     @property
     def margin(self):
         """
         Margin based on total customer selling amount
         including GST minus vehicle cost.
         """
-
         return (
             self.total_selling_amount
             - self.vehicle_cost
         )
-
 
     # =====================================================
     # SAVE
