@@ -609,14 +609,13 @@ django
                     <label for="received_amount">
                         Received Amount
                     </label>
-{{ order.customer_advance_amount }}
                     <input
                         type="number"
                         id="received_amount"
                         name="received_amount"
                         step="0.01"
                         min="0"
-                        value="{{ order.customer_advance_amount|default:'' }}"
+                        value="{{ order.customer.customer_advance_amount|default:'' }}"
                         placeholder="0.00"
                         required
                     >

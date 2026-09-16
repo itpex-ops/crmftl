@@ -1612,7 +1612,7 @@ def customer_payments(request):
             # Do not trust the value submitted by browser.
 
             selling_amount = order.selling_amount
-
+            customer_advance_amount = order.customer_advance_amount
             if selling_amount is None or selling_amount <= 0:
 
                 messages.error(
