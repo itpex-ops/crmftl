@@ -443,10 +443,1002 @@ django
     .orders-search {
         max-width: 100%;
     }
+}```django
+{% extends "layouts/base.html" %}
+
+{% block title %}Customer Payments{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.cpay-page {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    padding: 22px 28px 40px;
+    background: #f8f9fb;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.cpay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.cpay-title {
+    margin: 0;
+    color: #212529;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.cpay-subtitle {
+    margin: 4px 0 0;
+    color: #8a9199;
+    font-size: 11px;
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.cpay-message {
+    margin-bottom: 15px;
+    padding: 10px 14px;
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #495057;
+    font-size: 11px;
+}
+
+/* =========================================================
+   FORM CARD
+   ========================================================= */
+
+.cpay-form-card {
+    width: 100%;
+    margin-bottom: 18px;
+    padding: 18px;
+    background: #ffffff;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.orders-toolbar {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.orders-search {
+    display: flex;
+    width: 100%;
+    max-width: 520px;
+}
+
+.orders-search input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    padding: 0 13px;
+    border: 1px solid #dfe3e8;
+    border-right: none;
+    border-radius: 7px 0 0 7px;
+    background: #ffffff;
+    color: #343a40;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.orders-search input::placeholder {
+    color: #9aa0a6;
+}
+
+.orders-search input:focus {
+    border-color: #FDB81B;
+    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.10);
+}
+
+.orders-search button {
+    width: 90px;
+    height: 42px;
+    border: 1px solid #FDB81B;
+    border-radius: 0 7px 7px 0;
+    background: #FDB81B;
+    color: #212529;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.orders-search button:hover {
+    background: #e7a900;
+    color: #ffffff;
+}
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.cpay-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px 18px;
+}
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.cpay-field {
+    min-width: 0;
+}
+
+.cpay-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #495057;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.cpay-field input,
+.cpay-field select {
+    width: 100%;
+    height: 38px;
+    padding: 6px 9px;
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #343a40;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    outline: none;
+    box-sizing: border-box;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cpay-field input:focus,
+.cpay-field select:focus {
+    border-color: #FDB81B;
+    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
+}
+
+/* =========================================================
+   AUTO-FILLED AMOUNTS
+   ========================================================= */
+
+#selling_amount,
+#received_amount {
+    background: #f8f9fb;
+    font-weight: 600;
+}
+
+/* =========================================================
+   FORM ACTIONS
+   ========================================================= */
+
+.cpay-form-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.cpay-save-btn {
+    min-width: 140px;
+    height: 38px;
+    padding: 0 18px;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    background: #0d6efd;
+    color: #ffffff;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cpay-save-btn:hover {
+    background: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.cpay-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.cpay-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.cpay-table {
+    width: 100%;
+    min-width: 950px;
+    margin: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+.cpay-table th:nth-child(1),
+.cpay-table td:nth-child(1) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(2),
+.cpay-table td:nth-child(2) {
+    width: 18%;
+}
+
+.cpay-table th:nth-child(3),
+.cpay-table td:nth-child(3) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(4),
+.cpay-table td:nth-child(4) {
+    width: 12%;
+}
+
+.cpay-table th:nth-child(5),
+.cpay-table td:nth-child(5) {
+    width: 16%;
+}
+
+.cpay-table th:nth-child(6),
+.cpay-table td:nth-child(6) {
+    width: 10%;
+}
+
+.cpay-table th:nth-child(7),
+.cpay-table td:nth-child(7) {
+    width: 10%;
+}
+
+.cpay-table th:nth-child(8),
+.cpay-table td:nth-child(8) {
+    width: 10%;
+}
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.cpay-table thead th {
+    height: 42px;
+    padding: 9px 12px;
+    background: #f3f4f6;
+    border-bottom: 1px solid #dfe3e8;
+    color: #343a40;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.cpay-table thead th.amount-header {
+    text-align: right;
+}
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.cpay-table tbody td {
+    height: 43px;
+    padding: 9px 12px;
+    border-bottom: 1px solid #eef0f2;
+    color: #555e68;
+    text-align: left;
+    vertical-align: middle;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cpay-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cpay-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* =========================================================
+   TRIP
+   ========================================================= */
+
+.cpay-table .trip-number {
+    color: #212529;
+    font-weight: 600;
+}
+
+/* =========================================================
+   AMOUNT
+   ========================================================= */
+
+.cpay-table .amount {
+    color: #343a40;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.cpay-table .status-cell {
+    text-align: left;
+}
+
+.cpay-table .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.cpay-table .status-success {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.cpay-table .status-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.cpay-table .status-info {
+    background: #cff4fc;
+    color: #055160;
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.cpay-table .empty-row {
+    height: 100px;
+    padding: 30px 20px !important;
+    color: #8a9199 !important;
+    font-size: 11px;
+    text-align: center !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .cpay-page {
+        padding: 18px 15px 30px;
+    }
+
+    .cpay-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cpay-table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .cpay-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cpay-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .orders-search {
+        max-width: 100%;
+    }
 }
 
 </style>
 
+
+<div class="cpay-page">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="cpay-header">
+
+        <div>
+
+            <h1 class="cpay-title">
+                Customer Payments
+            </h1>
+
+            <p class="cpay-subtitle">
+                Manage customer receipts and payment details.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="cpay-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         PAYMENT FORM CARD
+         ===================================================== -->
+
+    <div class="cpay-form-card">
+
+        <!-- =================================================
+             SEARCH
+             ================================================= -->
+
+        <div class="orders-toolbar">
+
+            <form method="get" class="orders-search">
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ request.GET.q|default:'' }}"
+                    placeholder="Search trip, customer, vehicle, route..."
+                    autocomplete="off"
+                >
+
+                <button type="submit">
+                    <i class="bi bi-search me-1"></i>
+                    Search
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT ENTRY FORM
+             ================================================= -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="cpay-form-grid">
+
+                <!-- =================================================
+                     ORDER
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="order">
+                        Trip / Order
+                    </label>
+
+                    <select
+                        id="order"
+                        name="order"
+                        required
+                    >
+
+                        <option value="">
+                            Select Trip
+                        </option>
+
+                        {% for order in orders %}
+
+                            <option
+                                value="{{ order.pk }}"
+                                data-selling-price="{{ order.selling_amount|default:0 }}"
+                                data-customer-advance="{{ order.customer_advance_amount|default:0 }}"
+                                {% if request.POST.order == order.pk|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ order.trip_number }} - {{ order.customer.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- =================================================
+                     SELLING AMOUNT
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="selling_amount">
+                        Selling Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="selling_amount"
+                        name="selling_amount"
+                        step="0.01"
+                        min="0"
+                        value=""
+                        placeholder="Auto-filled"
+                        readonly
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =================================================
+                     RECEIVED AMOUNT
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_amount">
+                        Received Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="received_amount"
+                        name="received_amount"
+                        step="0.01"
+                        min="0"
+                        value="{{ request.POST.received_amount|default:'' }}"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =================================================
+                     PAYMENT MODE
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_through">
+                        Received Through
+                    </label>
+
+                    <select
+                        id="received_through"
+                        name="received_through"
+                    >
+
+                        <option value="">
+                            Select Mode
+                        </option>
+
+                        <option
+                            value="RTGS"
+                            {% if request.POST.received_through == "RTGS" %}
+                                selected
+                            {% endif %}
+                        >
+                            RTGS
+                        </option>
+
+                        <option
+                            value="NEFT"
+                            {% if request.POST.received_through == "NEFT" %}
+                                selected
+                            {% endif %}
+                        >
+                            NEFT
+                        </option>
+
+                        <option
+                            value="CASH"
+                            {% if request.POST.received_through == "CASH" %}
+                                selected
+                            {% endif %}
+                        >
+                            CASH
+                        </option>
+
+                        <option
+                            value="IMPS"
+                            {% if request.POST.received_through == "IMPS" %}
+                                selected
+                            {% endif %}
+                        >
+                            IMPS
+                        </option>
+
+                        <option
+                            value="UPI"
+                            {% if request.POST.received_through == "UPI" %}
+                                selected
+                            {% endif %}
+                        >
+                            UPI
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =================================================
+                     UTR
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="utr_details">
+                        UTR / Transaction Details
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utr_details"
+                        name="utr_details"
+                        value="{{ request.POST.utr_details|default:'' }}"
+                        placeholder="Enter UTR / transaction reference"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SAVE BUTTON
+                 ================================================= -->
+
+            <div class="cpay-form-actions">
+
+                <button
+                    type="submit"
+                    class="cpay-save-btn"
+                >
+                    <i class="bi bi-receipt me-1"></i>
+                    Save Receipt
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAYMENT HISTORY
+         ===================================================== -->
+
+    <div class="cpay-card">
+
+        <div class="cpay-table-wrapper">
+
+            <table class="cpay-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Trip
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th class="amount-header">
+                            Selling
+                        </th>
+
+                        <th class="amount-header">
+                            Received
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Mode
+                        </th>
+
+                        <th>
+                            UTR
+                        </th>
+
+                        <th>
+                            Received At
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for p in payments %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="trip-number">
+                                    {{ p.order.trip_number }}
+                                </div>
+
+                            </td>
+
+                            <td>
+                                {{ p.order.customer.name|default:"-" }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.selling_amount|floatformat:2 }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.received_amount|floatformat:2 }}
+                            </td>
+
+                            <td class="status-cell">
+
+                                {% if p.status == "Payment Cleared" %}
+
+                                    <span class="status status-success">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% elif p.status == "Part Amount Received" %}
+
+                                    <span class="status status-info">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-warning">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ p.received_through|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.utr_details|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.received_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="empty-row"
+                            >
+                                No customer receipts found.
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     AUTO-FILL AMOUNTS
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const orderSelect =
+        document.getElementById("order");
+
+    const sellingAmount =
+        document.getElementById("selling_amount");
+
+    const receivedAmount =
+        document.getElementById("received_amount");
+
+
+    if (
+        !orderSelect ||
+        !sellingAmount ||
+        !receivedAmount
+    ) {
+        return;
+    }
+
+
+    function updateAmounts() {
+
+        const selectedOption =
+            orderSelect.options[
+                orderSelect.selectedIndex
+            ];
+
+
+        if (
+            !selectedOption ||
+            !orderSelect.value
+        ) {
+
+            sellingAmount.value = "";
+            receivedAmount.value = "";
+
+            return;
+        }
+
+
+        /* Selling Amount */
+
+        const sellingPrice =
+            selectedOption.getAttribute(
+                "data-selling-price"
+            );
+
+        sellingAmount.value =
+            sellingPrice || "";
+
+
+        /* Customer Advance */
+
+        const customerAdvance =
+            selectedOption.getAttribute(
+                "data-customer-advance"
+            );
+
+
+        /*
+         * Only auto-fill Received Amount when
+         * the browser has not submitted a value.
+         */
+
+        {% if not request.POST.received_amount %}
+
+            receivedAmount.value =
+                customerAdvance || "";
+
+        {% endif %}
+
+    }
+
+
+    /* Trip selection */
+
+    orderSelect.addEventListener(
+        "change",
+        updateAmounts
+    );
+
+
+    /* Initial load */
+
+    updateAmounts();
+
+});
+
+</script>
+
+{% endblock %}
+<!-- ### Important
+
+Your Trip option now carries **both values**:
+
+```html
+data-selling-price="{{ order.selling_amount|default:0 }}"
+data-customer-advance="{{ order.customer_advance_amount|default:0 }}"
+```
+
+So:
+
+* **Selling Amount** ← `order.selling_amount`
+* **Received Amount** ← `order.customer_advance_amount`
+
+When you change the Trip, both fields update automatically.
+
+Also, I removed the duplicate `selected` conditions and corrected all the malformed `=*=*` comparisons.
+
+One backend point remains important: when saving the receipt, you should ideally get `selling_amount` from the selected `Order` in Django rather than trusting the readonly HTML value. -->
+
+</style>
 
 <div class="cpay-page">
 
@@ -557,6 +1549,13 @@ django
                             <option
                                 value="{{ order.pk }}"
                                 data-selling-price="{{ order.selling_amount|default:0 }}"
+                                data-customer-adv-price = "{{ order.customer_advance_amount|default:0 }}"
+                                {% if request.GET.q == order.trip_number %}
+                                    selected
+                                {% endif %}
+                                {% if request.POST.order == order.pk|stringformat:"s" %}
+                                    selected
+                                {% endif %}
                                 {% if request.POST.order == order.pk|stringformat:"s" %}
                                     selected
                                 {% endif %}
@@ -615,12 +1614,10 @@ django
                         name="received_amount"
                         step="0.01"
                         min="0"
-                        value="{{ order.customer.customer_advance_amount|default:'' }}"
+                        value="{{ order.customer_advance_amount|default:'' }}"
                         placeholder="0.00"
-                        required
-                    >
+                        required>
                 </div>
-
 
                 <!-- =================================================
                      PAYMENT MODE
