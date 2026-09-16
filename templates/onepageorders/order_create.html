@@ -1,4 +1,4 @@
-html
+
 {% extends "layouts/base.html" %}
 
 {% block content %}
@@ -502,7 +502,17 @@ html
                     <div class="order-form-label">
                         Lead Generated Through
                     </div>
-
+                    <div class="order-form-control">
+                                <select name="lead_source" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="justdial">Just Dial</option>
+                                    <option value="inbound">Inbound</option>
+                                    <option value="outbound">Outbound</option>
+                                    <option value="social media">Social Media</option>
+                                    <option value="reference">Reference</option>
+                                </select>
+                            </div>
+                    </div>
                     <div class="order-form-control">
 
                         <select name="lead_generated_through">
@@ -550,7 +560,8 @@ html
 
                     </div>
 
-                </div>
+                </div>  
+
 
 
                 <!-- Sales Closed By -->
