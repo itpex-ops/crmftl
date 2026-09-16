@@ -1,3 +1,4 @@
+django
 {% extends "layouts/base.html" %}
 
 {% block title %}Customer Payments{% endblock %}
@@ -178,6 +179,13 @@
 .cpay-field select:focus {
     border-color: #FDB81B;
     box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
+}
+
+/* Selling amount should look auto-filled */
+
+#selling_amount {
+    background: #f8f9fb;
+    font-weight: 600;
 }
 
 /* =========================================================
@@ -439,447 +447,488 @@
 
 </style>
 
+
 <div class="cpay-page">
 
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
-<!-- =====================================================
-     HEADER
-     ===================================================== -->
+    <div class="cpay-header">
 
-<div class="cpay-header">
+        <div>
 
-    <div>
-        <h1 class="cpay-title">
-            Customer Payments
-        </h1>
+            <h1 class="cpay-title">
+                Customer Payments
+            </h1>
 
-        <p class="cpay-subtitle">
-            Manage customer receipts and payment details.
-        </p>
-    </div>
+            <p class="cpay-subtitle">
+                Manage customer receipts and payment details.
+            </p>
 
-</div>
-
-
-<!-- =====================================================
-     MESSAGES
-     ===================================================== -->
-
-{% if messages %}
-
-    {% for message in messages %}
-
-        <div class="cpay-message">
-            {{ message }}
         </div>
 
-    {% endfor %}
-
-{% endif %}
+    </div>
 
 
-<!-- =====================================================
-     PAYMENT FORM CARD
-     ===================================================== -->
+    <!-- =====================================================
+         MESSAGES
+         ===================================================== -->
 
-<div class="cpay-form-card">
+    {% if messages %}
 
-    <!-- =================================================
-         SEARCH
-         ================================================= -->
+        {% for message in messages %}
 
-    <div class="orders-toolbar">
+            <div class="cpay-message">
+                {{ message }}
+            </div>
 
-        <form method="get" class="orders-search">
+        {% endfor %}
 
-            <input
-                type="text"
-                name="q"
-                value="{{ request.GET.q|default:'' }}"
-                placeholder="Search trip, customer, vehicle, route..."
-                autocomplete="off"
-            >
+    {% endif %}
 
-            <button type="submit">
-                <i class="bi bi-search me-1"></i>
-                Search
-            </button>
+
+    <!-- =====================================================
+         PAYMENT FORM CARD
+         ===================================================== -->
+
+    <div class="cpay-form-card">
+
+        <!-- =================================================
+             SEARCH
+             ================================================= -->
+
+        <div class="orders-toolbar">
+
+            <form method="get" class="orders-search">
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ request.GET.q|default:'' }}"
+                    placeholder="Search trip, customer, vehicle, route..."
+                    autocomplete="off"
+                >
+
+                <button type="submit">
+
+                    <i class="bi bi-search me-1"></i>
+
+                    Search
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT ENTRY FORM
+             ================================================= -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="cpay-form-grid">
+
+                <!-- =================================================
+                     ORDER
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="order">
+                        Trip / Order
+                    </label>
+
+                    <select
+                        id="order"
+                        name="order"
+                        required
+                    >
+
+                        <option value="">
+                            Select Trip
+                        </option>
+
+                        {% for order in orders %}
+
+                            <option
+                                value="{{ order.pk }}"
+                                data-selling-price="{{ order.selling_amount|default:0 }}"
+                                {% if request.POST.order == order.pk|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ order.trip_number }}
+                                -
+                                {{ order.customer.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- =================================================
+                     SELLING AMOUNT
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="selling_amount">
+                        Selling Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="selling_amount"
+                        name="selling_amount"
+                        step="0.01"
+                        min="0"
+                        value=""
+                        placeholder="Auto-filled"
+                        readonly
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =================================================
+                     RECEIVED AMOUNT
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_amount">
+                        Received Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="received_amount"
+                        name="received_amount"
+                        step="0.01"
+                        min="0"
+                        value="{{ request.POST.received_amount|default:'' }}"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =================================================
+                     PAYMENT MODE
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="received_through">
+                        Received Through
+                    </label>
+
+                    <select
+                        id="received_through"
+                        name="received_through"
+                    >
+
+                        <option value="">
+                            Select Mode
+                        </option>
+
+                        <option
+                            value="RTGS"
+                            {% if request.POST.received_through == "RTGS" %}
+                                selected
+                            {% endif %}
+                        >
+                            RTGS
+                        </option>
+
+                        <option
+                            value="NEFT"
+                            {% if request.POST.received_through == "NEFT" %}
+                                selected
+                            {% endif %}
+                        >
+                            NEFT
+                        </option>
+
+                        <option
+                            value="CASH"
+                            {% if request.POST.received_through == "CASH" %}
+                                selected
+                            {% endif %}
+                        >
+                            CASH
+                        </option>
+
+                        <option
+                            value="IMPS"
+                            {% if request.POST.received_through == "IMPS" %}
+                                selected
+                            {% endif %}
+                        >
+                            IMPS
+                        </option>
+
+                        <option
+                            value="UPI"
+                            {% if request.POST.received_through == "UPI" %}
+                                selected
+                            {% endif %}
+                        >
+                            UPI
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =================================================
+                     UTR
+                     ================================================= -->
+
+                <div class="cpay-field">
+
+                    <label for="utr_details">
+                        UTR / Transaction Details
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utr_details"
+                        name="utr_details"
+                        value="{{ request.POST.utr_details|default:'' }}"
+                        placeholder="Enter UTR / transaction reference"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SAVE BUTTON
+                 ================================================= -->
+
+            <div class="cpay-form-actions">
+
+                <button
+                    type="submit"
+                    class="cpay-save-btn"
+                >
+
+                    <i class="bi bi-receipt me-1"></i>
+
+                    Save Receipt
+
+                </button>
+
+            </div>
 
         </form>
 
     </div>
 
 
-    <!-- =================================================
-         PAYMENT ENTRY FORM
-         ================================================= -->
+    <!-- =====================================================
+         PAYMENT HISTORY
+         ===================================================== -->
 
-    <form method="POST">
+    <div class="cpay-card">
 
-        {% csrf_token %}
+        <div class="cpay-table-wrapper">
 
-        <div class="cpay-form-grid">
+            <table class="cpay-table">
 
-            <!-- =========================================
-                 ORDER
-                 ========================================= -->
+                <thead>
 
-            <div class="cpay-field">
+                    <tr>
 
-                <label for="order">
-                    Trip / Order
-                </label>
+                        <th>
+                            Trip
+                        </th>
 
-                <select
-                    id="order"
-                    name="order"
-                    required
-                >
+                        <th>
+                            Customer
+                        </th>
 
-                    <option value="">
-                        Select Trip
-                    </option>
+                        <th class="amount-header">
+                            Selling
+                        </th>
 
-                    {% for order in orders %}
+                        <th class="amount-header">
+                            Received
+                        </th>
 
-                        <option
-                            value="{{ order.pk }}"
-                            {% if request.POST.order == order.pk|stringformat:"s" %}
-                                selected
-                            {% endif %}
-                        >
-                            {{ order.trip_number }}
-                            -
-                            {{ order.customer.name }}
-                        </option>
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Mode
+                        </th>
+
+                        <th>
+                            UTR
+                        </th>
+
+                        <th>
+                            Received At
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for p in payments %}
+
+                        <tr>
+
+                            <td>
+                                <div class="trip-number">
+                                    {{ p.order.trip_number }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ p.order.customer.name|default:"-" }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.selling_amount|floatformat:2 }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.received_amount|floatformat:2 }}
+                            </td>
+
+                            <td class="status-cell">
+
+                                {% if p.status == "Payment Cleared" %}
+
+                                    <span class="status status-success">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% elif p.status == "Part Amount Received" %}
+
+                                    <span class="status status-info">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-warning">
+                                        {{ p.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ p.received_through|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.utr_details|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.received_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="empty-row"
+                            >
+                                No customer receipts found.
+                            </td>
+
+                        </tr>
 
                     {% endfor %}
 
-                </select>
+                </tbody>
 
-            </div>
-
-
-            <!-- =========================================
-                 SELLING AMOUNT
-                 ========================================= -->
-
-            <div class="cpay-field">
-
-                <label for="selling_amount">
-                    Selling Amount
-                </label>
-
-                <input
-                    type="number"
-                    id="selling_amount"
-                    name="selling_amount"
-                    step="0.01"
-                    min="0"
-                    value="{{ orders.selling_amount }}"
-                    placeholder="0.00"
-                    required
-                >
-            </div>
-
-
-            <!-- =========================================
-                 RECEIVED AMOUNT
-                 ========================================= -->
-
-            <div class="cpay-field">
-
-                <label for="received_amount">
-                    Received Amount
-                </label>
-
-                <input
-                    type="number"
-                    id="received_amount"
-                    name="received_amount"
-                    step="0.01"
-                    min="0"
-                    value="{{ request.POST.received_amount|default:'' }}"
-                    placeholder="0.00"
-                    required
-                >
-
-            </div>
-
-
-            <!-- =========================================
-                 PAYMENT MODE
-                 ========================================= -->
-
-            <div class="cpay-field">
-
-                <label for="received_through">
-                    Received Through
-                </label>
-
-                <select
-                    id="received_through"
-                    name="received_through"
-                >
-
-                    <option value="">
-                        Select Mode
-                    </option>
-
-                    <option
-                        value="RTGS"
-                        {% if request.POST.received_through == "RTGS" %}
-                            selected
-                        {% endif %}
-                    >
-                        RTGS
-                    </option>
-
-                    <option
-                        value="NEFT"
-                        {% if request.POST.received_through == "NEFT" %}
-                            selected
-                        {% endif %}
-                    >
-                        NEFT
-                    </option>
-
-                    <option
-                        value="CASH"
-                        {% if request.POST.received_through == "CASH" %}
-                            selected
-                        {% endif %}
-                    >
-                        CASH
-                    </option>
-
-                    <option
-                        value="IMPS"
-                        {% if request.POST.received_through == "IMPS" %}
-                            selected
-                        {% endif %}
-                    >
-                        IMPS
-                    </option>
-
-                    <option
-                        value="UPI"
-                        {% if request.POST.received_through == "UPI" %}
-                            selected
-                        {% endif %}
-                    >
-                        UPI
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- =========================================
-                 UTR
-                 ========================================= -->
-
-            <div class="cpay-field">
-
-                <label for="utr_details">
-                    UTR / Transaction Details
-                </label>
-
-                <input
-                    type="text"
-                    id="utr_details"
-                    name="utr_details"
-                    value="{{ request.POST.utr_details|default:'' }}"
-                    placeholder="Enter UTR / transaction reference"
-                >
-
-            </div>
+            </table>
 
         </div>
-
-
-        <!-- =================================================
-             SAVE BUTTON
-             ================================================= -->
-
-        <div class="cpay-form-actions">
-
-            <button
-                type="submit"
-                class="cpay-save-btn"
-            >
-                <i class="bi bi-receipt me-1"></i>
-                Save Receipt
-            </button>
-
-        </div>
-
-    </form>
-
-</div>
-
-
-<!-- =====================================================
-     PAYMENT HISTORY
-     ===================================================== -->
-
-<div class="cpay-card">
-
-    <div class="cpay-table-wrapper">
-
-        <table class="cpay-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Trip
-                    </th>
-
-                    <th>
-                        Customer
-                    </th>
-
-                    <th class="amount-header">
-                        Selling
-                    </th>
-
-                    <th class="amount-header">
-                        Received
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th>
-                        Mode
-                    </th>
-
-                    <th>
-                        UTR
-                    </th>
-
-                    <th>
-                        Received At
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for p in payments %}
-
-                <tr>
-
-                    <!-- Trip -->
-
-                    <td>
-
-                        <div class="trip-number">
-                            {{ p.order.trip_number }}
-                        </div>
-
-                    </td>
-
-
-                    <!-- Customer -->
-
-                    <td>
-                        {{ p.order.customer.name|default:"-" }}
-                    </td>
-
-
-                    <!-- Selling -->
-
-                    <td class="amount">
-                        ₹{{ p.selling_amount|floatformat:2 }}
-                    </td>
-
-
-                    <!-- Received -->
-
-                    <td class="amount">
-                        ₹{{ p.received_amount|floatformat:2 }}
-                    </td>
-
-
-                    <!-- Status -->
-
-                    <td class="status-cell">
-
-                        {% if p.status == "Payment Cleared" %}
-
-                            <span class="status status-success">
-                                {{ p.status }}
-                            </span>
-
-                        {% elif p.status == "Part Amount Received" %}
-
-                            <span class="status status-info">
-                                {{ p.status }}
-                            </span>
-
-                        {% else %}
-
-                            <span class="status status-warning">
-                                {{ p.status }}
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- Mode -->
-
-                    <td>
-                        {{ p.received_through|default:"-" }}
-                    </td>
-
-
-                    <!-- UTR -->
-
-                    <td>
-                        {{ p.utr_details|default:"-" }}
-                    </td>
-
-
-                    <!-- Received At -->
-
-                    <td>
-                        {{ p.received_at|date:"d/m/Y H:i" }}
-                    </td>
-
-                </tr>
-
-                {% empty %}
-
-                <tr>
-
-                    <td
-                        colspan="8"
-                        class="empty-row"
-                    >
-                        No customer receipts found.
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
 
     </div>
 
 </div>
-</div>
+
+
+<!-- =========================================================
+     AUTO-FILL SELLING AMOUNT
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const orderSelect = document.getElementById("order");
+    const sellingAmount = document.getElementById("selling_amount");
+
+    if (!orderSelect || !sellingAmount) {
+        return;
+    }
+
+
+    function updateSellingAmount() {
+
+        const selectedOption =
+            orderSelect.options[orderSelect.selectedIndex];
+
+        if (!selectedOption || !orderSelect.value) {
+
+            sellingAmount.value = "";
+
+            return;
+        }
+
+        const sellingPrice =
+            selectedOption.getAttribute("data-selling-price");
+
+        sellingAmount.value = sellingPrice || "";
+
+    }
+
+
+    // When Trip is selected
+    orderSelect.addEventListener(
+        "change",
+        updateSellingAmount
+    );
+
+
+    // Restore amount after validation error
+    updateSellingAmount();
+
+});
+
+</script>
+
 
 {% endblock %}
+
