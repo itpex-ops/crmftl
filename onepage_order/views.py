@@ -184,6 +184,48 @@ def to_date(value):
 # =============================================================
 
 @login_required
+def onepageorder_delete(request, pk):
+
+    if request.method != "POST":
+        messages.error(
+            request,
+            "Invalid request."
+        )
+        return redirect(
+            "onepageorder_detail",
+            pk=pk
+        )
+
+    order = get_object_or_404(
+        Order,
+        pk=pk
+    )
+
+    trip_number = order.trip_number
+
+    try:
+
+        with transaction.atomic():
+
+            order.delete()
+
+        messages.success(
+            request,
+            f"Order {trip_number} deleted successfully."
+        )
+
+    except Exception:
+        messages.error(
+            request,
+            f"Unable to delete order {trip_number}."
+        )
+
+    return redirect(
+        "onepageorder_list"
+    )
+
+
+@login_required
 def onepageorder_list(request):
 
     search = request.GET.get("q", "").strip()
