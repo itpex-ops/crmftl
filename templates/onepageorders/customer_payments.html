@@ -566,39 +566,22 @@
 
             <div class="cpay-field">
 
-    <label for="order">
-        Trip / Order
-    </label>
+                <label for="selling_amount">
+                    Selling Amount
+                </label>
 
-    <select
-        id="order"
-        name="order"
-        required
-    >
+                <input
+                    type="number"
+                    id="selling_amount"
+                    name="selling_amount"
+                    step="0.01"
+                    min="0"
+                    value="{{ orders.selling_amount }}"
+                    placeholder="0.00"
+                    required
+                >
+            </div>
 
-        <option value="">
-            Select Trip
-        </option>
-
-        {% for order in orders %}
-
-            <option
-                value="{{ order.pk }}"
-                data-selling-price="{{ order.selling_amount|default:0 }}"
-                {% if request.POST.order == order.pk|stringformat:"s" %}
-                    selected
-                {% endif %}
-            >
-                {{ order.trip_number }}
-                -
-                {{ order.customer.name }}
-            </option>
-
-        {% endfor %}
-
-    </select>
-
-</div>
 
             <!-- =========================================
                  RECEIVED AMOUNT
