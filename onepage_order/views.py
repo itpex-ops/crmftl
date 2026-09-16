@@ -135,6 +135,7 @@ def vehicle_live_location(request, pk):
             latest_location.received_at.isoformat(),
 
     })
+
 # =============================================================
 # HELPER FUNCTIONS
 # =============================================================
@@ -227,9 +228,7 @@ def onepageorder_delete(request, pk):
 
 @login_required
 def onepageorder_list(request):
-
     search = request.GET.get("q", "").strip()
-
     orders = (
         Order.objects
         .select_related("customer")
@@ -239,7 +238,6 @@ def onepageorder_list(request):
         )
         .order_by("-id")
     )
-
     if search:
         orders = orders.filter(
             Q(trip_number__icontains=search)
@@ -596,25 +594,17 @@ def prepare_order_for_validation(order):
 
 @login_required
 def onepageorder_create(request):
-
-    template_name = (
-        "onepageorders/order_create.html"
-    )
-
+    template_name = ("onepageorders/order_create.html")
     if request.method != "POST":
         return render(
             request,
             template_name,
         )
-
     try:
-
         with transaction.atomic():
-
             # ==================================================
             # CUSTOMER
             # ==================================================
-
             customer = (
                 create_customer_from_request(
                     request
@@ -1240,7 +1230,6 @@ def onepageorder_edit(request, pk):
         }
     )
 
-
 # =============================================================
 # VEHICLE PAYMENTS
 # =============================================================
@@ -1251,13 +1240,25 @@ def vehicle_payments(request):
     # ---------------------------------------------------------
     # Orders for dropdown
     # ---------------------------------------------------------
-
+    search = request.GET.get("q", "").strip()
     orders = (
-        Order.objects
-        .select_related("customer")
-        .order_by("-id")
-    )
-
+            Order.objects
+            .select_related("customer")
+            .prefetch_related(
+                "vehicle_payments",
+                "customer_payments",
+            )
+            .order_by("-id")
+        )
+    if search:
+            orders = orders.filter(
+                Q(trip_number__icontains=search)
+                | Q(customer__name__icontains=search)
+                | Q(origin__icontains=search)
+                | Q(destination__icontains=search)
+                | Q(vehicle_number__icontains=search)
+                | Q(vehicle_type__icontains=search)
+            )
 
     # ---------------------------------------------------------
     # Payment history
@@ -1499,7 +1500,6 @@ def vehicle_payments(request):
             "payments": payments,
         }
     )
-
 
 # =============================================================
 # CUSTOMER PAYMENTS
