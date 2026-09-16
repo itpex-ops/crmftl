@@ -357,6 +357,10 @@ def build_order_from_request(request, customer):
             request,
             "lead_generated_through",
         ),
+        reference_name=get_post_value(
+            request,
+            "reference_name",
+        ),
 
         sales_closed_by=get_post_value(
             request,
@@ -952,10 +956,15 @@ def onepageorder_edit(request, pk):
                 order.lead_generated_through = request.POST.get(
                     "lead_generated_through",
                     ""
-                )
+                ).strip()
+                
+                order.reference_name = request.POST.get(
+                    "reference_name",
+                    ""
+                ).strip()
 
                 order.sales_closed_by = request.POST.get(
-                    "sales_closed_by",
+                    "sales_closed_by",  
                     ""
                 ).strip()
 

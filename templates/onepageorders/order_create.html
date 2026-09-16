@@ -496,74 +496,29 @@
 
 
                 <!-- Lead Generated Through -->
-
                 <div class="order-form-row">
-
                     <div class="order-form-label">
                         Lead Generated Through
                     </div>
                     <div class="order-form-control">
-                                <select name="lead_source" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="justdial">Just Dial</option>
-                                    <option value="inbound">Inbound</option>
-                                    <option value="outbound">Outbound</option>
-                                    <option value="social media">Social Media</option>
-                                    <option value="reference">Reference</option>
-                                </select>
-                            </div>
-                    </div>
-                    <div class="order-form-control">
-
-                        <select name="lead_generated_through">
-
-                            <option value="">
-                                Select
-                            </option>
-
-                            <option value="Social Media"
-                                {% if request.POST.lead_generated_through == "Social Media" %}
-                                    selected
-                                {% endif %}>
-                                Social Media
-                            </option>
-
-                            <option value="Outbound Calls"
-                                {% if request.POST.lead_generated_through == "Outbound Calls" %}
-                                    selected
-                                {% endif %}>
-                                Outbound Calls
-                            </option>
-
-                            <option value="Reference"
-                                {% if request.POST.lead_generated_through == "Reference" %}
-                                    selected
-                                {% endif %}>
-                                Reference
-                            </option>
-
-                            <option value="Field Sales"
-                                {% if request.POST.lead_generated_through == "Field Sales" %}
-                                    selected
-                                {% endif %}>
-                                Field Sales
-                            </option>
-
-                            <option value="Justdial"
-                                {% if request.POST.lead_generated_through == "Justdial" %}
-                                    selected
-                                {% endif %}>
-                                Justdial
-                            </option>
-
+                        <select name="lead_source" class="form-select">
+                            <option value="">Select</option>
+                            <option value="justdial">Just Dial</option>
+                            <option value="inbound">Inbound</option>
+                            <option value="outbound">Outbound</option>
+                            <option value="social media">Social Media</option>
+                            <option value="reference">Reference</option>
                         </select>
-
                     </div>
-
                 </div>  
-
-
-
+                <div class="order-form-row">
+                    <div class="col-md-4">
+                                <label class="form-label">
+                                    Reference / Social Media
+                                </label>
+                                <input type="text" name="reference_name" class="form-control">
+                    </div>
+                </div>
                 <!-- Sales Closed By -->
 
                 <div class="order-form-row">

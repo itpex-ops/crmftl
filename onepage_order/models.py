@@ -1,8 +1,6 @@
 from decimal import Decimal
-
 from django.core.validators import MinValueValidator
 from django.db import models
-
 
 # ============================================================
 # CUSTOMER
@@ -107,6 +105,11 @@ class Order(models.Model):
         blank=True,
     )
 
+    reference_name = models.CharField(
+        max_length=120, 
+        blank=True,
+    )
+    
     sales_closed_by = models.CharField(
         max_length=120,
         blank=True,
