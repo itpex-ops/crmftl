@@ -75,7 +75,7 @@ urlpatterns = [
 
     path(
         "vehicle-live/<int:pk>/location/",
-        views.onepageordervehicle_live_location,
+        views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
@@ -93,8 +93,8 @@ urlpatterns = [
 
     path(
         "live-tracking/",
-        views.onepageorderlive_tracking_list,
-        name="onepageorderlive_tracking_list",
+        views.live_tracking_list,
+        name="live_tracking_list",
     ),
 
     path(

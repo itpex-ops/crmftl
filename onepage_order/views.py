@@ -136,7 +136,7 @@ def add_tracking_template_flags(tracking):
 # LIVE TRACKING PAGE
 # =============================================================
 @login_required
-def onepageordervehicle_live(request, pk):
+def vehicle_live(request, pk):
     """
     Display the live-tracking page using a TrackingSession PK.
     TrackingSession is linked directly to Order.
@@ -173,7 +173,7 @@ def onepageordervehicle_live(request, pk):
     )
 
 @login_required
-def onepageordervehicle_live_location(request, pk):
+def vehicle_live_location(request, pk):
     """
     Return the latest location using a TrackingSession PK.
     """
@@ -1882,7 +1882,7 @@ def unique_location_history(session):
 # =============================================================
 
 @login_required
-def onepageorderlive_tracking_list(request):
+def live_tracking_list(request):
     query = request.GET.get("q", "").strip()
 
     orders = (
@@ -1918,7 +1918,7 @@ def onepageorderlive_tracking_list(request):
 # =============================================================
 
 @login_required
-def onepagelive_tracking_setup(request, order_id):
+def live_tracking_setup(request, order_id):
     order = get_object_or_404(
         Order.objects.select_related(
             "customer", "tracking", "tracking_session"
@@ -1962,7 +1962,7 @@ def import_driver(request, order_id):
             )
 
         return redirect(
-            "onepagelive_tracking_setup",
+            "live_tracking_setup",
             order_id=order.pk,
         )
 
@@ -1978,7 +1978,7 @@ def import_driver(request, order_id):
     messages.error(request, error_message)
 
     return redirect(
-        "onepagelive_tracking_setup",
+        "live_tracking_setup",
         order_id=order.pk,
     )
 
@@ -1990,7 +1990,7 @@ def import_driver(request, order_id):
 @login_required
 def delete_tracking(request, pk):
     if request.method != "POST":
-        return redirect("onepageorderlive_tracking_list")
+        return redirect("live_tracking_list")
 
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
@@ -2002,7 +2002,7 @@ def delete_tracking(request, pk):
             request,
             "Tracking entity ID is missing.",
         )
-        return redirect("onepageorderlive_tracking_list")
+        return redirect("live_tracking_list")
 
     result = DeleteService.delete_tracking(session)
 
@@ -2022,7 +2022,7 @@ def delete_tracking(request, pk):
             result.get("message", "Unable to delete tracking."),
         )
 
-    return redirect("onepageorderlive_tracking_list")
+    return redirect("live_tracking_list")
 
 
 # # =============================================================
@@ -2045,7 +2045,7 @@ def send_consent(request, session_id):
             str(result.get("message", "Unable to check consent.")),
         )
 
-    return redirect("onepageorderlive_tracking_list")
+    return redirect("live_tracking_list")
 
 
 @login_required
@@ -2058,7 +2058,7 @@ def check_consent(request, session_id):
             request,
             str(result.get("message", "Unable to check consent.")),
         )
-        return redirect("onepageorderlive_tracking_list")
+        return redirect("live_tracking_list")
 
     consent_status = result.get("status")
 
@@ -2103,7 +2103,7 @@ def check_consent(request, session_id):
             f"Consent Status : {consent_status}",
         )
 
-    return redirect("onepageorderlive_tracking_list")
+    return redirect("live_tracking_list")
 
 
 # # =============================================================
@@ -2130,6 +2130,7 @@ def test_location(request, session_id):
 
     result = LocationService.get_location(driver_mobile)
     return JsonResponse(result, safe=False)
+
 
 # # =============================================================
 # # LIVE TRACKING PAGE
@@ -2164,6 +2165,7 @@ def vehicle_live(request, session_id):
             "locations": session.locations.all(),
         },
     )
+
 
 # # =============================================================
 # # LIVE TRACKING LOCATION API
@@ -2241,6 +2243,7 @@ def vehicle_live_location(request, session_id):
             ),
         }
     )
+
 
 # # # =============================================================
 # # # LOCATION HISTORY
