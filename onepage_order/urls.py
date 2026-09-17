@@ -45,23 +45,23 @@ urlpatterns = [
 #     # PAYMENTS
 #     # =========================================================
 
-#     path(
-#         "vehicle-payments/",
-#         views.vehicle_payments,
-#         name="vehicle_payments",
-#     ),
+    path(
+        "vehicle-payments/",
+        views.vehicle_payments,
+        name="vehicle_payments",
+    ),
 
-#     path(
-#         "customer-payments/",
-#         views.customer_payments,
-#         name="customer_payments",
-#     ),
+    path(
+        "customer-payments/",
+        views.customer_payments,
+        name="customer_payments",
+    ),
 
-#     path(
-#         "admin-margin/",
-#         views.admin_margin,
-#         name="admin_margin",
-#     ),
+    path(
+        "admin-margin/",
+        views.admin_margin,
+        name="admin_margin",
+    ),
 
 #     # =========================================================
 #     # LIVE TRACKING
