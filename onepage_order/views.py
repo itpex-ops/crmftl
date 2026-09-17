@@ -1,14 +1,16 @@
 from decimal import Decimal, InvalidOperation
-from datetime import datetime, timezone
+from datetime import datetime
 import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.utils import timezone
 
-from vehicles.models import Vehicle
 from .models import (
     Customer,
     Order,
@@ -22,20 +24,147 @@ from .models import (
     ApiLog,
     ApiToken,
 )
-from django.http import JsonResponse
-from django.core.exceptions import ValidationError
+
 logger = logging.getLogger(__name__)
+
+
+# =============================================================
+# COMMON HELPERS
+# =============================================================
+
+def get_post_value(request, field, default=""):
+    """Return a cleaned POST string."""
+    value = request.POST.get(field, default)
+    return value.strip() if isinstance(value, str) else default
+
+
+def to_decimal(value, default="0.00"):
+    """Safely convert POST input to Decimal."""
+    if value in (None, ""):
+        return Decimal(default)
+
+    try:
+        return Decimal(str(value).strip())
+    except (InvalidOperation, ValueError, TypeError):
+        return Decimal(default)
+
+
+def to_integer(value, default=0):
+    """Safely convert POST input to integer."""
+    if value in (None, ""):
+        return default
+
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def to_date(value):
+    """Convert HTML date input (YYYY-MM-DD) to a Python date."""
+    if not value:
+        return None
+
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return None
+
+
+def gst_from_request(request):
+    """
+    Read and validate the GST checkbox value.
+
+    Supported values:
+    0, 7, 8, 10, 13
+    """
+    raw_value = request.POST.get("gst_percent", "0")
+    gst_percent = to_decimal(raw_value, "0.00")
+
+    valid_rates = {
+        Decimal("0.00"),
+        Decimal("7.00"),
+        Decimal("8.00"),
+        Decimal("10.00"),
+        Decimal("13.00"),
+    }
+
+    if gst_percent not in valid_rates:
+        raise ValidationError("Invalid GST percentage selected.")
+
+    return gst_percent
+
+
+def order_queryset():
+    """Common optimized Order queryset."""
+    return (
+        Order.objects
+        .select_related(
+            "customer",
+            "tracking",
+            "tracking_session",
+        )
+        .prefetch_related(
+            "vehicle_payments",
+            "customer_payments",
+        )
+        .order_by("-id")
+    )
+
+
+def payment_page_context(orders, payments):
+    return {
+        "orders": orders,
+        "payments": payments,
+    }
+
+
+def add_tracking_template_flags(tracking):
+    """
+    Backward-compatible template aliases.
+
+    Tracking model stores:
+    - live tracking as live_tracking_at
+    - balance transfer as balance_to_fleet
+
+    Older tracking_page templates may still use:
+    - tracking.live_tracking
+    - tracking.balance_trans_fleet
+    """
+    tracking.live_tracking = bool(
+        tracking.live_tracking_at
+    )
+    tracking.balance_trans_fleet = bool(
+        tracking.balance_to_fleet
+    )
+    return tracking
+
+
+# =============================================================
+# LIVE TRACKING PAGE
+# =============================================================
+
 @login_required
 def vehicle_live(request, pk):
+    """
+    Display the live-tracking page using a TrackingSession PK.
+    TrackingSession is linked directly to Order.
+    """
     tracking_session = get_object_or_404(
-        TrackingSession.objects.select_related("order"),
-        pk=pk
+        TrackingSession.objects.select_related(
+            "order",
+            "order__customer",
+            "order__tracking",
+        ),
+        pk=pk,
     )
 
     order = tracking_session.order
+    tracking = getattr(order, "tracking", None)
 
     latest_location = (
-        tracking_session.locations
+        LiveLocation.objects
+        .filter(session=tracking_session)
         .order_by("-received_at")
         .first()
     )
@@ -43,21 +172,25 @@ def vehicle_live(request, pk):
     context = {
         "tracking_session": tracking_session,
         "order": order,
+        "tracking": tracking,
         "latest_location": latest_location,
     }
 
     return render(
         request,
         "onepageorders/tracking_page.html",
-        context
+        context,
     )
+
 
 @login_required
 def vehicle_live_location(request, pk):
-
+    """
+    Return the latest location using a TrackingSession PK.
+    """
     tracking_session = get_object_or_404(
-        TrackingSession,
-        pk=pk
+        TrackingSession.objects.select_related("order"),
+        pk=pk,
     )
 
     order = tracking_session.order
@@ -70,178 +203,138 @@ def vehicle_live_location(request, pk):
     )
 
     if not latest_location:
-
         return JsonResponse({
             "success": True,
+            "tracking": True,
             "has_location": False,
-
             "vehicle_number": order.vehicle_number or "",
             "driver_number": order.driver_number or "",
-
-            "tracking_reference":
-                tracking_session.tracking_reference,
-
-            "status":
-                tracking_session.get_status_display(),
-
-            "message":
-                "Waiting for vehicle location..."
+            "trip_number": order.trip_number or "",
+            "tracking_reference": (
+                tracking_session.tracking_reference
+            ),
+            "status": tracking_session.get_status_display(),
+            "tracking_enabled": (
+                tracking_session.tracking_enabled
+            ),
+            "consent_received": (
+                tracking_session.consent_received
+            ),
+            "message": "Waiting for vehicle location...",
         })
 
+    latitude = (
+        float(latest_location.latitude)
+        if latest_location.latitude is not None
+        else None
+    )
+
+    longitude = (
+        float(latest_location.longitude)
+        if latest_location.longitude is not None
+        else None
+    )
 
     return JsonResponse({
-
         "success": True,
+        "tracking": True,
         "has_location": True,
-
-        "vehicle_number":
-            order.vehicle_number or "",
-
-        "driver_number":
-            order.driver_number or "",
-
-        "trip_number":
-            order.trip_number or "",
-
-        "tracking_reference":
-            tracking_session.tracking_reference,
-
-        "status":
-            tracking_session.get_status_display(),
-
-        "tracking_enabled":
-            tracking_session.tracking_enabled,
-
-        "consent_received":
-            tracking_session.consent_received,
-
-        "latitude":
-            float(latest_location.latitude),
-
-        "longitude":
-            float(latest_location.longitude),
-
-        "accuracy":
-            latest_location.accuracy,
-
-        "location_name":
-            latest_location.location_name or "",
-
-        "address":
-            latest_location.address or "",
-
-        "location_status":
-            latest_location.location_status or "",
-
-        "tracked":
-            latest_location.tracked,
-
-        "received_at":
-            latest_location.received_at.isoformat(),
-
+        "vehicle_number": order.vehicle_number or "",
+        "driver_number": order.driver_number or "",
+        "trip_number": order.trip_number or "",
+        "tracking_reference": (
+            tracking_session.tracking_reference
+        ),
+        "status": tracking_session.get_status_display(),
+        "tracking_enabled": (
+            tracking_session.tracking_enabled
+        ),
+        "consent_received": (
+            tracking_session.consent_received
+        ),
+        "latitude": latitude,
+        "longitude": longitude,
+        "accuracy": latest_location.accuracy,
+        "location_name": (
+            latest_location.location_name or ""
+        ),
+        "address": latest_location.address or "",
+        "location_status": (
+            latest_location.location_status or ""
+        ),
+        "tracked": latest_location.tracked,
+        "received_at": (
+            latest_location.received_at.isoformat()
+        ),
+        "session_last_updated": (
+            tracking_session.last_updated.isoformat()
+            if tracking_session.last_updated
+            else None
+        ),
     })
 
+
 # =============================================================
-# HELPER FUNCTIONS
+# ORDER DELETE
 # =============================================================
 
-def to_decimal(value, default="0.00"):
-    """
-    Safely convert POST value to Decimal.
-    """
-    if value in (None, ""):
-        return Decimal(default)
+@login_required
+def onepageorder_delete(request, pk):
+    if request.method != "POST":
+        messages.error(
+            request,
+            "Invalid request.",
+        )
+        return redirect(
+            "onepageorder_detail",
+            pk=pk,
+        )
+
+    order = get_object_or_404(
+        Order,
+        pk=pk,
+    )
+
+    trip_number = order.trip_number
 
     try:
-        return Decimal(str(value))
-    except (InvalidOperation, ValueError, TypeError):
-        return Decimal(default)
+        with transaction.atomic():
+            order.delete()
 
-def to_integer(value, default=0):
-    """
-    Safely convert POST value to integer.
-    """
-    if value in (None, ""):
-        return default
+        messages.success(
+            request,
+            f"Order {trip_number} deleted successfully.",
+        )
 
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        return default
+    except Exception:
+        logger.exception(
+            "Unable to delete order %s",
+            trip_number,
+        )
+        messages.error(
+            request,
+            f"Unable to delete order {trip_number}.",
+        )
 
-def to_date(value):
-    """
-    HTML date input sends YYYY-MM-DD.
-    """
-    if not value:
-        return None
+    return redirect("onepageorder_list")
 
-    try:
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
-    except ValueError:
-        return None
+
+# Backward-compatible name if an old URL still points to delete_vehicle.
+@login_required
+def delete_vehicle(request, pk):
+    return onepageorder_delete(request, pk)
+
 
 # =============================================================
 # ORDER LIST
 # =============================================================
 
 @login_required
-def onepageorder_delete(request, pk):
-
-    if request.method != "POST":
-        messages.error(
-            request,
-            "Invalid request."
-        )
-        return redirect(
-            "onepageorder_detail",
-            pk=pk
-        )
-
-    order = get_object_or_404(
-        Order,
-        pk=pk
-    )
-
-    trip_number = order.trip_number
-
-    try:
-
-        with transaction.atomic():
-
-            order.delete()
-
-        messages.success(
-            request,
-            f"Order {trip_number} deleted successfully."
-        )
-
-    except Exception:
-        messages.error(
-            request,
-            f"Unable to delete order {trip_number}."
-        )
-
-    return redirect(
-        "onepageorder_list"
-    )
-
-
-@login_required
 def onepageorder_list(request):
     search = request.GET.get("q", "").strip()
-    orders = (
-        Order.objects
-        .select_related("customer")
-        .prefetch_related(
-            "vehicle_payments",
-            "customer_payments",
-        )
-        .order_by("-id")
-    )
+
+    orders = order_queryset()
+
     if search:
         orders = orders.filter(
             Q(trip_number__icontains=search)
@@ -261,57 +354,12 @@ def onepageorder_list(request):
         },
     )
 
-# ============================================================
-# FORM VALUE HELPERS
-# ============================================================
 
-def get_post_value(request, field, default=""):
-    """
-    Return a cleaned POST string.
-    """
-    return request.POST.get(field, default).strip()
-
-
-def to_decimal(value, default="0.00"):
-    """
-    Safely convert form input to Decimal.
-    """
-    if value in (None, ""):
-        return Decimal(default)
-
-    try:
-        return Decimal(str(value).strip())
-    except (InvalidOperation, ValueError, TypeError):
-        return Decimal(default)
-
-
-def to_integer(value, default=0):
-    """
-    Safely convert form input to integer.
-    """
-    if value in (None, ""):
-        return default
-
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        return default
-
-
-def to_date(value):
-    """
-    Return date string as-is.
-
-    Django DateField validation will handle the
-    actual date validation during full_clean().
-    """
-    return value or None
+# =============================================================
+# ORDER CREATE HELPERS
+# =============================================================
 
 def create_customer_from_request(request):
-    """
-    Create and validate Customer from POST data.
-    """
-
     customer_name = get_post_value(
         request,
         "customer_name",
@@ -343,20 +391,17 @@ def create_customer_from_request(request):
 
     return customer
 
+
 def build_order_from_request(request, customer):
     """
-    Build an Order instance from POST data.
-
-    This function does NOT save the order.
+    Build an Order from POST data.
+    The object is returned without saving.
     """
 
     order = Order(
-        # ----------------------------------------------------
-        # Customer / Sales
-        # ----------------------------------------------------
-
         customer=customer,
 
+        # Customer / Sales
         lead_generated_through=get_post_value(
             request,
             "lead_generated_through",
@@ -365,293 +410,220 @@ def build_order_from_request(request, customer):
             request,
             "reference_name",
         ),
-
         sales_closed_by=get_post_value(
             request,
             "sales_closed_by",
         ),
 
-        # ----------------------------------------------------
         # Shipment
-        # ----------------------------------------------------
-
         origin=get_post_value(
             request,
             "origin",
         ),
-
         destination=get_post_value(
             request,
             "destination",
         ),
-
         material=get_post_value(
             request,
             "material",
         ),
-
         packing_type=get_post_value(
             request,
             "packing_type",
         ),
-
         no_of_pieces=to_integer(
-            request.POST.get("no_of_pieces")
+            request.POST.get("no_of_pieces"),
         ),
-
         weight_tons=to_decimal(
             request.POST.get("weight_tons"),
             "0.000",
         ),
 
-        # ----------------------------------------------------
         # Vehicle
-        # ----------------------------------------------------
-
         vehicle_type=get_post_value(
             request,
             "vehicle_type",
         ),
-
         vehicle_number=get_post_value(
             request,
             "vehicle_number",
         ),
-
         driver_number=get_post_value(
             request,
             "driver_number",
         ),
-
         owner_number=get_post_value(
             request,
             "owner_number",
         ),
-
         vehicle_sourced_by=request.POST.get(
             "vehicle_sourced_by",
             "Direct",
         ),
-
         owner_broker_name=get_post_value(
             request,
             "owner_broker_name",
         ),
 
-        # ----------------------------------------------------
         # Commercials
-        # ----------------------------------------------------
-
         freight_amount=to_decimal(
-            request.POST.get("freight_amount")
+            request.POST.get("freight_amount"),
         ),
-
         loading_unloading_charges=to_decimal(
             request.POST.get(
                 "loading_unloading_charges"
-            )
+            ),
         ),
-
         halting_charges=to_decimal(
             request.POST.get(
                 "halting_charges"
-            )
+            ),
         ),
-
         other_charges=to_decimal(
-            request.POST.get(
-                "other_charges"
-            )
+            request.POST.get("other_charges"),
         ),
-
         selling_amount=to_decimal(
-            request.POST.get(
-                "selling_amount"
-            )
+            request.POST.get("selling_amount"),
         ),
-
-        gst_percent=to_decimal(
-            request.POST.get(
-                "gst_percent"
-            )
-        ),
+        gst_percent=gst_from_request(request),
 
         manager_approval=request.POST.get(
             "manager_approval",
             "Pending",
         ),
-
         approved_by=get_post_value(
             request,
             "approved_by",
         ),
 
-        # ----------------------------------------------------
         # Customer Payment Terms
-        # ----------------------------------------------------
-
         customer_billing_type=request.POST.get(
             "customer_billing_type",
             "",
         ),
-
         customer_payment_type=request.POST.get(
             "customer_payment_type",
             "",
         ),
-
         customer_advance_amount=to_decimal(
             request.POST.get(
                 "customer_advance_amount"
-            )
+            ),
         ),
-
         customer_balance_amount=to_decimal(
             request.POST.get(
                 "customer_balance_amount"
-            )
+            ),
         ),
-
         customer_payment_method=request.POST.get(
             "customer_payment_method",
             "",
         ),
-
         promised_due_date=to_date(
             request.POST.get(
                 "promised_due_date"
             )
         ),
 
-        # ----------------------------------------------------
-        # Contracted Vehicle Payment
-        # ----------------------------------------------------
-
+        # Contracted Vehicle Payment Terms
         vehicle_advance_amount=to_decimal(
             request.POST.get(
                 "vehicle_advance_amount"
-            )
+            ),
         ),
-
         vehicle_balance_amount=to_decimal(
             request.POST.get(
                 "vehicle_balance_amount"
-            )
+            ),
         ),
-
         vehicle_owner_name=get_post_value(
             request,
             "vehicle_owner_name",
         ),
-
         pan_card=get_post_value(
             request,
             "pan_card",
         ),
-
         account_name=get_post_value(
             request,
             "account_name",
         ),
-
         account_number=get_post_value(
             request,
             "account_number",
         ),
-
         ifsc_code=get_post_value(
             request,
             "ifsc_code",
         ),
-
         upi_number=get_post_value(
             request,
             "upi_number",
         ),
 
-        # ----------------------------------------------------
         # Options
-        # ----------------------------------------------------
-
         send_sms=(
-            request.POST.get("send_sms")
-            == "on"
+            request.POST.get("send_sms") == "on"
         ),
-
         create_agreement_tds=(
             request.POST.get(
                 "create_agreement_tds"
-            )
-            == "on"
+            ) == "on"
         ),
     )
 
     return order
 
+
 def prepare_order_for_validation(order):
     """
-    Generate fields that are required before full_clean().
+    Order.full_clean() runs before Order.save(), so generate
+    trip_number first.
     """
-
     if not order.trip_number:
-        order.trip_number = (
-            Order.generate_trip_number()
-        )
+        order.trip_number = Order.generate_trip_number()
 
     return order
 
+
+# =============================================================
+# ORDER CREATE
+# =============================================================
+
 @login_required
 def onepageorder_create(request):
-    template_name = ("onepageorders/order_create.html")
+    template_name = "onepageorders/order_create.html"
+
     if request.method != "POST":
         return render(
             request,
             template_name,
         )
+
     try:
         with transaction.atomic():
-            # ==================================================
-            # CUSTOMER
-            # ==================================================
-            customer = (
-                create_customer_from_request(
-                    request
-                )
-            )
 
-            # ==================================================
-            # ORDER
-            # ==================================================
+            customer = create_customer_from_request(
+                request
+            )
 
             order = build_order_from_request(
                 request,
                 customer,
             )
 
-            # ==================================================
-            # TRIP NUMBER
-            # ==================================================
-
             prepare_order_for_validation(
                 order
             )
 
-            # ==================================================
-            # VALIDATION
-            # ==================================================
-
             order.full_clean()
-
-            # ==================================================
-            # SAVE
-            # ==================================================
-
             order.save()
 
-        # ======================================================
-        # SUCCESS
-        # ======================================================
-        Tracking.objects.get_or_create(order=order)
+            # Create the workflow record together with the order.
+            Tracking.objects.get_or_create(
+                order=order
+            )
 
         messages.success(
             request,
@@ -666,12 +638,7 @@ def onepageorder_create(request):
             pk=order.pk,
         )
 
-    # ==========================================================
-    # VALIDATION ERROR
-    # ==========================================================
-
     except ValidationError as e:
-
         logger.warning(
             "Order validation failed: %s",
             e,
@@ -693,7 +660,6 @@ def onepageorder_create(request):
                 request,
                 " | ".join(error_messages),
             )
-
         else:
             messages.error(
                 request,
@@ -705,12 +671,7 @@ def onepageorder_create(request):
             template_name,
         )
 
-    # ==========================================================
-    # UNEXPECTED ERROR
-    # ==========================================================
-
     except Exception:
-
         logger.exception(
             "Unexpected error while creating order"
         )
@@ -728,19 +689,25 @@ def onepageorder_create(request):
             request,
             template_name,
         )
+
+
 # =============================================================
 # ORDER DETAIL
 # =============================================================
 
 @login_required
 def onepageorder_detail(request, pk):
-
     order = get_object_or_404(
         Order.objects
-        .select_related("customer")
+        .select_related(
+            "customer",
+            "tracking",
+            "tracking_session",
+        )
         .prefetch_related(
             "vehicle_payments",
             "customer_payments",
+            "tracking__documents",
         ),
         pk=pk,
     )
@@ -750,417 +717,432 @@ def onepageorder_detail(request, pk):
         "onepageorders/order_detail.html",
         {
             "order": order,
+            "tracking": getattr(
+                order,
+                "tracking",
+                None,
+            ),
         },
     )
 
+
 # =============================================================
-# LIVE TRACKING - CURRENT LOCATION API
+# LIVE TRACKING - ORDER LOCATION API
 # =============================================================
 
 @login_required
 def order_live_location(request, pk):
-
     order = get_object_or_404(
-        Order,
+        Order.objects.select_related(
+            "tracking_session",
+        ),
         pk=pk,
     )
 
     tracking_session = getattr(
         order,
         "tracking_session",
-        None
+        None,
     )
 
-    # ---------------------------------------------------------
-    # No tracking session
-    # ---------------------------------------------------------
-
     if not tracking_session:
-
         return JsonResponse(
             {
                 "success": False,
                 "tracking": False,
-                "message": "Live tracking is not enabled for this order.",
+                "message": (
+                    "Live tracking is not enabled "
+                    "for this order."
+                ),
             },
             status=404,
         )
 
-    # ---------------------------------------------------------
-    # Latest location
-    # ---------------------------------------------------------
-
     latest_location = (
         LiveLocation.objects
-        .filter(
-            session=tracking_session
-        )
+        .filter(session=tracking_session)
         .order_by("-received_at")
         .first()
     )
 
-    # ---------------------------------------------------------
-    # No location received yet
-    # ---------------------------------------------------------
-
     if not latest_location:
-
-        return JsonResponse(
-            {
-                "success": True,
-                "tracking": True,
-                "has_location": False,
-                "status": tracking_session.get_status_display(),
-                "tracking_reference": tracking_session.tracking_reference,
-                "driver_mobile": tracking_session.driver_mobile,
-                "message": "Waiting for vehicle location...",
-            }
-        )
-
-    # ---------------------------------------------------------
-    # Return latest location
-    # ---------------------------------------------------------
-
-    return JsonResponse(
-        {
+        return JsonResponse({
             "success": True,
             "tracking": True,
-            "has_location": True,
-
-            "status": tracking_session.get_status_display(),
-
-            "tracking_enabled": (
-                tracking_session.tracking_enabled
+            "has_location": False,
+            "trip_number": order.trip_number or "",
+            "vehicle_number": (
+                order.vehicle_number or ""
             ),
-
-            "consent_received": (
-                tracking_session.consent_received
+            "driver_number": (
+                order.driver_number or ""
             ),
-
+            "status": (
+                tracking_session.get_status_display()
+            ),
             "tracking_reference": (
                 tracking_session.tracking_reference
             ),
-
             "driver_mobile": (
                 tracking_session.driver_mobile
             ),
-
-            "latitude": float(
-                latest_location.latitude
+            "tracking_enabled": (
+                tracking_session.tracking_enabled
             ),
-
-            "longitude": float(
-                latest_location.longitude
+            "consent_received": (
+                tracking_session.consent_received
             ),
-
-            "accuracy": (
-                latest_location.accuracy
+            "message": (
+                "Waiting for vehicle location..."
             ),
+        })
 
-            "location_name": (
-                latest_location.location_name
-                or ""
-            ),
-
-            "address": (
-                latest_location.address
-                or ""
-            ),
-
-            "location_status": (
-                latest_location.location_status
-                or ""
-            ),
-
-            "tracked": (
-                latest_location.tracked
-            ),
-
-            "received_at": (
-                latest_location.received_at.isoformat()
-            ),
-
-            "session_last_updated": (
-                tracking_session.last_updated.isoformat()
-                if tracking_session.last_updated
-                else None
-            ),
-        }
+    latitude = (
+        float(latest_location.latitude)
+        if latest_location.latitude is not None
+        else None
     )
-# =============================================================
-# EDIT ORDER
-# =============================================================
 
+    longitude = (
+        float(latest_location.longitude)
+        if latest_location.longitude is not None
+        else None
+    )
+
+    return JsonResponse({
+        "success": True,
+        "tracking": True,
+        "has_location": True,
+        "trip_number": order.trip_number or "",
+        "vehicle_number": (
+            order.vehicle_number or ""
+        ),
+        "driver_number": (
+            order.driver_number or ""
+        ),
+        "status": (
+            tracking_session.get_status_display()
+        ),
+        "tracking_enabled": (
+            tracking_session.tracking_enabled
+        ),
+        "consent_received": (
+            tracking_session.consent_received
+        ),
+        "tracking_reference": (
+            tracking_session.tracking_reference
+        ),
+        "driver_mobile": (
+            tracking_session.driver_mobile
+        ),
+        "latitude": latitude,
+        "longitude": longitude,
+        "accuracy": latest_location.accuracy,
+        "location_name": (
+            latest_location.location_name or ""
+        ),
+        "address": (
+            latest_location.address or ""
+        ),
+        "location_status": (
+            latest_location.location_status or ""
+        ),
+        "tracked": latest_location.tracked,
+        "received_at": (
+            latest_location.received_at.isoformat()
+        ),
+        "session_last_updated": (
+            tracking_session.last_updated.isoformat()
+            if tracking_session.last_updated
+            else None
+        ),
+    })
+
+
+# =============================================================
+# TRACKING WORKFLOW
+# =============================================================
 
 @login_required
 def tracking_page(request, pk):
+    """
+    Tracking page uses Order PK.
 
-    # ============================================================
-    # GET ORDER
-    # ============================================================
+    Tracking model fields are used exactly as defined:
+    - vehicle_placed
+    - vehicle_document
+    - invoice_eway
+    - advance_to_fleet
+    - balance_to_fleet
+    - fleet_departed
+    - arrived
+    - delivered
+    - pod_received
+    - lr_no_b
+    - settled
+
+    Live tracking is represented by live_tracking_at because
+    Tracking does not have a live_tracking Boolean field.
+    """
 
     order = get_object_or_404(
-        Order.objects.select_related(
+        Order.objects
+        .select_related(
             "customer",
+            "tracking",
             "tracking_session",
         ),
-        pk=pk
+        pk=pk,
     )
 
-    # ============================================================
-    # GET OR CREATE TRACKING
-    # ============================================================
-
-    tracking, created = Tracking.objects.get_or_create(
+    tracking, _created = Tracking.objects.get_or_create(
         order=order
     )
-
-    # ============================================================
-    # POST
-    # ============================================================
+    add_tracking_template_flags(tracking)
 
     if request.method == "POST":
 
         # --------------------------------------------------------
-        # BLOCK IF ALREADY SETTLED
+        # LOCK AFTER SETTLEMENT
         # --------------------------------------------------------
 
         if tracking.settled:
             messages.warning(
                 request,
-                "Tracking already settled. Editing is locked."
+                "Tracking already settled. Editing is locked.",
             )
 
             return redirect(
                 "onepageorder_detail",
-                pk=order.pk
+                pk=order.pk,
             )
 
-        # --------------------------------------------------------
-        # CHECKBOXES
-        # --------------------------------------------------------
+        try:
+            with transaction.atomic():
 
-        tracking.vehicle_placed = (
-            request.POST.get("vehicle_placed") == "on"
-        )
+                # ------------------------------------------------
+                # CHECKBOXES
+                # ------------------------------------------------
 
-        tracking.live_tracking = (
-            request.POST.get("live_tracking") == "on"
-        )
-
-        tracking.vehicle_document = (
-            request.POST.get("vehicle_document") == "on"
-        )
-
-        tracking.invoice_eway = (
-            request.POST.get("invoice_eway") == "on"
-        )
-
-        tracking.lr_no_b = (
-            request.POST.get("lr_no_b") == "on"
-        )
-
-        tracking.advance_to_fleet = (
-            request.POST.get("advance_to_fleet") == "on"
-        )
-
-        tracking.fleet_departed = (
-            request.POST.get("fleet_departed") == "on"
-        )
-
-        tracking.balance_trans_fleet = (
-            request.POST.get("balance_trans_fleet") == "on"
-        )
-
-        tracking.arrived = (
-            request.POST.get("arrived") == "on"
-        )
-
-        tracking.delivered = (
-            request.POST.get("delivered") == "on"
-        )
-
-        tracking.pod_received = (
-            request.POST.get("pod_received") == "on"
-        )
-
-        tracking.settled = (
-            request.POST.get("settled") == "on"
-        )
-
-        # --------------------------------------------------------
-        # LR NUMBER
-        # --------------------------------------------------------
-
-        tracking.lr_no = request.POST.get(
-            "lr_no",
-            ""
-        ).strip()
-
-        # --------------------------------------------------------
-        # REMARKS
-        # --------------------------------------------------------
-
-        tracking.remarks = request.POST.get(
-            "remarks",
-            ""
-        ).strip()
-
-        # --------------------------------------------------------
-        # TIMELINE
-        # --------------------------------------------------------
-
-        now = timezone.now()
-
-        if (
-            tracking.vehicle_placed
-            and not tracking.vehicle_placed_at
-        ):
-            tracking.vehicle_placed_at = now
-
-        if (
-            tracking.live_tracking
-            and not tracking.live_tracking_at
-        ):
-            tracking.live_tracking_at = now
-
-        if (
-            tracking.fleet_departed
-            and not tracking.fleet_departed_at
-        ):
-            tracking.fleet_departed_at = now
-
-        if (
-            tracking.arrived
-            and not tracking.arrived_at
-        ):
-            tracking.arrived_at = now
-
-        if (
-            tracking.delivered
-            and not tracking.delivered_at
-        ):
-            tracking.delivered_at = now
-
-        # --------------------------------------------------------
-        # STATUS
-        # --------------------------------------------------------
-
-        if tracking.settled:
-
-            tracking.status = "settled"
-
-        elif tracking.pod_received:
-
-            tracking.status = "pod_received"
-
-        elif tracking.delivered:
-
-            tracking.status = "delivered"
-
-        elif tracking.arrived:
-
-            tracking.status = "arrived"
-
-        elif tracking.balance_trans_fleet:
-
-            tracking.status = "balance_trans_fleet"
-
-        elif tracking.fleet_departed:
-
-            tracking.status = "fleet_departed"
-
-        elif tracking.advance_to_fleet:
-
-            tracking.status = "advance_to_fleet"
-
-        elif tracking.invoice_eway:
-
-            tracking.status = "invoice_eway"
-
-        elif tracking.lr_no_b:
-
-            tracking.status = "lr_generated"
-
-        elif tracking.vehicle_document:
-
-            tracking.status = "vehicle_document"
-
-        elif tracking.live_tracking:
-
-            tracking.status = "live_tracking"
-
-        elif tracking.vehicle_placed:
-
-            tracking.status = "vehicle_placed"
-
-        # --------------------------------------------------------
-        # SAVE TRACKING + DOCUMENTS
-        # --------------------------------------------------------
-
-        with transaction.atomic():
-
-            tracking.save()
-
-            files = request.FILES.getlist("documents")
-
-            for file in files:
-
-                TrackingDocument.objects.create(
-                    tracking=tracking,
-                    file=file
+                tracking.vehicle_placed = (
+                    "vehicle_placed" in request.POST
                 )
 
-        # --------------------------------------------------------
-        # LIVE TRACKING
-        # --------------------------------------------------------
+                tracking.vehicle_document = (
+                    "vehicle_document" in request.POST
+                )
 
-        if tracking.live_tracking:
+                tracking.invoice_eway = (
+                    "invoice_eway" in request.POST
+                )
 
-            tracking_session = getattr(
-                order,
-                "tracking_session",
-                None
-            )
+                tracking.advance_to_fleet = (
+                    "advance_to_fleet" in request.POST
+                )
+
+                # HTML name is balance_trans_fleet,
+                # model field is balance_to_fleet.
+                tracking.balance_to_fleet = (
+                    "balance_trans_fleet"
+                    in request.POST
+                )
+
+                tracking.fleet_departed = (
+                    "fleet_departed" in request.POST
+                )
+
+                tracking.arrived = (
+                    "arrived" in request.POST
+                )
+
+                tracking.delivered = (
+                    "delivered" in request.POST
+                )
+
+                tracking.pod_received = (
+                    "pod_received" in request.POST
+                )
+
+                tracking.settled = (
+                    "settled" in request.POST
+                )
+
+                # ------------------------------------------------
+                # LR + REMARKS
+                # ------------------------------------------------
+
+                tracking.lr_no = get_post_value(
+                    request,
+                    "lr_no",
+                )
+
+                tracking.remarks = get_post_value(
+                    request,
+                    "remarks",
+                )
+
+                # ------------------------------------------------
+                # LIVE TRACKING
+                # ------------------------------------------------
+                #
+                # Tracking model has live_tracking_at, not a
+                # live_tracking Boolean. Use the POST checkbox as
+                # an event trigger and preserve the timestamp.
+                # ------------------------------------------------
+
+                live_tracking_requested = (
+                    "live_tracking" in request.POST
+                )
+
+                now = timezone.now()
+
+                if (
+                    live_tracking_requested
+                    and not tracking.live_tracking_at
+                ):
+                    tracking.live_tracking_at = now
+
+                # ------------------------------------------------
+                # TIMELINE
+                # ------------------------------------------------
+
+                if (
+                    tracking.vehicle_placed
+                    and not tracking.vehicle_placed_at
+                ):
+                    tracking.vehicle_placed_at = now
+
+                if (
+                    tracking.fleet_departed
+                    and not tracking.fleet_departed_at
+                ):
+                    tracking.fleet_departed_at = now
+
+                if (
+                    tracking.arrived
+                    and not tracking.arrived_at
+                ):
+                    tracking.arrived_at = now
+
+                if (
+                    tracking.delivered
+                    and not tracking.delivered_at
+                ):
+                    tracking.delivered_at = now
+
+                # ------------------------------------------------
+                # STATUS
+                # ------------------------------------------------
+
+                if tracking.settled:
+                    tracking.status = "settled"
+
+                elif tracking.pod_received:
+                    tracking.status = "pod_received"
+
+                elif tracking.delivered:
+                    tracking.status = "delivered"
+
+                elif tracking.arrived:
+                    tracking.status = "arrived"
+
+                elif tracking.balance_to_fleet:
+                    tracking.status = "balance_trans_fleet"
+
+                elif tracking.fleet_departed:
+                    tracking.status = "fleet_departed"
+
+                elif tracking.advance_to_fleet:
+                    tracking.status = "advance_to_fleet"
+
+                elif tracking.invoice_eway:
+                    tracking.status = "invoice_eway"
+
+                elif tracking.lr_no_b:
+                    tracking.status = "lr_generated"
+
+                elif tracking.vehicle_document:
+                    tracking.status = "vehicle_document"
+
+                elif tracking.live_tracking_at:
+                    tracking.status = "live_tracking"
+
+                elif tracking.vehicle_placed:
+                    tracking.status = "vehicle_placed"
+
+                tracking.save()
+                add_tracking_template_flags(tracking)
+
+                # ------------------------------------------------
+                # DOCUMENTS
+                # ------------------------------------------------
+
+                for uploaded_file in (
+                    request.FILES.getlist("documents")
+                ):
+                    TrackingDocument.objects.create(
+                        tracking=tracking,
+                        file=uploaded_file,
+                    )
 
             # ----------------------------------------------------
-            # SESSION EXISTS
+            # LIVE TRACKING NAVIGATION
             # ----------------------------------------------------
 
-            if tracking_session:
+            if live_tracking_requested:
+
+                tracking_session = getattr(
+                    order,
+                    "tracking_session",
+                    None,
+                )
+
+                if tracking_session:
+                    return redirect(
+                        "vehicle_live",
+                        tracking_session.pk,
+                    )
 
                 return redirect(
-                    "vehicle_live",
-                    tracking_session.pk
+                    "import_driver",
+                    order.pk,
                 )
 
-            # ----------------------------------------------------
-            # NO SESSION
-            # IMPORT DRIVER
-            # ----------------------------------------------------
-
-            return redirect(
-                "import_driver",
-                order.pk
+            messages.success(
+                request,
+                "Tracking updated successfully.",
             )
 
-        # --------------------------------------------------------
-        # NORMAL SAVE
-        # --------------------------------------------------------
+            return redirect(
+                "onepageorder_detail",
+                pk=order.pk,
+            )
 
-        messages.success(
-            request,
-            "Tracking updated successfully."
-        )
+        except ValidationError as e:
 
-        return redirect(
-            "onepageorder_detail",
-            pk=order.pk
-        )
+            logger.warning(
+                "Tracking validation failed: %s",
+                e,
+                exc_info=True,
+            )
 
-    # ============================================================
-    # GET
-    # ============================================================
+            messages.error(
+                request,
+                str(e),
+            )
+
+        except Exception:
+
+            logger.exception(
+                "Unexpected error while updating tracking "
+                "for order %s",
+                order.pk,
+            )
+
+            messages.error(
+                request,
+                "Unable to update tracking. Please try again.",
+            )
 
     return render(
         request,
@@ -1168,127 +1150,109 @@ def tracking_page(request, pk):
         {
             "order": order,
             "tracking": tracking,
-        }
+            "tracking_session": getattr(
+                order,
+                "tracking_session",
+                None,
+            ),
+            "documents": tracking.documents.all(),
+        },
     )
 
-def delete_vehicle(request, pk):
-    is_superadmin = request.user.is_superuser
-    is_admin = request.user.is_admin
-    vehicle = get_object_or_404(Order, id=pk)
-    vehicle.delete()
-    return redirect(
-        reverse(
-            'onepageorder_list',
-            kwargs={'is_superadmin': is_superadmin, 'is_admin': is_admin}
-        )
-    )
+
+# =============================================================
+# ORDER EDIT
+# =============================================================
 
 @login_required
 def onepageorder_edit(request, pk):
 
     order = get_object_or_404(
         Order.objects.select_related("customer"),
-        pk=pk
+        pk=pk,
     )
-
 
     if request.method == "POST":
 
         try:
-
             with transaction.atomic():
 
-                # =================================================
+                # ------------------------------------------------
                 # CUSTOMER
-                # =================================================
+                # ------------------------------------------------
 
                 customer = order.customer
 
-                customer.name = request.POST.get(
+                customer.name = get_post_value(
+                    request,
                     "customer_name",
-                    ""
-                ).strip()
+                )
 
-                customer.contact_number = request.POST.get(
+                customer.contact_number = get_post_value(
+                    request,
                     "contact_number",
-                    ""
-                ).strip()
+                )
 
-                customer.email = request.POST.get(
+                customer.email = get_post_value(
+                    request,
                     "email",
-                    ""
-                ).strip()
+                )
 
-                customer.address = request.POST.get(
+                customer.address = get_post_value(
+                    request,
                     "address",
-                    ""
-                ).strip()
-
+                )
 
                 if not customer.name:
-
-                    messages.error(
-                        request,
+                    raise ValidationError(
                         "Customer Name is required."
                     )
 
-                    return render(
-                        request,
-                        "onepageorders/order_edit.html",
-                        {
-                            "order": order,
-                        }
-                    )
-
-
                 customer.full_clean()
-
                 customer.save()
 
-
-                # =================================================
+                # ------------------------------------------------
                 # CUSTOMER / SALES
-                # =================================================
+                # ------------------------------------------------
 
-                order.lead_generated_through = request.POST.get(
+                order.lead_generated_through = get_post_value(
+                    request,
                     "lead_generated_through",
-                    ""
-                ).strip()
-                
-                order.reference_name = request.POST.get(
+                )
+
+                order.reference_name = get_post_value(
+                    request,
                     "reference_name",
-                    ""
-                ).strip()
+                )
 
-                order.sales_closed_by = request.POST.get(
-                    "sales_closed_by",  
-                    ""
-                ).strip()
+                order.sales_closed_by = get_post_value(
+                    request,
+                    "sales_closed_by",
+                )
 
-
-                # =================================================
+                # ------------------------------------------------
                 # SHIPMENT
-                # =================================================
+                # ------------------------------------------------
 
-                order.origin = request.POST.get(
+                order.origin = get_post_value(
+                    request,
                     "origin",
-                    ""
-                ).strip()
+                )
 
-                order.destination = request.POST.get(
+                order.destination = get_post_value(
+                    request,
                     "destination",
-                    ""
-                ).strip()
+                )
 
-                order.material = request.POST.get(
+                order.material = get_post_value(
+                    request,
                     "material",
-                    ""
-                ).strip()
+                )
 
-                order.packing_type = request.POST.get(
+                order.packing_type = get_post_value(
+                    request,
                     "packing_type",
-                    ""
-                ).strip()
+                )
 
                 order.no_of_pieces = to_integer(
                     request.POST.get(
@@ -1300,48 +1264,46 @@ def onepageorder_edit(request, pk):
                     request.POST.get(
                         "weight_tons"
                     ),
-                    "0.000"
+                    "0.000",
                 )
 
-
-                # =================================================
+                # ------------------------------------------------
                 # VEHICLE
-                # =================================================
+                # ------------------------------------------------
 
-                order.vehicle_type = request.POST.get(
+                order.vehicle_type = get_post_value(
+                    request,
                     "vehicle_type",
-                    ""
-                ).strip()
+                )
 
-                order.vehicle_number = request.POST.get(
+                order.vehicle_number = get_post_value(
+                    request,
                     "vehicle_number",
-                    ""
-                ).strip()
+                )
 
-                order.driver_number = request.POST.get(
+                order.driver_number = get_post_value(
+                    request,
                     "driver_number",
-                    ""
-                ).strip()
+                )
 
-                order.owner_number = request.POST.get(
+                order.owner_number = get_post_value(
+                    request,
                     "owner_number",
-                    ""
-                ).strip()
+                )
 
                 order.vehicle_sourced_by = request.POST.get(
                     "vehicle_sourced_by",
-                    "Direct"
+                    "Direct",
                 )
 
-                order.owner_broker_name = request.POST.get(
+                order.owner_broker_name = get_post_value(
+                    request,
                     "owner_broker_name",
-                    ""
-                ).strip()
+                )
 
-
-                # =================================================
+                # ------------------------------------------------
                 # COMMERCIALS
-                # =================================================
+                # ------------------------------------------------
 
                 order.freight_amount = to_decimal(
                     request.POST.get(
@@ -1373,29 +1335,32 @@ def onepageorder_edit(request, pk):
                     )
                 )
 
-                order.manager_approval = request.POST.get(
-                    "manager_approval",
-                    "Pending"
+                order.gst_percent = gst_from_request(
+                    request
                 )
 
-                order.approved_by = request.POST.get(
+                order.manager_approval = request.POST.get(
+                    "manager_approval",
+                    "Pending",
+                )
+
+                order.approved_by = get_post_value(
+                    request,
                     "approved_by",
-                    ""
-                ).strip()
+                )
 
-
-                # =================================================
+                # ------------------------------------------------
                 # CUSTOMER PAYMENT TERMS
-                # =================================================
+                # ------------------------------------------------
 
                 order.customer_billing_type = request.POST.get(
                     "customer_billing_type",
-                    ""
+                    "",
                 )
 
                 order.customer_payment_type = request.POST.get(
                     "customer_payment_type",
-                    ""
+                    "",
                 )
 
                 order.customer_advance_amount = to_decimal(
@@ -1412,7 +1377,7 @@ def onepageorder_edit(request, pk):
 
                 order.customer_payment_method = request.POST.get(
                     "customer_payment_method",
-                    ""
+                    "",
                 )
 
                 order.promised_due_date = to_date(
@@ -1421,10 +1386,9 @@ def onepageorder_edit(request, pk):
                     )
                 )
 
-
-                # =================================================
-                # CONTRACTED VEHICLE
-                # =================================================
+                # ------------------------------------------------
+                # CONTRACTED VEHICLE PAYMENT
+                # ------------------------------------------------
 
                 order.vehicle_advance_amount = to_decimal(
                     request.POST.get(
@@ -1438,103 +1402,121 @@ def onepageorder_edit(request, pk):
                     )
                 )
 
-                order.vehicle_owner_name = request.POST.get(
+                order.vehicle_owner_name = get_post_value(
+                    request,
                     "vehicle_owner_name",
-                    ""
-                ).strip()
+                )
 
-                order.pan_card = request.POST.get(
+                order.pan_card = get_post_value(
+                    request,
                     "pan_card",
-                    ""
-                ).strip()
+                )
 
-                order.account_name = request.POST.get(
+                order.account_name = get_post_value(
+                    request,
                     "account_name",
-                    ""
-                ).strip()
+                )
 
-                order.account_number = request.POST.get(
+                order.account_number = get_post_value(
+                    request,
                     "account_number",
-                    ""
-                ).strip()
+                )
 
-                order.ifsc_code = request.POST.get(
+                order.ifsc_code = get_post_value(
+                    request,
                     "ifsc_code",
-                    ""
-                ).strip()
+                )
 
-                order.upi_number = request.POST.get(
+                order.upi_number = get_post_value(
+                    request,
                     "upi_number",
-                    ""
-                ).strip()
+                )
 
-
-                # =================================================
-                # OPTIONAL CHECKBOXES
-                # =================================================
+                # ------------------------------------------------
+                # OPTIONS
+                # ------------------------------------------------
 
                 order.send_sms = (
-                    request.POST.get(
-                        "send_sms"
-                    ) == "on"
+                    request.POST.get("send_sms")
+                    == "on"
                 )
 
                 order.create_agreement_tds = (
                     request.POST.get(
                         "create_agreement_tds"
-                    ) == "on"
+                    )
+                    == "on"
                 )
 
-
-                # =================================================
+                # ------------------------------------------------
                 # VALIDATE + SAVE
-                # =================================================
+                # ------------------------------------------------
 
                 order.full_clean()
-
-                # Recalculates total_trip_cost.
                 order.save()
-
 
             messages.success(
                 request,
-                f"Order {order.trip_number} updated successfully."
+                (
+                    f"Order {order.trip_number} "
+                    "updated successfully."
+                ),
             )
 
             return redirect(
                 "onepageorder_detail",
-                pk=order.pk
+                pk=order.pk,
             )
 
+        except ValidationError as e:
 
-        except Exception as e:
+            logger.warning(
+                "Order edit validation failed: %s",
+                e,
+                exc_info=True,
+            )
 
-            print(
-                "ORDER EDIT ERROR:",
-                repr(e)
+            if hasattr(e, "message_dict"):
+                error_messages = []
+
+                for field, errors in (
+                    e.message_dict.items()
+                ):
+                    for error in errors:
+                        error_messages.append(
+                            f"{field}: {error}"
+                        )
+
+                messages.error(
+                    request,
+                    " | ".join(error_messages),
+                )
+            else:
+                messages.error(
+                    request,
+                    str(e),
+                )
+
+        except Exception:
+
+            logger.exception(
+                "Unexpected error while editing order %s",
+                order.pk,
             )
 
             messages.error(
                 request,
-                f"Unable to update order: {str(e)}"
+                "Unable to update order. Please try again.",
             )
-
-            return render(
-                request,
-                "onepageorders/order_edit.html",
-                {
-                    "order": order,
-                }
-            )
-
 
     return render(
         request,
         "onepageorders/order_edit.html",
         {
             "order": order,
-        }
+        },
     )
+
 
 # =============================================================
 # VEHICLE PAYMENTS
@@ -1543,32 +1525,19 @@ def onepageorder_edit(request, pk):
 @login_required
 def vehicle_payments(request):
 
-    # ---------------------------------------------------------
-    # Orders for dropdown
-    # ---------------------------------------------------------
     search = request.GET.get("q", "").strip()
-    orders = (
-            Order.objects
-            .select_related("customer")
-            .prefetch_related(
-                "vehicle_payments",
-                "customer_payments",
-            )
-            .order_by("-id")
-        )
-    if search:
-            orders = orders.filter(
-                Q(trip_number__icontains=search)
-                | Q(customer__name__icontains=search)
-                | Q(origin__icontains=search)
-                | Q(destination__icontains=search)
-                | Q(vehicle_number__icontains=search)
-                | Q(vehicle_type__icontains=search)
-            )
 
-    # ---------------------------------------------------------
-    # Payment history
-    # ---------------------------------------------------------
+    orders = order_queryset()
+
+    if search:
+        orders = orders.filter(
+            Q(trip_number__icontains=search)
+            | Q(customer__name__icontains=search)
+            | Q(origin__icontains=search)
+            | Q(destination__icontains=search)
+            | Q(vehicle_number__icontains=search)
+            | Q(vehicle_type__icontains=search)
+        )
 
     payments = (
         VehiclePayment.objects
@@ -1582,92 +1551,48 @@ def vehicle_payments(request):
         )
     )
 
-
-    # ---------------------------------------------------------
-    # SAVE
-    # ---------------------------------------------------------
-
     if request.method == "POST":
 
         try:
-
-            order_id = request.POST.get(
+            order_id = get_post_value(
+                request,
                 "order",
-                ""
-            ).strip()
+            )
 
-            vehicle_number = request.POST.get(
+            vehicle_number = get_post_value(
+                request,
                 "vehicle_number",
-                ""
-            ).strip().upper()
+            ).upper()
 
-            payment_type = request.POST.get(
+            payment_type = get_post_value(
+                request,
                 "payment_type",
-                ""
-            ).strip()
+            )
 
-            amount_value = request.POST.get(
+            amount_value = get_post_value(
+                request,
                 "amount",
-                ""
-            ).strip()
+            )
 
-            transaction_reference = request.POST.get(
+            transaction_reference = get_post_value(
+                request,
                 "transaction_reference",
-                ""
-            ).strip()
-
-
-            # =================================================
-            # ORDER
-            # =================================================
+            )
 
             if not order_id:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Please select a Trip / Order."
                 )
 
-                return render(
-                    request,
-                    "onepageorders/vehicle_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-
             order = get_object_or_404(
                 Order,
-                pk=order_id
+                pk=order_id,
             )
 
-
-            # =================================================
-            # VEHICLE
-            # =================================================
-
             if not vehicle_number:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Vehicle Number is required."
                 )
-
-                return render(
-                    request,
-                    "onepageorders/vehicle_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-
-            # =================================================
-            # PAYMENT TYPE
-            # =================================================
 
             valid_payment_types = {
                 "Advance",
@@ -1676,160 +1601,82 @@ def vehicle_payments(request):
             }
 
             if payment_type not in valid_payment_types:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Please select a valid Payment Type."
                 )
 
-                return render(
-                    request,
-                    "onepageorders/vehicle_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-
-            # =================================================
-            # AMOUNT
-            # =================================================
-
-            try:
-
-                amount = Decimal(
-                    amount_value
-                )
-
-            except (
-                InvalidOperation,
-                ValueError,
-                TypeError,
-            ):
-
-                messages.error(
-                    request,
-                    "Please enter a valid payment amount."
-                )
-
-                return render(
-                    request,
-                    "onepageorders/vehicle_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
+            amount = to_decimal(
+                amount_value,
+                "0.00",
+            )
 
             if amount <= 0:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Payment amount must be greater than zero."
                 )
 
-                return render(
-                    request,
-                    "onepageorders/vehicle_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-
-            # =================================================
-            # SAVE
-            # =================================================
-
             with transaction.atomic():
-
                 payment = VehiclePayment.objects.create(
-
                     order=order,
-
                     vehicle_number=vehicle_number,
-
                     payment_type=payment_type,
-
                     amount=amount,
-
                     transaction_reference=(
                         transaction_reference
                     ),
                 )
-
 
             messages.success(
                 request,
                 (
                     f"Vehicle payment of "
                     f"₹{payment.amount:,.2f} "
-                    f"saved successfully."
-                )
+                    "saved successfully."
+                ),
             )
 
             return redirect(
                 "vehicle_payments"
             )
 
+        except ValidationError as e:
 
-        except Exception as e:
+            messages.error(
+                request,
+                str(e),
+            )
 
-            print(
-                "VEHICLE PAYMENT ERROR:",
-                repr(e)
+        except Exception:
+
+            logger.exception(
+                "Unexpected vehicle payment error"
             )
 
             messages.error(
                 request,
-                f"Unable to save payment: {str(e)}"
+                "Unable to save vehicle payment.",
             )
-
-            return render(
-                request,
-                "onepageorders/vehicle_payments.html",
-                {
-                    "orders": orders,
-                    "payments": payments,
-                }
-            )
-
 
     return render(
         request,
         "onepageorders/vehicle_payments.html",
-        {
-            "orders": orders,
-            "payments": payments,
-        }
+        payment_page_context(
+            orders,
+            payments,
+        ),
     )
+
 
 # =============================================================
 # CUSTOMER PAYMENTS
 # =============================================================
 
-
 @login_required
 def customer_payments(request):
 
-    # ---------------------------------------------------------
-    # Orders for dropdown
-    # ---------------------------------------------------------
-
     search = request.GET.get("q", "").strip()
 
-    orders = (
-        Order.objects
-        .select_related("customer")
-        .prefetch_related(
-            "vehicle_payments",
-            "customer_payments",
-        )
-        .order_by("-id")
-    )
+    orders = order_queryset()
 
     if search:
         orders = orders.filter(
@@ -1840,10 +1687,6 @@ def customer_payments(request):
             | Q(vehicle_number__icontains=search)
             | Q(vehicle_type__icontains=search)
         )
-
-    # ---------------------------------------------------------
-    # Receipt history
-    # ---------------------------------------------------------
 
     payments = (
         CustomerPayment.objects
@@ -1857,134 +1700,58 @@ def customer_payments(request):
         )
     )
 
-    # ---------------------------------------------------------
-    # SAVE
-    # ---------------------------------------------------------
-
     if request.method == "POST":
 
         try:
-
-            order_id = request.POST.get(
+            order_id = get_post_value(
+                request,
                 "order",
-                ""
-            ).strip()
+            )
 
-            received_amount_value = request.POST.get(
-                "received_amount",
-                ""
-            ).strip()
+            received_amount = to_decimal(
+                get_post_value(
+                    request,
+                    "received_amount",
+                ),
+                "0.00",
+            )
 
-            received_through = request.POST.get(
+            received_through = get_post_value(
+                request,
                 "received_through",
-                ""
-            ).strip()
+            )
 
-            utr_details = request.POST.get(
+            utr_details = get_post_value(
+                request,
                 "utr_details",
-                ""
-            ).strip()
-
-            # =================================================
-            # ORDER
-            # =================================================
+            )
 
             if not order_id:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Please select a Trip / Order."
-                )
-
-                return render(
-                    request,
-                    "onepageorders/customer_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
                 )
 
             order = get_object_or_404(
                 Order,
-                pk=order_id
+                pk=order_id,
             )
 
-            # =================================================
-            # SELLING AMOUNT
-            # =================================================
-            # IMPORTANT:
-            # Get selling amount directly from Order.
-            # Do not trust the value submitted by browser.
+            # Customer payment is against the GST-inclusive
+            # total selling amount.
+            selling_amount = order.total_selling_amount
 
-            selling_amount = order.selling_amount
-            customer_advance_amount = order.customer_advance_amount
-            if selling_amount is None or selling_amount <= 0:
-
-                messages.error(
-                    request,
-                    f"Selling amount is not available for Trip "
-                    f"{order.trip_number}."
-                )
-
-                return render(
-                    request,
-                    "onepageorders/customer_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-            # =================================================
-            # RECEIVED AMOUNT
-            # =================================================
-
-            try:
-
-                received_amount = Decimal(
-                    received_amount_value
-                )
-
-            except (
-                InvalidOperation,
-                ValueError,
-                TypeError,
-            ):
-
-                messages.error(
-                    request,
-                    "Please enter a valid Received Amount."
-                )
-
-                return render(
-                    request,
-                    "onepageorders/customer_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
+            if selling_amount <= 0:
+                raise ValidationError(
+                    (
+                        "Total selling amount is not available "
+                        f"for Trip {order.trip_number}."
+                    )
                 )
 
             if received_amount < 0:
-
-                messages.error(
-                    request,
+                raise ValidationError(
                     "Received Amount cannot be negative."
                 )
-
-                return render(
-                    request,
-                    "onepageorders/customer_payments.html",
-                    {
-                        "orders": orders,
-                        "payments": payments,
-                    }
-                )
-
-            # =================================================
-            # PAYMENT MODE
-            # =================================================
 
             valid_modes = {
                 "RTGS",
@@ -1995,24 +1762,16 @@ def customer_payments(request):
             }
 
             if received_through not in valid_modes:
-                received_through = ""
-
-            # =================================================
-            # SAVE
-            # =================================================
+                raise ValidationError(
+                    "Please select a valid payment mode."
+                )
 
             with transaction.atomic():
-
                 payment = CustomerPayment.objects.create(
-
                     order=order,
-
                     selling_amount=selling_amount,
-
                     received_amount=received_amount,
-
                     received_through=received_through,
-
                     utr_details=utr_details,
                 )
 
@@ -2021,47 +1780,41 @@ def customer_payments(request):
                 (
                     f"Customer payment of "
                     f"₹{payment.received_amount:,.2f} "
-                    f"saved successfully."
-                )
+                    "saved successfully."
+                ),
             )
 
             return redirect(
                 "customer_payments"
             )
 
-        except Exception as e:
+        except ValidationError as e:
 
-            print(
-                "CUSTOMER PAYMENT ERROR:",
-                repr(e)
+            messages.error(
+                request,
+                str(e),
+            )
+
+        except Exception:
+
+            logger.exception(
+                "Unexpected customer payment error"
             )
 
             messages.error(
                 request,
-                f"Unable to save customer payment: {str(e)}"
+                "Unable to save customer payment.",
             )
-
-            return render(
-                request,
-                "onepageorders/customer_payments.html",
-                {
-                    "orders": orders,
-                    "payments": payments,
-                }
-            )
-
-    # ---------------------------------------------------------
-    # GET
-    # ---------------------------------------------------------
 
     return render(
         request,
         "onepageorders/customer_payments.html",
-        {
-            "orders": orders,
-            "payments": payments,
-        }
+        payment_page_context(
+            orders,
+            payments,
+        ),
     )
+
 
 # =============================================================
 # ADMIN MARGIN
@@ -2072,7 +1825,10 @@ def admin_margin(request):
 
     orders = (
         Order.objects
-        .select_related("customer")
+        .select_related(
+            "customer",
+            "tracking",
+        )
         .prefetch_related(
             "vehicle_payments",
             "customer_payments",
@@ -2085,5 +1841,5 @@ def admin_margin(request):
         "onepageorders/admin_margin.html",
         {
             "orders": orders,
-        }
+        },
     )
