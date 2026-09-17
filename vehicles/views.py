@@ -539,7 +539,6 @@ def tracking_page(request, vehicle_id):
             request,
             "Tracking updated successfully."
         )
-
         return redirect(
             "all_assigned_vehicles"
         )
