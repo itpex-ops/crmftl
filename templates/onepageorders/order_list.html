@@ -844,13 +844,13 @@
 
                             {% else %}
 
-                            <a href="{% url 'tracking_page' vehicle.pk %}" class="btn btn-success btn-sm">
+                            <a href="{% url 'tracking_page' o.pk %}" class="btn btn-success btn-sm">
                                 🚚 Open Tracking
                             </a>
 
                             {% endif %}
                             {% if is_admin or is_superuser %}
-                               <a href="{% url 'delete_vehicle' vehicle.pk %}" class="btn btn-warning btn-sm">
+                               <a href="{% url 'delete_vehicle' o.pk %}" class="btn btn-warning btn-sm">
                                 Remove
                             </a>
                             {% endif %}
