@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import (
     Customer,
     Order,
+    Tracking,
     VehiclePayment,
     CustomerPayment,
     TrackingSession,
@@ -151,7 +152,6 @@ def to_decimal(value, default="0.00"):
         return Decimal(str(value))
     except (InvalidOperation, ValueError, TypeError):
         return Decimal(default)
-
 
 def to_integer(value, default=0):
     """
@@ -647,6 +647,7 @@ def onepageorder_create(request):
         # ======================================================
         # SUCCESS
         # ======================================================
+        Tracking.objects.get_or_create(order=order)
 
         messages.success(
             request,
