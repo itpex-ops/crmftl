@@ -128,10 +128,7 @@ class Vehicle(models.Model):
     @property
     def can_take_advance(self):
         return self.remaining_balance_amount > 0
-
-    def can_take_balance(self):
-        return self.remaining_balance_amount == 0
-
+    
     def auto_close_live_tracking(self):
             """
             Remove SmartTrail tracking when trip is settled

@@ -1031,10 +1031,8 @@
         Payment Terms by Customer
     </div>
 
-
     <!-- Customer Billing Type -->
     <div class="order-form-row">
-
         <div class="order-form-label">
             Customer Billing Type
         </div>
@@ -1043,8 +1041,7 @@
 
             <select
                 name="customer_billing_type"
-                id="customer_billing_type"
-            >
+                id="customer_billing_type">
                 <option value="">Select</option>
 
                 <option value="Retail"
@@ -1060,9 +1057,7 @@
                     {% endif %}>
                     Credit
                 </option>
-
             </select>
-
         </div>
 
     </div>
@@ -1091,13 +1086,10 @@
 
     <!-- Customer Advance -->
     <div class="order-form-row">
-
         <div class="order-form-label">
             Customer Advance Amount
         </div>
-
         <div class="order-form-control">
-
             <input
                 type="number"
                 name="customer_advance_amount"
@@ -1105,21 +1097,16 @@
                 min="0"
                 value="{{ request.POST.customer_advance_amount|default:'0' }}"
             >
-
         </div>
-
     </div>
 
 
     <!-- Customer Balance -->
     <div class="order-form-row">
-
         <div class="order-form-label">
             Customer Balance Amount
         </div>
-
         <div class="order-form-control">
-
             <input
                 type="number"
                 name="customer_balance_amount"
@@ -1127,11 +1114,8 @@
                 min="0"
                 value="{{ request.POST.customer_balance_amount|default:'0' }}"
             >
-
         </div>
-
     </div>
-
 
     <!-- Customer Payment Method -->
     <div class="order-form-row">
