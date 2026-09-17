@@ -69,7 +69,7 @@ urlpatterns = [
 
     path(
         "vehicle-live/<int:pk>/",
-        views.onepageordervehicle_live,
+        views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
@@ -91,15 +91,15 @@ urlpatterns = [
     # LIVE TRACKING LIST / SETUP
     # =========================================================
 
-    path(
-        "live-tracking/",
-        views.live_tracking_list,
-        name="live_tracking_list",
-    ),
+    # path(
+    #     "live-tracking/",
+    #     views.live_tracking_list,
+    #     name="live_tracking_list",
+    # ),
 
     path(
         "live-tracking/setup/<int:order_id>/",
-        views.onepagelive_tracking_setup,
+        views.live_tracking_setup,
         name="onepagelive_tracking_setup",
     ),
 
@@ -109,11 +109,11 @@ urlpatterns = [
         name="import_driver",
     ),
 
-    path(
-        "live-tracking/<int:pk>/delete/",
-        views.delete_tracking,
-        name="delete_tracking",
-    ),
+    # path(
+    #     "live-tracking/<int:pk>/delete/",
+    #     views.delete_tracking,
+    #     name="delete_tracking",
+    # ),
 
 
     # =========================================================
