@@ -2294,6 +2294,7 @@ def tracking_history(request, session_id):
         },
     )
 
+
 # =============================================================
 # REFRESH LOCATION
 # =============================================================
@@ -2408,6 +2409,7 @@ def refresh_location(request, session_id):
         "vehicle_live",
         session_id=session.id,
     )
+
 
 # =============================================================
 # TEST AUTHENTICATION
