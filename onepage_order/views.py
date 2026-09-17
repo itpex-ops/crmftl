@@ -913,7 +913,7 @@ def tracking_page(request, pk):
                 request,
                 "Tracking already settled. Editing is locked."
             )
-            return redirect("all_assigned_vehicles")
+            return redirect("onepageorder_list")
 
         # --------------------------------
         # CHECKBOXES
@@ -1115,7 +1115,7 @@ def delete_vehicle(request, pk):
     vehicle.delete()
     return redirect(
         reverse(
-            'all_assigned_vehicles',
+            'onepageorder_list',
             kwargs={'is_superadmin': is_superadmin, 'is_admin': is_admin}
         )
     )
