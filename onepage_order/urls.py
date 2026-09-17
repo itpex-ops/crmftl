@@ -73,12 +73,12 @@ urlpatterns = [
     path(
         "vehicle-live/<int:pk>/",
         views.vehicle_live,
-        name="vehicle_live",
+        name="onepageordervehicle_live",
     ),
 
     path(
         "vehicle-live/<int:pk>/location/",
         views.vehicle_live_location,
-        name="vehicle_live_location",
+        name="onepageordervehicle_live_location",
     ),
 ]
