@@ -97,11 +97,11 @@ urlpatterns = [
     #     name="live_tracking_list",
     # ),
 
-    # path(
-    #     "live-tracking/setup/<int:order_id>/",
-    #     views.live_tracking_setup,
-    #     name="live_tracking_setup",
-    # ),
+    path(
+        "live-tracking/setup/<int:order_id>/",
+        views.live_tracking_setup,
+        name="live_tracking_setup",
+    ),
 
     # path(
     #     "live-tracking/import-driver/<int:order_id>/",
