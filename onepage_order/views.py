@@ -1,7 +1,6 @@
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
 import logging
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -10,7 +9,6 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
 from .models import (
     Customer,
     Order,
@@ -22,11 +20,8 @@ from .models import (
     LiveLocation,
     SMSLog,
     ApiLog,
-    ApiToken,
-)
-
+    ApiToken,)
 logger = logging.getLogger(__name__)
-
 
 # =============================================================
 # COMMON HELPERS
@@ -69,7 +64,6 @@ def to_date(value):
         return datetime.strptime(value, "%Y-%m-%d").date()
     except (TypeError, ValueError):
         return None
-
 
 def gst_from_request(request):
     """
@@ -178,7 +172,7 @@ def vehicle_live(request, pk):
 
     return render(
         request,
-        "onepageorders/tracking_page.html",
+        "onepageorders/tracking.html",
         context,
     )
 
@@ -586,7 +580,6 @@ def prepare_order_for_validation(order):
 
     return order
 
-
 # =============================================================
 # ORDER CREATE
 # =============================================================
@@ -594,13 +587,11 @@ def prepare_order_for_validation(order):
 @login_required
 def onepageorder_create(request):
     template_name = "onepageorders/order_create.html"
-
     if request.method != "POST":
         return render(
             request,
             template_name,
         )
-
     try:
         with transaction.atomic():
 
@@ -690,7 +681,6 @@ def onepageorder_create(request):
             template_name,
         )
 
-
 # =============================================================
 # ORDER DETAIL
 # =============================================================
@@ -724,7 +714,6 @@ def onepageorder_detail(request, pk):
             ),
         },
     )
-
 
 # =============================================================
 # LIVE TRACKING - ORDER LOCATION API
@@ -1146,7 +1135,7 @@ def tracking_page(request, pk):
 
     return render(
         request,
-        "onepageorders/tracking_page.html",
+        "onepageorders/tracking.html",
         {
             "order": order,
             "tracking": tracking,
