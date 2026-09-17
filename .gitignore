@@ -47,14 +47,9 @@ orders/migrations/
 accounts/migrations/
 live_tracking/migrations/
 banking/migrations/
-<<<<<<< HEAD
-onepage_order/migrations/
-=======
-
->>>>>>> 3f87233392fd2be6bc7cd8e9d714e8fd944d8ba4
 
 # Celery / Redis (if used)
-celerybeat-schedule
+celerybeat-schedul
 *.pid
 
 # Logs
