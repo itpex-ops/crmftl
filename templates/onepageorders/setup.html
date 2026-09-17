@@ -42,23 +42,23 @@
                     <table class="table table-borderless table-sm mb-0">
 
                         <tr>
-                            <th width="45%">FTL No</th>
-                            <td>{{ vehicle.ftl_no }}</td>
+                            <th width="45%">TRI_ No</th>
+                            <td>{{ order.trip_number }}</td>
                         </tr>
 
                         <tr>
                             <th>Vehicle No</th>
-                            <td>{{ vehicle.vehicle_number }}</td>
+                            <td>{{ order.vehicle_number }}</td>
                         </tr>
 
                         <tr>
                             <th>Driver Mobile</th>
-                            <td>{{ vehicle.driver_number }}</td>
+                            <td>{{ order.driver_number }}</td>
                         </tr>
 
                         <tr>
                             <th>Owner Mobile</th>
-                            <td>{{ vehicle.owner_number }}</td>
+                            <td>{{ order.owner_number }}</td>
                         </tr>
 
                         {% if session %}
@@ -172,7 +172,7 @@
 
                                 {% if not session %}
 
-                                    <a href="{% url 'import_driver' vehicle.id %}"
+                                    <a href="{% url 'import_driver' order.id %}"
                                        class="btn btn-primary btn-sm">
 
                                         <i class="bi bi-cloud-upload"></i>

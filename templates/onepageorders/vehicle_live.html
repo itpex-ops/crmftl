@@ -1,109 +1,406 @@
-{% extends 'layouts/base.html' %}
-{% block title %}Live Tracking{% endblock %}
+```html
+{% extends "layouts/base.html" %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+
+{% block title %}Live Tracking{% endblock %}
 
 {% block content %}
 
-<div class="container mt-0">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card shadow-sm">
-                <div class="page-header">
-                    <h4>vehicle Details</h4>
-                    <small class="text-muted">Details of the vehicle being tracked</small>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">FTL No</label>
-                            <div>{{ session.vehicle.ftl_no }}</div>
-                        </div>
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">Vehicle</label>
-                            <div>{{ session.vehicle.vehicle_number }}</div>
-                        </div>
+<style>
+    .tracking-page {
+        padding: 15px 20px 30px;
+    }
 
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">Driver</label>
-                            <div>{{ session.vehicle.driver_number }}</div>
-                        </div>
+    .tracking-card {
+        border: 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
 
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">Status</label>
-                            <div>
-                                {% if session.status == "active" %}
-                                <span class="badge bg-success">Active</span>
-                                {% elif session.status == "pending" %}
-                                <span class="badge bg-warning text-dark">Pending</span>
-                                {% else %}
-                                <span class="badge bg-secondary">{{ session.status }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
+    .tracking-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+    }
 
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">Latitude</label>
-                            <div>{{ session.latitude|default:"--" }}</div>
-                        </div>
+    .tracking-header h5 {
+        margin: 0;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
 
-                        <div class="col-md-2">
-                            <label class="fw-semibold text-muted">Longitude</label>
-                            <div>{{ session.longitude|default:"--" }}</div>
-                        </div>
+    .tracking-header small {
+        display: block;
+        margin-top: 3px;
+    }
 
-                        <div class="col-12">
-                            <label class="fw-semibold text-muted">Current Location</label>
-                            <div>{{ session.last_location|default:"Location not available" }}</div>
-                        </div>
-                         <div id="locationToast" class="location-toast">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span>New Location Received</span>
-                        </div> 
-                    </div>
+    .info-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #777;
+        margin-bottom: 3px;
+    }
 
-                </div>
-            </div>
+    .info-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #222;
+        min-height: 20px;
+    }
 
+    .location-box {
+        background: #f8f9fa;
+        border-radius: 7px;
+        padding: 12px 15px;
+        border: 1px solid #eee;
+    }
+
+    .map-card-header {
+        min-height: 55px;
+        padding: 12px 18px;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
+
+    .map-card-header span {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    #map {
+        width: 100%;
+        height: 500px;
+        border-radius: 6px;
+    }
+
+    .map-placeholder {
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: #f8f9fa;
+        border-radius: 6px;
+        color: #777;
+    }
+
+    .map-placeholder i {
+        font-size: 38px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .location-status {
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .location-toast {
+        position: fixed;
+        top: 80px;
+        right: 25px;
+        z-index: 9999;
+        background: #198754;
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 7px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .location-toast.show {
+        display: flex;
+        animation: toastFade 3s ease forwards;
+    }
+
+    @keyframes toastFade {
+        0% {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        10% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        80% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+</style>
+
+
+<div class="container-fluid tracking-page">
+
+    <!-- =====================================================
+         VEHICLE DETAILS
+         ===================================================== -->
+
+    <div class="card tracking-card mb-3">
+
+        <div class="tracking-header">
+            <h5>
+                <i class="bi bi-truck me-1"></i>
+                Vehicle Details
+            </h5>
+
+            <small class="text-muted">
+                Details of the vehicle being tracked
+            </small>
         </div>
 
-        <div class="col-lg-8">
 
-            <div class="card shadow-sm">
+        <div class="card-body">
 
-                <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="row g-3">
 
-                    <span>Live Map</span>
-
-                    <a href="{% url 'refresh_location' session.id %}" class="btn btn-success btn-sm">
-
-                        <i class="bi bi-arrow-clockwise"></i>
-
-                        Refresh Location
-
-                    </a>
-
+                <!-- FTL -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <span class="info-label">FTL No</span>
+                    <div class="info-value">
+                        {{ order.trip_number|default:"--" }}
+                    </div>
                 </div>
 
-                <div class="card-body">
 
-                    {% if session.latitude and session.longitude %}
+                <!-- Vehicle -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <span class="info-label">Vehicle</span>
+                    <div class="info-value">
+                        {{ order.vehicle_number|default:"--" }}
+                    </div>
+                </div>
 
-                    <div id="map" style="height:500px;width:100%;"></div>
 
-                    {% else %}
+                <!-- Driver -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <span class="info-label">Driver</span>
+                    <div class="info-value">
+                        {{ session.driver_mobile|default:order.driver_number|default:"--" }}
+                    </div>
+                </div>
 
-                    <div class="alert alert-warning mb-0">
 
-                        <i class="bi bi-geo-alt"></i>
+                <!-- Tracking Status -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
 
-                        Live location is not available yet.
-                        Please click <strong>Refresh Location</strong> after tracking becomes active.
+                    <span class="info-label">
+                        Tracking Status
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.status == "active" %}
+
+                            <span class="badge bg-success">
+                                <i class="bi bi-broadcast me-1"></i>
+                                Live Tracking
+                            </span>
+
+                        {% elif session.status == "waiting_location" %}
+
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split me-1"></i>
+                                Waiting Location
+                            </span>
+
+                        {% elif session.status == "consent_received" %}
+
+                            <span class="badge bg-info text-dark">
+                                Consent Received
+                            </span>
+
+                        {% elif session.status == "sms_sent" %}
+
+                            <span class="badge bg-primary">
+                                SMS Sent
+                            </span>
+
+                        {% elif session.status == "imported" %}
+
+                            <span class="badge bg-secondary">
+                                Imported
+                            </span>
+
+                        {% elif session.status == "paused" %}
+
+                            <span class="badge bg-warning text-dark">
+                                Paused
+                            </span>
+
+                        {% elif session.status == "stopped" %}
+
+                            <span class="badge bg-secondary">
+                                Stopped
+                            </span>
+
+                        {% elif session.status == "deleted" %}
+
+                            <span class="badge bg-dark">
+                                Deleted
+                            </span>
+
+                        {% elif session.status == "expired" %}
+
+                            <span class="badge bg-danger">
+                                Consent Expired
+                            </span>
+
+                        {% elif session.status == "license_hold" %}
+
+                            <span class="badge bg-danger">
+                                License Hold
+                            </span>
+
+                        {% elif session.status == "error" %}
+
+                            <span class="badge bg-danger">
+                                Error
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-light text-dark border">
+                                Not Enabled
+                            </span>
+
+                        {% endif %}
 
                     </div>
 
-                    {% endif %}
+                </div>
+
+
+                <!-- Tracking Enabled -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Tracking
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.tracking_enabled %}
+
+                            <span class="text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Enabled
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                <i class="bi bi-dash-circle me-1"></i>
+                                Not Active
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Location Status -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Location Status
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.location_status %}
+                            {{ session.location_status }}
+                        {% else %}
+                            <span class="text-muted">--</span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Latitude -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Latitude
+                    </span>
+
+                    <div class="info-value">
+                        {{ session.latitude|default:"--" }}
+                    </div>
+
+                </div>
+
+
+                <!-- Longitude -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Longitude
+                    </span>
+
+                    <div class="info-value">
+                        {{ session.longitude|default:"--" }}
+                    </div>
+
+                </div>
+
+
+                <!-- Last Updated -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Last Updated
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.last_updated %}
+                            {{ session.last_updated|date:"d-m-Y H:i:s" }}
+                        {% else %}
+                            --
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Current Location -->
+                <div class="col-12">
+
+                    <span class="info-label">
+                        Current Location
+                    </span>
+
+                    <div class="location-box">
+
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+
+                        {% if session.last_location %}
+                            {{ session.last_location }}
+                        {% else %}
+                            <span class="text-muted">
+                                Location not available
+                            </span>
+                        {% endif %}
+
+                    </div>
 
                 </div>
 
@@ -113,9 +410,109 @@
 
     </div>
 
+
+
+    <!-- =====================================================
+         LIVE MAP
+         ===================================================== -->
+
+    <div class="card tracking-card">
+
+        <div class="map-card-header d-flex justify-content-between align-items-center">
+
+            <div>
+                <span>
+                    <i class="bi bi-map me-1"></i>
+                    Live Map
+                </span>
+            </div>
+
+
+            <div class="d-flex gap-2">
+
+                {% if session.status != "deleted" %}
+
+                    <a
+                        href="{% url 'refresh_location' session.id %}"
+                        class="btn btn-success btn-sm"
+                    >
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Refresh Location
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% if session.latitude and session.longitude %}
+
+                <div id="map"></div>
+
+            {% else %}
+
+                <div class="map-placeholder">
+
+                    <div>
+
+                        <i class="bi bi-geo-alt text-muted"></i>
+
+                        <h6 class="mb-1">
+                            Live location is not available yet
+                        </h6>
+
+                        <div class="small text-muted mb-3">
+                            Please click
+                            <strong>Refresh Location</strong>
+                            after tracking becomes active.
+                        </div>
+
+                        {% if session.location_status %}
+
+                            <span class="badge bg-warning text-dark">
+                                {{ session.location_status }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
 </div>
 
+
+
+<!-- =====================================================
+     LOCATION TOAST
+     ===================================================== -->
+
+<div id="locationToast" class="location-toast">
+
+    <i class="bi bi-geo-alt-fill"></i>
+
+    <span>
+        New Location Received
+    </span>
+
+</div>
+
+
+
 {% if session.latitude and session.longitude %}
+
+<!-- Google Maps -->
+
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 
 <script>
@@ -123,20 +520,22 @@
     function initMap() {
 
         const location = {
-
             lat: parseFloat("{{ session.latitude }}"),
-
             lng: parseFloat("{{ session.longitude }}")
-
         };
+
 
         const map = new google.maps.Map(
             document.getElementById("map"),
             {
                 zoom: 16,
-                center: location
+                center: location,
+                mapTypeControl: true,
+                streetViewControl: false,
+                fullscreenControl: true
             }
         );
+
 
         new google.maps.Marker({
 
@@ -144,27 +543,36 @@
 
             map: map,
 
-            title: "{{ session.vehicle.vehicle_number }}"
+            title: "{{ order.vehicle_number|escapejs }}"
 
         });
 
     }
 
-    window.onload = initMap;
 
-</script>
-<script>
+    window.addEventListener("load", initMap);
+
+
     function showLocationNotification() {
 
-        const toast = document.getElementById("locationToast");
+        const toast =
+            document.getElementById("locationToast");
+
+        if (!toast) {
+            return;
+        }
 
         toast.classList.remove("show");
 
-        void toast.offsetWidth; // restart animation
+        void toast.offsetWidth;
 
         toast.classList.add("show");
+
     }
+
 </script>
 
 {% endif %}
+
 {% endblock %}
+```

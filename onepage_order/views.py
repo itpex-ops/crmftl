@@ -1918,25 +1918,25 @@ def admin_margin(request):
 # LIVE TRACKING SETUP
 # =============================================================
 
-# @login_required
-# def live_tracking_setup(request, order_id):
-#     order = get_object_or_404(
-#         Order.objects.select_related(
-#             "customer", "tracking", "tracking_session"
-#         ),
-#         pk=order_id,
-#     )
+@login_required
+def live_tracking_setup(request, order_id):
+    order = get_object_or_404(
+        Order.objects.select_related(
+            "customer", "tracking", "tracking_session"
+        ),
+        pk=order_id,
+    )
 
-#     session = getattr(order, "tracking_session", None)
+    session = getattr(order, "tracking_session", None)
 
-#     return render(
-#         request,
-#         "live_tracking/setup.html",
-#         {
-#             "order": order,
-#             "session": session,
-#         },
-#     )
+    return render(
+        request,
+        "onepageorders/setup.html",
+        {
+            "order": order,
+            "session": session,
+        },
+    )
 
 # # =============================================================
 # # IMPORT DRIVER

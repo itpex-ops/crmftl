@@ -754,7 +754,6 @@ class TrackingSession(models.Model):
     def __str__(self):
         return self.order.trip_number
 
-
 # ============================================================
 # LIVE LOCATION
 # ============================================================
@@ -811,7 +810,6 @@ class LiveLocation(models.Model):
 
     class Meta:
         ordering = ["-received_at"]
-
 
 # ============================================================
 # SMS LOG
