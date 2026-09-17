@@ -68,7 +68,7 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepagevehicle-live/<int:pk>/",
+        "vehicle-live/<int:pk>/",
         views.onepageordervehicle_live,
         name="onepageordervehicle_live",
     ),
@@ -150,6 +150,12 @@ urlpatterns = [
         name="vehicle_history",
     ),
 
+    # # Alias
+    path(
+        "vehicle-live/<int:session_id>/tracking-history/",
+        views.tracking_history,
+        name="tracking_history",
+    ),
 
     # # Alias
     path(
