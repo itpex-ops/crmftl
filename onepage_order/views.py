@@ -1990,7 +1990,7 @@ def import_driver(request, order_id):
 @login_required
 def delete_tracking(request, pk):
     if request.method != "POST":
-        return redirect("live_tracking_list")
+        return redirect("onepageorderlive_tracking_list")
 
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
@@ -2002,7 +2002,7 @@ def delete_tracking(request, pk):
             request,
             "Tracking entity ID is missing.",
         )
-        return redirect("live_tracking_list")
+        return redirect("onepageorderlive_tracking_list")
 
     result = DeleteService.delete_tracking(session)
 
@@ -2022,7 +2022,7 @@ def delete_tracking(request, pk):
             result.get("message", "Unable to delete tracking."),
         )
 
-    return redirect("live_tracking_list")
+    return redirect("onepageorderlive_tracking_list")
 
 
 # # =============================================================
@@ -2045,7 +2045,7 @@ def send_consent(request, session_id):
             str(result.get("message", "Unable to check consent.")),
         )
 
-    return redirect("live_tracking_list")
+    return redirect("onepageorderlive_tracking_list")
 
 
 @login_required
@@ -2058,7 +2058,7 @@ def check_consent(request, session_id):
             request,
             str(result.get("message", "Unable to check consent.")),
         )
-        return redirect("live_tracking_list")
+        return redirect("onepageorderlive_tracking_list")
 
     consent_status = result.get("status")
 
@@ -2103,7 +2103,7 @@ def check_consent(request, session_id):
             f"Consent Status : {consent_status}",
         )
 
-    return redirect("live_tracking_list")
+    return redirect("onepageorderlive_tracking_list")
 
 
 # # =============================================================

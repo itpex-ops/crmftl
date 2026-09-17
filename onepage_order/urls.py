@@ -139,6 +139,18 @@ urlpatterns = [
     # =========================================================
 
     path(
+        "vehicle-live/<int:session_id>/",
+        views.vehicle_live,
+        name="vehicle_live",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/location/",
+        views.vehicle_live_location,
+        name="vehicle_live_location",
+    ),
+
+    path(
         "vehicle-live/<int:session_id>/refresh/",
         views.refresh_location,
         name="refresh_location",

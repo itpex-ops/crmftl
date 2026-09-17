@@ -18,7 +18,7 @@
             </small>
         </div>
 
-        <a href="{% url 'live_tracking_list' %}" class="btn btn-outline-secondary">
+        <a href="{% url 'onepageorderlive_tracking_list' %}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i>
             Back
         </a>
@@ -320,7 +320,7 @@
 
                                 {% if session and session.last_latitude and session.last_longitude %}
 
-                                    <a href="{% url 'onepageordervehicle_live' session.id %}"
+                                    <a href="{% url 'vehicle_live' session.id %}"
                                        class="btn btn-info btn-sm">
 
                                         <i class="bi bi-geo-alt-fill"></i>
