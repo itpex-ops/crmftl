@@ -132,12 +132,9 @@ def add_tracking_template_flags(tracking):
         tracking.balance_to_fleet
     )
     return tracking
-
-
 # =============================================================
 # LIVE TRACKING PAGE
 # =============================================================
-
 @login_required
 def vehicle_live(request, pk):
     """
@@ -152,7 +149,6 @@ def vehicle_live(request, pk):
         ),
         pk=pk,
     )
-
     order = tracking_session.order
     tracking = getattr(order, "tracking", None)
 
@@ -902,7 +898,7 @@ def tracking_page(request, pk):
             )
 
             return redirect(
-                "onepageorder_detail",
+                "onepageorder_list",
                 pk=order.pk,
             )
 
@@ -1088,7 +1084,7 @@ def tracking_page(request, pk):
 
                 if tracking_session:
                     return redirect(
-                        "vehicle_live",
+                        "onepageordervehicle_live_location",
                         tracking_session.pk,
                     )
 
