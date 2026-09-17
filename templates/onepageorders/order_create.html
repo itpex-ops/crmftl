@@ -494,7 +494,6 @@
 
                 </div>
 
-
                 <!-- Lead Generated Through -->
                 <div class="order-form-row">
                     <div class="order-form-label">
@@ -1609,32 +1608,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                     <div class="order-form-control">
-
                         <select name="vehicle_sourced_by">
-
-                            <option value="Direct"
-                                {% if request.POST.vehicle_sourced_by == "Direct" or not request.POST.vehicle_sourced_by %}
-                                    selected
-                                {% endif %}>
-                                Direct
-                            </option>
-
-                            <option value="Broker"
-                                {% if request.POST.vehicle_sourced_by == "Broker" %}
-                                    selected
-                                {% endif %}>
-                                Broker
-                            </option>
-
+                            <option value="Direct" {% if request.POST.vehicle_sourced_by == "Direct" or not request.POST.vehicle_sourced_by %} selected {% endif %}>Direct</option>
+                            <option value="Broker" {% if request.POST.vehicle_sourced_by == "Broker" %}selected{% endif %}>Broker</option>
+                            <option value="transporters" {% if request.POST.vehicle_sourced_by == "transporters" %} selected {% endif %}>Transporters</option>
+                            <option value="brokers" {% if request.POST.vehicle_sourced_by == "brokers" %} selected {% endif %}>Brokers</option>
+                            <option value="drivers" {% if request.POST.vehicle_sourced_by == "drivers" %} selected {% endif %}>Drivers</option>
+                            <option value="others" {% if request.POST.vehicle_sourced_by == "others" %} selected {% endif %}>Others</option>
                         </select>
-
                     </div>
-
+                    <div class="col-sm-3 d-none" id="source_other_div">
+                                <label class="form-label">Other Source</label>
+                                <input type="text" id="source_other" name="source_other" class="form-control form-input"
+                                placeholder="Enter source name">
+                    </div>
                 </div>
-
-
                 <!-- Owner / Broker -->
-
                 <div class="order-form-row">
 
                     <div class="order-form-label">
@@ -1742,13 +1731,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="order-form-label">
                         PAN Card
                     </div>
-
                     <div class="order-form-control">
 
                         <input
                             type="text"
                             name="pan_card"
                             value="{{ request.POST.pan_card|default:'' }}"
+                            maxlength="10" style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                            title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
                         >
 
                     </div>
@@ -1817,49 +1807,43 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                 </div>
-
-
                 <!-- UPI -->
 
-                <div class="order-form-row">
-
+                <div class="order-form-row" id="upi-number-row">
                     <div class="order-form-label">
                         UPI Number
                     </div>
 
                     <div class="order-form-control">
-
                         <input
                             type="text"
                             name="upi_number"
+                            id="upi_number"
                             value="{{ request.POST.upi_number|default:'' }}"
+                            maxlength="10"
+                            pattern="[0-9]{10}"
+                            placeholder="Enter UPI number"
                         >
-
                     </div>
-
                 </div>
-
             </div>
 
         </div>
-
 
         <!-- =====================================================
              CREATE ORDER BUTTON
              ===================================================== -->
 
         <div class="create-order-container">
-
             <button
                 type="submit"
                 class="btn btn-primary create-order-button"
+                id="saveBtn"
             >
-
                 <i class="bi bi-save me-1"></i>
                 Create Order
 
             </button>
-
         </div>
 
     </form>
@@ -2124,6 +2108,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-
+<script>
+    document.querySelector('input[name="pan_number"]').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+</script>
+<script>
+document.getElementById("customerForm").addEventListener("submit", function () {
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.innerHTML = "⏳ Saving...";
+});
+</script>
 {% endblock %}
 
