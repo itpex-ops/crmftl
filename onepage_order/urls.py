@@ -91,11 +91,11 @@ urlpatterns = [
     # LIVE TRACKING LIST / SETUP
     # =========================================================
 
-    # path(
-    #     "live-tracking/",
-    #     views.live_tracking_list,
-    #     name="live_tracking_list",
-    # ),
+    path(
+        "live-tracking/",
+        views.live_tracking_list,
+        name="live_tracking_list",
+    ),
 
     path(
         "live-tracking/setup/<int:order_id>/",
