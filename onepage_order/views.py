@@ -1096,7 +1096,7 @@ def tracking_page(request, pk):
         )
 
         return redirect(
-            "all_assigned_vehicles"
+            "onepageorder_list"
         )
 
     return render(
