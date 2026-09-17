@@ -32,7 +32,6 @@ class Customer(models.Model):
     def __str__(self):
         return self.name
 
-
 # ============================================================
 # ORDER
 # ============================================================
@@ -538,7 +537,6 @@ class Order(models.Model):
             f"{self.origin} to "
             f"{self.destination}"
         )
-
 
 # ============================================================
 # VEHICLE PAYMENT

@@ -1,15 +1,19 @@
 from decimal import Decimal, InvalidOperation
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from vehicles.models import Vehicle
 from .models import (
     Customer,
     Order,
     Tracking,
+    TrackingDocument,
     VehiclePayment,
     CustomerPayment,
     TrackingSession,
@@ -886,6 +890,235 @@ def order_live_location(request, pk):
 # =============================================================
 # EDIT ORDER
 # =============================================================
+
+@login_required
+def tracking_page(request, pk):
+
+    vehicle = get_object_or_404(
+        Order.vehicles.select_related("order") ,
+        id=pk
+    )
+
+    tracking, created = Tracking.objects.get_or_create(
+        order=vehicle.order
+    )
+
+    if request.method == "POST":
+
+        # --------------------------------
+        # BLOCK IF SETTLED
+        # --------------------------------
+        if tracking.settled:
+            messages.warning(
+                request,
+                "Tracking already settled. Editing is locked."
+            )
+            return redirect("all_assigned_vehicles")
+
+        # --------------------------------
+        # CHECKBOXES
+        # --------------------------------
+
+        tracking.vehicle_placed = (
+            "vehicle_placed" in request.POST
+        )
+
+        tracking.live_tracking = (
+            "live_tracking" in request.POST
+        )
+
+        tracking.vehicle_document = (
+            "vehicle_document" in request.POST
+        )
+
+        tracking.invoice_eway = (
+            "invoice_eway" in request.POST
+        )
+
+        tracking.lr_no_b = (
+            "lr_no_b" in request.POST
+        )
+
+        tracking.advance_to_fleet = (
+            "advance_to_fleet" in request.POST
+        )
+
+        tracking.fleet_departed = (
+            "fleet_departed" in request.POST
+        )
+
+        tracking.balance_trans_fleet = (
+            "balance_trans_fleet" in request.POST
+        )
+
+        tracking.arrived = (
+            "arrived" in request.POST
+        )
+
+        tracking.delivered = (
+            "delivered" in request.POST
+        )
+
+        tracking.pod_received = (
+            "pod_received" in request.POST
+        )
+
+        tracking.settled = (
+            "settled" in request.POST
+        )
+
+        tracking.lr_no = request.POST.get(
+            "lr_no",
+            ""
+        ).strip()
+
+        tracking.remarks = request.POST.get(
+            "remarks",
+            ""
+        ).strip()
+
+        # --------------------------------
+        # TIMELINE
+        # --------------------------------
+
+        now = timezone.now()
+
+        if tracking.vehicle_placed and not tracking.vehicle_placed_at:
+            tracking.vehicle_placed_at = now
+
+        if tracking.live_tracking and not tracking.live_tracking_at:
+            tracking.live_tracking_at = now
+
+        if tracking.fleet_departed and not tracking.fleet_departed_at:
+            tracking.fleet_departed_at = now
+
+        if tracking.arrived and not tracking.arrived_at:
+            tracking.arrived_at = now
+
+        if tracking.delivered and not tracking.delivered_at:
+            tracking.delivered_at = now
+
+        # --------------------------------
+        # STATUS
+        # --------------------------------
+
+        if tracking.settled:
+            tracking.status = "settled"
+
+        elif tracking.pod_received:
+            tracking.status = "pod_received"
+
+        elif tracking.delivered:
+            tracking.status = "delivered"
+
+        elif tracking.arrived:
+            tracking.status = "arrived"
+
+        elif tracking.fleet_departed:
+            tracking.status = "fleet_departed"
+
+        elif tracking.advance_to_fleet:
+            tracking.status = "advance_to_fleet"
+
+        elif tracking.invoice_eway:
+            tracking.status = "invoice_eway"
+
+        elif tracking.lr_no_b:
+            tracking.status = "lr_generated"
+
+        elif tracking.vehicle_document:
+            tracking.status = "vehicle_document"
+
+        elif tracking.live_tracking:
+            tracking.status = "live_tracking"
+
+        elif tracking.vehicle_placed:
+            tracking.status = "vehicle_placed"
+
+        # --------------------------------
+        # SAVE TRACKING
+        # --------------------------------
+
+        tracking.save()
+
+        # --------------------------------
+        # DOCUMENTS
+        # --------------------------------
+
+        files = request.FILES.getlist("documents")
+
+        for file in files:
+            TrackingDocument.objects.create(
+                tracking=tracking,
+                file=file
+            )
+
+        # --------------------------------
+        # LIVE TRACKING
+        # --------------------------------
+
+        if tracking.live_tracking:
+
+            # --------------------------------
+            # SESSION ALREADY EXISTS
+            # --------------------------------
+
+            tracking_session = getattr(
+                vehicle,
+                "tracking_session",
+                None
+            )
+
+            if tracking_session:
+
+                return redirect(
+                    "vehicle_live",
+                    tracking_session.pk
+                )
+
+            # --------------------------------
+            # SESSION DOES NOT EXIST
+            # IMPORT DRIVER
+            # --------------------------------
+
+            return redirect(
+                "import_driver",
+                vehicle.id
+            )
+
+        # --------------------------------
+        # NORMAL SAVE
+        # --------------------------------
+
+        messages.success(
+            request,
+            "Tracking updated successfully."
+        )
+
+        return redirect(
+            "all_assigned_vehicles"
+        )
+
+    return render(
+        request,
+        "onepageorders/tracking_page.html",
+        {
+            "vehicle": vehicle,
+            "tracking": tracking,
+        }
+    )
+
+def delete_vehicle(request, pk):
+    is_superadmin = request.user.is_superuser
+    is_admin = request.user.is_admin
+    vehicle = get_object_or_404(Order, id=pk)
+    vehicle.delete()
+    return redirect(
+        reverse(
+            'all_assigned_vehicles',
+            kwargs={'is_superadmin': is_superadmin, 'is_admin': is_admin}
+        )
+    )
 
 @login_required
 def onepageorder_edit(request, pk):

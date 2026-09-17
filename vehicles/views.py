@@ -327,10 +327,8 @@ def all_assigned_vehicles(request):
 def delete_vehicle(request, vehicle_id):
     is_superadmin = request.user.is_superuser
     is_admin = request.user.is_admin
-
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
     vehicle.delete()
-
     return redirect(
         reverse(
             'all_assigned_vehicles',
@@ -555,7 +553,6 @@ def tracking_page(request, vehicle_id):
         }
     )
 
-
 @csrf_exempt
 def update_tracking_ajax(request):
 
@@ -641,11 +638,6 @@ def update_vehicle_inline(request):
 
         return JsonResponse({"success": True, "balance_html": balance_html, "total_freight": vehicle.total_freight})
     return JsonResponse({"success": False})
-
-# vehicles/views.py
-
-from django.shortcuts import render
-from vehicles.models import Vehicle, Tracking
 
 def vehicle_dashboard(request):
 

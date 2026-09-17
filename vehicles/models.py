@@ -114,7 +114,6 @@ class Vehicle(models.Model):
 
     @property
     def is_locked(self):
-
         if hasattr(self.order, "tracking"):
             return self.order.tracking.settled
         return False
@@ -162,6 +161,7 @@ class Vehicle(models.Model):
     
             # Delete tracking session
             session.delete()
+
     
     def save(self, *args, **kwargs):
     
@@ -177,7 +177,6 @@ class Vehicle(models.Model):
             if not was_settled and self.settled:
                 self.auto_close_live_tracking()
     
-
     def save(self, *args, **kwargs):
         self.total_freight = (
             Decimal(self.freight_amount or 0)
