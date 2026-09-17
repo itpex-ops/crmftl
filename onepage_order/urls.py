@@ -104,7 +104,7 @@ urlpatterns = [
     ),
 
     path(
-        "onepagelive-tracking/import-driver/<int:order_id>/",
+        "live-tracking/import-driver/<int:order_id>/",
         views.import_driver,
         name="import_driver",
     ),
