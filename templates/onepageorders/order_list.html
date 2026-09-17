@@ -636,12 +636,10 @@
                                 </button>
 
                             {% else %}
-
                                 <a
-                                    href="{% url 'tracking_page' o.pk %}"
-                                    class="btn btn-success btn-sm order-action-btn"
-                                >
-                                    🚚 Open Tracking
+                                    href="{% url 'onepageorder_tracking' o.pk %}"
+                                    class="btn btn-success btn-sm order-action-btn">
+                                    🚚 Tracking
                                 </a>
 
                             {% endif %}

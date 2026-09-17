@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
 
     # =========================================================
-    # ORDER
+    # ORDERS
     # =========================================================
 
     path(
@@ -29,7 +29,7 @@ urlpatterns = [
     path(
         "<int:pk>/tracking/",
         views.tracking_page,
-        name="tracking_page",
+        name="onepageorder_tracking",
     ),
 
     path(
