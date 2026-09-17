@@ -1,5 +1,8 @@
+
 {% extends "layouts/base.html" %}
+
 {% block title %}Orders{% endblock %}
+
 {% block content %}
 
 <style>
@@ -16,7 +19,6 @@
     min-height: calc(100vh - 70px);
 }
 
-
 /* =========================================================
    PAGE HEADER
    ========================================================= */
@@ -31,23 +33,18 @@
 
 .orders-title {
     margin: 0;
-
     font-family: "Poppins", sans-serif;
     font-size: 22px;
     font-weight: 600;
-
     color: #212529;
 }
 
 .orders-subtitle {
     margin-top: 4px;
-
     font-family: "Poppins", sans-serif;
     font-size: 11px;
-
     color: #8a9199;
 }
-
 
 /* =========================================================
    CREATE BUTTON
@@ -56,23 +53,17 @@
 .create-order-btn {
     height: 40px;
     padding: 0 18px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border: 1px solid #FDB81B;
     border-radius: 7px;
-
     background: #FDB81B;
     color: #212529;
-
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 600;
-
     text-decoration: none;
-
     transition: all 0.2s ease;
 }
 
@@ -82,55 +73,38 @@
     color: #ffffff;
 }
 
-
 /* =========================================================
-   SEARCH AREA
+   SEARCH
    ========================================================= */
 
 .orders-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 15px;
-
     margin-bottom: 18px;
 }
 
 .orders-search {
     display: flex;
-
     width: 100%;
     max-width: 620px;
-
     height: 42px;
 }
 
-/* Input */
-
 .orders-search input {
     flex: 1;
-
     min-width: 0;
-
     height: 42px;
-
     padding: 0 13px;
-
     border: 1px solid #dfe3e8;
     border-right: none;
-
     border-radius: 7px 0 0 7px;
-
     background: #ffffff;
-
     font-family: "Poppins", sans-serif;
     font-size: 12px;
-
     color: #343a40;
-
     outline: none;
-
     box-sizing: border-box;
 }
 
@@ -140,31 +114,20 @@
 
 .orders-search input:focus {
     border-color: #FDB81B;
-
-    box-shadow:
-        0 0 0 3px rgba(253, 184, 27, 0.10);
+    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.10);
 }
-
-
-/* Search button */
 
 .orders-search button {
     width: 90px;
     height: 42px;
-
     border: 1px solid #FDB81B;
-
     border-radius: 0 7px 7px 0;
-
     background: #FDB81B;
     color: #212529;
-
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 500;
-
     cursor: pointer;
-
     transition: all 0.2s ease;
 }
 
@@ -173,24 +136,17 @@
     color: #ffffff;
 }
 
-
 /* =========================================================
    TABLE CARD
    ========================================================= */
 
 .orders-card {
     width: 100%;
-
     background: #ffffff;
-
     border: 1px solid #e1e5e9;
-
     border-radius: 10px;
-
     overflow: hidden;
-
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 /* =========================================================
@@ -199,142 +155,92 @@
 
 .orders-table {
     width: 100%;
-
     margin: 0;
-
     border-collapse: collapse;
-
     table-layout: fixed;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
-
 .orders-table thead th {
     padding: 12px 14px;
-
     background: #f7f8fa;
-
     border-bottom: 1px solid #dfe3e8;
-
     color: #495057;
-
     font-family: "Poppins", sans-serif;
     font-size: 11px;
     font-weight: 600;
-
     white-space: nowrap;
-
     vertical-align: middle;
-
     text-align: left;
-
     box-sizing: border-box;
 }
-
-/* =========================================================
-   BODY
-   ========================================================= */
 
 .orders-table tbody td {
     padding: 12px 14px;
-
     border-bottom: 1px solid #eef0f2;
-
     color: #343a40;
-
     font-family: "Poppins", sans-serif;
     font-size: 11px;
-
     vertical-align: middle;
-
     box-sizing: border-box;
-
     overflow: hidden;
 }
-
-
-/* =========================================================
-   LAST ROW
-   ========================================================= */
 
 .orders-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-
-/* =========================================================
-   HOVER
-   ========================================================= */
-
 .orders-table tbody tr:hover {
     background: #fffdf4;
 }
 
-
 /* =========================================================
-   COLUMN WIDTHS + ALIGNMENT
+   COLUMN WIDTHS
    ========================================================= */
 
-/* 1. TRIP */
 .orders-table th:nth-child(1),
 .orders-table td:nth-child(1) {
     width: 15%;
     text-align: left;
 }
 
-
-/* 2. CUSTOMER */
 .orders-table th:nth-child(2),
 .orders-table td:nth-child(2) {
     width: 18%;
     text-align: left;
 }
 
-
-/* 3. ROUTE */
 .orders-table th:nth-child(3),
 .orders-table td:nth-child(3) {
     width: 20%;
     text-align: left;
 }
 
-
-/* 4. VEHICLE */
 .orders-table th:nth-child(4),
 .orders-table td:nth-child(4) {
     width: 19%;
     text-align: left;
 }
 
-
-/* 5. FREIGHT */
 .orders-table th:nth-child(5),
 .orders-table td:nth-child(5) {
     width: 10%;
     text-align: right;
 }
 
-
-/* 6. MARGIN */
 .orders-table th:nth-child(6),
 .orders-table td:nth-child(6) {
     width: 10%;
     text-align: right;
 }
 
-
-/* 7. ACTION */
 .orders-table th:nth-child(7),
 .orders-table td:nth-child(7) {
     width: 8%;
     text-align: center;
 }
 
-
 /* =========================================================
-   REMOVE BOOTSTRAP ALIGNMENT CONFLICTS
+   ALIGNMENT
    ========================================================= */
 
 .orders-table td.text-end,
@@ -347,19 +253,15 @@
     text-align: center !important;
 }
 
-
 /* =========================================================
-   TRIP NUMBER
+   TRIP
    ========================================================= */
 
 .trip-number {
     font-weight: 600;
-
     color: #1f2937;
-
     white-space: nowrap;
 }
-
 
 /* =========================================================
    VEHICLE
@@ -367,28 +269,19 @@
 
 .vehicle-number {
     font-weight: 500;
-
     color: #343a40;
-
     white-space: nowrap;
 }
 
 .vehicle-type {
     display: block;
-
     margin-top: 2px;
-
     font-size: 9px;
-
     color: #8a9199;
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
-
 
 /* =========================================================
    ROUTE
@@ -398,35 +291,27 @@
     white-space: nowrap;
 }
 
-
 /* =========================================================
    MONEY
    ========================================================= */
 
 .amount {
     white-space: nowrap;
-
     font-weight: 500;
-
     color: #343a40;
 }
 
 .margin-positive {
     color: #198754;
-
     font-weight: 600;
-
     white-space: nowrap;
 }
 
 .margin-negative {
     color: #dc3545;
-
     font-weight: 600;
-
     white-space: nowrap;
 }
-
 
 /* =========================================================
    VIEW BUTTON
@@ -434,41 +319,40 @@
 
 .view-order-btn {
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
     height: 31px;
-
     padding: 0 12px;
-
     border: 1px solid #0d6efd;
-
     border-radius: 5px;
-
     background: #ffffff;
-
     color: #0d6efd;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 10px;
-
     font-weight: 500;
-
     text-decoration: none;
-
     white-space: nowrap;
-
     transition: all 0.2s ease;
 }
 
 .view-order-btn:hover {
     background: #0d6efd;
-
     color: #ffffff;
 }
 
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.order-action-btn {
+    height: 31px;
+    padding: 0 10px;
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 5px;
+    white-space: nowrap;
+}
 
 /* =========================================================
    EMPTY STATE
@@ -476,117 +360,15 @@
 
 .empty-orders {
     padding: 45px 20px !important;
-
     text-align: center !important;
-
     color: #8a9199 !important;
 }
 
 .empty-orders i {
     display: block;
-
     margin-bottom: 8px;
-
     font-size: 28px;
 }
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-    .orders-table {
-        min-width: 900px;
-        table-layout: fixed;
-    }
-
-    .orders-table th,
-    .orders-table td {
-        padding: 11px 12px;
-    }
-
-}
-
-/* =========================================================
-   MONEY
-   ========================================================= */
-
-.amount {
-    white-space: nowrap;
-
-    font-weight: 500;
-
-    color: #343a40;
-}
-
-.margin-positive {
-    color: #198754;
-    font-weight: 600;
-}
-
-.margin-negative {
-    color: #dc3545;
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   VIEW BUTTON
-   ========================================================= */
-
-.view-order-btn {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    height: 31px;
-
-    padding: 0 12px;
-
-    border: 1px solid #0d6efd;
-    border-radius: 5px;
-
-    background: #ffffff;
-    color: #0d6efd;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
-}
-
-.view-order-btn:hover {
-    background: #0d6efd;
-    color: #ffffff;
-}
-
-
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
-.empty-orders {
-    padding: 45px 20px !important;
-
-    text-align: center;
-
-    color: #8a9199 !important;
-}
-
-.empty-orders i {
-    display: block;
-
-    margin-bottom: 8px;
-
-    font-size: 28px;
-}
-
 
 /* =========================================================
    RESPONSIVE
@@ -612,8 +394,15 @@
         max-width: 100%;
     }
 
-}
+    .orders-table {
+        min-width: 900px;
+    }
 
+    .orders-table th,
+    .orders-table td {
+        padding: 11px 12px;
+    }
+}
 
 @media (max-width: 650px) {
 
@@ -624,12 +413,13 @@
     .orders-title {
         font-size: 19px;
     }
-
 }
 
 </style>
 
+
 <div class="orders-page">
+
     <!-- =====================================================
          HEADER
          ===================================================== -->
@@ -637,7 +427,6 @@
     <div class="orders-header">
 
         <div>
-
             <h3 class="orders-title">
                 Orders
             </h3>
@@ -645,22 +434,18 @@
             <div class="orders-subtitle">
                 View and manage all customer orders
             </div>
-
         </div>
-
 
         <a
             href="{% url 'onepageorder_create' %}"
             class="create-order-btn"
         >
-
             <i class="bi bi-plus-lg me-1"></i>
-
             Create Order
-
         </a>
 
     </div>
+
 
     <!-- =====================================================
          SEARCH
@@ -681,16 +466,14 @@
             >
 
             <button type="submit">
-
                 <i class="bi bi-search me-1"></i>
-
                 Search
-
             </button>
 
         </form>
 
     </div>
+
 
     <!-- =====================================================
          ORDERS TABLE
@@ -703,39 +486,23 @@
             <table class="orders-table">
 
                 <thead>
-
                     <tr>
 
-                        <th>
-                            Trip
-                        </th>
+                        <th>Trip</th>
 
-                        <th>
-                            Customer
-                        </th>
+                        <th>Customer</th>
 
-                        <th>
-                            Route
-                        </th>
+                        <th>Route</th>
 
-                        <th>
-                            Vehicle
-                        </th>
+                        <th>Vehicle</th>
 
-                        <th>
-                            Freight
-                        </th>
+                        <th>Freight</th>
 
-                        <th>
-                            Margin
-                        </th>
+                        <th>Margin</th>
 
-                        <th>
-                            Action
-                        </th>
+                        <th>Action</th>
 
                     </tr>
-
                 </thead>
 
 
@@ -744,23 +511,39 @@
                     {% for o in orders %}
 
                     <tr>
-                        <!-- TRIP -->
+
+                        <!-- =================================================
+                             TRIP
+                             ================================================= -->
+
                         <td>
-                            <a href="{% url 'onepageorder_detail' o.pk %}" class="btn btn-sm btn-custom">
-                                <i class=" bi bi-eye me-1"></i>
+
+                            <a
+                                href="{% url 'onepageorder_detail' o.pk %}"
+                                class="btn btn-sm btn-custom"
+                            >
+                                <i class="bi bi-eye me-1"></i>
+
                                 <span class="trip-number">
-                                   <strong>{{ o.trip_number }}</strong>
+                                    <strong>{{ o.trip_number }}</strong>
                                 </span>
                             </a>
+
                         </td>
-                        <!-- CUSTOMER -->
+
+
+                        <!-- =================================================
+                             CUSTOMER
+                             ================================================= -->
 
                         <td>
-
                             {{ o.customer.name }}
-
                         </td>
-                        <!-- ROUTE -->
+
+
+                        <!-- =================================================
+                             ROUTE
+                             ================================================= -->
 
                         <td>
 
@@ -777,7 +560,11 @@
                             </span>
 
                         </td>
-                        <!-- VEHICLE -->
+
+
+                        <!-- =================================================
+                             VEHICLE
+                             ================================================= -->
 
                         <td>
 
@@ -786,88 +573,121 @@
                             </span>
 
                             {% if o.vehicle_type %}
-
-                            <small class="vehicle-type">
-                                {{ o.vehicle_type }}
-                            </small>
-
+                                <small class="vehicle-type">
+                                    {{ o.vehicle_type }}
+                                </small>
                             {% endif %}
 
                         </td>
 
-                        <!-- FREIGHT -->
+
+                        <!-- =================================================
+                             FREIGHT
+                             ================================================= -->
 
                         <td class="text-end">
 
                             <span class="amount">
-
                                 ₹ {{ o.freight_amount|floatformat:2 }}
-
                             </span>
 
                         </td>
 
 
-                        <!-- MARGIN -->
+                        <!-- =================================================
+                             MARGIN
+                             ================================================= -->
 
                         <td class="text-end">
 
                             {% if o.margin >= 0 %}
 
                                 <span class="margin-positive">
-
                                     ₹ {{ o.margin|floatformat:2 }}
-
                                 </span>
 
                             {% else %}
 
                                 <span class="margin-negative">
-
                                     ₹ {{ o.margin|floatformat:2 }}
-
                                 </span>
 
                             {% endif %}
 
                         </td>
 
-                        <!-- ACTION -->
+
+                        <!-- =================================================
+                             ACTION
+                             ================================================= -->
 
                         <td class="text-center">
-                            {% if order.tracking and order.tracking.settled %}
 
-                            <button class="btn btn-light btn-sm" disabled>
-                                🔒 Trip Closed
-                            </button>
+                            <!-- TRACKING -->
+
+                            {% if o.tracking and o.tracking.settled %}
+
+                                <button
+                                    type="button"
+                                    class="btn btn-light btn-sm order-action-btn"
+                                    disabled
+                                >
+                                    🔒 Trip Closed
+                                </button>
 
                             {% else %}
 
-                            <a href="{% url 'tracking_page' o.pk %}" class="btn btn-success btn-sm">
-                                🚚 Open Tracking
-                            </a>
+                                <a
+                                    href="{% url 'tracking_page' o.pk %}"
+                                    class="btn btn-success btn-sm order-action-btn"
+                                >
+                                    🚚 Open Tracking
+                                </a>
 
                             {% endif %}
+
+
+                            <!-- ADMIN / SUPERUSER REMOVE -->
+
                             {% if is_admin or is_superuser %}
-                               <a href="{% url 'delete_vehicle' o.pk %}" class="btn btn-warning btn-sm">
-                                Remove
-                            </a>
+
+                                <a
+                                    href="{% url 'delete_vehicle' o.pk %}"
+                                    class="btn btn-warning btn-sm order-action-btn ms-1"
+                                    onclick="return confirm('Are you sure you want to remove this vehicle?');"
+                                >
+                                    Remove
+                                </a>
+
                             {% endif %}
-                        
+
+
+                            <!-- DELETE ORDER -->
+
                             <form
                                 method="post"
                                 action="{% url 'onepageorder_delete' o.pk %}"
                                 onsubmit="return confirm('Are you sure you want to delete {{ o.trip_number }}?');"
-                                class="d-inline ms-1">
-                                        {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash me-1"></i>
+                                class="d-inline ms-1"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger btn-sm order-action-btn"
+                                    title="Delete Order"
+                                >
+                                    <i class="bi bi-trash"></i>
                                 </button>
+
                             </form>
 
                         </td>
 
                     </tr>
+
+
                     {% empty %}
 
                     <tr>
@@ -894,7 +714,6 @@
         </div>
 
     </div>
-
 
 </div>
 
