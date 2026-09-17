@@ -604,7 +604,7 @@
                                 <input
                                     type="checkbox"
                                     name="balance_trans_fleet"
-                                    {% if tracking.balance_trans_fleet %}
+                                    {% if tracking.balance_to_fleet %}
                                         checked
                                     {% endif %}
                                 >
@@ -726,17 +726,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const lrCheck = document.getElementById("lrCheck");
     const lrBox = document.getElementById("lrBox");
 
-
     function toggleLR() {
-
         if (!lrCheck || !lrBox) return;
-
         lrBox.style.display =
             lrCheck.checked ? "block" : "none";
-
     }
-
-
     if (lrCheck) {
 
         lrCheck.addEventListener("change", toggleLR);
@@ -902,7 +896,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
-
 
 <!-- =========================================================
      STYLE
