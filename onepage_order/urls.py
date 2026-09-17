@@ -28,22 +28,18 @@ urlpatterns = [
         views.tracking_page,
         name="onepageorder_tracking",
     ),
-]
-#     path(
-#         "<int:pk>/delete/",
-#         views.onepageorder_delete,
-#         name="onepageorder_delete",
-#     ),
 
-#     path(
-#         "<int:pk>/",
-#         views.onepageorder_detail,
-#         name="onepageorder_detail",
-#     ),
+    path(
+        "<int:pk>/delete/",
+        views.onepageorder_delete,
+        name="onepageorder_delete",
+    ),
 
-#     # =========================================================
-#     # PAYMENTS
-#     # =========================================================
+    path(
+        "<int:pk>/",
+        views.onepageorder_detail,
+        name="onepageorder_detail",
+    ),
 
     path(
         "vehicle-payments/",
@@ -62,7 +58,7 @@ urlpatterns = [
         views.admin_margin,
         name="admin_margin",
     ),
-
+]
 #     # =========================================================
 #     # LIVE TRACKING
 #     # =========================================================
