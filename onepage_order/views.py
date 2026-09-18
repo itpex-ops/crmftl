@@ -2061,12 +2061,7 @@ def onepageorder_send_consent(request, pk):
             "onepageorder_tracking_list"
         )
 
-    session = get_object_or_404(
-        TrackingSession.objects.select_related(
-            "order",
-        ),
-        pk=pk,
-    )
+    session = get_object_or_404(onepageorder_check_consent)
 
     result = ConsentService.onepageorder_send_consent(
         session
@@ -2240,7 +2235,6 @@ def onepageorder_check_consent(request, pk):
         pk=session.order.pk,
     )
 
-
 # =============================================================
 # DELETE TRACKING
 # pk = TRACKING SESSION PK
@@ -2352,7 +2346,6 @@ def delete_tracking(request, pk):
         "onepageorder_tracking_setup",
         pk=session.order.pk,
     )
-
 
 # =============================================================
 # TEST LOCATION API

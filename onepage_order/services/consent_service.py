@@ -1,11 +1,8 @@
 import requests
-
 from django.conf import settings
-
 from onepage_order.models import TrackingSession, ApiLog
 from onepage_order.services.consent_auth_service import ConsentAuthService
 from onepage_order.services.modify_service import ModifyService
-
 
 class ConsentService:
 
@@ -66,7 +63,7 @@ class ConsentService:
     # =========================================================
 
     @classmethod
-    def send_consent(cls, session):
+    def onepageorder_send_consent(cls, session):
 
         if not session:
 
@@ -275,7 +272,7 @@ class ConsentService:
     # =========================================================
 
     @classmethod
-    def check_consent(cls, session):
+    def onepageorder_check_consent(cls, session):
 
         if not session:
 
