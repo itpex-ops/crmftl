@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
 
     # =========================================================
@@ -102,49 +103,49 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "<int:pk>/",
+        "vehicle-live/<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "<int:pk>/location/",
+        "vehicle-live/<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "<int:pk>/refresh/",
+        "vehicle-live/<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "<int:pk>/history/",
+        "vehicle-live/<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "<int:pk>/tracking-history/",
+        "vehicle-live/<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "<int:pk>/live-history/",
+        "vehicle-live/<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "<int:pk>/test-location/",
+        "vehicle-live/<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
 
     path(
-        "<int:pk>/delete/",
+        "vehicle-live/<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
