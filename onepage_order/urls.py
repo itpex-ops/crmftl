@@ -84,13 +84,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "setup/<int:order_id>/",
+        "live-tracking/setup/<int:order_id>/",
         views.onepageorderlive_tracking_setup,
         name="onepageorderlive_tracking_setup",
     ),
 
     path(
-        "import-driver/<int:order_id>/",
+        "live-tracking/import-driver/<int:order_id>/",
         views.import_driver,
         name="import_driver",
     ),
@@ -103,56 +103,49 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "vehicle-live/<int:pk>/",
+        "live-tracking/vehicle-live/<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "vehicle-live/<int:pk>/location/",
+        "live-tracking/vehicle-live/<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "vehicle-live/<int:pk>/refresh/",
+        "live-tracking/vehicle-live/<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "vehicle-live/<int:pk>/history/",
+        "live-tracking/vehicle-live/<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "vehicle-live/<int:pk>/tracking-history/",
+        "live-tracking/vehicle-live/<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "vehicle-live/<int:pk>/live-history/",
+        "live-tracking/vehicle-live/<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "vehicle-live/<int:pk>/test-location/",
+        "live-tracking/vehicle-live/<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
 
-
-    # =========================================================
-    # TRACKING DELETE
-    #
-    # pk = TrackingSession PK
-    # =========================================================
-
     path(
-        "vehicle-live/<int:pk>/delete/",
+        "live-tracking/vehicle-live/<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
@@ -160,16 +153,18 @@ urlpatterns = [
 
     # =========================================================
     # CONSENT
+    #
+    # pk = TrackingSession PK
     # =========================================================
 
     path(
-        "consent/<int:pk>/",
+        "live-tracking/consent/<int:pk>/",
         views.send_consent,
         name="send_consent",
     ),
 
     path(
-        "consent/check/<int:pk>/",
+        "live-tracking/consent/check/<int:pk>/",
         views.check_consent,
         name="check_consent",
     ),
