@@ -143,43 +143,6 @@ def add_tracking_template_flags(tracking):
 # LIVE TRACKING PAGE
 # =============================================================
 @login_required
-def vehicle_live(request, pk):
-    """
-    Display the live-tracking page using a TrackingSession PK.
-    TrackingSession is linked directly to Order.
-    """
-    tracking_session = get_object_or_404(
-        TrackingSession.objects.select_related(
-            "order",
-            "order__customer",
-            "order__tracking",
-        ),
-        pk=pk,
-    )
-    order = tracking_session.order
-    tracking = getattr(order, "tracking", None)
-
-    latest_location = (
-        LiveLocation.objects
-        .filter(session=tracking_session)
-        .order_by("-received_at")
-        .first()
-    )
-
-    context = {
-        "tracking_session": tracking_session,
-        "order": order,
-        "tracking": tracking,
-        "latest_location": latest_location,
-    }
-
-    return render(
-        request,
-        "onepageorders/tracking.html",
-        context,
-    )
-
-@login_required
 def vehicle_live_location(request, pk):
     """
     Return the latest location using a TrackingSession PK.
@@ -280,10 +243,7 @@ def onepageorder_delete(request, pk):
             request,
             "Invalid request.",
         )
-        return redirect(
-            "onepageorder_list",
-            pk=pk,
-        )
+        return redirect("onepageorder_list")
 
     order = get_object_or_404(
         Order,
@@ -2030,13 +1990,13 @@ def import_driver(request, order_id):
 # =============================================================
 
 @login_required
-def delete_tracking(request, pk):
+def delete_tracking(request, session_id):
     if request.method != "POST":
         return redirect("live_tracking_list")
 
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=pk,
+        pk=session_id,
     )
 
     if not session.entity_id:

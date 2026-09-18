@@ -1,10 +1,13 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
+
     # =========================================================
     # ORDERS
     # =========================================================
+
     path(
         "list/",
         views.onepageorder_list,
@@ -41,6 +44,11 @@ urlpatterns = [
         name="onepageorder_detail",
     ),
 
+
+    # =========================================================
+    # PAYMENTS
+    # =========================================================
+
     path(
         "vehicle-payments/",
         views.vehicle_payments,
@@ -57,40 +65,29 @@ urlpatterns = [
         "admin-margin/",
         views.admin_margin,
         name="admin_margin",
-         ),
-
-    path(
-            "setup/<int:vehicle_id>/",
-            views.live_tracking_setup,
-            name="onepageorderlive_tracking_setup",
-        ),
-
-    path(
-        "vehicle-live/<int:pk>/location/",
-        views.vehicle_live_location,
-        name="onepageordervehicle_live_location",
     ),
 
-#     # =========================================================
-#     # LIVE TRACKING
-#     # =========================================================
+
+    # =========================================================
+    # LIVE TRACKING LIST
+    # =========================================================
 
     path(
-        "vehicle-live/<int:pk>/",
-        views.vehicle_live,
-        name="onepageordervehicle_live",
-    ),
-        path(
-        "",
+        "live-tracking/",
         views.live_tracking_list,
         name="live_tracking_list",
     ),
 
 
+    # =========================================================
+    # LIVE TRACKING SETUP
+    # =========================================================
 
-#     # =========================================================
-#     # LIVE TRACKING LIST / SETUP
-#     # =========================================================
+    path(
+        "setup/<int:order_id>/",
+        views.onepageorderlive_tracking_setup,
+        name="onepageorderlive_tracking_setup",
+    ),
 
     path(
         "import-driver/<int:order_id>/",
@@ -98,8 +95,64 @@ urlpatterns = [
         name="import_driver",
     ),
 
+
+    # =========================================================
+    # LIVE TRACKING
+    #
+    # session_id = TrackingSession PK
+    # =========================================================
+
     path(
-        "<int:pk>/delete/",
+        "vehicle-live/<int:session_id>/",
+        views.vehicle_live,
+        name="onepageordervehicle_live",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/location/",
+        views.vehicle_live_location,
+        name="onepageordervehicle_live_location",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/refresh/",
+        views.refresh_location,
+        name="refresh_location",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/history/",
+        views.vehicle_history,
+        name="vehicle_history",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/tracking-history/",
+        views.tracking_history,
+        name="tracking_history",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/live-history/",
+        views.live_tracking_history,
+        name="live_tracking_history",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/test-location/",
+        views.test_location,
+        name="test_location",
+    ),
+
+
+    # =========================================================
+    # TRACKING DELETE
+    #
+    # session_id = TrackingSession PK
+    # =========================================================
+
+    path(
+        "vehicle-live/<int:session_id>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
@@ -123,59 +176,8 @@ urlpatterns = [
 
 
     # =========================================================
-    # LIVE TRACKING PAGE
-    # `session_id` = TrackingSession PK
+    # API / AUTH TEST
     # =========================================================
-
-    path(
-        "vehicle-live/<int:session_id>/",
-        views.vehicle_live,
-        name="vehicle_live",
-    ),
-
-    path(
-        "vehicle-live/<int:session_id>/location/",
-        views.vehicle_live_location,
-        name="vehicle_live_location",
-    ),
-
-    path(
-        "vehicle-live/<int:session_id>/refresh/",
-        views.refresh_location,
-        name="refresh_location",
-    ),
-
-    path(
-        "vehicle-live/<int:session_id>/history/",
-        views.vehicle_history,
-        name="vehicle_history",
-    ),
-
-    # # Alias
-    path(
-        "vehicle-live/<int:session_id>/tracking-history/",
-        views.tracking_history,
-        name="tracking_history",
-    ),
-
-    # # Alias
-    path(
-        "vehicle-live/<int:session_id>/live-history/",
-        views.live_tracking_history,
-        name="live_tracking_history",
-    ),
-
-    # # Test current location
-    path(
-        "vehicle-live/<int:session_id>/test-location/",
-        views.test_location,
-        name="test_location",
-    ),
-
-
-    # # =========================================================
-    # # API / AUTH TEST
-    # # =========================================================
 
     path(
         "test-consent-auth/",
