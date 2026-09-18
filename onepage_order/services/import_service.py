@@ -12,201 +12,330 @@ from ..models import (
 
 class ImportService:
 
+    # =========================================================
+    # MOBILE NORMALIZATION
+    # =========================================================
+
+    @staticmethod
+    def normalize_mobile(mobile):
+        """
+        Convert Indian mobile number to:
+
+            91XXXXXXXXXX
+
+        Accepted:
+
+            9876543210
+            919876543210
+            +919876543210
+            00919876543210
+        """
+
+        mobile = str(mobile or "").strip()
+
+        # Remove common separators
+        mobile = (
+            mobile
+            .replace(" ", "")
+            .replace("-", "")
+            .replace("(", "")
+            .replace(")", "")
+        )
+
+        if mobile.startswith("+91"):
+            mobile = mobile[3:]
+
+        elif mobile.startswith("0091"):
+            mobile = mobile[4:]
+
+        elif mobile.startswith("91") and len(mobile) == 12:
+            mobile = mobile[2:]
+
+        # Must now be exactly 10 digits
+        if len(mobile) != 10 or not mobile.isdigit():
+            return None
+
+        return "91" + mobile
+
+    # =========================================================
+    # IMPORT DRIVER
+    # =========================================================
+
     @classmethod
     def import_driver(cls, vehicle):
 
-        # -------------------------------------------------------
+        if not vehicle:
+            return {
+                "success": False,
+                "message": "Vehicle / Order not found."
+            }
+
+        # -----------------------------------------------------
         # GET TRACKING ACCESS TOKEN
-        # -------------------------------------------------------
+        # -----------------------------------------------------
 
         auth = TrackingAuthService.get_tracking_token()
 
         if not auth.get("success"):
             return auth
 
-        access_token = auth["token"]
+        access_token = auth.get("token")
 
-        # -------------------------------------------------------
+        if not access_token:
+            return {
+                "success": False,
+                "message": "Tracking access token not available."
+            }
+
+        # -----------------------------------------------------
         # IMPORT API URL
-        # -------------------------------------------------------
+        # -----------------------------------------------------
 
-        url = settings.TELENITY_IMPORT_API
+        url = getattr(
+            settings,
+            "TELENITY_IMPORT_API",
+            ""
+        )
 
-        # -------------------------------------------------------
-        # HEADERS
-        # -------------------------------------------------------
+        if not url:
+            return {
+                "success": False,
+                "message": "TELENITY_IMPORT_API is not configured."
+            }
 
-        headers = {
-            "Token": access_token,
-            "Content-Type": "application/json"
-        }
-
-        # -------------------------------------------------------
+        # -----------------------------------------------------
         # MOBILE FORMAT
-        # -------------------------------------------------------
+        # -----------------------------------------------------
 
-        mobile = str(vehicle.driver_number).strip()
+        mobile = cls.normalize_mobile(
+            vehicle.driver_number
+        )
 
-        mobile = mobile.replace(" ", "")
-
-        if mobile.startswith("+91"):
-            mobile = mobile[3:]
-
-        if mobile.startswith("91") and len(mobile) == 12:
-            pass
-
-        elif len(mobile) == 10:
-            mobile = "91" + mobile
-
-        else:
+        if not mobile:
             return {
                 "success": False,
                 "message": "Invalid Driver Mobile Number."
             }
 
-        # -------------------------------------------------------
+        # -----------------------------------------------------
+        # HEADERS
+        # -----------------------------------------------------
+
+        headers = {
+            "Token": access_token,
+            "Content-Type": "application/json",
+            "Accept": "*/*",
+        }
+
+        # -----------------------------------------------------
         # REQUEST PAYLOAD
-        # -------------------------------------------------------
+        # -----------------------------------------------------
 
         payload = {
             "entityImportList": [
                 {
                     "firstName": "Driver",
                     "lastName": vehicle.vehicle_number,
-                    "msisdn": mobile
+                    "msisdn": mobile,
                 }
             ]
         }
 
-        print("\n" + "=" * 80)
+        # -----------------------------------------------------
+        # SAFE DEBUG OUTPUT
+        # -----------------------------------------------------
+
+        masked_token = "********"
+
+        if len(access_token) > 12:
+            masked_token = (
+                access_token[:8]
+                + "********"
+            )
+
+        print()
+        print("=" * 80)
         print("TELENITY IMPORT REQUEST")
         print("=" * 80)
         print("URL :", url)
-        print("HEADERS :", headers)
+        print(
+            "HEADERS :",
+            {
+                "Token": masked_token,
+                "Content-Type": "application/json",
+                "Accept": "*/*",
+            }
+        )
         print("PAYLOAD :", payload)
         print("=" * 80)
 
         try:
 
+            # -------------------------------------------------
+            # API REQUEST
+            # -------------------------------------------------
+
             response = requests.post(
                 url=url,
                 headers=headers,
                 json=payload,
-                timeout=30
+                timeout=30,
             )
 
-            # -------------------------------------------------------
+            # -------------------------------------------------
             # SAFE RESPONSE
-            # -------------------------------------------------------
+            # -------------------------------------------------
 
             try:
                 response_data = response.json()
 
-            except Exception:
-
+            except ValueError:
                 response_data = {
                     "raw_response": response.text
                 }
 
-            # -------------------------------------------------------
-            # MASK TOKEN
-            # -------------------------------------------------------
+            # -------------------------------------------------
+            # MASK TOKEN FOR API LOG
+            # -------------------------------------------------
 
-            masked_headers = headers.copy()
+            masked_headers = {
+                "Token": masked_token,
+                "Content-Type": "application/json",
+                "Accept": "*/*",
+            }
 
-            if "Token" in masked_headers:
-
-                token = masked_headers["Token"]
-
-                if len(token) > 12:
-                    masked_headers["Token"] = (
-                        token[:8] + "********"
-                    )
-
-            # -------------------------------------------------------
+            # -------------------------------------------------
             # SAVE API LOG
-            # -------------------------------------------------------
+            # -------------------------------------------------
 
             ApiLog.objects.create(
-
                 api_name="Import API",
-
                 request_url=url,
-
                 request_method="POST",
-
                 request_headers=masked_headers,
-
                 request_body=payload,
-
                 response_code=response.status_code,
-
-                response_body=response_data
-
+                response_body=response_data,
             )
 
-            print("\n" + "=" * 80)
+            # -------------------------------------------------
+            # DEBUG RESPONSE
+            # -------------------------------------------------
+
+            print()
+            print("=" * 80)
             print("TELENITY IMPORT RESPONSE")
             print("=" * 80)
             print("STATUS :", response.status_code)
-            print("BODY :", response_data)
+            print("BODY   :", response_data)
             print("=" * 80)
 
-            # -------------------------------------------------------
+            # =================================================
             # SUCCESS
-            # -------------------------------------------------------
+            # =================================================
 
-            if response.status_code == 200:
+            if response.status_code in (200, 201, 202):
 
-                success_list = response_data.get("successList") or []
+                success_list = (
+                    response_data.get("successList")
+                    or []
+                )
 
-                if len(success_list) == 0:
+                if not success_list:
 
                     return {
                         "success": False,
-                        "message": "Import succeeded but successList is empty."
+                        "status_code": response.status_code,
+                        "message": (
+                            "Import API succeeded, "
+                            "but successList is empty."
+                        ),
+                        "response": response_data,
                     }
 
                 item = success_list[0]
 
-                session, created = TrackingSession.objects.get_or_create(
-                    vehicle=vehicle
+                # -------------------------------------------------
+                # GET ENTITY ID
+                # -------------------------------------------------
+
+                entity_id = item.get("entityId")
+
+                if not entity_id:
+
+                    return {
+                        "success": False,
+                        "message": (
+                            "Import API succeeded, "
+                            "but entityId was not returned."
+                        ),
+                        "response": response_data,
+                    }
+
+                # -------------------------------------------------
+                # CREATE / UPDATE TRACKING SESSION
+                # -------------------------------------------------
+
+                session, created = (
+                    TrackingSession.objects.get_or_create(
+                        order=vehicle
+                    )
                 )
 
                 session.driver_mobile = mobile
 
-                session.tracking_reference = vehicle.ftl_no
+                session.tracking_reference = (
+                    vehicle.ftl_no
+                )
 
-                session.entity_id = item.get("entityId")
+                session.entity_id = entity_id
 
-                session.status = "pending"
+                # IMPORTANT:
+                # "pending" is NOT a valid TrackingSession status.
+                session.status = "imported"
 
                 session.consent_received = False
 
+                session.tracking_enabled = False
+
                 session.save()
+
+                # -------------------------------------------------
+                # RESULT
+                # -------------------------------------------------
 
                 return {
                     "success": True,
+                    "created": created,
                     "session": session,
-                    "response": response_data
+                    "entity_id": entity_id,
+                    "response": response_data,
                 }
 
-            # -------------------------------------------------------
+            # =================================================
             # FAILED
-            # -------------------------------------------------------
+            # =================================================
 
             return {
                 "success": False,
                 "status_code": response.status_code,
-                "message": response_data
+                "message": response_data,
             }
+
+        # =====================================================
+        # TIMEOUT
+        # =====================================================
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
-                "message": "Connection Timeout."
+                "message": "Connection timeout while contacting Telenity Import API."
             }
+
+        # =====================================================
+        # CONNECTION ERROR
+        # =====================================================
 
         except requests.exceptions.ConnectionError:
 
@@ -215,9 +344,24 @@ class ImportService:
                 "message": "Unable to connect to Telenity Server."
             }
 
-        except Exception as e:
+        # =====================================================
+        # REQUEST ERROR
+        # =====================================================
+
+        except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
-                "message": str(e)
+                "message": f"Import API request failed: {exc}"
+            }
+
+        # =====================================================
+        # OTHER ERROR
+        # =====================================================
+
+        except Exception as exc:
+
+            return {
+                "success": False,
+                "message": str(exc)
             }

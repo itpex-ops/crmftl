@@ -83,7 +83,7 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorders/setup/<int:order_id>/",
+        "onepageorder/onepageorders/setup/<int:order_id>/",
         views.onepageorderlive_tracking_setup,
         name="onepageorderlive_tracking_setup",
     ),
