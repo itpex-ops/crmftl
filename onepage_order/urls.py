@@ -62,7 +62,7 @@ urlpatterns = [
     path(
             "setup/<int:vehicle_id>/",
             views.live_tracking_setup,
-            name="live_tracking_setup",
+            name="onepageorderlive_tracking_setup",
         ),
 
     path(

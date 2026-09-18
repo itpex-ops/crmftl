@@ -1213,8 +1213,6 @@ def tracking_page(request, pk):
         },
     )
 
-
-
 # =============================================================
 # ORDER EDIT
 # =============================================================
@@ -1962,7 +1960,7 @@ def live_tracking_list(request):
 # =============================================================
 
 @login_required
-def live_tracking_setup(request, order_id):
+def onepageorderlive_tracking_setup(request, order_id):
     order = get_object_or_404(
         Order.objects.select_related(
             "customer", "tracking", "tracking_session"
@@ -2006,7 +2004,7 @@ def import_driver(request, order_id):
             )
 
         return redirect(
-            "live_tracking_setup",
+            "onepageorderlive_tracking_setup",
             order_id=order.pk,
         )
 
@@ -2022,7 +2020,7 @@ def import_driver(request, order_id):
     messages.error(request, error_message)
 
     return redirect(
-        "live_tracking_setup",
+        "onepageorderlive_tracking_setup",
         order_id=order.pk,
     )
 
