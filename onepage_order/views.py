@@ -1990,13 +1990,13 @@ def import_driver(request, order_id):
 # =============================================================
 
 @login_required
-def delete_tracking(request, session_id):
+def delete_tracking(request, pk):
     if request.method != "POST":
         return redirect("live_tracking_list")
 
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=session_id,
+        pk=pk,
     )
 
     if not session.entity_id:
@@ -2032,8 +2032,8 @@ def delete_tracking(request, session_id):
 # # =============================================================
 
 @login_required
-def send_consent(request, session_id):
-    session = get_object_or_404(TrackingSession, pk=session_id)
+def send_consent(request, pk):
+    session = get_object_or_404(TrackingSession, pk=pk)
     result = ConsentService.check_consent(session)
 
     if result.get("success"):
@@ -2051,8 +2051,8 @@ def send_consent(request, session_id):
 
 
 @login_required
-def check_consent(request, session_id):
-    session = get_object_or_404(TrackingSession, pk=session_id)
+def check_consent(request, pk):
+    session = get_object_or_404(TrackingSession, pk=pk)
     result = ConsentService.check_consent(session)
 
     if not result.get("success"):
@@ -2112,10 +2112,10 @@ def check_consent(request, session_id):
 # =============================================================
 
 @login_required
-def test_location(request, session_id):
+def test_location(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=session_id,
+        pk=pk,
     )
 
     driver_mobile = get_driver_mobile(session)
@@ -2138,14 +2138,14 @@ def test_location(request, session_id):
 # =============================================================
 
 @login_required
-def vehicle_live(request, session_id):
+def vehicle_live(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related(
             "order",
             "order__customer",
             "order__tracking",
         ),
-        pk=session_id,
+        pk=pk,
     )
 
     order = session.order
@@ -2172,10 +2172,10 @@ def vehicle_live(request, session_id):
 # # # =============================================================
 
 @login_required
-def vehicle_history(request, session_id):
+def vehicle_history(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=session_id,
+        pk=pk,
     )
 
     history = unique_location_history(session)
@@ -2192,15 +2192,15 @@ def vehicle_history(request, session_id):
 
 
 @login_required
-def live_tracking_history(request, session_id):
-    return vehicle_history(request, session_id)
+def live_tracking_history(request, pk):
+    return vehicle_history(request, pk)
 
 
 @login_required
-def tracking_history(request, session_id):
+def tracking_history(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=session_id,
+        pk=pk,
     )
 
     history = session.locations.all().order_by("-received_at")
@@ -2221,10 +2221,10 @@ def tracking_history(request, session_id):
 # =============================================================
 
 @login_required
-def refresh_location(request, session_id):
+def refresh_location(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related("order"),
-        pk=session_id,
+        pk=pk,
     )
 
     logger.info(
@@ -2249,7 +2249,7 @@ def refresh_location(request, session_id):
         )
         return redirect(
             "vehicle_live",
-            session_id=session.id,
+            pk=session.id,
         )
 
     # ---------------------------------------------------------
@@ -2267,7 +2267,7 @@ def refresh_location(request, session_id):
             )
             return redirect(
                 "vehicle_live",
-                session_id=session.id,
+                pk=session.id,
             )
 
         session.tracking_enabled = True
@@ -2328,7 +2328,7 @@ def refresh_location(request, session_id):
 
     return redirect(
         "vehicle_live",
-        session_id=session.id,
+        pk=session.id,
     )
 
 # # =============================================================

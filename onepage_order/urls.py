@@ -99,47 +99,47 @@ urlpatterns = [
     # =========================================================
     # LIVE TRACKING
     #
-    # session_id = TrackingSession PK
+    # pk = TrackingSession PK
     # =========================================================
 
     path(
-        "vehicle-live/<int:session_id>/",
+        "vehicle-live/<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/location/",
+        "vehicle-live/<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/refresh/",
+        "vehicle-live/<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/history/",
+        "vehicle-live/<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/tracking-history/",
+        "vehicle-live/<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/live-history/",
+        "vehicle-live/<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "vehicle-live/<int:session_id>/test-location/",
+        "vehicle-live/<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
@@ -148,11 +148,11 @@ urlpatterns = [
     # =========================================================
     # TRACKING DELETE
     #
-    # session_id = TrackingSession PK
+    # pk = TrackingSession PK
     # =========================================================
 
     path(
-        "vehicle-live/<int:session_id>/delete/",
+        "vehicle-live/<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
@@ -163,13 +163,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "consent/<int:session_id>/",
+        "consent/<int:pk>/",
         views.send_consent,
         name="send_consent",
     ),
 
     path(
-        "consent/check/<int:session_id>/",
+        "consent/check/<int:pk>/",
         views.check_consent,
         name="check_consent",
     ),
