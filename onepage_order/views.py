@@ -1907,7 +1907,7 @@ def live_tracking_list(request):
 
     return render(
         request,
-        "onepageorders//list.html",
+        "onepageorders/list.html",
         {
             "orders": orders,
             "q": query,
@@ -2157,7 +2157,7 @@ def vehicle_live(request, pk):
 
     return render(
         request,
-        "onepageorders//vehicle_live.html",
+        "onepageorders/vehicle_live.html",
         {
             "session": session,
             "order": order,
@@ -2182,7 +2182,7 @@ def vehicle_history(request, pk):
 
     return render(
         request,
-        "onepageorders//history.html",
+        "onepageorders/history.html",
         {
             "session": session,
             "order": session.order,
@@ -2207,7 +2207,7 @@ def tracking_history(request, pk):
 
     return render(
         request,
-        "onepageorders//history.html",
+        "onepageorders/history.html",
         {
             "session": session,
             "order": session.order,
