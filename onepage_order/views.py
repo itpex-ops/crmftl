@@ -1892,6 +1892,7 @@ def live_tracking_list(request):
         .select_related("customer", "tracking", "tracking_session")
         .filter(tracking_session__isnull=False)
         .exclude(tracking__settled=True)
+        .exclude(tracking_session__status="deleted")
         .order_by("-id")
     )
 
@@ -2248,7 +2249,7 @@ def refresh_location(request, pk):
             "Driver consent has not been approved yet.",
         )
         return redirect(
-            "vehicle_live",
+            "onepageordervehicle_live",
             pk=session.id,
         )
 
@@ -2266,7 +2267,7 @@ def refresh_location(request, pk):
                 f"{modify_result.get('message', 'Unknown error')}",
             )
             return redirect(
-                "vehicle_live",
+                "onepageordervehicle_live",
                 pk=session.id,
             )
 
@@ -2327,7 +2328,7 @@ def refresh_location(request, pk):
         )
 
     return redirect(
-        "vehicle_live",
+        "onepageordervehicle_live",
         pk=session.id,
     )
 
