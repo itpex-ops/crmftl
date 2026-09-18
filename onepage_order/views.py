@@ -854,28 +854,28 @@ def order_live_location(request, pk):
 @login_required
 def tracking_page(request, pk):
     """
-    Tracking page uses Order PK.
+    Order Tracking Page.
 
-    Tracking model fields are used exactly as defined:
-    - vehicle_placed
-    - vehicle_document
-    - invoice_eway
-    - advance_to_fleet
-    - balance_to_fleet
-    - fleet_departed
-    - arrived
-    - delivered
-    - pod_received
-    - lr_no_b
-    - settled
+    Tracking workflow fields:
+        vehicle_placed
+        vehicle_document
+        invoice_eway
+        advance_to_fleet
+        balance_to_fleet
+        fleet_departed
+        arrived
+        delivered
+        pod_received
+        lr_no_b
+        settled
 
-    Live tracking is represented by live_tracking_at because
-    Tracking does not have a live_tracking Boolean field.
+    Live Tracking:
+        Tracking.live_tracking_at = timestamp/event
+        TrackingSession = actual SmartTrail tracking session
     """
 
     order = get_object_or_404(
-        Order.objects
-        .select_related(
+        Order.objects.select_related(
             "customer",
             "tracking",
             "tracking_session",
@@ -883,10 +883,19 @@ def tracking_page(request, pk):
         pk=pk,
     )
 
+    # ------------------------------------------------------------
+    # GET / CREATE TRACKING
+    # ------------------------------------------------------------
+
     tracking, _created = Tracking.objects.get_or_create(
         order=order
     )
+
     add_tracking_template_flags(tracking)
+
+    # ------------------------------------------------------------
+    # POST
+    # ------------------------------------------------------------
 
     if request.method == "POST":
 
@@ -901,23 +910,25 @@ def tracking_page(request, pk):
             )
 
             return redirect(
-                "onepageorder_list",
+                "onepageorder_detail",
                 pk=order.pk,
             )
 
         try:
             with transaction.atomic():
 
-                # ------------------------------------------------
-                # CHECKBOXES
-                # ------------------------------------------------
+                now = timezone.now()
 
-                tracking.vehicle_placed = (
-                    "vehicle_placed" in request.POST
-                )
+                # =================================================
+                # CHECKBOXES
+                # =================================================
 
                 tracking.vehicle_document = (
                     "vehicle_document" in request.POST
+                )
+
+                tracking.vehicle_placed = (
+                    "vehicle_placed" in request.POST
                 )
 
                 tracking.invoice_eway = (
@@ -928,11 +939,14 @@ def tracking_page(request, pk):
                     "advance_to_fleet" in request.POST
                 )
 
-                # HTML name is balance_trans_fleet,
-                # model field is balance_to_fleet.
+                # HTML field:
+                # balance_trans_fleet
+                #
+                # Model field:
+                # balance_to_fleet
+
                 tracking.balance_to_fleet = (
-                    "balance_trans_fleet"
-                    in request.POST
+                    "balance_trans_fleet" in request.POST
                 )
 
                 tracking.fleet_departed = (
@@ -955,34 +969,41 @@ def tracking_page(request, pk):
                     "settled" in request.POST
                 )
 
-                # ------------------------------------------------
-                # LR + REMARKS
-                # ------------------------------------------------
+                # =================================================
+                # LR
+                # =================================================
+
+                tracking.lr_no_b = (
+                    "lr_no_b" in request.POST
+                )
 
                 tracking.lr_no = get_post_value(
                     request,
                     "lr_no",
                 )
 
+                # =================================================
+                # REMARKS
+                # =================================================
+
                 tracking.remarks = get_post_value(
                     request,
                     "remarks",
                 )
 
-                # ------------------------------------------------
+                # =================================================
                 # LIVE TRACKING
-                # ------------------------------------------------
+                # =================================================
                 #
-                # Tracking model has live_tracking_at, not a
-                # live_tracking Boolean. Use the POST checkbox as
-                # an event trigger and preserve the timestamp.
-                # ------------------------------------------------
+                # live_tracking_at is an event timestamp.
+                #
+                # Once enabled, DO NOT remove it when later
+                # workflow statuses are completed.
+                # =================================================
 
                 live_tracking_requested = (
                     "live_tracking" in request.POST
                 )
-
-                now = timezone.now()
 
                 if (
                     live_tracking_requested
@@ -990,9 +1011,9 @@ def tracking_page(request, pk):
                 ):
                     tracking.live_tracking_at = now
 
-                # ------------------------------------------------
+                # =================================================
                 # TIMELINE
-                # ------------------------------------------------
+                # =================================================
 
                 if (
                     tracking.vehicle_placed
@@ -1018,9 +1039,24 @@ def tracking_page(request, pk):
                 ):
                     tracking.delivered_at = now
 
-                # ------------------------------------------------
-                # STATUS
-                # ------------------------------------------------
+                # =================================================
+                # CURRENT WORKFLOW STATUS
+                # =================================================
+                #
+                # Live Tracking is NOT used as the permanent
+                # current status once the trip progresses.
+                #
+                # Example:
+                # Live Tracking enabled
+                #        ↓
+                # Fleet Departed
+                #        ↓
+                # Arrived
+                #        ↓
+                # Delivered
+                #
+                # live_tracking_at remains stored.
+                # =================================================
 
                 if tracking.settled:
                     tracking.status = "settled"
@@ -1059,23 +1095,27 @@ def tracking_page(request, pk):
                     tracking.status = "vehicle_placed"
 
                 tracking.save()
+
                 add_tracking_template_flags(tracking)
 
-                # ------------------------------------------------
-                # DOCUMENTS
-                # ------------------------------------------------
+                # =================================================
+                # DOCUMENT UPLOAD
+                # =================================================
 
-                for uploaded_file in (
-                    request.FILES.getlist("documents")
-                ):
+                uploaded_files = request.FILES.getlist(
+                    "documents"
+                )
+
+                for uploaded_file in uploaded_files:
+
                     TrackingDocument.objects.create(
                         tracking=tracking,
                         file=uploaded_file,
                     )
 
-            # ----------------------------------------------------
+            # ====================================================
             # LIVE TRACKING NAVIGATION
-            # ----------------------------------------------------
+            # ====================================================
 
             if live_tracking_requested:
 
@@ -1085,16 +1125,29 @@ def tracking_page(request, pk):
                     None,
                 )
 
+                # -----------------------------------------------
+                # Existing Tracking Session
+                # -----------------------------------------------
+
                 if tracking_session:
+
                     return redirect(
-                        "onepageordervehicle_live_location",
+                        "onepageordervehicle_live",
                         tracking_session.pk,
                     )
+
+                # -----------------------------------------------
+                # No Tracking Session
+                # -----------------------------------------------
 
                 return redirect(
                     "import_driver",
                     order.pk,
                 )
+
+            # ====================================================
+            # NORMAL SAVE
+            # ====================================================
 
             messages.success(
                 request,
@@ -1132,20 +1185,34 @@ def tracking_page(request, pk):
                 "Unable to update tracking. Please try again.",
             )
 
+    # ------------------------------------------------------------
+    # LIVE TRACKING SESSION
+    # ------------------------------------------------------------
+
+    tracking_session = getattr(
+        order,
+        "tracking_session",
+        None,
+    )
+
+    # ------------------------------------------------------------
+    # RENDER
+    # ------------------------------------------------------------
+
     return render(
         request,
         "onepageorders/tracking.html",
         {
             "order": order,
             "tracking": tracking,
-            "tracking_session": getattr(
-                order,
-                "tracking_session",
-                None,
-            ),
+            "tracking_session": tracking_session,
             "documents": tracking.documents.all(),
+            "live_tracking_enabled": bool(
+                tracking.live_tracking_at
+            ),
         },
     )
+
 
 
 # =============================================================
