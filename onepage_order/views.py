@@ -2071,7 +2071,7 @@ def onepageorder_send_consent(request, pk):
         pk=pk,
     )
 
-    result = ConsentService.send_consent(
+    result = ConsentService.onepageorder_send_consent(
         session
     )
 
@@ -2136,7 +2136,7 @@ def onepageorder_check_consent(request, pk):
         pk=pk,
     )
 
-    result = ConsentService.check_consent(
+    result = ConsentService.onepageorder_check_consent(
         session
     )
 
