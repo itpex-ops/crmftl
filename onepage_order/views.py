@@ -114,7 +114,6 @@ def payment_page_context(orders, payments):
         "payments": payments,
     }
 
-
 def add_tracking_template_flags(tracking):
     """
     Backward-compatible template aliases.
@@ -2047,6 +2046,11 @@ def import_driver(request, pk):
 # pk = TRACKING SESSION PK
 # =============================================================
 
+# =============================================================
+# SEND CONSENT
+# pk = TRACKING SESSION PK
+# =============================================================
+
 @login_required
 def onepageorder_send_consent(request, pk):
 
@@ -2058,12 +2062,16 @@ def onepageorder_send_consent(request, pk):
         )
 
         return redirect(
-            "onepageorder_tracking_list"
+            "onepageorder_tracking_setup",
+            pk=pk,
         )
 
-    session = get_object_or_404(onepageorder_check_consent)
+    session = get_object_or_404(
+        TrackingSession,
+        pk=pk,
+    )
 
-    result = ConsentService.onepageorder_send_consent(
+    result = ConsentService.send_consent(
         session
     )
 
@@ -2081,10 +2089,7 @@ def onepageorder_send_consent(request, pk):
             "Unable to send consent SMS.",
         )
 
-        if isinstance(
-            message,
-            dict,
-        ):
+        if isinstance(message, dict):
 
             message = (
                 message.get("errorMessage")
@@ -2104,6 +2109,124 @@ def onepageorder_send_consent(request, pk):
     )
 
 
+# =============================================================
+# CHECK CONSENT
+# pk = TRACKING SESSION PK
+# =============================================================
+
+@login_required
+def onepageorder_check_consent(request, pk):
+
+    if request.method not in (
+        "GET",
+        "POST",
+    ):
+
+        messages.warning(
+            request,
+            "Invalid request method.",
+        )
+
+        return redirect(
+            "onepageorder_tracking_list"
+        )
+
+    session = get_object_or_404(
+        TrackingSession,
+        pk=pk,
+    )
+
+    result = ConsentService.check_consent(
+        session
+    )
+
+    if not result.get("success"):
+
+        message = result.get(
+            "message",
+            "Unable to check consent.",
+        )
+
+        if isinstance(message, dict):
+
+            message = (
+                message.get("errorMessage")
+                or message.get("message")
+                or message.get("raw_response")
+                or str(message)
+            )
+
+        messages.error(
+            request,
+            str(message),
+        )
+
+        return redirect(
+            "onepageorder_tracking_setup",
+            pk=session.order.pk,
+        )
+
+    # Service has already updated the session.
+    session.refresh_from_db()
+
+    if (
+        session.consent_received
+        and session.tracking_enabled
+    ):
+
+        messages.success(
+            request,
+            (
+                "Consent received. "
+                "Live tracking has been activated."
+            ),
+        )
+
+    elif session.status == "sms_sent":
+
+        messages.warning(
+            request,
+            "Driver consent is still pending.",
+        )
+
+    elif session.status == "license_hold":
+
+        messages.warning(
+            request,
+            "Tracking is currently on license hold.",
+        )
+
+    elif session.status == "expired":
+
+        messages.warning(
+            request,
+            "Tracking consent has expired.",
+        )
+
+    elif session.status == "error":
+
+        messages.error(
+            request,
+            (
+                "Consent was received, but "
+                "tracking could not be activated."
+            ),
+        )
+
+    else:
+
+        messages.info(
+            request,
+            (
+                "Tracking status: "
+                f"{session.get_status_display()}"
+            ),
+        )
+
+    return redirect(
+        "onepageorder_tracking_setup",
+        pk=session.order.pk,
+    )
 # =============================================================
 # CHECK CONSENT
 # pk = TRACKING SESSION PK
