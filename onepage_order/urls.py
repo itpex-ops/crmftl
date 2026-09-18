@@ -72,7 +72,7 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorders/",
+        "tracking_list/",
         views.live_tracking_list,
         name="live_tracking_list",
     ),
@@ -83,13 +83,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorder/onepageorders/setup/<int:order_id>/",
+        "<int:pk>/setup/",
         views.onepageorderlive_tracking_setup,
         name="onepageorderlive_tracking_setup",
     ),
 
     path(
-        "onepageorders/import-driver/<int:order_id>/",
+        "import-driver/<int:pk>/",
         views.import_driver,
         name="import_driver",
     ),
@@ -102,49 +102,49 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorders/<int:pk>/",
+        "<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "onepageorders/<int:pk>/location/",
+        "<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "onepageorders/<int:pk>/refresh/",
+        "<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "onepageorders/<int:pk>/history/",
+        "<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "onepageorders/<int:pk>/tracking-history/",
+        "<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "onepageorders/<int:pk>/live-history/",
+        "<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "onepageorders/<int:pk>/test-location/",
+        "<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
 
     path(
-        "onepageorders/<int:pk>/delete/",
+        "<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
@@ -157,13 +157,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorders/consent/<int:pk>/",
+        "consent/<int:pk>/",
         views.send_consent,
         name="send_consent",
     ),
 
     path(
-        "onepageorders/consent/check/<int:pk>/",
+        "consent/check/<int:pk>/",
         views.check_consent,
         name="check_consent",
     ),

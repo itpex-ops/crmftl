@@ -1563,7 +1563,7 @@ def vehicle_payments(request):
     if request.method == "POST":
 
         try:
-            order_id = get_post_value(
+            pk = get_post_value(
                 request,
                 "order",
             )
@@ -1588,14 +1588,14 @@ def vehicle_payments(request):
                 "transaction_reference",
             )
 
-            if not order_id:
+            if not pk:
                 raise ValidationError(
                     "Please select a Trip / Order."
                 )
 
             order = get_object_or_404(
                 Order,
-                pk=order_id,
+                pk=pk,
             )
 
             if not vehicle_number:
@@ -1712,7 +1712,7 @@ def customer_payments(request):
     if request.method == "POST":
 
         try:
-            order_id = get_post_value(
+            pk = get_post_value(
                 request,
                 "order",
             )
@@ -1735,14 +1735,14 @@ def customer_payments(request):
                 "utr_details",
             )
 
-            if not order_id:
+            if not pk:
                 raise ValidationError(
                     "Please select a Trip / Order."
                 )
 
             order = get_object_or_404(
                 Order,
-                pk=order_id,
+                pk=pk,
             )
 
             # Customer payment is against the GST-inclusive
@@ -1917,12 +1917,12 @@ def live_tracking_list(request):
 # =============================================================
 
 @login_required
-def onepageorderlive_tracking_setup(request, order_id):
+def onepageorderlive_tracking_setup(request, pk):
     order = get_object_or_404(
         Order.objects.select_related(
             "customer", "tracking", "tracking_session"
         ),
-        pk=order_id,
+        pk=pk,
     )
 
     session = getattr(order, "tracking_session", None)
@@ -1941,8 +1941,8 @@ def onepageorderlive_tracking_setup(request, order_id):
 # # =============================================================
 
 @login_required
-def import_driver(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
+def import_driver(request, pk):
+    order = get_object_or_404(Order, pk=pk)
 
     # ImportService must accept Order rather than Vehicle.
     result = ImportService.import_driver(order)
@@ -1962,7 +1962,7 @@ def import_driver(request, order_id):
 
         return redirect(
             "onepageorderlive_tracking_setup",
-            order_id=order.pk,
+            pk=order.pk,
         )
 
     error_message = result.get("message", "Import failed.")
@@ -1978,7 +1978,7 @@ def import_driver(request, order_id):
 
     return redirect(
         "onepageorderlive_tracking_setup",
-        order_id=order.pk,
+        pk=order.pk,
     )
 
 
