@@ -102,49 +102,49 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/",
+        "onepageorders/<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/location/",
+        "onepageorders/<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/refresh/",
+        "onepageorders/<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/history/",
+        "onepageorders/<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/tracking-history/",
+        "onepageorders/<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/live-history/",
+        "onepageorders/<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/test-location/",
+        "onepageorders/<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
 
     path(
-        "onepageorders/vehicle-live/<int:pk>/delete/",
+        "onepageorders/<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),

@@ -2227,7 +2227,7 @@ def refresh_location(request, pk):
     logger.info(
         "REFRESH LOCATION | session=%s order=%s driver_mobile=%s "
         "entity_id=%s consent=%s status=%s",
-        session.id,
+        session.pk,
         session.order.trip_number,
         get_driver_mobile(session),
         session.entity_id,
@@ -2246,7 +2246,7 @@ def refresh_location(request, pk):
         )
         return redirect(
             "onepageordervehicle_live",
-            pk=session.id,
+            pk=session.pk,
         )
 
     # ---------------------------------------------------------
@@ -2264,7 +2264,7 @@ def refresh_location(request, pk):
             )
             return redirect(
                 "onepageordervehicle_live",
-                pk=session.id,
+                pk=session.pk,
             )
 
         session.tracking_enabled = True
@@ -2286,7 +2286,7 @@ def refresh_location(request, pk):
 
     logger.info(
         "REFRESH LOCATION RESULT | session=%s result=%s",
-        session.id,
+        session.pk,
         result,
     )
 
@@ -2325,7 +2325,7 @@ def refresh_location(request, pk):
 
     return redirect(
         "onepageordervehicle_live",
-        pk=session.id,
+        pk=session.pk,
     )
 
 # # =============================================================
