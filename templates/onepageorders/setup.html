@@ -27,7 +27,7 @@
         </div>
 
         <a
-            href="{% url 'live_tracking_list' %}"
+            href="{% url 'onepageorder_tracking_list' %}"
             class="btn btn-outline-secondary"
         >
             <i class="bi bi-arrow-left"></i>
@@ -319,7 +319,7 @@
                                         {% if not session %}
 
                                             <a
-                                                href="{% url 'import_driver' order.pk %}"
+                                                href="{% url 'onepageorder_import_driver' order.pk %}"
                                                 class="btn btn-primary btn-sm"
                                             >
 
@@ -443,7 +443,7 @@
 
                                                 <form
                                                     method="post"
-                                                    action="{% url 'send_consent' session.pk %}"
+                                                    action="{% url 'onepageorder_send_consent' session.pk %}"
                                                     class="d-inline"
                                                 >
 
@@ -563,7 +563,7 @@
 
                                                 <form
                                                     method="post"
-                                                    action="{% url 'check_consent' session.pk %}"
+                                                    action="{% url 'onepageorder_check_consent' session.pk %}"
                                                     class="d-inline"
                                                 >
 

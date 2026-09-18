@@ -1,5 +1,4 @@
 from django.urls import path
-
 from . import views
 
 
@@ -7,7 +6,6 @@ urlpatterns = [
 
     # =========================================================
     # ORDERS
-    # pk = Order PK
     # =========================================================
 
     path(
@@ -71,39 +69,29 @@ urlpatterns = [
 
 
     # =========================================================
-    # LIVE TRACKING LIST
+    # ONE PAGE ORDER LIVE TRACKING
     # =========================================================
 
     path(
-        "tracking_list/",
-        views.live_tracking_list,
-        name="live_tracking_list",
+        "tracking-list/",
+        views.onepageorder_tracking_list,
+        name="onepageorder_tracking_list",
     ),
 
-
-    # =========================================================
-    # LIVE TRACKING SETUP
     # pk = Order PK
-    # =========================================================
-
     path(
         "<int:pk>/setup/",
-        views.onepageorderlive_tracking_setup,
-        name="onepageorderlive_tracking_setup",
+        views.onepageorder_tracking_setup,
+        name="onepageorder_tracking_setup",
     ),
 
     path(
         "import-driver/<int:pk>/",
         views.import_driver,
-        name="import_driver",
+        name="onepageorder_import_driver",
     ),
 
-
-    # =========================================================
-    # LIVE VEHICLE
     # pk = TrackingSession PK
-    # =========================================================
-
     path(
         "vehicle-live/<int:pk>/",
         views.vehicle_live,
@@ -119,37 +107,37 @@ urlpatterns = [
     path(
         "vehicle-live/<int:pk>/refresh/",
         views.refresh_location,
-        name="refresh_location",
+        name="onepageordervehicle_refresh",
     ),
 
     path(
         "vehicle-live/<int:pk>/history/",
         views.vehicle_history,
-        name="vehicle_history",
+        name="onepageordervehicle_history",
     ),
 
     path(
         "vehicle-live/<int:pk>/tracking-history/",
         views.tracking_history,
-        name="tracking_history",
+        name="onepageordervehicle_tracking_history",
     ),
 
     path(
         "vehicle-live/<int:pk>/live-history/",
         views.live_tracking_history,
-        name="live_tracking_history",
+        name="onepageordervehicle_live_history",
     ),
 
     path(
         "vehicle-live/<int:pk>/test-location/",
         views.test_location,
-        name="test_location",
+        name="onepageordervehicle_test_location",
     ),
 
     path(
         "vehicle-live/<int:pk>/delete/",
         views.delete_tracking,
-        name="delete_tracking",
+        name="onepageordervehicle_delete",
     ),
 
 
@@ -160,36 +148,36 @@ urlpatterns = [
 
     path(
         "consent/<int:pk>/",
-        views.send_consent,
-        name="send_consent",
+        views.onepageorder_send_consent,
+        name="onepageorder_send_consent",
     ),
 
     path(
         "consent/check/<int:pk>/",
-        views.check_consent,
-        name="check_consent",
+        views.onepageorder_check_consent,
+        name="onepageorder_check_consent",
     ),
 
 
     # =========================================================
-    # API / AUTH TEST
+    # TEST APIs
     # =========================================================
 
     path(
         "test-consent-auth/",
         views.test_consent_auth,
-        name="test_consent_auth",
+        name="onepageorder_test_consent_auth",
     ),
 
     path(
         "test-tracking-auth/",
         views.test_tracking_auth,
-        name="test_tracking_auth",
+        name="onepageorder_test_tracking_auth",
     ),
 
     path(
         "api-token-status/",
         views.api_token_status,
-        name="api_token_status",
+        name="onepageorder_api_token_status",
     ),
 ]

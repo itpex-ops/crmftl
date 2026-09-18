@@ -1081,26 +1081,17 @@ def tracking_page(request, pk):
                     None,
                 )
 
-                # -----------------------------------------------
-                # Existing Tracking Session
-                # -----------------------------------------------
-
                 if tracking_session:
 
                     return redirect(
                         "onepageordervehicle_live",
-                        tracking_session.pk,
+                        pk=tracking_session.pk,
                     )
 
-                # -----------------------------------------------
-                # No Tracking Session
-                # -----------------------------------------------
-
                 return redirect(
-                    "import_driver",
-                    order.pk,
+                    "onepageorder_import_driver",
+                    pk=order.pk,
                 )
-
             # ====================================================
             # NORMAL SAVE
             # ====================================================
@@ -1907,7 +1898,7 @@ def unique_location_history(session):
 # =============================================================
 
 @login_required
-def live_tracking_list(request):
+def onepageorder_tracking_list(request):
 
     query = request.GET.get(
         "q",
@@ -1960,7 +1951,7 @@ def live_tracking_list(request):
 # =============================================================
 
 @login_required
-def onepageorderlive_tracking_setup(request, pk):
+def onepageorder_tracking_setup(request, pk):
 
     order = get_object_or_404(
         Order.objects.select_related(
@@ -2015,7 +2006,7 @@ def import_driver(request, pk):
         )
 
         return redirect(
-            "onepageorderlive_tracking_setup",
+            "onepageorder_tracking_setup",
             pk=order.pk,
         )
 
@@ -2046,7 +2037,7 @@ def import_driver(request, pk):
     )
 
     return redirect(
-        "onepageorderlive_tracking_setup",
+        "onepageorder_tracking_setup",
         pk=order.pk,
     )
 
@@ -2057,7 +2048,7 @@ def import_driver(request, pk):
 # =============================================================
 
 @login_required
-def send_consent(request, pk):
+def onepageorder_send_consent(request, pk):
 
     if request.method != "POST":
 
@@ -2067,7 +2058,7 @@ def send_consent(request, pk):
         )
 
         return redirect(
-            "live_tracking_list"
+            "onepageorder_tracking_list"
         )
 
     session = get_object_or_404(
@@ -2077,7 +2068,7 @@ def send_consent(request, pk):
         pk=pk,
     )
 
-    result = ConsentService.send_consent(
+    result = ConsentService.onepageorder_send_consent(
         session
     )
 
@@ -2113,7 +2104,7 @@ def send_consent(request, pk):
         )
 
     return redirect(
-        "onepageorderlive_tracking_setup",
+        "onepageorder_tracking_setup",
         pk=session.order.pk,
     )
 
@@ -2124,7 +2115,7 @@ def send_consent(request, pk):
 # =============================================================
 
 @login_required
-def check_consent(request, pk):
+def onepageorder_check_consent(request, pk):
 
     if request.method not in (
         "GET",
@@ -2137,7 +2128,7 @@ def check_consent(request, pk):
         )
 
         return redirect(
-            "live_tracking_list"
+            "onepageorder_tracking_list"
         )
 
     session = get_object_or_404(
@@ -2147,7 +2138,7 @@ def check_consent(request, pk):
         pk=pk,
     )
 
-    result = ConsentService.check_consent(
+    result = ConsentService.onepageorder_check_consent(
         session
     )
 
@@ -2176,7 +2167,7 @@ def check_consent(request, pk):
         )
 
         return redirect(
-            "onepageorderlive_tracking_setup",
+            "onepageorder_tracking_setup",
             pk=session.order.pk,
         )
 
@@ -2245,7 +2236,7 @@ def check_consent(request, pk):
         )
 
     return redirect(
-        "onepageorderlive_tracking_setup",
+        "onepageorder_tracking_setup",
         pk=session.order.pk,
     )
 
@@ -2266,7 +2257,7 @@ def delete_tracking(request, pk):
         )
 
         return redirect(
-            "live_tracking_list"
+            "onepageorder_tracking_list"
         )
 
     session = get_object_or_404(
@@ -2288,7 +2279,7 @@ def delete_tracking(request, pk):
         )
 
         return redirect(
-            "live_tracking_list"
+            "onepageorder_tracking_list"
         )
 
     # ---------------------------------------------------------
@@ -2306,7 +2297,7 @@ def delete_tracking(request, pk):
         )
 
         return redirect(
-            "onepageorderlive_tracking_setup",
+            "onepageorder_tracking_setup",
             pk=session.order.pk,
         )
 
@@ -2332,7 +2323,7 @@ def delete_tracking(request, pk):
         )
 
         return redirect(
-            "live_tracking_list"
+            "onepageorder_tracking_list"
         )
 
     message = result.get(
@@ -2358,7 +2349,7 @@ def delete_tracking(request, pk):
     )
 
     return redirect(
-        "onepageorderlive_tracking_setup",
+        "onepageorder_tracking_setup",
         pk=session.order.pk,
     )
 
