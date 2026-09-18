@@ -1,7 +1,7 @@
 import requests
 from django.conf import settings
 from .auth_service import TrackingAuthService
-from live_tracking.models import ApiLog
+from ..models import ApiLog
 
 class DeleteService:
     @classmethod

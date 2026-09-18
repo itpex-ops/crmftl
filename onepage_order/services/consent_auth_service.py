@@ -5,9 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
-from .models import ApiToken
-
-
+from ..models import ApiToken
 class ConsentAuthService:
 
     @classmethod

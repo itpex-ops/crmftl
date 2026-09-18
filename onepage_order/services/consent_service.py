@@ -4,7 +4,7 @@ from django.conf import settings
 
 from .consent_auth_service import ConsentAuthService
 
-from live_tracking.models import (
+from ..models import (
     TrackingSession,
     ApiLog,
 )

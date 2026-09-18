@@ -4,7 +4,7 @@ from django.conf import settings
 
 from .auth_service import TrackingAuthService
 
-from live_tracking.models import (
+from ..models import (
     TrackingSession,
     ApiLog,
 )

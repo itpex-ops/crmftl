@@ -1,12 +1,8 @@
 import requests
-
 from django.conf import settings
-
 from .auth_service import TrackingAuthService
-from live_tracking.models import ApiLog
-
 from django.utils.dateparse import parse_datetime
-from live_tracking.models import ApiLog, LiveLocation
+from ..models import ApiLog, LiveLocation
 
 class LocationService:
 

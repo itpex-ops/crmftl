@@ -58,148 +58,140 @@ urlpatterns = [
         views.admin_margin,
         name="admin_margin",
          ),
-    path("live-tra/setup/<int:order_id>/",
+
+    path(
+            "setup/<int:vehicle_id>/",
             views.live_tracking_setup,
-            name="onepagelive_tracking_setup",
+            name="live_tracking_setup",
         ),
-   
-]
+
+    path(
+        "vehicle-live/<int:pk>/location/",
+        views.vehicle_live_location,
+        name="onepageordervehicle_live_location",
+    ),
+
 #     # =========================================================
 #     # LIVE TRACKING
 #     # =========================================================
 
-#     path(
-#         "vehicle-live/<int:pk>/",
-#         views.vehicle_live,
-#         name="onepageordervehicle_live",
-#     ),
+    path(
+        "vehicle-live/<int:pk>/",
+        views.vehicle_live,
+        name="onepageordervehicle_live",
+    ),
+        path(
+        "",
+        views.live_tracking_list,
+        name="live_tracking_list",
+    ),
 
-#     path(
-#         "vehicle-live/<int:pk>/location/",
-#         views.vehicle_live_location,
-#         name="onepageordervehicle_live_location",
-#     ),
-
-
-#     path(
-#         "admin-margin/",
-#         views.admin_margin,
-#         name="admin_margin",
-#     ),
 
 
 #     # =========================================================
 #     # LIVE TRACKING LIST / SETUP
 #     # =========================================================
 
-#     path(
-#         "live-tracking/",
-#         views.live_tracking_list,
-#         name="live_tracking_list",
-#     ),
+    path(
+        "import-driver/<int:order_id>/",
+        views.import_driver,
+        name="import_driver",
+    ),
 
-   
-
-#     path(
-#         "live-tracking/import-driver/<int:order_id>/",
-#         views.import_driver,
-#         name="import_driver",
-#     ),
-
-#     # path(
-#     #     "live-tracking/<int:pk>/delete/",
-#     #     views.delete_tracking,
-#     #     name="delete_tracking",
-#     # ),
+    path(
+        "<int:pk>/delete/",
+        views.delete_tracking,
+        name="delete_tracking",
+    ),
 
 
-#     # =========================================================
-#     # CONSENT
-#     # =========================================================
+    # =========================================================
+    # CONSENT
+    # =========================================================
 
-#     path(
-#         "live-tracking/consent/<int:session_id>/",
-#         views.send_consent,
-#         name="send_consent",
-#     ),
+    path(
+        "consent/<int:session_id>/",
+        views.send_consent,
+        name="send_consent",
+    ),
 
-#     path(
-#         "live-tracking/consent/check/<int:session_id>/",
-#         views.check_consent,
-#         name="check_consent",
-#     ),
-
-
-#     # =========================================================
-#     # LIVE TRACKING PAGE
-#     # `session_id` = TrackingSession PK
-#     # =========================================================
-
-#     path(
-#         "vehicle-live/<int:session_id>/",
-#         views.vehicle_live,
-#         name="vehicle_live",
-#     ),
-
-#     path(
-#         "vehicle-live/<int:session_id>/location/",
-#         views.vehicle_live_location,
-#         name="vehicle_live_location",
-#     ),
-
-#     path(
-#         "vehicle-live/<int:session_id>/refresh/",
-#         views.refresh_location,
-#         name="refresh_location",
-#     ),
-
-#     path(
-#         "vehicle-live/<int:session_id>/history/",
-#         views.vehicle_history,
-#         name="vehicle_history",
-#     ),
-
-#     # # Alias
-#     path(
-#         "vehicle-live/<int:session_id>/tracking-history/",
-#         views.tracking_history,
-#         name="tracking_history",
-#     ),
-
-#     # # Alias
-#     path(
-#         "vehicle-live/<int:session_id>/live-history/",
-#         views.live_tracking_history,
-#         name="live_tracking_history",
-#     ),
-
-#     # # Test current location
-#     path(
-#         "vehicle-live/<int:session_id>/test-location/",
-#         views.test_location,
-#         name="test_location",
-#     ),
+    path(
+        "consent/check/<int:session_id>/",
+        views.check_consent,
+        name="check_consent",
+    ),
 
 
-#     # # =========================================================
-#     # # API / AUTH TEST
-#     # # =========================================================
+    # =========================================================
+    # LIVE TRACKING PAGE
+    # `session_id` = TrackingSession PK
+    # =========================================================
 
-#     path(
-#         "live-tracking/test-consent-auth/",
-#         views.test_consent_auth,
-#         name="test_consent_auth",
-#     ),
+    path(
+        "vehicle-live/<int:session_id>/",
+        views.vehicle_live,
+        name="vehicle_live",
+    ),
 
-#     path(
-#         "live-tracking/test-tracking-auth/",
-#         views.test_tracking_auth,
-#         name="test_tracking_auth",
-#     ),
+    path(
+        "vehicle-live/<int:session_id>/location/",
+        views.vehicle_live_location,
+        name="vehicle_live_location",
+    ),
 
-#     path(
-#         "live-tracking/api-token-status/",
-#         views.api_token_status,
-#         name="api_token_status",
-#     ),
-# ]
+    path(
+        "vehicle-live/<int:session_id>/refresh/",
+        views.refresh_location,
+        name="refresh_location",
+    ),
+
+    path(
+        "vehicle-live/<int:session_id>/history/",
+        views.vehicle_history,
+        name="vehicle_history",
+    ),
+
+    # # Alias
+    path(
+        "vehicle-live/<int:session_id>/tracking-history/",
+        views.tracking_history,
+        name="tracking_history",
+    ),
+
+    # # Alias
+    path(
+        "vehicle-live/<int:session_id>/live-history/",
+        views.live_tracking_history,
+        name="live_tracking_history",
+    ),
+
+    # # Test current location
+    path(
+        "vehicle-live/<int:session_id>/test-location/",
+        views.test_location,
+        name="test_location",
+    ),
+
+
+    # # =========================================================
+    # # API / AUTH TEST
+    # # =========================================================
+
+    path(
+        "test-consent-auth/",
+        views.test_consent_auth,
+        name="test_consent_auth",
+    ),
+
+    path(
+        "test-tracking-auth/",
+        views.test_tracking_auth,
+        name="test_tracking_auth",
+    ),
+
+    path(
+        "api-token-status/",
+        views.api_token_status,
+        name="api_token_status",
+    ),
+]
