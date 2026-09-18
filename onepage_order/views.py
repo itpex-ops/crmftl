@@ -2030,79 +2030,124 @@ def delete_tracking(request, pk):
 
 @login_required
 def send_consent(request, pk):
-    session = get_object_or_404(TrackingSession, pk=pk)
-    result = ConsentService.check_consent(session)
+    """Send consent SMS. pk = TrackingSession PK."""
+    session = get_object_or_404(
+        TrackingSession.objects.select_related("order"),
+        pk=pk,
+    )
+
+    if request.method != "POST":
+        messages.warning(request, "Invalid request method.")
+        return redirect(
+            "onepageorderlive_tracking_setup",
+            pk=session.order.pk,
+        )
+
+    result = ConsentService.send_consent(session)
 
     if result.get("success"):
-        messages.success(
-            request,
-            "Consent status checked successfully.",
-        )
+        messages.success(request, "Consent SMS sent successfully.")
     else:
-        messages.error(
-            request,
-            str(result.get("message", "Unable to check consent.")),
-        )
+        message = result.get("message", "Unable to send consent SMS.")
+        if isinstance(message, dict):
+            message = (
+                message.get("errorMessage")
+                or message.get("message")
+                or message.get("raw_response")
+                or str(message)
+            )
+        messages.error(request, str(message))
 
-    return redirect("live_tracking_list")
+    return redirect(
+        "onepageorderlive_tracking_setup",
+        pk=session.order.pk,
+    )
 
 
 @login_required
 def check_consent(request, pk):
-    session = get_object_or_404(TrackingSession, pk=pk)
+    """Check consent. pk = TrackingSession PK."""
+    session = get_object_or_404(
+        TrackingSession.objects.select_related("order"),
+        pk=pk,
+    )
+
     result = ConsentService.check_consent(session)
 
     if not result.get("success"):
-        messages.error(
-            request,
-            str(result.get("message", "Unable to check consent.")),
+        message = result.get("message", "Unable to check consent.")
+        if isinstance(message, dict):
+            message = (
+                message.get("errorMessage")
+                or message.get("message")
+                or message.get("raw_response")
+                or str(message)
+            )
+        messages.error(request, str(message))
+        return redirect(
+            "onepageorderlive_tracking_setup",
+            pk=session.order.pk,
         )
-        return redirect("live_tracking_list")
 
-    consent_status = result.get("status")
+    consent_status = (result.get("status") or "").lower()
 
     if consent_status in {
+        "allowed",
         "approved",
         "accepted",
+        "consent_approved",
         "consent_received",
         "active",
     }:
-        session.consent_received = True
-        session.status = "consent_received"
-        session.save(update_fields=["consent_received", "status"])
+        session.refresh_from_db()
 
-        modify_result = ModifyService.start_tracking(session)
-
-        if modify_result.get("success"):
-            session.tracking_enabled = True
+        if session.tracking_enabled:
+            session.consent_received = True
             session.status = "waiting_location"
             session.save(
-                update_fields=["tracking_enabled", "status"]
+                update_fields=["consent_received", "status"]
             )
-
             messages.success(
                 request,
                 "Consent received. Live tracking has been activated.",
             )
         else:
+            session.consent_received = True
+            session.status = "consent_received"
+            session.save(
+                update_fields=["consent_received", "status"]
+            )
             messages.warning(
                 request,
-                "Consent received, but live tracking could not be "
-                "activated: "
-                + str(
-                    modify_result.get(
-                        "message",
-                        "Modify API failed.",
-                    )
-                ),
+                "Consent received, but live tracking is not active yet.",
             )
+
+    elif consent_status == "pending":
+        session.consent_received = False
+        session.status = "sms_sent"
+        session.save(
+            update_fields=["consent_received", "status"]
+        )
+        messages.warning(request, "Driver consent is still pending.")
+
+    elif consent_status == "license_hold":
+        session.consent_received = False
+        session.status = "license_hold"
+        session.save(
+            update_fields=["consent_received", "status"]
+        )
+        messages.warning(request, "Tracking is currently on license hold.")
+
     else:
         messages.warning(
             request,
-            f"Consent Status : {consent_status}",
+            f"Consent Status : {consent_status or 'Unknown'}",
         )
 
-    return redirect("live_tracking_list")
+    return redirect(
+        "onepageorderlive_tracking_setup",
+        pk=session.order.pk,
+    )
 
 # =============================================================
 # TEST LOCATION
@@ -2268,7 +2313,7 @@ def refresh_location(request, pk):
             )
 
         session.tracking_enabled = True
-        session.status = "active"
+        session.status = "waiting_location"
         session.save(
             update_fields=["tracking_enabled", "status"]
         )
