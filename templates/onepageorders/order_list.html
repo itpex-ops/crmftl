@@ -1,4 +1,3 @@
-
 {% extends "layouts/base.html" %}
 
 {% block title %}Orders{% endblock %}
@@ -18,6 +17,7 @@
     background: #f8f9fb;
     min-height: calc(100vh - 70px);
 }
+
 
 /* =========================================================
    PAGE HEADER
@@ -46,6 +46,7 @@
     color: #8a9199;
 }
 
+
 /* =========================================================
    CREATE BUTTON
    ========================================================= */
@@ -53,17 +54,24 @@
 .create-order-btn {
     height: 40px;
     padding: 0 18px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     border: 1px solid #FDB81B;
     border-radius: 7px;
+
     background: #FDB81B;
     color: #212529;
+
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 600;
+
     text-decoration: none;
+    white-space: nowrap;
+
     transition: all 0.2s ease;
 }
 
@@ -72,6 +80,7 @@
     border-color: #e7a900;
     color: #ffffff;
 }
+
 
 /* =========================================================
    SEARCH
@@ -96,14 +105,19 @@
     flex: 1;
     min-width: 0;
     height: 42px;
+
     padding: 0 13px;
+
     border: 1px solid #dfe3e8;
     border-right: none;
     border-radius: 7px 0 0 7px;
+
     background: #ffffff;
+
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     color: #343a40;
+
     outline: none;
     box-sizing: border-box;
 }
@@ -120,13 +134,17 @@
 .orders-search button {
     width: 90px;
     height: 42px;
+
     border: 1px solid #FDB81B;
     border-radius: 0 7px 7px 0;
+
     background: #FDB81B;
     color: #212529;
+
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     font-weight: 500;
+
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -136,18 +154,34 @@
     color: #ffffff;
 }
 
+
 /* =========================================================
    TABLE CARD
    ========================================================= */
 
 .orders-card {
     width: 100%;
+
     background: #ffffff;
+
     border: 1px solid #e1e5e9;
     border-radius: 10px;
+
     overflow: hidden;
+
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.orders-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
 
 /* =========================================================
    TABLE
@@ -155,33 +189,48 @@
 
 .orders-table {
     width: 100%;
+    min-width: 900px;
+
     margin: 0;
+
     border-collapse: collapse;
     table-layout: fixed;
+
+    font-family: "Poppins", sans-serif;
 }
 
 .orders-table thead th {
     padding: 12px 14px;
+
     background: #f7f8fa;
+
     border-bottom: 1px solid #dfe3e8;
+
     color: #495057;
-    font-family: "Poppins", sans-serif;
+
     font-size: 11px;
     font-weight: 600;
+
     white-space: nowrap;
     vertical-align: middle;
     text-align: left;
+
     box-sizing: border-box;
 }
 
 .orders-table tbody td {
     padding: 12px 14px;
+
     border-bottom: 1px solid #eef0f2;
+
     color: #343a40;
-    font-family: "Poppins", sans-serif;
+
     font-size: 11px;
+
     vertical-align: middle;
+
     box-sizing: border-box;
+
     overflow: hidden;
 }
 
@@ -193,31 +242,44 @@
     background: #fffdf4;
 }
 
+
 /* =========================================================
    COLUMN WIDTHS
    ========================================================= */
 
+/*
+    Total = 100%
+
+    Trip       13%
+    Customer   17%
+    Route      21%
+    Vehicle    18%
+    Freight    10%
+    Margin     10%
+    Action     11%
+*/
+
 .orders-table th:nth-child(1),
 .orders-table td:nth-child(1) {
-    width: 15%;
+    width: 13%;
     text-align: left;
 }
 
 .orders-table th:nth-child(2),
 .orders-table td:nth-child(2) {
-    width: 18%;
+    width: 17%;
     text-align: left;
 }
 
 .orders-table th:nth-child(3),
 .orders-table td:nth-child(3) {
-    width: 20%;
+    width: 21%;
     text-align: left;
 }
 
 .orders-table th:nth-child(4),
 .orders-table td:nth-child(4) {
-    width: 19%;
+    width: 18%;
     text-align: left;
 }
 
@@ -235,9 +297,10 @@
 
 .orders-table th:nth-child(7),
 .orders-table td:nth-child(7) {
-    width: 8%;
+    width: 11%;
     text-align: center;
 }
+
 
 /* =========================================================
    ALIGNMENT
@@ -253,6 +316,7 @@
     text-align: center !important;
 }
 
+
 /* =========================================================
    TRIP
    ========================================================= */
@@ -263,33 +327,90 @@
     white-space: nowrap;
 }
 
+
+/* =========================================================
+   TRIP BUTTON
+   ========================================================= */
+
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+
+    padding: 4px 9px;
+
+    border: 1px solid #0d6efd;
+    border-radius: 5px;
+
+    background: #ffffff;
+    color: #0d6efd;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover {
+    background: #0d6efd;
+    color: #ffffff;
+}
+
+
 /* =========================================================
    VEHICLE
    ========================================================= */
 
 .vehicle-number {
+    display: block;
+
     font-weight: 500;
     color: #343a40;
+
     white-space: nowrap;
 }
 
 .vehicle-type {
     display: block;
+
     margin-top: 2px;
+
     font-size: 9px;
     color: #8a9199;
+
     white-space: nowrap;
+
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 
 /* =========================================================
    ROUTE
    ========================================================= */
 
-.orders-table td:nth-child(3) {
+.route-text {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
     white-space: nowrap;
+
+    overflow: hidden;
 }
+
+.route-place {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 /* =========================================================
    MONEY
@@ -297,62 +418,56 @@
 
 .amount {
     white-space: nowrap;
+
     font-weight: 500;
     color: #343a40;
 }
 
 .margin-positive {
     color: #198754;
+
     font-weight: 600;
+
     white-space: nowrap;
 }
 
 .margin-negative {
     color: #dc3545;
+
     font-weight: 600;
+
     white-space: nowrap;
 }
 
-/* =========================================================
-   VIEW BUTTON
-   ========================================================= */
-
-.view-order-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 31px;
-    padding: 0 12px;
-    border: 1px solid #0d6efd;
-    border-radius: 5px;
-    background: #ffffff;
-    color: #0d6efd;
-    font-family: "Poppins", sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.view-order-btn:hover {
-    background: #0d6efd;
-    color: #ffffff;
-}
 
 /* =========================================================
    ACTION BUTTONS
    ========================================================= */
 
 .order-action-btn {
-    height: 31px;
-    padding: 0 10px;
+    height: 30px;
+
+    padding: 0 8px;
+
     font-family: "Poppins", sans-serif;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 500;
+
     border-radius: 5px;
+
     white-space: nowrap;
 }
+
+.action-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    flex-wrap: nowrap;
+}
+
 
 /* =========================================================
    EMPTY STATE
@@ -360,19 +475,37 @@
 
 .empty-orders {
     padding: 45px 20px !important;
+
     text-align: center !important;
+
     color: #8a9199 !important;
 }
 
 .empty-orders i {
     display: block;
+
     margin-bottom: 8px;
+
     font-size: 28px;
 }
+
 
 /* =========================================================
    RESPONSIVE
    ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .orders-page {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .orders-table {
+        min-width: 950px;
+    }
+}
+
 
 @media (max-width: 900px) {
 
@@ -395,7 +528,7 @@
     }
 
     .orders-table {
-        min-width: 900px;
+        min-width: 950px;
     }
 
     .orders-table th,
@@ -403,6 +536,7 @@
         padding: 11px 12px;
     }
 }
+
 
 @media (max-width: 650px) {
 
@@ -413,215 +547,276 @@
     .orders-title {
         font-size: 19px;
     }
+
+    .orders-subtitle {
+        font-size: 10px;
+    }
 }
 
 </style>
 
-
 <div class="orders-page">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+```
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
 
-    <div class="orders-header">
+<div class="orders-header">
 
-        <div>
-            <h3 class="orders-title">
-                Orders
-            </h3>
+    <div>
 
-            <div class="orders-subtitle">
-                View and manage all customer orders
-            </div>
+        <h3 class="orders-title">
+            Orders
+        </h3>
+
+        <div class="orders-subtitle">
+            View and manage all customer orders
         </div>
 
-        <a
-            href="{% url 'onepageorder_create' %}"
-            class="create-order-btn"
-        >
-            <i class="bi bi-plus-lg me-1"></i>
-            Create Order
-        </a>
-
     </div>
 
 
-    <!-- =====================================================
-         SEARCH
-         ===================================================== -->
+    <a
+        href="{% url 'onepageorder_create' %}"
+        class="create-order-btn"
+    >
+        <i class="bi bi-plus-lg me-1"></i>
+        Create Order
+    </a>
 
-    <div class="orders-toolbar">
+</div>
 
-        <form
-            method="get"
-            class="orders-search"
+
+<!-- =====================================================
+     SEARCH
+     ===================================================== -->
+
+<div class="orders-toolbar">
+
+    <form
+        method="get"
+        class="orders-search"
+    >
+
+        <input
+            type="text"
+            name="q"
+            value="{{ q|default:'' }}"
+            placeholder="Search trip, customer, vehicle, route..."
+            autocomplete="off"
         >
 
-            <input
-                type="text"
-                name="q"
-                value="{{ q }}"
-                placeholder="Search trip, customer, vehicle, route..."
-            >
+        <button type="submit">
+            <i class="bi bi-search me-1"></i>
+            Search
+        </button>
 
-            <button type="submit">
-                <i class="bi bi-search me-1"></i>
-                Search
-            </button>
+    </form>
 
-        </form>
-
-    </div>
+</div>
 
 
-    <!-- =====================================================
-         ORDERS TABLE
-         ===================================================== -->
+<!-- =====================================================
+     ORDERS TABLE
+     ===================================================== -->
 
-    <div class="orders-card">
+<div class="orders-card">
 
-        <div class="table-responsive">
+    <div class="orders-table-wrapper">
 
-            <table class="orders-table">
+        <table class="orders-table">
 
-                <thead>
-                    <tr>
+            <thead>
 
-                        <th>Trip</th>
+                <tr>
 
-                        <th>Customer</th>
+                    <th>
+                        Trip
+                    </th>
 
-                        <th>Route</th>
+                    <th>
+                        Customer
+                    </th>
 
-                        <th>Vehicle</th>
+                    <th>
+                        Route
+                    </th>
 
-                        <th>Freight</th>
+                    <th>
+                        Vehicle
+                    </th>
 
-                        <th>Margin</th>
+                    <th class="text-end">
+                        Freight
+                    </th>
 
-                        <th>Action</th>
+                    <th class="text-end">
+                        Margin
+                    </th>
 
-                    </tr>
-                </thead>
+                    <th class="text-center">
+                        Action
+                    </th>
 
+                </tr>
 
-                <tbody>
-
-                    {% for o in orders %}
-
-                    <tr>
-
-                        <!-- =================================================
-                             TRIP
-                             ================================================= -->
-
-                        <td>
-
-                            <a
-                                href="{% url 'onepageorder_detail' o.pk %}"
-                                class="btn btn-sm btn-custom"
-                            >
-                                <i class="bi bi-eye me-1"></i>
-
-                                <span class="trip-number">
-                                    <strong>{{ o.trip_number }}</strong>
-                                </span>
-                            </a>
-
-                        </td>
+            </thead>
 
 
-                        <!-- =================================================
-                             CUSTOMER
-                             ================================================= -->
+            <tbody>
 
-                        <td>
+                {% for o in orders %}
+
+                <tr>
+
+
+                    <!-- =================================================
+                         TRIP
+                         ================================================= -->
+
+                    <td>
+
+                        <a
+                            href="{% url 'onepageorder_detail' o.pk %}"
+                            class="btn-custom"
+                        >
+
+                            <i class="bi bi-eye me-1"></i>
+
+                            <span class="trip-number">
+                                {{ o.trip_number }}
+                            </span>
+
+                        </a>
+
+                    </td>
+
+
+                    <!-- =================================================
+                         CUSTOMER
+                         ================================================= -->
+
+                    <td>
+
+                        {% if o.customer %}
                             {{ o.customer.name }}
-                        </td>
+                        {% else %}
+                            <span class="text-muted">
+                                —
+                            </span>
+                        {% endif %}
+
+                    </td>
 
 
-                        <!-- =================================================
-                             ROUTE
-                             ================================================= -->
+                    <!-- =================================================
+                         ROUTE
+                         ================================================= -->
 
-                        <td>
+                    <td>
 
-                            <span>
+                        <div class="route-text">
+
+                            <span
+                                class="route-place"
+                                title="{{ o.origin }}"
+                            >
                                 {{ o.origin }}
                             </span>
 
-                            <span class="text-muted mx-1">
+                            <span class="text-muted">
                                 →
                             </span>
 
-                            <span>
+                            <span
+                                class="route-place"
+                                title="{{ o.destination }}"
+                            >
                                 {{ o.destination }}
                             </span>
 
-                        </td>
+                        </div>
+
+                    </td>
 
 
-                        <!-- =================================================
-                             VEHICLE
-                             ================================================= -->
+                    <!-- =================================================
+                         VEHICLE
+                         ================================================= -->
 
-                        <td>
+                    <td>
+
+                        {% if o.vehicle_number %}
 
                             <span class="vehicle-number">
                                 {{ o.vehicle_number }}
                             </span>
 
-                            {% if o.vehicle_type %}
-                                <small class="vehicle-type">
-                                    {{ o.vehicle_type }}
-                                </small>
-                            {% endif %}
+                        {% else %}
 
-                        </td>
-
-
-                        <!-- =================================================
-                             FREIGHT
-                             ================================================= -->
-
-                        <td class="text-end">
-
-                            <span class="amount">
-                                ₹ {{ o.freight_amount|floatformat:2 }}
+                            <span class="text-muted">
+                                —
                             </span>
 
-                        </td>
+                        {% endif %}
 
 
-                        <!-- =================================================
-                             MARGIN
-                             ================================================= -->
+                        {% if o.vehicle_type %}
 
-                        <td class="text-end">
+                            <small class="vehicle-type">
+                                {{ o.vehicle_type }}
+                            </small>
 
-                            {% if o.margin >= 0 %}
+                        {% endif %}
 
-                                <span class="margin-positive">
-                                    ₹ {{ o.margin|floatformat:2 }}
-                                </span>
-
-                            {% else %}
-
-                                <span class="margin-negative">
-                                    ₹ {{ o.margin|floatformat:2 }}
-                                </span>
-
-                            {% endif %}
-
-                        </td>
+                    </td>
 
 
-                        <!-- =================================================
-                             ACTION
-                             ================================================= -->
+                    <!-- =================================================
+                         FREIGHT
+                         ================================================= -->
 
-                        <td class="text-center">
+                    <td class="text-end">
+
+                        <span class="amount">
+                            ₹ {{ o.freight_amount|floatformat:2 }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- =================================================
+                         MARGIN
+                         ================================================= -->
+
+                    <td class="text-end">
+
+                        {% if o.margin >= 0 %}
+
+                            <span class="margin-positive">
+                                ₹ {{ o.margin|floatformat:2 }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="margin-negative">
+                                ₹ {{ o.margin|floatformat:2 }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- =================================================
+                         ACTION
+                         ================================================= -->
+
+                    <td class="text-center">
+
+                        <div class="action-wrapper">
+
 
                             <!-- TRACKING -->
 
@@ -631,15 +826,19 @@
                                     type="button"
                                     class="btn btn-light btn-sm order-action-btn"
                                     disabled
+                                    title="Trip Closed"
                                 >
-                                    🔒 Trip Closed
+                                    🔒
                                 </button>
 
                             {% else %}
+
                                 <a
                                     href="{% url 'onepageorder_tracking' o.pk %}"
-                                    class="btn btn-success btn-sm order-action-btn">
-                                    🚚 Tracking
+                                    class="btn btn-success btn-sm order-action-btn"
+                                    title="Tracking"
+                                >
+                                    🚚
                                 </a>
 
                             {% endif %}
@@ -651,10 +850,11 @@
 
                                 <a
                                     href="{% url 'delete_vehicle' o.pk %}"
-                                    class="btn btn-warning btn-sm order-action-btn ms-1"
+                                    class="btn btn-warning btn-sm order-action-btn"
                                     onclick="return confirm('Are you sure you want to remove this vehicle?');"
+                                    title="Remove Vehicle"
                                 >
-                                    Remove
+                                    <i class="bi bi-x-lg"></i>
                                 </a>
 
                             {% endif %}
@@ -665,8 +865,8 @@
                             <form
                                 method="post"
                                 action="{% url 'onepageorder_delete' o.pk %}"
-                                onsubmit="return confirm('Are you sure you want to delete {{ o.trip_number }}?');"
-                                class="d-inline ms-1"
+                                onsubmit="return confirm('Are you sure you want to delete {{ o.trip_number|escapejs }}?');"
+                                class="d-inline"
                             >
 
                                 {% csrf_token %}
@@ -681,37 +881,41 @@
 
                             </form>
 
-                        </td>
 
-                    </tr>
+                        </div>
+
+                    </td>
+
+                </tr>
 
 
-                    {% empty %}
+                {% empty %}
 
-                    <tr>
+                <tr>
 
-                        <td
-                            colspan="7"
-                            class="empty-orders"
-                        >
+                    <td
+                        colspan="7"
+                        class="empty-orders"
+                    >
 
-                            <i class="bi bi-box-seam"></i>
+                        <i class="bi bi-box-seam"></i>
 
-                            No orders found.
+                        No orders found.
 
-                        </td>
+                    </td>
 
-                    </tr>
+                </tr>
 
-                    {% endfor %}
+                {% endfor %}
 
-                </tbody>
+            </tbody>
 
-            </table>
-
-        </div>
+        </table>
 
     </div>
+
+</div>
+```
 
 </div>
 
