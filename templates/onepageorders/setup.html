@@ -80,19 +80,39 @@
                                         Active
                                     </span>
 
-                                {% elif session.status == "pending" %}
+                                {% elif session.status == "waiting_location" %}
                                     <span class="badge bg-warning text-dark">
-                                        Pending
+                                        Waiting Location
                                     </span>
 
-                                {% elif session.status == "failed" %}
+                                {% elif session.status == "consent_received" %}
+                                    <span class="badge bg-info text-dark">
+                                        Consent Received
+                                    </span>
+
+                                {% elif session.status == "imported" %}
+                                    <span class="badge bg-primary">
+                                        Imported
+                                    </span>
+
+                                {% elif session.status == "sms_sent" %}
+                                    <span class="badge bg-warning text-dark">
+                                        SMS Sent
+                                    </span>
+
+                                {% elif session.status == "error" %}
                                     <span class="badge bg-danger">
-                                        Failed
+                                        Error
+                                    </span>
+
+                                {% elif session.status == "deleted" %}
+                                    <span class="badge bg-secondary">
+                                        Deleted
                                     </span>
 
                                 {% else %}
                                     <span class="badge bg-secondary">
-                                        {{ session.status|title }}
+                                        {{ session.get_status_display }}
                                     </span>
                                 {% endif %}
 
@@ -251,7 +271,7 @@
 
                                     {% else %}
 
-                                        <a href="{% url 'send_consent' session.id %}"
+                                        <a href="{% url 'send_consent' session.pk %}"
                                            class="btn btn-warning btn-sm">
 
                                             <i class="bi bi-chat-dots"></i>
@@ -284,7 +304,7 @@
 
                             <td>
 
-                                <strong>4. View Live Map</strong><br>
+                                <strong>3. View Live Map</strong><br>
 
                                 <small class="text-muted">
                                     Open the driver's current location on the map.
@@ -294,7 +314,7 @@
 
                             <td>
 
-                                {% if session and session.latitude and session.longitude %}
+                                {% if session and session.latitude is not None and session.longitude is not None %}
 
                                     <span class="badge bg-success">
                                         Ready
@@ -318,9 +338,9 @@
 
                             <td>
 
-                                {% if session and session.last_latitude and session.last_longitude %}
+                                {% if session and session.latitude is not None and session.longitude is not None %}
 
-                                    <a href="{% url 'onepageordervehicle_live' session.id %}"
+                                    <a href="{% url 'onepageordervehicle_live' session.pk %}"
                                        class="btn btn-info btn-sm">
 
                                         <i class="bi bi-geo-alt-fill"></i>

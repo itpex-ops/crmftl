@@ -39,7 +39,6 @@ def get_post_value(request, field, default=""):
     value = request.POST.get(field, default)
     return value.strip() if isinstance(value, str) else default
 
-
 def to_decimal(value, default="0.00"):
     """Safely convert POST input to Decimal."""
     if value in (None, ""):
@@ -59,7 +58,6 @@ def to_integer(value, default=0):
         return int(value)
     except (ValueError, TypeError):
         return default
-
 
 def to_date(value):
     """Convert HTML date input (YYYY-MM-DD) to a Python date."""
@@ -94,7 +92,6 @@ def gst_from_request(request):
 
     return gst_percent
 
-
 def order_queryset():
     """Common optimized Order queryset."""
     return (
@@ -110,7 +107,6 @@ def order_queryset():
         )
         .order_by("-id")
     )
-
 
 def payment_page_context(orders, payments):
     return {
@@ -138,6 +134,7 @@ def add_tracking_template_flags(tracking):
         tracking.balance_to_fleet
     )
     return tracking
+
 # =============================================================
 # LIVE TRACKING PAGE
 # =============================================================
