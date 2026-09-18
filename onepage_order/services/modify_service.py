@@ -2,9 +2,8 @@ import requests
 
 from django.conf import settings
 
-from .auth_service import TrackingAuthService
-
-from ..models import ApiLog
+from onepage_order.models import TrackingSession, ApiLog
+from onepage_order.services.auth_service import TrackingAuthService
 
 
 class ModifyService:
@@ -16,123 +15,103 @@ class ModifyService:
     @classmethod
     def start_tracking(cls, session):
 
-        # -----------------------------------------------------
-        # VALIDATE SESSION
-        # -----------------------------------------------------
-
         if not session:
+
             return {
                 "success": False,
-                "message": "Tracking session not found."
+                "message": "Tracking session not found.",
             }
 
-        # -----------------------------------------------------
-        # GET TRACKING ACCESS TOKEN
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Entity ID
+        # ---------------------------------------------------------
+
+        entity_id = session.entity_id
+
+        if not entity_id:
+
+            return {
+                "success": False,
+                "message": (
+                    "Telenity entity ID is not available."
+                ),
+            }
+
+        # ---------------------------------------------------------
+        # Tracking authentication
+        # ---------------------------------------------------------
 
         auth = TrackingAuthService.get_tracking_token()
 
         if not auth.get("success"):
-            return auth
+
+            return {
+                "success": False,
+                "message": auth.get(
+                    "message",
+                    "Unable to get tracking authentication token.",
+                ),
+                "auth_response": auth,
+            }
 
         token = auth.get("token")
 
         if not token:
-            return {
-                "success": False,
-                "message": "Tracking access token not available."
-            }
-
-        # -----------------------------------------------------
-        # ENTITY ID
-        # -----------------------------------------------------
-
-        if not session.entity_id:
 
             return {
                 "success": False,
-                "message": "Entity ID is missing."
+                "message": (
+                    "Tracking authentication succeeded "
+                    "but token was not returned."
+                ),
             }
 
-        # -----------------------------------------------------
-        # MODIFY API URL
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Modify API URL
+        # ---------------------------------------------------------
 
         base_url = getattr(
             settings,
             "TELENITY_MODIFY_API",
-            ""
+            "",
         )
 
         if not base_url:
 
             return {
                 "success": False,
-                "message": "TELENITY_MODIFY_API is not configured."
+                "message": (
+                    "TELENITY_MODIFY_API "
+                    "is not configured."
+                ),
             }
 
-        url = (
-            f"{base_url.rstrip('/')}"
-            f"/{session.entity_id}"
-        )
+        # ---------------------------------------------------------
+        # URL
+        # ---------------------------------------------------------
 
-        # -----------------------------------------------------
-        # HEADERS
-        # -----------------------------------------------------
+        url = f"{base_url}/{entity_id}"
+
+        # ---------------------------------------------------------
+        # Headers
+        # ---------------------------------------------------------
 
         headers = {
             "Token": token,
             "Content-Type": "application/json",
-            "Accept": "*/*",
+            "Accept": "application/json",
         }
 
-        # -----------------------------------------------------
-        # PAYLOAD
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Payload
+        # ---------------------------------------------------------
 
         payload = {
             "isActive": True,
             "isTracked": True,
         }
 
-        # -----------------------------------------------------
-        # MASK TOKEN
-        # -----------------------------------------------------
-
-        masked_token = "********"
-
-        if len(token) > 12:
-
-            masked_token = (
-                token[:8]
-                + "********"
-            )
-
-        # -----------------------------------------------------
-        # DEBUG REQUEST
-        # -----------------------------------------------------
-
-        print()
-        print("=" * 80)
-        print("MODIFY API REQUEST")
-        print("=" * 80)
-        print("URL :", url)
-        print(
-            "Headers :",
-            {
-                "Token": masked_token,
-                "Content-Type": "application/json",
-                "Accept": "*/*",
-            }
-        )
-        print("Payload :", payload)
-        print("=" * 80)
-
         try:
-
-            # -------------------------------------------------
-            # API REQUEST
-            # -------------------------------------------------
 
             response = requests.put(
                 url=url,
@@ -141,9 +120,9 @@ class ModifyService:
                 timeout=30,
             )
 
-            # -------------------------------------------------
-            # SAFE RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # Parse response
+            # -----------------------------------------------------
 
             try:
 
@@ -155,41 +134,36 @@ class ModifyService:
                     "raw_response": response.text
                 }
 
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # API LOG
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
-            ApiLog.objects.create(
-                api_name="Modify API",
-                request_url=url,
-                request_method="PUT",
-                request_headers={
-                    "Token": masked_token,
-                    "Content-Type": "application/json",
-                    "Accept": "*/*",
-                },
-                request_body=payload,
-                response_code=response.status_code,
-                response_body=response_data,
-            )
+            try:
 
-            # -------------------------------------------------
-            # DEBUG RESPONSE
-            # -------------------------------------------------
+                ApiLog.objects.create(
+                    api_name="Modify API",
+                    request_url=url,
+                    request_method="PUT",
+                    request_headers={
+                        "Token": "********",
+                    },
+                    request_body=payload,
+                    response_code=response.status_code,
+                    response_body=response_data,
+                )
 
-            print()
-            print("=" * 80)
-            print("MODIFY API RESPONSE")
-            print("=" * 80)
-            print("Status   :", response.status_code)
-            print("Response :", response_data)
-            print("=" * 80)
+            except Exception:
+                pass
 
-            # =================================================
+            # =====================================================
             # SUCCESS
-            # =================================================
+            # =====================================================
 
-            if response.status_code in (200, 201, 202):
+            if response.status_code in (
+                200,
+                201,
+                202,
+            ):
 
                 session.tracking_enabled = True
                 session.status = "waiting_location"
@@ -205,49 +179,56 @@ class ModifyService:
                     "success": True,
                     "status": "waiting_location",
                     "tracking_enabled": True,
+                    "message": (
+                        "Tracking activated successfully."
+                    ),
                     "response": response_data,
                 }
 
-            # =================================================
+            # =====================================================
             # FAILURE
-            # =================================================
+            # =====================================================
 
             return {
                 "success": False,
                 "status_code": response.status_code,
-                "message": response_data,
+                "message": (
+                    "Telenity Modify API failed."
+                ),
+                "response": response_data,
             }
 
-        # =====================================================
+        # =========================================================
         # TIMEOUT
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
                 "message": (
-                    "Connection timeout while "
-                    "contacting Telenity Modify API."
-                )
+                    "Modify API request timed out."
+                ),
             }
 
-        # =====================================================
+        # =========================================================
         # CONNECTION ERROR
-        # =====================================================
+        # =========================================================
 
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as exc:
 
             return {
                 "success": False,
                 "message": (
-                    "Unable to connect to Telenity Server."
-                )
+                    "Unable to connect to Telenity "
+                    "Modify API."
+                ),
+                "error": str(exc),
             }
 
-        # =====================================================
+        # =========================================================
         # REQUEST ERROR
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.RequestException as exc:
 
@@ -255,16 +236,16 @@ class ModifyService:
                 "success": False,
                 "message": (
                     f"Modify API request failed: {exc}"
-                )
+                ),
             }
 
-        # =====================================================
-        # OTHER ERROR
-        # =====================================================
+        # =========================================================
+        # UNEXPECTED ERROR
+        # =========================================================
 
         except Exception as exc:
 
             return {
                 "success": False,
-                "message": str(exc)
+                "message": str(exc),
             }

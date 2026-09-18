@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 
@@ -6,28 +7,79 @@ urlpatterns = [
 
     # =========================================================
     # ORDERS
+    # pk = Order PK
     # =========================================================
 
-    path("list/", views.onepageorder_list, name="onepageorder_list"),
-    path("new/", views.onepageorder_create, name="onepageorder_create"),
-    path("<int:pk>/edit/", views.onepageorder_edit, name="onepageorder_edit"),
-    path("<int:pk>/tracking/", views.tracking_page, name="onepageorder_tracking"),
-    path("<int:pk>/delete/", views.onepageorder_delete, name="onepageorder_delete"),
-    path("<int:pk>/", views.onepageorder_detail, name="onepageorder_detail"),
+    path(
+        "list/",
+        views.onepageorder_list,
+        name="onepageorder_list",
+    ),
+
+    path(
+        "new/",
+        views.onepageorder_create,
+        name="onepageorder_create",
+    ),
+
+    path(
+        "<int:pk>/edit/",
+        views.onepageorder_edit,
+        name="onepageorder_edit",
+    ),
+
+    path(
+        "<int:pk>/tracking/",
+        views.tracking_page,
+        name="onepageorder_tracking",
+    ),
+
+    path(
+        "<int:pk>/delete/",
+        views.onepageorder_delete,
+        name="onepageorder_delete",
+    ),
+
+    path(
+        "<int:pk>/",
+        views.onepageorder_detail,
+        name="onepageorder_detail",
+    ),
+
 
     # =========================================================
     # PAYMENTS
     # =========================================================
 
-    path("vehicle-payments/", views.vehicle_payments, name="vehicle_payments"),
-    path("customer-payments/", views.customer_payments, name="customer_payments"),
-    path("admin-margin/", views.admin_margin, name="admin_margin"),
+    path(
+        "vehicle-payments/",
+        views.vehicle_payments,
+        name="vehicle_payments",
+    ),
+
+    path(
+        "customer-payments/",
+        views.customer_payments,
+        name="customer_payments",
+    ),
+
+    path(
+        "admin-margin/",
+        views.admin_margin,
+        name="admin_margin",
+    ),
+
 
     # =========================================================
     # LIVE TRACKING LIST
     # =========================================================
 
-    path("tracking_list/", views.live_tracking_list, name="live_tracking_list"),
+    path(
+        "tracking_list/",
+        views.live_tracking_list,
+        name="live_tracking_list",
+    ),
+
 
     # =========================================================
     # LIVE TRACKING SETUP
@@ -46,8 +98,9 @@ urlpatterns = [
         name="import_driver",
     ),
 
+
     # =========================================================
-    # LIVE TRACKING
+    # LIVE VEHICLE
     # pk = TrackingSession PK
     # =========================================================
 
@@ -99,6 +152,7 @@ urlpatterns = [
         name="delete_tracking",
     ),
 
+
     # =========================================================
     # CONSENT
     # pk = TrackingSession PK
@@ -116,11 +170,26 @@ urlpatterns = [
         name="check_consent",
     ),
 
+
     # =========================================================
     # API / AUTH TEST
     # =========================================================
 
-    path("test-consent-auth/", views.test_consent_auth, name="test_consent_auth"),
-    path("test-tracking-auth/", views.test_tracking_auth, name="test_tracking_auth"),
-    path("api-token-status/", views.api_token_status, name="api_token_status"),
+    path(
+        "test-consent-auth/",
+        views.test_consent_auth,
+        name="test_consent_auth",
+    ),
+
+    path(
+        "test-tracking-auth/",
+        views.test_tracking_auth,
+        name="test_tracking_auth",
+    ),
+
+    path(
+        "api-token-status/",
+        views.api_token_status,
+        name="api_token_status",
+    ),
 ]

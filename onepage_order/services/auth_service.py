@@ -8,9 +8,10 @@ class TrackingAuthService:
     @classmethod
     def get_tracking_token(cls):
         """
-        Get the Telenity / SmartTrail Tracking API authentication token.
+        Get Telenity / SmartTrail Tracking API authentication token.
 
         Returns:
+
             {
                 "success": True,
                 "token": "...",
@@ -27,6 +28,10 @@ class TrackingAuthService:
             }
         """
 
+        # =========================================================
+        # SETTINGS
+        # =========================================================
+
         url = getattr(
             settings,
             "TELENITY_TRACKING_AUTH_API",
@@ -39,11 +44,12 @@ class TrackingAuthService:
             "",
         )
 
-        # ---------------------------------------------------------
-        # Validate configuration
-        # ---------------------------------------------------------
+        # =========================================================
+        # VALIDATE SETTINGS
+        # =========================================================
 
         if not url:
+
             return {
                 "success": False,
                 "message": (
@@ -53,6 +59,7 @@ class TrackingAuthService:
             }
 
         if not basic_token:
+
             return {
                 "success": False,
                 "message": (
@@ -61,9 +68,9 @@ class TrackingAuthService:
                 ),
             }
 
-        # ---------------------------------------------------------
-        # Headers
-        # ---------------------------------------------------------
+        # =========================================================
+        # HEADERS
+        # =========================================================
 
         headers = {
             "Authorization": (
@@ -75,9 +82,9 @@ class TrackingAuthService:
 
         try:
 
-            # -----------------------------------------------------
-            # Authentication API
-            # -----------------------------------------------------
+            # =====================================================
+            # AUTHENTICATION API
+            # =====================================================
 
             response = requests.get(
                 url=url,
@@ -85,9 +92,9 @@ class TrackingAuthService:
                 timeout=30,
             )
 
-            # -----------------------------------------------------
-            # HTTP error
-            # -----------------------------------------------------
+            # =====================================================
+            # HTTP ERROR
+            # =====================================================
 
             if response.status_code != 200:
 
@@ -100,14 +107,16 @@ class TrackingAuthService:
                     ),
                 }
 
-            # -----------------------------------------------------
-            # JSON response
-            # -----------------------------------------------------
+            # =====================================================
+            # JSON RESPONSE
+            # =====================================================
 
             try:
+
                 data = response.json()
 
             except ValueError:
+
                 return {
                     "success": False,
                     "status_code": response.status_code,
@@ -118,13 +127,14 @@ class TrackingAuthService:
                     "raw_response": response.text,
                 }
 
-            # -----------------------------------------------------
-            # Extract token
-            # -----------------------------------------------------
+            # =====================================================
+            # GET TOKEN
+            # =====================================================
 
             access_token = data.get("token")
 
             if not access_token:
+
                 return {
                     "success": False,
                     "status_code": response.status_code,
@@ -135,9 +145,9 @@ class TrackingAuthService:
                     "response": data,
                 }
 
-            # -----------------------------------------------------
-            # Success
-            # -----------------------------------------------------
+            # =====================================================
+            # SUCCESS
+            # =====================================================
 
             return {
                 "success": True,
@@ -146,9 +156,9 @@ class TrackingAuthService:
                 "response": data,
             }
 
-        # ---------------------------------------------------------
-        # Request errors
-        # ---------------------------------------------------------
+        # =========================================================
+        # TIMEOUT
+        # =========================================================
 
         except requests.exceptions.Timeout:
 
@@ -160,7 +170,11 @@ class TrackingAuthService:
                 ),
             }
 
-        except requests.exceptions.ConnectionError as e:
+        # =========================================================
+        # CONNECTION ERROR
+        # =========================================================
+
+        except requests.exceptions.ConnectionError as exc:
 
             return {
                 "success": False,
@@ -168,20 +182,29 @@ class TrackingAuthService:
                     "Unable to connect to tracking "
                     "authentication API."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }
 
-        except requests.exceptions.RequestException as e:
+        # =========================================================
+        # REQUEST ERROR
+        # =========================================================
+
+        except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
                 "message": (
-                    "Tracking authentication API request failed."
+                    "Tracking authentication API "
+                    "request failed."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }
 
-        except Exception as e:
+        # =========================================================
+        # UNEXPECTED ERROR
+        # =========================================================
+
+        except Exception as exc:
 
             return {
                 "success": False,
@@ -189,5 +212,5 @@ class TrackingAuthService:
                     "Unexpected error while getting "
                     "tracking authentication token."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }

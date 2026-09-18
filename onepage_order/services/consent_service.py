@@ -2,34 +2,12 @@ import requests
 
 from django.conf import settings
 
-from ..models import TrackingSession, ApiLog
-
-from .consent_auth_service import ConsentAuthService
-from .modify_service import ModifyService
+from onepage_order.models import TrackingSession, ApiLog
+from onepage_order.services.consent_auth_service import ConsentAuthService
+from onepage_order.services.modify_service import ModifyService
 
 
 class ConsentService:
-    """
-    Handles Telenity Consent API operations.
-
-    Flow:
-
-        Import Driver
-             ↓
-        Send Consent SMS
-             ↓
-        Check Consent
-             ↓
-        Consent Approved
-             ↓
-        Start Tracking / Modify API
-             ↓
-        Waiting Location
-             ↓
-        Location Received
-             ↓
-        Active
-    """
 
     # =========================================================
     # MOBILE FORMAT
@@ -42,20 +20,21 @@ class ConsentService:
 
             91XXXXXXXXXX
 
-        Examples:
+        Accepted examples:
 
             +919876543210
             919876543210
             9876543210
+            00919876543210
 
-        all become:
-
-            919876543210
+        Returns:
+            91XXXXXXXXXX
+            or None for invalid number.
         """
 
         mobile = str(mobile or "").strip()
 
-        # Remove spaces, hyphens and brackets
+        # Remove common formatting
         mobile = (
             mobile
             .replace(" ", "")
@@ -64,20 +43,23 @@ class ConsentService:
             .replace(")", "")
         )
 
+        # +91XXXXXXXXXX
         if mobile.startswith("+91"):
             mobile = mobile[3:]
 
+        # 0091XXXXXXXXXX
         elif mobile.startswith("0091"):
             mobile = mobile[4:]
 
+        # 91XXXXXXXXXX
         elif mobile.startswith("91") and len(mobile) == 12:
             mobile = mobile[2:]
 
-        # Final format
-        if not mobile.startswith("91"):
-            mobile = "91" + mobile
+        # Must be exactly 10 digits
+        if len(mobile) != 10 or not mobile.isdigit():
+            return None
 
-        return mobile
+        return f"91{mobile}"
 
     # =========================================================
     # SEND CONSENT
@@ -87,10 +69,15 @@ class ConsentService:
     def send_consent(cls, session):
 
         if not session:
+
             return {
                 "success": False,
-                "message": "Tracking session not found."
+                "message": "Tracking session not found.",
             }
+
+        # ---------------------------------------------------------
+        # Get Consent API token
+        # ---------------------------------------------------------
 
         auth = ConsentAuthService.get_consent_token()
 
@@ -100,26 +87,54 @@ class ConsentService:
         bearer_token = auth.get("token")
 
         if not bearer_token:
+
             return {
                 "success": False,
-                "message": "Consent API bearer token not available."
+                "message": (
+                    "Consent API bearer token not available."
+                ),
             }
 
-        mobile = cls.normalize_mobile(session.driver_mobile)
+        # ---------------------------------------------------------
+        # Mobile
+        # ---------------------------------------------------------
 
-        if not mobile or len(mobile) != 12:
+        mobile = cls.normalize_mobile(
+            session.driver_mobile
+        )
+
+        if not mobile:
+
             return {
                 "success": False,
-                "message": "Invalid driver mobile number."
+                "message": (
+                    "Invalid driver mobile number."
+                ),
             }
 
-        url = getattr(settings, "TELENITY_CONSENT_API", "")
+        # ---------------------------------------------------------
+        # API URL
+        # ---------------------------------------------------------
+
+        url = getattr(
+            settings,
+            "TELENITY_CONSENT_API",
+            "",
+        )
 
         if not url:
+
             return {
                 "success": False,
-                "message": "TELENITY_CONSENT_API is not configured."
+                "message": (
+                    "TELENITY_CONSENT_API "
+                    "is not configured."
+                ),
             }
+
+        # ---------------------------------------------------------
+        # Headers
+        # ---------------------------------------------------------
 
         headers = {
             "Authorization": f"Bearer {bearer_token}",
@@ -127,17 +142,13 @@ class ConsentService:
             "Accept": "*/*",
         }
 
-        payload = {
-            "address": f"tel:+{mobile}"
-        }
+        # ---------------------------------------------------------
+        # Payload
+        # ---------------------------------------------------------
 
-        print()
-        print("=" * 80)
-        print("CONSENT REQUEST")
-        print("=" * 80)
-        print("URL     :", url)
-        print("Payload :", payload)
-        print("=" * 80)
+        payload = {
+            "address": f"tel:+{mobile}",
+        }
 
         try:
 
@@ -148,9 +159,9 @@ class ConsentService:
                 timeout=30,
             )
 
-            # -------------------------------------------------
-            # RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # Response
+            # -----------------------------------------------------
 
             try:
                 response_data = response.json()
@@ -160,37 +171,40 @@ class ConsentService:
                     "raw_response": response.text
                 }
 
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # API LOG
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
-            ApiLog.objects.create(
-                api_name="Consent API",
-                request_url=url,
-                request_method="POST",
-                request_headers={
-                    "Authorization": "Bearer ********"
-                },
-                request_body=payload,
-                response_code=response.status_code,
-                response_body=response_data,
-            )
+            try:
 
-            print("=" * 80)
-            print("CONSENT RESPONSE")
-            print("=" * 80)
-            print("Status   :", response.status_code)
-            print("Response :", response_data)
-            print("=" * 80)
+                ApiLog.objects.create(
+                    api_name="Consent API",
+                    request_url=url,
+                    request_method="POST",
+                    request_headers={
+                        "Authorization": "Bearer ********",
+                    },
+                    request_body=payload,
+                    response_code=response.status_code,
+                    response_body=response_data,
+                )
 
-            # -------------------------------------------------
+            except Exception:
+                pass
+
+            # -----------------------------------------------------
             # SUCCESS
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
-            if response.status_code in (200, 201, 202):
+            if response.status_code in (
+                200,
+                201,
+                202,
+            ):
 
                 session.status = "sms_sent"
                 session.consent_received = False
+
                 session.save(
                     update_fields=[
                         "status",
@@ -201,38 +215,52 @@ class ConsentService:
                 return {
                     "success": True,
                     "status": "sms_sent",
+                    "message": (
+                        "Consent SMS sent successfully."
+                    ),
                     "response": response_data,
                 }
 
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # FAILURE
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
             return {
                 "success": False,
                 "status_code": response.status_code,
-                "message": response_data,
+                "message": (
+                    "Consent API request failed."
+                ),
+                "response": response_data,
             }
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
-                "message": "Connection timeout while contacting Telenity Consent API."
+                "message": (
+                    "Connection timeout while contacting "
+                    "Telenity Consent API."
+                ),
             }
 
         except requests.exceptions.ConnectionError:
 
             return {
                 "success": False,
-                "message": "Unable to connect to Telenity Consent API."
+                "message": (
+                    "Unable to connect to "
+                    "Telenity Consent API."
+                ),
             }
 
         except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
-                "message": f"Consent API request failed: {exc}"
+                "message": (
+                    f"Consent API request failed: {exc}"
+                ),
             }
 
         except Exception as exc:
@@ -250,10 +278,15 @@ class ConsentService:
     def check_consent(cls, session):
 
         if not session:
+
             return {
                 "success": False,
-                "message": "Tracking session not found."
+                "message": "Tracking session not found.",
             }
+
+        # ---------------------------------------------------------
+        # Get Consent API token
+        # ---------------------------------------------------------
 
         auth = ConsentAuthService.get_consent_token()
 
@@ -263,58 +296,60 @@ class ConsentService:
         bearer_token = auth.get("token")
 
         if not bearer_token:
+
             return {
                 "success": False,
-                "message": "Consent API bearer token not available."
+                "message": (
+                    "Consent API bearer token not available."
+                ),
             }
 
-        # -------------------------------------------------
-        # MOBILE
-        # -------------------------------------------------
+        # ---------------------------------------------------------
+        # Mobile
+        # ---------------------------------------------------------
 
-        mobile = cls.normalize_mobile(session.driver_mobile)
+        mobile = cls.normalize_mobile(
+            session.driver_mobile
+        )
 
-        if not mobile or len(mobile) != 12:
+        if not mobile:
+
             return {
                 "success": False,
-                "message": "Invalid driver mobile number."
+                "message": (
+                    "Invalid driver mobile number."
+                ),
             }
 
-        # -------------------------------------------------
-        # URL
-        # -------------------------------------------------
+        # ---------------------------------------------------------
+        # API URL
+        # ---------------------------------------------------------
 
         base_url = getattr(
             settings,
             "TELENITY_CONSENT_CHECK_API",
-            ""
+            "",
         )
 
         if not base_url:
+
             return {
                 "success": False,
-                "message": "TELENITY_CONSENT_CHECK_API is not configured."
+                "message": (
+                    "TELENITY_CONSENT_CHECK_API "
+                    "is not configured."
+                ),
             }
 
-        url = f"{base_url}?address=tel:+{mobile}"
+        url = (
+            f"{base_url}"
+            f"?address=tel:+{mobile}"
+        )
 
         headers = {
             "Authorization": f"Bearer {bearer_token}",
             "Accept": "*/*",
         }
-
-        print()
-        print("=" * 80)
-        print("CONSENT CHECK REQUEST")
-        print("=" * 80)
-        print("URL :", url)
-        print(
-            "Headers :",
-            {
-                "Authorization": "Bearer ********"
-            }
-        )
-        print("=" * 80)
 
         try:
 
@@ -324,9 +359,9 @@ class ConsentService:
                 timeout=30,
             )
 
-            # -------------------------------------------------
-            # RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # Response
+            # -----------------------------------------------------
 
             try:
                 response_data = response.json()
@@ -336,70 +371,72 @@ class ConsentService:
                     "raw_response": response.text
                 }
 
-            print("=" * 80)
-            print("RAW CONSENT RESPONSE")
-            print("=" * 80)
-            print("Status   :", response.status_code)
-            print("Response :", response_data)
-            print("=" * 80)
-
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # API LOG
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
-            ApiLog.objects.create(
-                api_name="Consent Check API",
-                request_url=url,
-                request_method="GET",
-                request_headers={
-                    "Authorization": "Bearer ********"
-                },
-                request_body=None,
-                response_code=response.status_code,
-                response_body=response_data,
-            )
+            try:
 
-            # -------------------------------------------------
+                ApiLog.objects.create(
+                    api_name="Consent Check API",
+                    request_url=url,
+                    request_method="GET",
+                    request_headers={
+                        "Authorization": "Bearer ********",
+                    },
+                    request_body=None,
+                    response_code=response.status_code,
+                    response_body=response_data,
+                )
+
+            except Exception:
+                pass
+
+            # -----------------------------------------------------
             # HTTP ERROR
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
             if response.status_code != 200:
 
                 return {
                     "success": False,
                     "status_code": response.status_code,
-                    "message": response_data,
+                    "message": (
+                        "Consent check API failed."
+                    ),
+                    "response": response_data,
                 }
 
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # CONSENT OBJECT
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
-            consent = response_data.get("Consent", {})
-
-            print("CONSENT OBJECT :", consent)
+            consent = response_data.get(
+                "Consent",
+                {},
+            )
 
             if not isinstance(consent, dict):
 
                 return {
                     "success": False,
-                    "message": "Invalid Consent API response format.",
+                    "message": (
+                        "Invalid Consent API response format."
+                    ),
                     "response": response_data,
                 }
 
-            # -------------------------------------------------
+            # -----------------------------------------------------
             # STATUS
-            # -------------------------------------------------
+            # -----------------------------------------------------
 
             status = str(
                 consent.get("status", "")
             ).strip().lower()
 
-            print("CONSENT STATUS :", status)
-
-            # =================================================
+            # =====================================================
             # APPROVED
-            # =================================================
+            # =====================================================
 
             if status in (
                 "allowed",
@@ -411,28 +448,39 @@ class ConsentService:
                 session.consent_received = True
                 session.status = "consent_received"
 
-                session.save(
-                    update_fields=[
-                        "consent_received",
-                        "status",
-                    ]
+                # Save consent reference if API provides one
+                consent_reference = (
+                    consent.get("reference")
+                    or consent.get("consentReference")
+                    or consent.get("consent_reference")
                 )
 
-                print("=" * 80)
-                print("CONSENT APPROVED")
-                print("=" * 80)
+                if consent_reference:
+                    session.consent_reference = (
+                        str(consent_reference)
+                    )
+
+                update_fields = [
+                    "consent_received",
+                    "status",
+                ]
+
+                if consent_reference:
+                    update_fields.append(
+                        "consent_reference"
+                    )
+
+                session.save(
+                    update_fields=update_fields
+                )
 
                 # -------------------------------------------------
-                # START TRACKING
+                # Start tracking through Modify API
                 # -------------------------------------------------
 
-                modify = ModifyService.start_tracking(session)
-
-                print("=" * 80)
-                print("MODIFY RESULT")
-                print("=" * 80)
-                print(modify)
-                print("=" * 80)
+                modify = ModifyService.start_tracking(
+                    session
+                )
 
                 if modify.get("success"):
 
@@ -450,12 +498,16 @@ class ConsentService:
                         "success": True,
                         "status": status,
                         "tracking_started": True,
+                        "message": (
+                            "Consent approved and "
+                            "tracking started."
+                        ),
                         "response": response_data,
                         "modify_response": modify,
                     }
 
                 # -------------------------------------------------
-                # CONSENT APPROVED BUT MODIFY FAILED
+                # MODIFY FAILED
                 # -------------------------------------------------
 
                 session.tracking_enabled = False
@@ -472,16 +524,19 @@ class ConsentService:
                     "success": False,
                     "status": status,
                     "tracking_started": False,
-                    "message": "Consent approved, but tracking could not be started.",
+                    "message": (
+                        "Consent approved, but tracking "
+                        "could not be started."
+                    ),
                     "response": response_data,
                     "modify_response": modify,
                 }
 
-            # =================================================
+            # =====================================================
             # PENDING
-            # =================================================
+            # =====================================================
 
-            elif status in (
+            if status in (
                 "pending",
                 "requested",
                 "waiting",
@@ -502,14 +557,17 @@ class ConsentService:
                     "success": True,
                     "status": status,
                     "tracking_started": False,
+                    "message": (
+                        "Consent is still pending."
+                    ),
                     "response": response_data,
                 }
 
-            # =================================================
+            # =====================================================
             # LICENSE HOLD
-            # =================================================
+            # =====================================================
 
-            elif status == "license_hold":
+            if status == "license_hold":
 
                 session.consent_received = False
                 session.status = "license_hold"
@@ -525,14 +583,17 @@ class ConsentService:
                     "success": True,
                     "status": status,
                     "tracking_started": False,
+                    "message": (
+                        "Tracking license is on hold."
+                    ),
                     "response": response_data,
                 }
 
-            # =================================================
+            # =====================================================
             # EXPIRED
-            # =================================================
+            # =====================================================
 
-            elif status == "expired":
+            if status == "expired":
 
                 session.consent_received = False
                 session.status = "expired"
@@ -548,57 +609,69 @@ class ConsentService:
                     "success": True,
                     "status": status,
                     "tracking_started": False,
+                    "message": (
+                        "Tracking consent has expired."
+                    ),
                     "response": response_data,
                 }
 
-            # =================================================
+            # =====================================================
             # UNKNOWN STATUS
-            # =================================================
+            # =====================================================
 
-            else:
+            session.consent_received = False
+            session.status = "error"
 
-                session.consent_received = False
-                session.status = "error"
+            session.save(
+                update_fields=[
+                    "consent_received",
+                    "status",
+                ]
+            )
 
-                session.save(
-                    update_fields=[
-                        "consent_received",
-                        "status",
-                    ]
-                )
-
-                return {
-                    "success": True,
-                    "status": status,
-                    "tracking_started": False,
-                    "message": "Unknown consent status received from Telenity.",
-                    "response": response_data,
-                }
+            return {
+                "success": True,
+                "status": status,
+                "tracking_started": False,
+                "message": (
+                    "Unknown consent status received "
+                    "from Telenity."
+                ),
+                "response": response_data,
+            }
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
-                "message": "Connection timeout while checking consent."
+                "message": (
+                    "Connection timeout while "
+                    "checking consent."
+                ),
             }
 
         except requests.exceptions.ConnectionError:
 
             return {
                 "success": False,
-                "message": "Unable to connect to Telenity Consent API."
+                "message": (
+                    "Unable to connect to "
+                    "Telenity Consent API."
+                ),
             }
 
         except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
-                "message": f"Consent check request failed: {exc}"
+                "message": (
+                    f"Consent check request failed: {exc}"
+                ),
             }
 
         except Exception as exc:
 
             return {
                 "success": False,
-                "message": str(exc)
+                "message": str(exc),
             }

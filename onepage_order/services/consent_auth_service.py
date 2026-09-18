@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
-from ..models import ApiToken
+from onepage_order.models import ApiToken
 
 
 class ConsentAuthService:
@@ -13,45 +13,60 @@ class ConsentAuthService:
     @classmethod
     def get_consent_token(cls):
         """
-        Get Telenity Consent API authentication token.
+        Get Telenity Consent API access token.
 
-        Flow:
-        1. Check existing valid token in ApiToken.
-        2. If valid, return database token.
-        3. Otherwise request a new token from Telenity.
-        4. Save the new token and expiry in ApiToken.
+        First checks ApiToken table for an existing valid token.
+        If no valid token exists, requests a new token from the
+        Consent Authentication API and stores it in ApiToken.
+
+        Returns:
+
+            {
+                "success": True,
+                "token": "...",
+                "status_code": 200,
+                "response": {...}
+            }
+
+        or:
+
+            {
+                "success": False,
+                "message": "..."
+            }
         """
 
         # =========================================================
-        # 1. CHECK EXISTING TOKEN
+        # 1. CHECK DATABASE TOKEN
         # =========================================================
 
-        token = (
+        existing_token = (
             ApiToken.objects
             .filter(
                 token_type="CONSENT",
-                access_token__isnull=False,
+                expires_at__gt=timezone.now(),
             )
             .order_by("-updated_at")
             .first()
         )
 
-        if token and token.expires_at:
-            if token.expires_at > timezone.now():
+        if existing_token:
 
-                # Update last used time
-                token.last_used = timezone.now()
-                token.save(update_fields=["last_used"])
+            existing_token.last_used = timezone.now()
+            existing_token.save(
+                update_fields=["last_used"]
+            )
 
-                return {
-                    "success": True,
-                    "token": token.access_token,
-                    "source": "database",
-                    "expires_at": token.expires_at.isoformat(),
-                }
+            return {
+                "success": True,
+                "token": existing_token.access_token,
+                "status_code": 200,
+                "response": existing_token.response_json,
+                "from_cache": True,
+            }
 
         # =========================================================
-        # 2. API SETTINGS
+        # 2. READ SETTINGS
         # =========================================================
 
         url = getattr(
@@ -67,6 +82,7 @@ class ConsentAuthService:
         )
 
         if not url:
+
             return {
                 "success": False,
                 "message": (
@@ -76,6 +92,7 @@ class ConsentAuthService:
             }
 
         if not basic_token:
+
             return {
                 "success": False,
                 "message": (
@@ -95,22 +112,22 @@ class ConsentAuthService:
             "Content-Type": (
                 "application/x-www-form-urlencoded"
             ),
-            "Accept": "*/*",
+            "Accept": "application/json",
         }
 
         # =========================================================
-        # 4. PAYLOAD
+        # 4. REQUEST PAYLOAD
         # =========================================================
 
         payload = {
             "grant_type": "client_credentials",
         }
 
-        # =========================================================
-        # 5. REQUEST TOKEN
-        # =========================================================
-
         try:
+
+            # =====================================================
+            # 5. AUTHENTICATION REQUEST
+            # =====================================================
 
             response = requests.post(
                 url=url,
@@ -118,18 +135,6 @@ class ConsentAuthService:
                 data=payload,
                 timeout=30,
             )
-
-            # =====================================================
-            # DEBUG
-            # =====================================================
-
-            print("\n")
-            print("=" * 80)
-            print("CONSENT AUTH RESPONSE")
-            print("=" * 80)
-            print("Status :", response.status_code)
-            print("Response :", response.text)
-            print("=" * 80)
 
             # =====================================================
             # 6. HTTP ERROR
@@ -147,10 +152,11 @@ class ConsentAuthService:
                 }
 
             # =====================================================
-            # 7. JSON RESPONSE
+            # 7. PARSE JSON
             # =====================================================
 
             try:
+
                 data = response.json()
 
             except ValueError:
@@ -159,14 +165,14 @@ class ConsentAuthService:
                     "success": False,
                     "status_code": response.status_code,
                     "message": (
-                        "Consent Auth API returned "
-                        "invalid JSON."
+                        "Consent authentication API "
+                        "returned invalid JSON."
                     ),
                     "raw_response": response.text,
                 }
 
             # =====================================================
-            # 8. GET ACCESS TOKEN
+            # 8. EXTRACT ACCESS TOKEN
             # =====================================================
 
             access_token = data.get("access_token")
@@ -177,8 +183,8 @@ class ConsentAuthService:
                     "success": False,
                     "status_code": response.status_code,
                     "message": (
-                        "Access token not returned "
-                        "by Consent Auth API."
+                        "access_token not found in consent "
+                        "authentication response."
                     ),
                     "response": data,
                 }
@@ -187,39 +193,43 @@ class ConsentAuthService:
             # 9. TOKEN EXPIRY
             # =====================================================
 
-            try:
-                expires_in = int(
-                    data.get(
-                        "expires_in",
-                        3600,
-                    )
-                )
+            expires_in = data.get("expires_in")
 
-            except (
-                TypeError,
-                ValueError,
-            ):
+            try:
+
+                expires_in = int(expires_in)
+
+            except (TypeError, ValueError):
+
+                # Default: 1 hour
                 expires_in = 3600
+
+            # Small safety buffer so we don't use a token
+            # right at the exact expiry time.
+            expiry_seconds = max(
+                expires_in - 60,
+                60,
+            )
 
             expires_at = (
                 timezone.now()
-                + timedelta(seconds=expires_in)
+                + timedelta(seconds=expiry_seconds)
             )
 
             # =====================================================
             # 10. SAVE TOKEN
             # =====================================================
 
-            ApiToken.objects.update_or_create(
-
-                token_type="CONSENT",
-
-                defaults={
-                    "access_token": access_token,
-                    "response_json": data,
-                    "expires_at": expires_at,
-                    "last_used": timezone.now(),
-                },
+            token_object, created = (
+                ApiToken.objects.update_or_create(
+                    token_type="CONSENT",
+                    defaults={
+                        "access_token": access_token,
+                        "response_json": data,
+                        "last_used": timezone.now(),
+                        "expires_at": expires_at,
+                    },
+                )
             )
 
             # =====================================================
@@ -228,13 +238,10 @@ class ConsentAuthService:
 
             return {
                 "success": True,
-                "token": access_token,
-                "token_type": data.get(
-                    "token_type"
-                ),
-                "expires_in": expires_in,
-                "expires_at": expires_at.isoformat(),
-                "source": "Consent Auth API",
+                "token": token_object.access_token,
+                "status_code": response.status_code,
+                "response": data,
+                "from_cache": False,
             }
 
         # =========================================================
@@ -246,7 +253,7 @@ class ConsentAuthService:
             return {
                 "success": False,
                 "message": (
-                    "Consent authentication "
+                    "Consent authentication API "
                     "request timed out."
                 ),
             }
@@ -255,43 +262,43 @@ class ConsentAuthService:
         # 13. CONNECTION ERROR
         # =========================================================
 
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError as exc:
 
             return {
                 "success": False,
                 "message": (
-                    "Unable to connect to "
-                    "Telenity Consent Auth API."
+                    "Unable to connect to consent "
+                    "authentication API."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }
 
         # =========================================================
-        # 14. OTHER REQUEST ERROR
+        # 14. REQUEST ERROR
         # =========================================================
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
                 "message": (
-                    "Consent authentication "
+                    "Consent authentication API "
                     "request failed."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }
 
         # =========================================================
         # 15. UNEXPECTED ERROR
         # =========================================================
 
-        except Exception as e:
+        except Exception as exc:
 
             return {
                 "success": False,
                 "message": (
                     "Unexpected error while getting "
-                    "Consent authentication token."
+                    "consent authentication token."
                 ),
-                "error": str(e),
+                "error": str(exc),
             }

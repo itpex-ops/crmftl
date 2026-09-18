@@ -2,178 +2,148 @@ import requests
 
 from django.conf import settings
 
-from .auth_service import TrackingAuthService
-
-from ..models import (
-    TrackingSession,
-    ApiLog,
-)
+from onepage_order.models import TrackingSession, ApiLog
+from onepage_order.services.auth_service import TrackingAuthService
 
 
 class ImportService:
 
-    # =========================================================
-    # MOBILE NORMALIZATION
-    # =========================================================
-
     @staticmethod
     def normalize_mobile(mobile):
         """
-        Convert Indian mobile number to:
-
-            91XXXXXXXXXX
-
-        Accepted:
-
-            9876543210
-            919876543210
-            +919876543210
-            00919876543210
+        Convert Indian 10-digit mobile number to 91XXXXXXXXXX.
         """
 
-        mobile = str(mobile or "").strip()
+        if not mobile:
+            return None
 
-        # Remove common separators
-        mobile = (
-            mobile
-            .replace(" ", "")
-            .replace("-", "")
-            .replace("(", "")
-            .replace(")", "")
-        )
+        mobile = str(mobile).strip()
 
-        if mobile.startswith("+91"):
-            mobile = mobile[3:]
+        # Remove common formatting
+        mobile = mobile.replace("+", "")
+        mobile = mobile.replace(" ", "")
+        mobile = mobile.replace("-", "")
 
-        elif mobile.startswith("0091"):
+        # 0091XXXXXXXXXX
+        if mobile.startswith("0091"):
             mobile = mobile[4:]
 
+        # 91XXXXXXXXXX
         elif mobile.startswith("91") and len(mobile) == 12:
             mobile = mobile[2:]
 
-        # Must now be exactly 10 digits
+        # Must finally be exactly 10 digits
         if len(mobile) != 10 or not mobile.isdigit():
             return None
 
-        return "91" + mobile
+        return f"91{mobile}"
 
-    # =========================================================
+    # =============================================================
     # IMPORT DRIVER
-    # =========================================================
+    # =============================================================
 
     @classmethod
-    def import_driver(cls, vehicle):
+    def import_driver(cls, order):
 
-        if not vehicle:
+        # ---------------------------------------------------------
+        # Validate driver number
+        # ---------------------------------------------------------
+
+        mobile = cls.normalize_mobile(
+            order.driver_number
+        )
+
+        if not mobile:
+
             return {
                 "success": False,
-                "message": "Vehicle / Order not found."
+                "message": (
+                    "Invalid driver mobile number. "
+                    "Enter a valid 10-digit mobile number."
+                ),
             }
 
-        # -----------------------------------------------------
-        # GET TRACKING ACCESS TOKEN
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Get tracking token
+        # ---------------------------------------------------------
 
         auth = TrackingAuthService.get_tracking_token()
 
         if not auth.get("success"):
-            return auth
 
-        access_token = auth.get("token")
-
-        if not access_token:
             return {
                 "success": False,
-                "message": "Tracking access token not available."
+                "message": auth.get(
+                    "message",
+                    "Unable to get tracking authentication token.",
+                ),
+                "auth_response": auth,
             }
 
-        # -----------------------------------------------------
-        # IMPORT API URL
-        # -----------------------------------------------------
+        token = auth.get("token")
+
+        if not token:
+
+            return {
+                "success": False,
+                "message": (
+                    "Tracking authentication succeeded "
+                    "but token was not returned."
+                ),
+            }
+
+        # ---------------------------------------------------------
+        # API URL
+        # ---------------------------------------------------------
 
         url = getattr(
             settings,
             "TELENITY_IMPORT_API",
-            ""
+            "",
         )
 
         if not url:
+
             return {
                 "success": False,
-                "message": "TELENITY_IMPORT_API is not configured."
+                "message": (
+                    "TELENITY_IMPORT_API "
+                    "is not configured."
+                ),
             }
 
-        # -----------------------------------------------------
-        # MOBILE FORMAT
-        # -----------------------------------------------------
-
-        mobile = cls.normalize_mobile(
-            vehicle.driver_number
-        )
-
-        if not mobile:
-            return {
-                "success": False,
-                "message": "Invalid Driver Mobile Number."
-            }
-
-        # -----------------------------------------------------
-        # HEADERS
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Headers
+        # ---------------------------------------------------------
 
         headers = {
-            "Token": access_token,
+            "Token": token,
             "Content-Type": "application/json",
-            "Accept": "*/*",
+            "Accept": "application/json",
         }
 
-        # -----------------------------------------------------
-        # REQUEST PAYLOAD
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Payload
+        # ---------------------------------------------------------
 
         payload = {
             "entityImportList": [
                 {
                     "firstName": "Driver",
-                    "lastName": vehicle.vehicle_number,
+                    "lastName": (
+                        order.vehicle_number
+                        or "Vehicle"
+                    ),
                     "msisdn": mobile,
                 }
             ]
         }
 
-        # -----------------------------------------------------
-        # SAFE DEBUG OUTPUT
-        # -----------------------------------------------------
-
-        masked_token = "********"
-
-        if len(access_token) > 12:
-            masked_token = (
-                access_token[:8]
-                + "********"
-            )
-
-        print()
-        print("=" * 80)
-        print("TELENITY IMPORT REQUEST")
-        print("=" * 80)
-        print("URL :", url)
-        print(
-            "HEADERS :",
-            {
-                "Token": masked_token,
-                "Content-Type": "application/json",
-                "Accept": "*/*",
-            }
-        )
-        print("PAYLOAD :", payload)
-        print("=" * 80)
-
         try:
 
-            # -------------------------------------------------
-            # API REQUEST
-            # -------------------------------------------------
+            # =====================================================
+            # CALL IMPORT API
+            # =====================================================
 
             response = requests.post(
                 url=url,
@@ -182,186 +152,224 @@ class ImportService:
                 timeout=30,
             )
 
-            # -------------------------------------------------
-            # SAFE RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # Parse response
+            # -----------------------------------------------------
 
             try:
                 response_data = response.json()
 
             except ValueError:
+
                 response_data = {
                     "raw_response": response.text
                 }
 
-            # -------------------------------------------------
-            # MASK TOKEN FOR API LOG
-            # -------------------------------------------------
+            # =====================================================
+            # API LOG
+            # =====================================================
 
-            masked_headers = {
-                "Token": masked_token,
-                "Content-Type": "application/json",
-                "Accept": "*/*",
-            }
+            try:
 
-            # -------------------------------------------------
-            # SAVE API LOG
-            # -------------------------------------------------
+                ApiLog.objects.create(
+                    api_name="IMPORT",
+                    request_url=url,
+                    request_method="POST",
+                    request_json=payload,
+                    response_json=response_data,
+                    response_code=response.status_code,
+                )
 
-            ApiLog.objects.create(
-                api_name="Import API",
-                request_url=url,
-                request_method="POST",
-                request_headers=masked_headers,
-                request_body=payload,
-                response_code=response.status_code,
-                response_body=response_data,
+            except Exception:
+                # Logging failure must not break the API flow.
+                pass
+
+            # =====================================================
+            # HTTP ERROR
+            # =====================================================
+
+            if response.status_code not in (
+                200,
+                201,
+                202,
+            ):
+
+                return {
+                    "success": False,
+                    "status_code": response.status_code,
+                    "message": (
+                        "Driver import API failed."
+                    ),
+                    "response": response_data,
+                }
+
+            # =====================================================
+            # SUCCESS RESPONSE
+            # =====================================================
+
+            success_list = response_data.get(
+                "successList"
             )
 
-            # -------------------------------------------------
-            # DEBUG RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # IMPORTANT
+            #
+            # Do not create TrackingSession if Telenity has not
+            # actually returned an imported entity.
+            # -----------------------------------------------------
 
-            print()
-            print("=" * 80)
-            print("TELENITY IMPORT RESPONSE")
-            print("=" * 80)
-            print("STATUS :", response.status_code)
-            print("BODY   :", response_data)
-            print("=" * 80)
+            if not success_list:
 
-            # =================================================
-            # SUCCESS
-            # =================================================
+                return {
+                    "success": False,
+                    "status_code": response.status_code,
+                    "message": (
+                        "Import API succeeded, but "
+                        "successList is empty."
+                    ),
+                    "response": response_data,
+                }
 
-            if response.status_code in (200, 201, 202):
+            # =====================================================
+            # FIRST IMPORTED ENTITY
+            # =====================================================
 
-                success_list = (
-                    response_data.get("successList")
-                    or []
-                )
+            item = success_list[0]
 
-                if not success_list:
+            entity_id = item.get("entityId")
 
-                    return {
-                        "success": False,
-                        "status_code": response.status_code,
-                        "message": (
-                            "Import API succeeded, "
-                            "but successList is empty."
+            if not entity_id:
+
+                return {
+                    "success": False,
+                    "status_code": response.status_code,
+                    "message": (
+                        "Import API returned successList "
+                        "but entityId was not found."
+                    ),
+                    "response": response_data,
+                    "success_item": item,
+                }
+
+            # =====================================================
+            # CREATE / GET TRACKING SESSION
+            # =====================================================
+
+            session, created = (
+                TrackingSession.objects.get_or_create(
+                    order=order,
+                    defaults={
+                        "driver_mobile": mobile,
+                        "tracking_reference": (
+                            order.trip_number
                         ),
-                        "response": response_data,
-                    }
-
-                item = success_list[0]
-
-                # -------------------------------------------------
-                # GET ENTITY ID
-                # -------------------------------------------------
-
-                entity_id = item.get("entityId")
-
-                if not entity_id:
-
-                    return {
-                        "success": False,
-                        "message": (
-                            "Import API succeeded, "
-                            "but entityId was not returned."
-                        ),
-                        "response": response_data,
-                    }
-
-                # -------------------------------------------------
-                # CREATE / UPDATE TRACKING SESSION
-                # -------------------------------------------------
-
-                session, created = (
-                    TrackingSession.objects.get_or_create(
-                        order=vehicle
-                    )
+                        "entity_id": entity_id,
+                        "status": "imported",
+                        "consent_received": False,
+                        "tracking_enabled": False,
+                    },
                 )
+            )
+
+            # =====================================================
+            # UPDATE EXISTING SESSION
+            # =====================================================
+
+            if not created:
 
                 session.driver_mobile = mobile
 
                 session.tracking_reference = (
-                    vehicle.ftl_no
+                    order.trip_number
                 )
 
                 session.entity_id = entity_id
 
-                # IMPORTANT:
-                # "pending" is NOT a valid TrackingSession status.
                 session.status = "imported"
 
                 session.consent_received = False
 
                 session.tracking_enabled = False
 
-                session.save()
+                session.save(
+                    update_fields=[
+                        "driver_mobile",
+                        "tracking_reference",
+                        "entity_id",
+                        "status",
+                        "consent_received",
+                        "tracking_enabled",
+                    ]
+                )
 
-                # -------------------------------------------------
-                # RESULT
-                # -------------------------------------------------
-
-                return {
-                    "success": True,
-                    "created": created,
-                    "session": session,
-                    "entity_id": entity_id,
-                    "response": response_data,
-                }
-
-            # =================================================
-            # FAILED
-            # =================================================
+            # =====================================================
+            # SUCCESS
+            # =====================================================
 
             return {
-                "success": False,
+                "success": True,
                 "status_code": response.status_code,
-                "message": response_data,
+                "message": (
+                    "Driver imported successfully."
+                ),
+                "session": session,
+                "entity_id": entity_id,
+                "mobile": mobile,
+                "response": response_data,
             }
 
-        # =====================================================
+        # =========================================================
         # TIMEOUT
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
-                "message": "Connection timeout while contacting Telenity Import API."
+                "message": (
+                    "Driver import API request timed out."
+                ),
             }
 
-        # =====================================================
+        # =========================================================
         # CONNECTION ERROR
-        # =====================================================
+        # =========================================================
 
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as exc:
 
             return {
                 "success": False,
-                "message": "Unable to connect to Telenity Server."
+                "message": (
+                    "Unable to connect to driver "
+                    "import API."
+                ),
+                "error": str(exc),
             }
 
-        # =====================================================
+        # =========================================================
         # REQUEST ERROR
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.RequestException as exc:
 
             return {
                 "success": False,
-                "message": f"Import API request failed: {exc}"
+                "message": (
+                    "Driver import API request failed."
+                ),
+                "error": str(exc),
             }
 
-        # =====================================================
-        # OTHER ERROR
-        # =====================================================
+        # =========================================================
+        # UNEXPECTED ERROR
+        # =========================================================
 
         except Exception as exc:
 
             return {
                 "success": False,
-                "message": str(exc)
+                "message": (
+                    "Unexpected error while importing driver."
+                ),
+                "error": str(exc),
             }

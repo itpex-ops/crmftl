@@ -1,4 +1,3 @@
-```html
 {% extends "layouts/base.html" %}
 {% load static %}
 
@@ -6,12 +5,25 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
+<link
+    rel="stylesheet"
+    href="{% static 'assets/common/css/common.css' %}"
+>
 
 <style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
     .tracking-page {
         padding: 15px 20px 30px;
     }
+
+
+    /* =========================================================
+       CARD
+       ========================================================= */
 
     .tracking-card {
         border: 0;
@@ -19,6 +31,11 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
         overflow: hidden;
     }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
 
     .tracking-header {
         padding: 15px 20px;
@@ -37,6 +54,11 @@
         margin-top: 3px;
     }
 
+
+    /* =========================================================
+       INFORMATION
+       ========================================================= */
+
     .info-label {
         display: block;
         font-size: 12px;
@@ -50,14 +72,26 @@
         font-weight: 500;
         color: #222;
         min-height: 20px;
+        word-break: break-word;
     }
+
+
+    /* =========================================================
+       LOCATION
+       ========================================================= */
 
     .location-box {
         background: #f8f9fa;
         border-radius: 7px;
         padding: 12px 15px;
         border: 1px solid #eee;
+        min-height: 45px;
     }
+
+
+    /* =========================================================
+       MAP HEADER
+       ========================================================= */
 
     .map-card-header {
         min-height: 55px;
@@ -71,11 +105,21 @@
         font-weight: 600;
     }
 
+
+    /* =========================================================
+       MAP
+       ========================================================= */
+
     #map {
         width: 100%;
         height: 500px;
         border-radius: 6px;
     }
+
+
+    /* =========================================================
+       PLACEHOLDER
+       ========================================================= */
 
     .map-placeholder {
         height: 500px;
@@ -86,6 +130,7 @@
         background: #f8f9fa;
         border-radius: 6px;
         color: #777;
+        border: 1px solid #eee;
     }
 
     .map-placeholder i {
@@ -94,10 +139,20 @@
         margin-bottom: 10px;
     }
 
+
+    /* =========================================================
+       LOCATION STATUS
+       ========================================================= */
+
     .location-status {
         font-size: 12px;
         margin-top: 4px;
     }
+
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
 
     .location-toast {
         position: fixed;
@@ -111,7 +166,7 @@
         display: none;
         align-items: center;
         gap: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     }
 
     .location-toast.show {
@@ -120,6 +175,7 @@
     }
 
     @keyframes toastFade {
+
         0% {
             opacity: 0;
             transform: translateY(-10px);
@@ -139,10 +195,35 @@
             transform: translateY(-10px);
         }
     }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .tracking-page {
+            padding: 10px;
+        }
+
+        #map,
+        .map-placeholder {
+            height: 400px;
+        }
+
+        .map-card-header {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+    }
+
 </style>
 
 
 <div class="container-fluid tracking-page">
+
 
     <!-- =====================================================
          VEHICLE DETAILS
@@ -151,6 +232,7 @@
     <div class="card tracking-card mb-3">
 
         <div class="tracking-header">
+
             <h5>
                 <i class="bi bi-truck me-1"></i>
                 Vehicle Details
@@ -159,6 +241,7 @@
             <small class="text-muted">
                 Details of the vehicle being tracked
             </small>
+
         </div>
 
 
@@ -166,34 +249,70 @@
 
             <div class="row g-3">
 
-                <!-- FTL -->
+
+                <!-- =================================================
+                     TRIP
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
-                    <span class="info-label">FTL No</span>
+
+                    <span class="info-label">
+                        Trip No
+                    </span>
+
                     <div class="info-value">
                         {{ order.trip_number|default:"--" }}
                     </div>
+
                 </div>
 
 
-                <!-- Vehicle -->
+                <!-- =================================================
+                     VEHICLE
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
-                    <span class="info-label">Vehicle</span>
+
+                    <span class="info-label">
+                        Vehicle
+                    </span>
+
                     <div class="info-value">
                         {{ order.vehicle_number|default:"--" }}
                     </div>
+
                 </div>
 
 
-                <!-- Driver -->
+                <!-- =================================================
+                     DRIVER
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
-                    <span class="info-label">Driver</span>
+
+                    <span class="info-label">
+                        Driver
+                    </span>
+
                     <div class="info-value">
-                        {{ session.driver_mobile|default:order.driver_number|default:"--" }}
+
+                        {% if session.driver_mobile %}
+                            {{ session.driver_mobile }}
+                        {% elif order.driver_number %}
+                            {{ order.driver_number }}
+                        {% else %}
+                            --
+                        {% endif %}
+
                     </div>
+
                 </div>
 
 
-                <!-- Tracking Status -->
+                <!-- =================================================
+                     TRACKING STATUS
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -224,14 +343,20 @@
 
                         {% elif session.status == "sms_sent" %}
 
-                            <span class="badge bg-primary">
+                            <span class="badge bg-warning text-dark">
                                 SMS Sent
                             </span>
 
                         {% elif session.status == "imported" %}
 
-                            <span class="badge bg-secondary">
+                            <span class="badge bg-primary">
                                 Imported
+                            </span>
+
+                        {% elif session.status == "not_enabled" %}
+
+                            <span class="badge bg-light text-dark border">
+                                Not Enabled
                             </span>
 
                         {% elif session.status == "paused" %}
@@ -255,7 +380,7 @@
                         {% elif session.status == "expired" %}
 
                             <span class="badge bg-danger">
-                                Consent Expired
+                                Expired
                             </span>
 
                         {% elif session.status == "license_hold" %}
@@ -273,7 +398,7 @@
                         {% else %}
 
                             <span class="badge bg-light text-dark border">
-                                Not Enabled
+                                {{ session.get_status_display }}
                             </span>
 
                         {% endif %}
@@ -283,7 +408,10 @@
                 </div>
 
 
-                <!-- Tracking Enabled -->
+                <!-- =================================================
+                     TRACKING ENABLED
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -313,7 +441,43 @@
                 </div>
 
 
-                <!-- Location Status -->
+                <!-- =================================================
+                     CONSENT
+                     ================================================= -->
+
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Consent
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.consent_received %}
+
+                            <span class="text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Approved
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                Pending
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     LOCATION STATUS
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -323,9 +487,19 @@
                     <div class="info-value">
 
                         {% if session.location_status %}
+
                             {{ session.location_status }}
+
+                        {% elif latest_location.location_status %}
+
+                            {{ latest_location.location_status }}
+
                         {% else %}
-                            <span class="text-muted">--</span>
+
+                            <span class="text-muted">
+                                --
+                            </span>
+
                         {% endif %}
 
                     </div>
@@ -333,7 +507,10 @@
                 </div>
 
 
-                <!-- Latitude -->
+                <!-- =================================================
+                     LATITUDE
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -341,13 +518,28 @@
                     </span>
 
                     <div class="info-value">
-                        {{ session.latitude|default:"--" }}
+
+                        {% if session.latitude is not None %}
+
+                            {{ session.latitude }}
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                --
+                            </span>
+
+                        {% endif %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Longitude -->
+                <!-- =================================================
+                     LONGITUDE
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -355,13 +547,28 @@
                     </span>
 
                     <div class="info-value">
-                        {{ session.longitude|default:"--" }}
+
+                        {% if session.longitude is not None %}
+
+                            {{ session.longitude }}
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                --
+                            </span>
+
+                        {% endif %}
+
                     </div>
 
                 </div>
 
 
-                <!-- Last Updated -->
+                <!-- =================================================
+                     LAST UPDATED
+                     ================================================= -->
+
                 <div class="col-lg-2 col-md-4 col-sm-6">
 
                     <span class="info-label">
@@ -371,9 +578,17 @@
                     <div class="info-value">
 
                         {% if session.last_updated %}
+
                             {{ session.last_updated|date:"d-m-Y H:i:s" }}
+
+                        {% elif latest_location.received_at %}
+
+                            {{ latest_location.received_at|date:"d-m-Y H:i:s" }}
+
                         {% else %}
+
                             --
+
                         {% endif %}
 
                     </div>
@@ -381,7 +596,64 @@
                 </div>
 
 
-                <!-- Current Location -->
+                <!-- =================================================
+                     TRACKING REFERENCE
+                     ================================================= -->
+
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Tracking Reference
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.tracking_reference %}
+
+                            {{ session.tracking_reference }}
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ENTITY ID
+                     ================================================= -->
+
+                <div class="col-lg-2 col-md-4 col-sm-6">
+
+                    <span class="info-label">
+                        Entity ID
+                    </span>
+
+                    <div class="info-value">
+
+                        {% if session.entity_id %}
+
+                            {{ session.entity_id }}
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CURRENT LOCATION
+                     ================================================= -->
+
                 <div class="col-12">
 
                     <span class="info-label">
@@ -393,16 +665,29 @@
                         <i class="bi bi-geo-alt-fill text-danger me-1"></i>
 
                         {% if session.last_location %}
+
                             {{ session.last_location }}
+
+                        {% elif latest_location.address %}
+
+                            {{ latest_location.address }}
+
+                        {% elif latest_location.location_name %}
+
+                            {{ latest_location.location_name }}
+
                         {% else %}
+
                             <span class="text-muted">
                                 Location not available
                             </span>
+
                         {% endif %}
 
                     </div>
 
                 </div>
+
 
             </div>
 
@@ -421,24 +706,99 @@
         <div class="map-card-header d-flex justify-content-between align-items-center">
 
             <div>
+
                 <span>
                     <i class="bi bi-map me-1"></i>
                     Live Map
                 </span>
+
+                {% if session.last_updated %}
+
+                    <div class="location-status text-muted">
+
+                        Last update:
+                        {{ session.last_updated|date:"d-m-Y H:i:s" }}
+
+                    </div>
+
+                {% endif %}
+
             </div>
 
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
+
+
+                <!-- =================================================
+                     HISTORY
+                     ================================================= -->
+
+                {% if session %}
+
+                    <a
+                        href="{% url 'live_tracking_history' session.pk %}"
+                        class="btn btn-outline-secondary btn-sm"
+                    >
+
+                        <i class="bi bi-clock-history me-1"></i>
+
+                        History
+
+                    </a>
+
+                {% endif %}
+
+
+                <!-- =================================================
+                     REFRESH
+                     ================================================= -->
 
                 {% if session.status != "deleted" %}
 
                     <a
-                        href="{% url 'refresh_location' session.id %}"
+                        href="{% url 'refresh_location' session.pk %}"
                         class="btn btn-success btn-sm"
+                        id="refreshLocationBtn"
                     >
+
                         <i class="bi bi-arrow-clockwise me-1"></i>
+
                         Refresh Location
+
                     </a>
+
+                {% endif %}
+
+
+                <!-- =================================================
+                     DELETE
+                     ================================================= -->
+
+                {% if session.status != "deleted" %}
+
+                    <form
+                        method="post"
+                        action="{% url 'delete_tracking' session.pk %}"
+                        class="d-inline"
+                        onsubmit="return confirm(
+                            'Are you sure you want to delete this tracking session?'
+                        );"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger btn-sm"
+                        >
+
+                            <i class="bi bi-trash me-1"></i>
+
+                            Delete Tracking
+
+                        </button>
+
+                    </form>
 
                 {% endif %}
 
@@ -449,9 +809,19 @@
 
         <div class="card-body">
 
-            {% if session.latitude and session.longitude %}
+
+            <!-- =================================================
+                 MAP AVAILABLE
+                 ================================================= -->
+
+            {% if session.latitude is not None and session.longitude is not None %}
 
                 <div id="map"></div>
+
+
+            <!-- =================================================
+                 NO LOCATION
+                 ================================================= -->
 
             {% else %}
 
@@ -466,10 +836,37 @@
                         </h6>
 
                         <div class="small text-muted mb-3">
-                            Please click
-                            <strong>Refresh Location</strong>
-                            after tracking becomes active.
+
+                            {% if session.status == "waiting_location" %}
+
+                                Tracking is enabled.
+                                Waiting for the vehicle's first location.
+
+                            {% elif session.status == "consent_received" %}
+
+                                Driver consent received.
+                                Tracking is being activated.
+
+                            {% elif session.status == "sms_sent" %}
+
+                                Waiting for driver consent.
+
+                            {% elif session.status == "imported" %}
+
+                                Consent SMS needs to be sent.
+
+                            {% elif session.status == "deleted" %}
+
+                                This tracking session has been deleted.
+
+                            {% else %}
+
+                                Please complete the tracking setup first.
+
+                            {% endif %}
+
                         </div>
+
 
                         {% if session.location_status %}
 
@@ -479,11 +876,13 @@
 
                         {% endif %}
 
+
                     </div>
 
                 </div>
 
             {% endif %}
+
 
         </div>
 
@@ -493,86 +892,130 @@
 
 
 
-<!-- =====================================================
+<!-- =============================================================
      LOCATION TOAST
-     ===================================================== -->
+     ============================================================= -->
 
 <div id="locationToast" class="location-toast">
 
     <i class="bi bi-geo-alt-fill"></i>
 
     <span>
-        New Location Received
+        Vehicle location updated
     </span>
 
 </div>
 
 
 
-{% if session.latitude and session.longitude %}
+<!-- =============================================================
+     GOOGLE MAP
+     ============================================================= -->
 
-<!-- Google Maps -->
+{% if session.latitude is not None and session.longitude is not None %}
 
-<script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
 
-<script>
+    <script>
 
-    function initMap() {
+        function initMap() {
 
-        const location = {
-            lat: parseFloat("{{ session.latitude }}"),
-            lng: parseFloat("{{ session.longitude }}")
-        };
+            const latitude = parseFloat(
+                "{{ session.latitude }}"
+            );
 
+            const longitude = parseFloat(
+                "{{ session.longitude }}"
+            );
 
-        const map = new google.maps.Map(
-            document.getElementById("map"),
-            {
-                zoom: 16,
-                center: location,
-                mapTypeControl: true,
-                streetViewControl: false,
-                fullscreenControl: true
+            if (
+                Number.isNaN(latitude) ||
+                Number.isNaN(longitude)
+            ) {
+                return;
             }
+
+
+            const location = {
+                lat: latitude,
+                lng: longitude
+            };
+
+
+            const mapElement = document.getElementById(
+                "map"
+            );
+
+            if (!mapElement) {
+                return;
+            }
+
+
+            const map = new google.maps.Map(
+                mapElement,
+                {
+                    zoom: 16,
+                    center: location,
+
+                    mapTypeControl: true,
+
+                    streetViewControl: false,
+
+                    fullscreenControl: true
+                }
+            );
+
+
+            new google.maps.Marker(
+                {
+                    position: location,
+
+                    map: map,
+
+                    title:
+                        "{{ order.vehicle_number|escapejs }}"
+                        || "Vehicle"
+                }
+            );
+
+        }
+
+
+        window.addEventListener(
+            "load",
+            initMap
         );
 
 
-        new google.maps.Marker({
+        /* =========================================================
+           LOCATION TOAST
+           ========================================================= */
 
-            position: location,
+        function showLocationNotification() {
 
-            map: map,
+            const toast =
+                document.getElementById(
+                    "locationToast"
+                );
 
-            title: "{{ order.vehicle_number|escapejs }}"
+            if (!toast) {
+                return;
+            }
 
-        });
+            toast.classList.remove(
+                "show"
+            );
 
-    }
+            void toast.offsetWidth;
 
-
-    window.addEventListener("load", initMap);
-
-
-    function showLocationNotification() {
-
-        const toast =
-            document.getElementById("locationToast");
-
-        if (!toast) {
-            return;
+            toast.classList.add(
+                "show"
+            );
         }
 
-        toast.classList.remove("show");
-
-        void toast.offsetWidth;
-
-        toast.classList.add("show");
-
-    }
-
-</script>
+    </script>
 
 {% endif %}
 
+
 {% endblock %}
-```

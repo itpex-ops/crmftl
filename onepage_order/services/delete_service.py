@@ -2,12 +2,45 @@ import requests
 
 from django.conf import settings
 
-from .auth_service import TrackingAuthService
-
-from ..models import ApiLog
+from onepage_order.models import TrackingSession, ApiLog
+from onepage_order.services.auth_service import TrackingAuthService
 
 
 class DeleteService:
+
+    # =========================================================
+    # MOBILE FORMAT
+    # =========================================================
+
+    @staticmethod
+    def normalize_mobile(mobile):
+        """
+        Convert Indian mobile number to:
+
+            91XXXXXXXXXX
+        """
+
+        mobile = str(mobile or "").strip()
+
+        mobile = (
+            mobile
+            .replace("+", "")
+            .replace(" ", "")
+            .replace("-", "")
+            .replace("(", "")
+            .replace(")", "")
+        )
+
+        if mobile.startswith("0091"):
+            mobile = mobile[4:]
+
+        elif mobile.startswith("91") and len(mobile) == 12:
+            mobile = mobile[2:]
+
+        if len(mobile) != 10 or not mobile.isdigit():
+            return None
+
+        return f"91{mobile}"
 
     # =========================================================
     # DELETE TRACKING
@@ -16,142 +49,104 @@ class DeleteService:
     @classmethod
     def delete_tracking(cls, session):
 
-        # -----------------------------------------------------
-        # VALIDATE SESSION
-        # -----------------------------------------------------
-
         if not session:
+
             return {
                 "success": False,
-                "message": "Tracking session not found."
+                "message": "Tracking session not found.",
             }
 
-        # -----------------------------------------------------
-        # GET TRACKING TOKEN
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Mobile
+        # ---------------------------------------------------------
+
+        mobile = cls.normalize_mobile(
+            session.driver_mobile
+        )
+
+        if not mobile:
+
+            return {
+                "success": False,
+                "message": (
+                    "Invalid driver mobile number."
+                ),
+            }
+
+        # ---------------------------------------------------------
+        # Get tracking token
+        # ---------------------------------------------------------
 
         auth = TrackingAuthService.get_tracking_token()
 
         if not auth.get("success"):
-            return auth
+
+            return {
+                "success": False,
+                "message": auth.get(
+                    "message",
+                    "Unable to get tracking authentication token.",
+                ),
+                "auth_response": auth,
+            }
 
         token = auth.get("token")
 
         if not token:
-            return {
-                "success": False,
-                "message": "Tracking access token not available."
-            }
-
-        # -----------------------------------------------------
-        # MOBILE FORMAT
-        # -----------------------------------------------------
-
-        mobile = str(
-            session.driver_mobile or ""
-        ).strip()
-
-        mobile = (
-            mobile
-            .replace(" ", "")
-            .replace("-", "")
-            .replace("(", "")
-            .replace(")", "")
-        )
-
-        if mobile.startswith("+91"):
-            mobile = mobile[3:]
-
-        elif mobile.startswith("0091"):
-            mobile = mobile[4:]
-
-        elif mobile.startswith("91") and len(mobile) == 12:
-            mobile = mobile[2:]
-
-        if len(mobile) != 10 or not mobile.isdigit():
 
             return {
                 "success": False,
-                "message": "Invalid Driver Mobile Number."
+                "message": (
+                    "Tracking authentication succeeded "
+                    "but token was not returned."
+                ),
             }
 
-        mobile = "91" + mobile
-
-        # -----------------------------------------------------
-        # DELETE API URL
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Delete API
+        # ---------------------------------------------------------
 
         url = getattr(
             settings,
             "TELENITY_DELETE_API",
-            ""
+            "",
         )
 
         if not url:
 
             return {
                 "success": False,
-                "message": "TELENITY_DELETE_API is not configured."
+                "message": (
+                    "TELENITY_DELETE_API "
+                    "is not configured."
+                ),
             }
 
-        # -----------------------------------------------------
-        # HEADERS
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Headers
+        # ---------------------------------------------------------
 
         headers = {
-            "Authorization": f"Bearer {token}",
+            "Token": token,
             "Content-Type": "application/json",
-            "Accept": "*/*",
+            "Accept": "application/json",
         }
 
-        # -----------------------------------------------------
-        # PAYLOAD
-        # -----------------------------------------------------
+        # ---------------------------------------------------------
+        # Payload
+        # ---------------------------------------------------------
 
         payload = {
             "msisdnList": [
-                mobile
+                mobile,
             ]
         }
 
-        # -----------------------------------------------------
-        # MASK TOKEN
-        # -----------------------------------------------------
-
-        masked_token = "********"
-
-        if len(token) > 12:
-
-            masked_token = (
-                token[:8]
-                + "********"
-            )
-
-        # -----------------------------------------------------
-        # DEBUG REQUEST
-        # -----------------------------------------------------
-
-        print()
-        print("=" * 80)
-        print("DELETE API REQUEST")
-        print("=" * 80)
-        print("URL :", url)
-        print(
-            "Headers :",
-            {
-                "Authorization": f"Bearer {masked_token}",
-                "Content-Type": "application/json",
-                "Accept": "*/*",
-            }
-        )
-        print("Payload :", payload)
-        print("=" * 80)
-
         try:
 
-            # -------------------------------------------------
-            # API REQUEST
-            # -------------------------------------------------
+            # =====================================================
+            # CALL DELETE API
+            # =====================================================
 
             response = requests.post(
                 url=url,
@@ -160,9 +155,9 @@ class DeleteService:
                 timeout=30,
             )
 
-            # -------------------------------------------------
-            # SAFE RESPONSE
-            # -------------------------------------------------
+            # -----------------------------------------------------
+            # Parse response
+            # -----------------------------------------------------
 
             try:
 
@@ -174,119 +169,141 @@ class DeleteService:
                     "raw_response": response.text
                 }
 
-            # -------------------------------------------------
-            # DEBUG RESPONSE
-            # -------------------------------------------------
-
-            print()
-            print("=" * 80)
-            print("DELETE API RESPONSE")
-            print("=" * 80)
-            print("Status   :", response.status_code)
-            print("Response :", response_data)
-            print("=" * 80)
-
-            # -------------------------------------------------
+            # =====================================================
             # API LOG
-            # -------------------------------------------------
+            # =====================================================
 
-            ApiLog.objects.create(
-                api_name="Delete API",
-                request_url=url,
-                request_method="POST",
-                request_headers={
-                    "Authorization": "Bearer ********",
-                    "Content-Type": "application/json",
-                    "Accept": "*/*",
-                },
-                request_body=payload,
-                response_code=response.status_code,
-                response_body=response_data,
-            )
+            try:
 
-            # =================================================
-            # SUCCESS
-            # =================================================
-
-            api_success = (
-                response.status_code in (
-                    200,
-                    201,
-                    202,
+                ApiLog.objects.create(
+                    api_name="Delete API",
+                    request_url=url,
+                    request_method="POST",
+                    request_headers={
+                        "Token": "********",
+                    },
+                    request_body=payload,
+                    response_code=response.status_code,
+                    response_body=response_data,
                 )
-                and response_data.get("success") is True
-            )
 
-            if api_success:
+            except Exception:
+                pass
 
-                # -------------------------------------------------
-                # MARK SESSION DELETED
-                # -------------------------------------------------
+            # =====================================================
+            # HTTP CHECK
+            # =====================================================
 
-                session.status = "deleted"
-
-                session.tracking_enabled = False
-
-                session.consent_received = False
-
-                session.latitude = None
-                session.longitude = None
-
-                session.last_location = None
-                session.last_updated = None
-                session.location_status = None
-
-                session.entity_id = None
-                session.consent_reference = None
-
-                session.save()
+            if response.status_code not in (
+                200,
+                201,
+                202,
+            ):
 
                 return {
-                    "success": True,
-                    "status": "deleted",
+                    "success": False,
+                    "status_code": response.status_code,
+                    "message": (
+                        "Telenity Delete API failed."
+                    ),
                     "response": response_data,
                 }
 
-            # =================================================
-            # API FAILURE
-            # =================================================
+            # =====================================================
+            # API SUCCESS CHECK
+            # =====================================================
+
+            if (
+                isinstance(response_data, dict)
+                and response_data.get("success") is False
+            ):
+
+                return {
+                    "success": False,
+                    "status_code": response.status_code,
+                    "message": (
+                        "Telenity Delete API returned "
+                        "a failure response."
+                    ),
+                    "response": response_data,
+                }
+
+            # =====================================================
+            # LOCAL SESSION UPDATE
+            # =====================================================
+
+            session.status = "deleted"
+            session.tracking_enabled = False
+            session.consent_received = False
+
+            session.latitude = None
+            session.longitude = None
+            session.last_location = None
+            session.last_updated = None
+            session.location_status = None
+
+            session.entity_id = None
+            session.consent_reference = None
+
+            session.save(
+                update_fields=[
+                    "status",
+                    "tracking_enabled",
+                    "consent_received",
+                    "latitude",
+                    "longitude",
+                    "last_location",
+                    "last_updated",
+                    "location_status",
+                    "entity_id",
+                    "consent_reference",
+                ]
+            )
+
+            # =====================================================
+            # SUCCESS
+            # =====================================================
 
             return {
-                "success": False,
-                "status_code": response.status_code,
-                "message": response_data,
+                "success": True,
+                "status": "deleted",
+                "message": (
+                    "Tracking deleted successfully."
+                ),
+                "response": response_data,
             }
 
-        # =====================================================
+        # =========================================================
         # TIMEOUT
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.Timeout:
 
             return {
                 "success": False,
                 "message": (
-                    "Connection timeout while "
-                    "contacting Telenity Delete API."
-                )
+                    "Delete API request timed out."
+                ),
             }
 
-        # =====================================================
+        # =========================================================
         # CONNECTION ERROR
-        # =====================================================
+        # =========================================================
 
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as exc:
 
             return {
                 "success": False,
                 "message": (
-                    "Unable to connect to Telenity Server."
-                )
+                    "Unable to connect to "
+                    "Telenity Delete API."
+                ),
+                "error": str(exc),
             }
 
-        # =====================================================
+        # =========================================================
         # REQUEST ERROR
-        # =====================================================
+        # =========================================================
 
         except requests.exceptions.RequestException as exc:
 
@@ -294,16 +311,16 @@ class DeleteService:
                 "success": False,
                 "message": (
                     f"Delete API request failed: {exc}"
-                )
+                ),
             }
 
-        # =====================================================
-        # OTHER ERROR
-        # =====================================================
+        # =========================================================
+        # UNEXPECTED ERROR
+        # =========================================================
 
         except Exception as exc:
 
             return {
                 "success": False,
-                "message": str(exc)
+                "message": str(exc),
             }
