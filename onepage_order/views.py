@@ -50,7 +50,6 @@ def to_decimal(value, default="0.00"):
     except (InvalidOperation, ValueError, TypeError):
         return Decimal(default)
 
-
 def to_integer(value, default=0):
     """Safely convert POST input to integer."""
     if value in (None, ""):

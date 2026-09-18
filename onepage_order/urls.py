@@ -73,7 +73,7 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "live-tracking/",
+        "onepageorders/",
         views.live_tracking_list,
         name="live_tracking_list",
     ),
@@ -84,13 +84,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "live-tracking/setup/<int:order_id>/",
+        "onepageorders/setup/<int:order_id>/",
         views.onepageorderlive_tracking_setup,
         name="onepageorderlive_tracking_setup",
     ),
 
     path(
-        "live-tracking/import-driver/<int:order_id>/",
+        "onepageorders/import-driver/<int:order_id>/",
         views.import_driver,
         name="import_driver",
     ),
@@ -103,49 +103,49 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/",
+        "onepageorders/vehicle-live/<int:pk>/",
         views.vehicle_live,
         name="onepageordervehicle_live",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/location/",
+        "onepageorders/vehicle-live/<int:pk>/location/",
         views.vehicle_live_location,
         name="onepageordervehicle_live_location",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/refresh/",
+        "onepageorders/vehicle-live/<int:pk>/refresh/",
         views.refresh_location,
         name="refresh_location",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/history/",
+        "onepageorders/vehicle-live/<int:pk>/history/",
         views.vehicle_history,
         name="vehicle_history",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/tracking-history/",
+        "onepageorders/vehicle-live/<int:pk>/tracking-history/",
         views.tracking_history,
         name="tracking_history",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/live-history/",
+        "onepageorders/vehicle-live/<int:pk>/live-history/",
         views.live_tracking_history,
         name="live_tracking_history",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/test-location/",
+        "onepageorders/vehicle-live/<int:pk>/test-location/",
         views.test_location,
         name="test_location",
     ),
 
     path(
-        "live-tracking/vehicle-live/<int:pk>/delete/",
+        "onepageorders/vehicle-live/<int:pk>/delete/",
         views.delete_tracking,
         name="delete_tracking",
     ),
@@ -158,13 +158,13 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "live-tracking/consent/<int:pk>/",
+        "onepageorders/consent/<int:pk>/",
         views.send_consent,
         name="send_consent",
     ),
 
     path(
-        "live-tracking/consent/check/<int:pk>/",
+        "onepageorders/consent/check/<int:pk>/",
         views.check_consent,
         name="check_consent",
     ),
