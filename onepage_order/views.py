@@ -1898,7 +1898,6 @@ def unique_location_history(session):
 
 @login_required
 def onepageorder_tracking_list(request):
-
     query = request.GET.get(
         "q",
         "",
@@ -1911,15 +1910,15 @@ def onepageorder_tracking_list(request):
             "tracking",
             "tracking_session",
         )
-        .filter(
-            tracking_session__isnull=False,
-        )
-        .exclude(
-            tracking_session__status="deleted",
-        )
-        .exclude(
-            tracking__settled=True,
-        )
+        # .filter(
+        #     tracking_session__isnull=False,
+        # )
+        # .exclude(
+        #     tracking_session__status="deleted",
+        # )
+        # .exclude(
+        #     tracking__settled=True,
+        # )
         .order_by("-id")
     )
 
@@ -1942,8 +1941,6 @@ def onepageorder_tracking_list(request):
             "q": query,
         },
     )
-
-
 # =============================================================
 # LIVE TRACKING SETUP
 # pk = ORDER PK
