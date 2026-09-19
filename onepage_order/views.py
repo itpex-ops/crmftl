@@ -1896,12 +1896,17 @@ def unique_location_history(session):
 # LIVE TRACKING LIST
 # =============================================================
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Prefetch
+from django.shortcuts import render
+
+from .models import Order, LiveLocation
+
+
 @login_required
 def onepageorder_tracking_list(request):
-    query = request.GET.get(
-        "q",
-        "",
-    ).strip()
+
+    query = request.GET.get("q", "").strip()
 
     orders = (
         Order.objects
@@ -1910,17 +1915,18 @@ def onepageorder_tracking_list(request):
             "tracking",
             "tracking_session",
         )
-        # .filter(
-        #     tracking_session__isnull=False,
-        # )
-        # .exclude(
-        #     tracking_session__status="deleted",
-        # )
-        # .exclude(
-        #     tracking__settled=True,
-        # )
+        .prefetch_related(
+            Prefetch(
+                "tracking_session__locations",
+                queryset=LiveLocation.objects.order_by("-received_at"),
+            )
+        )
         .order_by("-id")
     )
+
+    # =========================================================
+    # SEARCH
+    # =========================================================
 
     if query:
 
@@ -1941,7 +1947,6 @@ def onepageorder_tracking_list(request):
             "q": query,
         },
     )
-
 
 # =============================================================
 # LIVE TRACKING SETUP
