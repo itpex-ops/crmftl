@@ -65,9 +65,7 @@
                     {% for o in order %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>
-                            <strong>{{ o.trip_number }}</strong>
-                        </td>
+                        <td><strong>{{ o.trip_number }}</strong></td>
                         <td>{{ o.vehicle_number }}</td>
                         <td>{{ o.driver_number }}</td>
                         <!-- Status -->
@@ -162,7 +160,7 @@
                                 aria-expanded="false">
                                     <i class="bi bi-clock-history"></i>
                                 </a> -->
-                                <a href="#history{{ o.id }}"
+                                <a href="{% url 'onepageordervehicle_history' o.id }"
                                     class="btn btn-secondary btn-sm"
                                     data-bs-toggle="collapse"
                                     role="button"
