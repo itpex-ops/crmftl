@@ -3673,7 +3673,7 @@ def payment_report(request):
 
     return render(
         request,
-        "reports/payment_report.html",
+        "onepageorders/payment_report.html",
         context,
     )
 
