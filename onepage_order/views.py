@@ -2762,10 +2762,8 @@ def live_tracking_history(request, pk):
 # =============================================================
 # TRACKING HISTORY
 # =============================================================
-
 @login_required
 def tracking_history(request, pk):
-
     session = get_object_or_404(
         TrackingSession.objects.select_related(
             "order",
@@ -2773,13 +2771,11 @@ def tracking_history(request, pk):
         ),
         pk=pk,
     )
-
     history = (
         session.locations
         .all()
         .order_by("-received_at")
     )
-
     return render(
         request,
         "onepageorders/history.html",
@@ -2787,8 +2783,10 @@ def tracking_history(request, pk):
             "session": session,
             "order": session.order,
             "history": history,
+            "history_count": history.count(),
         },
     )
+
 # =============================================================
 # REFRESH LOCATION
 # pk = TRACKING SESSION PK
