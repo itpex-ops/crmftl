@@ -48,6 +48,8 @@ urlpatterns = [
         views.payment_report,
         name="payment_report",
     ),
+
+    path("payment_report_pdf/",views.payment_report_pdf,name='payment_report_pdf'),
     # =========================================================
     # PAYMENTS
     # =========================================================
