@@ -28,8 +28,6 @@ from .services.consent_service import ConsentService
 from .services.location_service import LocationService
 from .services.delete_service import DeleteService
 from .services.modify_service import ModifyService
-from django.conf import settings
-import requests
 logger = logging.getLogger(__name__)
 
 # =============================================================
@@ -2799,641 +2797,151 @@ def tracking_history(request, pk):
 # pk = TRACKING SESSION PK
 # =============================================================
 
-@classmethod
-def fetch_location(cls, session):
+@login_required
+def refresh_location(request, pk):
 
-    if not session:
-        return {
-            "success": False,
-            "location_available": False,
-            "message": "Tracking session not found.",
-        }
-
-    # =========================================================
-    # DRIVER MOBILE
-    # =========================================================
-
-    mobile = cls.normalize_mobile(
-        session.driver_mobile
+    session = get_object_or_404(
+        TrackingSession.objects.select_related(
+            "order",
+        ),
+        pk=pk,
     )
 
-    if not mobile:
-        logger.error(
-            "LOCATION | Invalid mobile | session=%s mobile=%s",
-            session.pk,
-            session.driver_mobile,
-        )
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": "Invalid driver mobile number.",
-        }
-
     logger.info(
-        "LOCATION FETCH START | "
-        "session=%s trip=%s mobile=%s entity=%s status=%s",
+        "REFRESH LOCATION | "
+        "session=%s order=%s mobile=%s "
+        "entity=%s consent=%s status=%s",
         session.pk,
-        session.order.trip_number if session.order else None,
-        mobile,
+        session.order.trip_number,
+        get_driver_mobile(session),
         session.entity_id,
+        session.consent_received,
         session.status,
     )
 
-    # =========================================================
-    # GET TOKEN
-    # =========================================================
+    # ---------------------------------------------------------
+    # 1. Consent
+    # ---------------------------------------------------------
 
-    auth = TrackingAuthService.get_tracking_token()
+    if not session.consent_received:
 
-    if not auth.get("success"):
-
-        logger.error(
-            "LOCATION AUTH FAILED | session=%s | auth=%s",
-            session.pk,
-            auth,
+        messages.warning(
+            request,
+            "Driver consent has not been approved yet.",
         )
 
-        return {
-            "success": False,
-            "location_available": False,
-            "message": auth.get(
+        return redirect(
+            "onepageordervehicle_live",
+            pk=session.pk,
+        )
+
+    # ---------------------------------------------------------
+    # 2. Start tracking if necessary
+    # ---------------------------------------------------------
+
+    if not session.tracking_enabled:
+
+        modify_result = (
+            ModifyService.start_tracking(
+                session
+            )
+        )
+
+        if not modify_result.get("success"):
+
+            message = modify_result.get(
                 "message",
-                "Unable to get tracking token.",
-            ),
-        }
+                "Unable to start tracking.",
+            )
 
-    token = auth.get("token")
+            if isinstance(
+                message,
+                dict,
+            ):
+                message = str(message)
 
-    if not token:
+            messages.error(
+                request,
+                str(message),
+            )
 
-        return {
-            "success": False,
-            "location_available": False,
-            "message": "Tracking token not available.",
-        }
+            return redirect(
+                "onepageordervehicle_live",
+                pk=session.pk,
+            )
 
-    # =========================================================
-    # API URL
-    # =========================================================
+        session.refresh_from_db()
 
-    base_url = getattr(
-        settings,
-        "TELENITY_LOCATION_API",
-        "",
+    # ---------------------------------------------------------
+    # 3. Fetch latest location
+    # ---------------------------------------------------------
+
+    result = LocationService.fetch_location(
+        session
     )
 
-    if not base_url:
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": (
-                "TELENITY_LOCATION_API is not configured."
-            ),
-        }
-
-    url = (
-        f"{base_url.rstrip('/')}"
-        f"/{mobile}"
-        f"?lastResult=True"
+    logger.info(
+        "REFRESH LOCATION RESULT | "
+        "session=%s result=%s",
+        session.pk,
+        result,
     )
 
-    headers = {
-        "Token": token,
-        "Accept": "application/json",
-    }
+    # ---------------------------------------------------------
+    # 4. User message
+    # ---------------------------------------------------------
 
-    # =========================================================
-    # API REQUEST
-    # =========================================================
+    if result.get("success"):
 
-    try:
+        if result.get("location_available"):
 
-        response = requests.get(
-            url=url,
-            headers=headers,
-            timeout=30,
-        )
-
-        try:
-            response_data = response.json()
-
-        except ValueError:
-            response_data = {
-                "raw_response": response.text
-            }
-
-        logger.info(
-            "LOCATION API RESPONSE | "
-            "session=%s status=%s",
-            session.pk,
-            response.status_code,
-        )
-
-        # =====================================================
-        # API LOG
-        # =====================================================
-
-        try:
-
-            ApiLog.objects.create(
-                api_name="Location API",
-                request_url=url,
-                request_method="GET",
-                request_headers={
-                    "Token": "********",
-                    "Accept": "application/json",
-                },
-                request_body=None,
-                response_code=response.status_code,
-                response_body=response_data,
-            )
-
-        except Exception:
-
-            logger.exception(
-                "LOCATION API LOG SAVE FAILED | session=%s",
-                session.pk,
-            )
-
-        # =====================================================
-        # HTTP ERROR
-        # =====================================================
-
-        if response.status_code != 200:
-
-            session.location_status = "error"
-
-            session.save(
-                update_fields=[
-                    "location_status",
-                ]
-            )
-
-            return {
-                "success": False,
-                "location_available": False,
-                "status_code": response.status_code,
-                "message": "Location API request failed.",
-                "response": response_data,
-            }
-
-        # =====================================================
-        # TERMINAL LOCATION
-        # =====================================================
-
-        terminal_locations = (
-            response_data.get(
-                "terminalLocation"
-            )
-            or []
-        )
-
-        if not terminal_locations:
-
-            logger.warning(
-                "LOCATION NOT AVAILABLE | session=%s",
-                session.pk,
-            )
-
-            session.location_status = (
-                "waiting_location"
-            )
-
-            session.status = (
-                "waiting_location"
-            )
-
-            session.save(
-                update_fields=[
-                    "location_status",
-                    "status",
-                ]
-            )
-
-            return {
-                "success": True,
-                "location_available": False,
-                "status": "waiting_location",
-                "message": (
-                    "Tracking is active, but current "
-                    "location is not available yet."
+            messages.success(
+                request,
+                (
+                    "Vehicle location updated "
+                    "successfully."
                 ),
-                "response": response_data,
-            }
+            )
 
-        # =====================================================
-        # FIRST TERMINAL
-        # =====================================================
+        else:
 
-        terminal = terminal_locations[0]
+            messages.info(
+                request,
+                (
+                    result.get(
+                        "message",
+                        (
+                            "Tracking is active, "
+                            "but the current location "
+                            "is not available yet."
+                        ),
+                    )
+                ),
+            )
 
-        entity_id = terminal.get(
-            "entityId"
+    else:
+
+        message = result.get(
+            "message",
+            "Unable to retrieve vehicle location.",
         )
 
-        current_location = terminal.get(
-            "currentLocation"
-        )
-
-        # =====================================================
-        # CURRENT LOCATION NOT AVAILABLE
-        # =====================================================
-
-        if not isinstance(
-            current_location,
+        if isinstance(
+            message,
             dict,
         ):
+            message = str(message)
 
-            if entity_id:
-
-                session.entity_id = entity_id
-
-            session.location_status = (
-                "waiting_location"
-            )
-
-            session.status = (
-                "waiting_location"
-            )
-
-            update_fields = [
-                "location_status",
-                "status",
-            ]
-
-            if entity_id:
-                update_fields.append(
-                    "entity_id"
-                )
-
-            session.save(
-                update_fields=update_fields
-            )
-
-            return {
-                "success": True,
-                "location_available": False,
-                "status": "waiting_location",
-                "message": (
-                    "Tracking is active, but the "
-                    "current location is not available."
-                ),
-                "response": response_data,
-            }
-
-        # =====================================================
-        # EXTRACT LOCATION
-        # =====================================================
-
-        latitude = current_location.get(
-            "latitude"
+        messages.error(
+            request,
+            str(message),
         )
 
-        longitude = current_location.get(
-            "longitude"
-        )
+    return redirect(
+        "onepageordervehicle_live",
+        pk=session.pk,
+    )
 
-        address = (
-            current_location.get(
-                "detailedAddress"
-            )
-            or current_location.get(
-                "address"
-            )
-            or ""
-        )
-
-        location_name = (
-            current_location.get(
-                "locationName"
-            )
-            or current_location.get(
-                "name"
-            )
-            or ""
-        )
-
-        accuracy = current_location.get(
-            "accuracy"
-        )
-
-        # Telenity may not return accuracy
-        if accuracy is None:
-            accuracy = 0
-
-        try:
-            accuracy = float(
-                accuracy
-            )
-        except (
-            TypeError,
-            ValueError,
-        ):
-            accuracy = 0
-
-        # =====================================================
-        # VALIDATE LAT / LONG
-        # =====================================================
-
-        if (
-            latitude is None
-            or longitude is None
-        ):
-
-            logger.warning(
-                "INVALID LOCATION | "
-                "session=%s latitude=%s longitude=%s",
-                session.pk,
-                latitude,
-                longitude,
-            )
-
-            session.location_status = (
-                "waiting_location"
-            )
-
-            session.status = (
-                "waiting_location"
-            )
-
-            session.save(
-                update_fields=[
-                    "location_status",
-                    "status",
-                ]
-            )
-
-            return {
-                "success": True,
-                "location_available": False,
-                "message": (
-                    "Location received without "
-                    "valid coordinates."
-                ),
-                "response": response_data,
-            }
-
-        # =====================================================
-        # RECEIVED TIME
-        # =====================================================
-
-        received_at = timezone.now()
-
-        location_timestamp = (
-            current_location.get(
-                "timestamp"
-            )
-        )
-
-        if location_timestamp:
-
-            try:
-
-                received_at = datetime.fromisoformat(
-                    str(
-                        location_timestamp
-                    ).replace(
-                        "Z",
-                        "+00:00",
-                    )
-                )
-
-                if received_at.tzinfo is None:
-
-                    received_at = (
-                        timezone.make_aware(
-                            received_at
-                        )
-                    )
-
-            except (
-                ValueError,
-                TypeError,
-            ):
-
-                received_at = timezone.now()
-
-        # =====================================================
-        # UPDATE TRACKING SESSION
-        # =====================================================
-
-        session.latitude = latitude
-
-        session.longitude = longitude
-
-        session.last_location = (
-            address
-            or location_name
-        )
-
-        session.last_updated = received_at
-
-        session.location_status = (
-            "Retrieved"
-        )
-
-        session.tracking_enabled = True
-
-        session.status = "active"
-
-        update_fields = [
-            "latitude",
-            "longitude",
-            "last_location",
-            "last_updated",
-            "location_status",
-            "tracking_enabled",
-            "status",
-        ]
-
-        if entity_id:
-
-            session.entity_id = entity_id
-
-            update_fields.append(
-                "entity_id"
-            )
-
-        session.save(
-            update_fields=update_fields
-        )
-
-        # =====================================================
-        # SAVE LOCATION HISTORY
-        # =====================================================
-
-        try:
-
-            live_location = (
-                LiveLocation.objects.create(
-
-                    session=session,
-
-                    tracked=True,
-
-                    location_status="Retrieved",
-
-                    address=address or "",
-
-                    latitude=latitude,
-
-                    longitude=longitude,
-
-                    accuracy=accuracy,
-
-                    location_name=(
-                        location_name or ""
-                    ),
-
-                    received_at=received_at,
-                )
-            )
-
-        except Exception as exc:
-
-            logger.exception(
-                "LIVE LOCATION SAVE FAILED | "
-                "session=%s trip=%s error=%s",
-                session.pk,
-                session.order.trip_number
-                if session.order
-                else None,
-                exc,
-            )
-
-            return {
-                "success": False,
-                "location_available": True,
-                "message": (
-                    "Location received, but history "
-                    "could not be saved."
-                ),
-                "error": str(exc),
-            }
-
-        logger.info(
-            "LIVE LOCATION HISTORY SAVED | "
-            "session=%s trip=%s location_id=%s "
-            "lat=%s lng=%s",
-            session.pk,
-            session.order.trip_number
-            if session.order
-            else None,
-            live_location.pk,
-            latitude,
-            longitude,
-        )
-
-        # =====================================================
-        # SUCCESS
-        # =====================================================
-
-        return {
-            "success": True,
-            "location_available": True,
-            "status": "active",
-            "message": (
-                "Vehicle location received successfully."
-            ),
-            "latitude": latitude,
-            "longitude": longitude,
-            "address": address,
-            "location_name": location_name,
-            "accuracy": accuracy,
-            "received_at": received_at,
-            "live_location_id": (
-                live_location.pk
-            ),
-        }
-
-    # =========================================================
-    # TIMEOUT
-    # =========================================================
-
-    except requests.exceptions.Timeout:
-
-        logger.exception(
-            "LOCATION API TIMEOUT | session=%s",
-            session.pk,
-        )
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": (
-                "Location API request timed out."
-            ),
-        }
-
-    # =========================================================
-    # CONNECTION ERROR
-    # =========================================================
-
-    except requests.exceptions.ConnectionError as exc:
-
-        logger.exception(
-            "LOCATION API CONNECTION ERROR | "
-            "session=%s error=%s",
-            session.pk,
-            exc,
-        )
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": (
-                "Unable to connect to Telenity "
-                "Location API."
-            ),
-            "error": str(exc),
-        }
-
-    # =========================================================
-    # REQUEST ERROR
-    # =========================================================
-
-    except requests.exceptions.RequestException as exc:
-
-        logger.exception(
-            "LOCATION API REQUEST ERROR | "
-            "session=%s error=%s",
-            session.pk,
-            exc,
-        )
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": (
-                "Location API request failed."
-            ),
-            "error": str(exc),
-        }
-
-    # =========================================================
-    # UNEXPECTED ERROR
-    # =========================================================
-
-    except Exception as exc:
-
-        logger.exception(
-            "LOCATION SERVICE ERROR | "
-            "session=%s error=%s",
-            session.pk,
-            exc,
-        )
-
-        return {
-            "success": False,
-            "location_available": False,
-            "message": (
-                "Unexpected error while retrieving "
-                "vehicle location."
-            ),
-            "error": str(exc),
-        }
 
 # =============================================================
 # TEST CONSENT AUTH
