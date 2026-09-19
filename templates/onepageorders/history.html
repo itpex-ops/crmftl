@@ -5,399 +5,116 @@
 
 {% block content %}
 
-<link rel="stylesheet"
-      href="{% static 'assets/common/css/common.css' %}">
+<div class="page-header">
+    <h4>
+        <i class="bi bi-clock-history text-primary me-2"></i>
+        Tracking History
+    </h4>
 
-<div class="container-fluid mt-1">
+    <small class="text-muted">
+        {{ order.trip_number }}
+        -
+        {{ order.vehicle_number }}
+    </small>
+</div>
 
-    <!-- =========================================================
-         HEADER
-    ========================================================== -->
 
-    <div class="page-header d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4>
-                <i class="bi bi-clock-history text-primary me-2"></i>
-                Tracking History
-            </h4>
-            <small class="text-muted">
+<div class="card shadow-sm">
 
-                <strong>{{ order.trip_number }}</strong>
+    <div class="card-body table-responsive">
 
-                {% if order.vehicle_number %}
-                    -
-                    {{ order.vehicle_number }}
-                {% endif %}
+        <table class="table table-hover align-middle">
 
-            </small>
-        </div>
+            <thead class="custom-table-head">
 
-        <div>
-            <a href="{% url 'onepageorder_tracking_list' %}"
-               class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left me-1"></i>
-                Back
-            </a>
-        </div>
-    </div>
+                <tr>
 
-    <!-- =========================================================
-         TRACKING INFORMATION
-    ========================================================== -->
+                    <th>#</th>
+                    <th>Date & Time</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Location</th>
+                    <th>Status</th>
 
-    <div class="card shadow-sm mb-3">
+                </tr>
 
-        <div class="card-body">
+            </thead>
 
-            <div class="row g-3">
+            <tbody>
 
-                <div class="col-md-3">
-                    <small class="text-muted d-block">
-                        Trip Number
-                    </small>
-                    <strong>
-                        {{ order.trip_number }}
-                    </strong>
-                </div>
+                {% for item in history %}
 
-                <div class="col-md-3">
-                    <small class="text-muted d-block">
-                        Vehicle
-                    </small>
-                    <strong>
-                        {{ order.vehicle_number|default:"--" }}
-                    </strong>
-                </div>
+                <tr>
 
-                <div class="col-md-3">
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
 
-                    <small class="text-muted d-block">
-                        Driver
-                    </small>
+                    <td>
+                        {{ item.received_at|date:"d-m-Y H:i:s" }}
+                    </td>
 
-                    <strong>
-                        {{ session.driver_mobile|default:order.driver_number|default:"--" }}
-                    </strong>
+                    <td>
+                        {{ item.latitude }}
+                    </td>
 
-                </div>
+                    <td>
+                        {{ item.longitude }}
+                    </td>
 
+                    <td>
+                        {% if item.location_name %}
+                            {{ item.location_name }}
+                        {% elif item.address %}
+                            {{ item.address }}
+                        {% else %}
+                            <span class="text-muted">Location not available</span>
+                        {% endif %}
+                    </td>
 
-                <div class="col-md-3">
+                    <td>
 
-                    <small class="text-muted d-block">
-                        Tracking Status
-                    </small>
+                        {% if item.tracked %}
 
+                            <span class="badge bg-success">
+                                <i class="bi bi-geo-alt-fill me-1"></i>
+                                Tracked
+                            </span>
 
-                    {% if session.status == "active" %}
+                        {% else %}
 
-                        <span class="badge bg-success">
+                            <span class="badge bg-secondary">
+                                Not Tracked
+                            </span>
 
-                            <i class="bi bi-broadcast me-1"></i>
-                            Live Tracking
+                        {% endif %}
 
-                        </span>
+                    </td>
 
-                    {% elif session.status == "waiting_location" %}
+                </tr>
 
-                        <span class="badge bg-warning text-dark">
+                {% empty %}
 
-                            <i class="bi bi-hourglass-split me-1"></i>
-                            Waiting Location
+                <tr>
 
-                        </span>
+                    <td colspan="6"
+                        class="text-center text-muted py-5">
 
-                    {% elif session.status == "sms_sent" %}
+                        <i class="bi bi-geo-alt fs-1"></i>
 
-                        <span class="badge bg-info">
+                        <br><br>
 
-                            <i class="bi bi-envelope me-1"></i>
-                            SMS Sent
+                        No location history found.
 
-                        </span>
+                    </td>
 
-                    {% elif session.status == "consent_received" %}
+                </tr>
 
-                        <span class="badge bg-primary">
+                {% endfor %}
 
-                            <i class="bi bi-check-circle me-1"></i>
-                            Consent Received
+            </tbody>
 
-                        </span>
-
-                    {% elif session.status == "stopped" %}
-
-                        <span class="badge bg-secondary">
-
-                            <i class="bi bi-stop-circle me-1"></i>
-                            Stopped
-
-                        </span>
-
-                    {% elif session.status == "deleted" %}
-
-                        <span class="badge bg-dark">
-
-                            <i class="bi bi-trash me-1"></i>
-                            Deleted
-
-                        </span>
-
-                    {% elif session.status == "error" %}
-
-                        <span class="badge bg-danger">
-
-                            <i class="bi bi-x-circle me-1"></i>
-                            Error
-
-                        </span>
-
-                    {% else %}
-
-                        <span class="badge bg-secondary">
-                            {{ session.get_status_display }}
-                        </span>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================================
-         LOCATION HISTORY
-    ========================================================== -->
-
-    <div class="card shadow-sm">
-
-        <div class="card-header bg-white">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                    <strong>
-                        <i class="bi bi-geo-alt me-1"></i>
-                        Location History
-                    </strong>
-
-                </div>
-
-                <span class="badge bg-primary">
-
-                    {{ history|length }} Records
-
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="card-body table-responsive p-0">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="custom-table-head">
-
-                    <tr>
-
-                        <th class="ps-3">#</th>
-
-                        <th>Date & Time</th>
-
-                        <th>Latitude</th>
-
-                        <th>Longitude</th>
-
-                        <th>Location</th>
-
-                        <th>Accuracy</th>
-
-                        <th>Status</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for item in history %}
-
-                    <tr>
-
-                        <!-- NUMBER -->
-
-                        <td class="ps-3">
-
-                            {{ forloop.counter }}
-
-                        </td>
-
-
-                        <!-- DATE -->
-
-                        <td class="text-nowrap">
-
-                            <i class="bi bi-calendar3 text-muted me-1"></i>
-
-                            {{ item.received_at|date:"d-m-Y H:i:s" }}
-
-                        </td>
-
-
-                        <!-- LATITUDE -->
-
-                        <td>
-
-                            {% if item.latitude %}
-
-                                {{ item.latitude }}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    --
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- LONGITUDE -->
-
-                        <td>
-
-                            {% if item.longitude %}
-
-                                {{ item.longitude }}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    --
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- LOCATION -->
-
-                        <td>
-
-                            {% if item.location_name %}
-
-                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-
-                                {{ item.location_name }}
-
-                            {% elif item.address %}
-
-                                <i class="bi bi-geo-alt text-primary me-1"></i>
-
-                                {{ item.address }}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    Location not available
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- ACCURACY -->
-
-                        <td>
-
-                            {% if item.accuracy %}
-
-                                {{ item.accuracy }} m
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    --
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- STATUS -->
-
-                        <td>
-
-                            {% if item.tracked %}
-
-                                <span class="badge bg-success">
-
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Tracked
-
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-secondary">
-
-                                    <i class="bi bi-dash-circle me-1"></i>
-                                    Not Tracked
-
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-
-                    {% empty %}
-
-                    <tr>
-
-                        <td colspan="7"
-                            class="text-center text-muted py-5">
-
-                            <i class="bi bi-geo-alt fs-1"></i>
-
-                            <br><br>
-
-                            <strong>
-                                No location history found.
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                Location records will appear here
-                                once tracking data is received.
-                            </small>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
+        </table>
 
     </div>
 
