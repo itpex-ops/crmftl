@@ -1903,10 +1903,30 @@ from django.shortcuts import render
 from .models import Order, LiveLocation
 
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Prefetch
+from django.shortcuts import render
+
+from .models import Order, LiveLocation
+
+
 @login_required
 def onepageorder_tracking_list(request):
 
     query = request.GET.get("q", "").strip()
+
+    # =========================================================
+    # LOCATION HISTORY
+    # Latest location first
+    # =========================================================
+
+    location_history = LiveLocation.objects.order_by(
+        "-received_at"
+    )
+
+    # =========================================================
+    # ORDERS
+    # =========================================================
 
     orders = (
         Order.objects
@@ -1918,7 +1938,8 @@ def onepageorder_tracking_list(request):
         .prefetch_related(
             Prefetch(
                 "tracking_session__locations",
-                queryset=LiveLocation.objects.order_by("-received_at"),
+                queryset=location_history,
+                to_attr="tracking_history",
             )
         )
         .order_by("-id")
@@ -1939,6 +1960,10 @@ def onepageorder_tracking_list(request):
             | Q(destination__icontains=query)
         )
 
+    # =========================================================
+    # RESPONSE
+    # =========================================================
+
     return render(
         request,
         "onepageorders/list.html",
@@ -1947,7 +1972,6 @@ def onepageorder_tracking_list(request):
             "q": query,
         },
     )
-
 # =============================================================
 # LIVE TRACKING SETUP
 # pk = ORDER PK
