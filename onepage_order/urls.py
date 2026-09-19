@@ -44,21 +44,21 @@ urlpatterns = [
     ),
 
     path(
-        "payments/",
+        "payment-report/",
         views.payment_report,
-        name="payment_report",
+        name="onepageorder_payment_report",
     ),
 
     path(
-        "payments/pdf/",
+        "payment-report/pdf/",
         views.payment_report_pdf,
-        name="payment_report_pdf",
+        name="onepageorder_payment_report_pdf",
     ),
 
     path(
-        "payments/excel/",
+        "payment-report/excel/",
         views.payment_report_excel,
-        name="payment_report_excel",
+        name="onepageorder_payment_report_excel",
     ),
 
 
