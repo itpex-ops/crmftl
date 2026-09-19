@@ -1,320 +1,1329 @@
 {% extends "layouts/base.html" %}
 {% load static %}
-{% block title %}Live Tracking{% endblock %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
-<div class="container-fluid mt-1">
-    <!-- Header -->
-    <div class="page-header d-flex justify-content-between align-items-center mb-4">
 
-        <div>
-            <h4>
-                <i class="bi bi-broadcast-pin text-primary me-2"></i>
-                Live Tracking
-            </h4>
-            <small class="text-muted">
-                Monitor all vehicles with SIM Tracking
-            </small>
+{% block title %}Live Tracking{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.tracking-page {
+    padding: 24px 28px 40px;
+    background: #f6f8fb;
+    min-height: calc(100vh - 64px);
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.tracking-header {
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-shadow: 0 3px 12px rgba(30, 41, 59, 0.05);
+}
+
+.tracking-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tracking-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eef5ff;
+    color: #2563eb;
+
+    font-size: 23px;
+}
+
+.tracking-title {
+    margin: 0;
+    color: #172033;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.tracking-subtitle {
+    margin: 3px 0 0;
+    color: #7b8494;
+    font-size: 13px;
+}
+
+.dashboard-btn {
+    border: none;
+    background: #2563eb;
+    color: #fff;
+
+    padding: 10px 17px;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.dashboard-btn:hover {
+    background: #1d4ed8;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.tracking-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 12px;
+
+    padding: 16px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.04);
+}
+
+.summary-left small {
+    display: block;
+    color: #8992a2;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.summary-left strong {
+    color: #172033;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.summary-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 9px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.summary-card.live .summary-icon {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.summary-card.history .summary-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.summary-card.disabled .summary-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-card {
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 12px;
+
+    padding: 15px;
+
+    margin-bottom: 18px;
+
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.04);
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    max-width: 760px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: #9aa3b2;
+    font-size: 15px;
+}
+
+.search-input {
+    width: 100%;
+    height: 42px;
+
+    border: 1px solid #dce2ea;
+    border-radius: 8px;
+
+    padding: 0 14px 0 40px;
+
+    font-size: 13px;
+    color: #263246;
+
+    outline: none;
+    transition: .2s ease;
+}
+
+.search-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+.search-btn {
+    height: 42px;
+    min-width: 105px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition: .2s ease;
+}
+
+.search-btn:hover {
+    background: #1d4ed8;
+}
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.tracking-table-card {
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 12px rgba(30, 41, 59, 0.05);
+}
+
+.table-top {
+    padding: 16px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+.table-heading {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #172033;
+}
+
+.table-count {
+    font-size: 12px;
+    color: #8992a2;
+}
+
+/* =========================================================
+   MAIN TABLE
+========================================================= */
+
+.tracking-table {
+    width: 100%;
+    margin: 0;
+
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tracking-table thead th {
+    background: #f8fafc;
+
+    color: #667085;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: .35px;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #e8ecf1;
+
+    white-space: nowrap;
+}
+
+.tracking-table tbody td {
+    padding: 13px 14px;
+
+    color: #475467;
+
+    font-size: 12px;
+
+    border-bottom: 1px solid #eef1f4;
+
+    vertical-align: middle;
+}
+
+.tracking-table tbody tr.main-row {
+    transition: .15s ease;
+}
+
+.tracking-table tbody tr.main-row:hover {
+    background: #f9fbff;
+}
+
+.tracking-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================================================
+   TRIP
+========================================================= */
+
+.trip-number {
+    color: #172033;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.vehicle-number {
+    color: #344054;
+    font-weight: 500;
+}
+
+.driver-number {
+    color: #667085;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.status-badge.live {
+    background: #ecfdf3;
+    color: #087443;
+}
+
+.status-badge.live::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.status-badge.unknown {
+    background: #f2f4f7;
+    color: #667085;
+}
+
+.status-badge.disabled {
+    background: #fff7e6;
+    color: #b54708;
+}
+
+.status-badge.stopped {
+    background: #fef3f2;
+    color: #b42318;
+}
+
+.status-badge.waiting {
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+/* =========================================================
+   LOCATION
+========================================================= */
+
+.location-cell {
+    max-width: 310px;
+}
+
+.location-text {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #475467;
+}
+
+.location-text i {
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.no-location {
+    color: #98a2b3;
+}
+
+.updated-text {
+    color: #667085;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.action-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 7px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    transition: .18s ease;
+}
+
+.action-btn.live-btn {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.action-btn.live-btn:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.action-btn.history-btn {
+    background: #f2f4f7;
+    color: #667085;
+}
+
+.action-btn.history-btn:hover {
+    background: #475467;
+    color: #fff;
+}
+
+.action-btn.disabled-btn {
+    background: #f2f4f7;
+    color: #98a2b3;
+}
+
+/* =========================================================
+   INLINE HISTORY
+========================================================= */
+
+.history-row td {
+    background: #f8fafc;
+    padding: 0 !important;
+}
+
+.history-wrapper {
+    padding: 15px 20px 18px 55px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.history-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    margin-bottom: 10px;
+}
+
+.history-title i {
+    color: #2563eb;
+}
+
+.history-table {
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.history-table th {
+    background: #f9fafb;
+
+    color: #667085;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    padding: 9px 10px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.history-table td {
+    color: #475467;
+
+    font-size: 11px;
+
+    padding: 9px 10px;
+
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.history-status {
+    font-size: 10px;
+    font-weight: 600;
+
+    padding: 4px 7px;
+
+    border-radius: 12px;
+
+    background: #ecfdf3;
+    color: #087443;
+}
+
+.no-history {
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px dashed #d0d5dd;
+    border-radius: 8px;
+
+    text-align: center;
+
+    color: #98a2b3;
+    font-size: 12px;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-state {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 50%;
+
+    background: #f2f4f7;
+    color: #98a2b3;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 12px;
+
+    font-size: 22px;
+}
+
+.empty-state h6 {
+    color: #344054;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #98a2b3;
+    font-size: 12px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .tracking-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tracking-table-card {
+        overflow-x: auto;
+    }
+
+    .tracking-table {
+        min-width: 950px;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .tracking-page {
+        padding: 15px;
+    }
+
+    .tracking-header {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .tracking-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .search-form {
+        max-width: 100%;
+    }
+
+    .search-btn {
+        min-width: 85px;
+    }
+}
+
+</style>
+
+
+<div class="tracking-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="tracking-header">
+
+        <div class="tracking-header-left">
+
+            <div class="tracking-icon">
+                <i class="bi bi-broadcast-pin"></i>
+            </div>
+
+            <div>
+                <h1 class="tracking-title">
+                    Live Tracking
+                </h1>
+
+                <p class="tracking-subtitle">
+                    Monitor vehicle movements and location updates
+                </p>
+            </div>
+
         </div>
-        <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
+
+        <a
+            href="{% url 'live_tracking_dashboard' %}"
+            class="dashboard-btn"
+        >
             <i class="bi bi-speedometer2 me-1"></i>
             Dashboard
         </a>
-    </div>
-    <!-- Search -->
-    <div class="card shadow-sm mb-3">
-        <div class="card-body">
-            <form method="get">
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="text"
-                               class="form-control"
-                               name="q"
-                               placeholder="Search Trip / Vehicle / Driver"
-                               value="{{ request.GET.q }}">
-                    </div>
 
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100">
-                            <i class="bi bi-search"></i>
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </form>
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="tracking-summary">
+
+        <div class="summary-card">
+
+            <div class="summary-left">
+                <small>Total Trips</small>
+                <strong>{{ order|length }}</strong>
+            </div>
+
+            <div class="summary-icon">
+                <i class="bi bi-truck"></i>
+            </div>
+
         </div>
+
+
+        <div class="summary-card live">
+
+            <div class="summary-left">
+
+                <small>Live</small>
+
+                <strong>
+                    {% with live_count=0 %}
+                        {{ live_count }}
+                    {% endwith %}
+                </strong>
+
+            </div>
+
+            <div class="summary-icon">
+                <i class="bi bi-broadcast"></i>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card history">
+
+            <div class="summary-left">
+
+                <small>Location Updates</small>
+
+                <strong>
+                    <i class="bi bi-clock-history"
+                       style="font-size:18px;"></i>
+                </strong>
+
+            </div>
+
+            <div class="summary-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card disabled">
+
+            <div class="summary-left">
+
+                <small>Tracking</small>
+
+                <strong>
+                    <i class="bi bi-check-circle"
+                       style="font-size:18px;"></i>
+                </strong>
+
+            </div>
+
+            <div class="summary-icon">
+                <i class="bi bi-activity"></i>
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Table -->
-    <div class="card shadow-sm">
-        <div class="card-body table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="custom-table-head">
-                    <tr class="main-head-row">
-                        <th>#</th>
-                        <th>TRIP No</th>
-                        <th>Vehicle</th>
-                        <th>Driver</th>
-                        <th>Status</th>
-                        <th>Current Location</th>
-                        <th>Last Updated</th>
-                        <th width="220">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for o in order %}
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
+    <div class="search-card">
+
+        <form method="get" class="search-form">
+
+            <div class="search-input-wrapper">
+
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ q }}"
+                    class="search-input"
+                    placeholder="Search Trip No, Vehicle, Driver..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="search-btn"
+            >
+                <i class="bi bi-search me-1"></i>
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
+
+    <div class="tracking-table-card">
+
+        <div class="table-top">
+
+            <div>
+                <h5 class="table-heading">
+                    Vehicle Tracking
+                </h5>
+
+                <div class="table-count">
+                    Current tracking status and latest location
+                </div>
+            </div>
+
+            <div class="table-count">
+                {{ order|length }} trip{{ order|length|pluralize }}
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="tracking-table">
+
+                <thead>
+
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><strong>{{ o.trip_number }}</strong>
-</td>
-                        <td>{{ o.vehicle_number }}</td>
-                        <td>{{ o.driver_number }}</td>
-                        <!-- Status -->
-                       <td>
 
-{% if o.tracking_session %}
+                        <th style="width:45px;">
+                            #
+                        </th>
 
-    {% if o.tracking_session.status == "active" %}
-        <span class="badge bg-success">
-            <i class="bi bi-broadcast"></i> Live
-        </span>
+                        <th>
+                            Trip No
+                        </th>
 
-    {% elif o.tracking_session.location_status == "Not Retrieved" %}
-        <span class="badge bg-warning text-dark">
-            <i class="bi bi-hourglass-split"></i>
-            Waiting Location
-        </span>
+                        <th>
+                            Vehicle
+                        </th>
 
-    {% elif o.tracking_session.status == "pending" %}
-        <span class="badge bg-info">
-            <i class="bi bi-envelope"></i>
-            SMS Sent
-        </span>
+                        <th>
+                            Driver
+                        </th>
 
-    {% elif o.tracking_session.status == "error" %}
-        <span class="badge bg-danger">
-            <i class="bi bi-x-circle"></i>
-            Failed
-        </span>
+                        <th>
+                            Status
+                        </th>
 
-    {% elif o.tracking_session.status == "stopped" %}
-        <span class="badge bg-secondary">
-            Deleted
-        </span>
+                        <th>
+                            Current Location
+                        </th>
 
-    {% else %}
-        <span class="badge bg-dark">
-            Unknown
-        </span>
+                        <th>
+                            Last Updated
+                        </th>
 
-    {% endif %}
+                        <th class="text-center">
+                            Action
+                        </th>
 
-{% else %}
-
-<span class="badge bg-dark">
-    Not Enabled
-</span>
-
-{% endif %}
-
-</td>
-
-                        <!-- Location -->
-                        <td>
-                            {% if o.tracking_session %}
-                                {{ o.tracking_session.last_location|default:"--" }}
-                            {% else %}
-                                --
-                            {% endif %}
-                        </td>
-                        <!-- Last Updated -->
-                        <td>
-                            {% if o.tracking_session %}
-                                {{ o.tracking_session.last_updated|date:"d-m-Y H:i" }}
-                            {% else %}
-                                --
-                            {% endif %}
-                        </td>
-                        <!-- Actions -->
-                        <td class="text-nowrap">
-                            {% if not o.tracking_session %}
-                                <a href="{% url 'import_driver' o.id %}"
-                                   class="btn btn-primary btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   title="Import Driver">
-                                    <i class="bi bi-cloud-upload"></i>
-                                </a>
-                            {% else %}
-
-                                <a href="{% url 'onepageordervehicle_live' o.tracking_session.pk %}"
-                                   class="btn btn-info btn-sm"
-                                   data-bs-toggle="tooltip"
-                                   title="View Live">
-                                    <i class="bi bi-geo-alt-fill"></i>
-                                <!-- </a>
-                                <a href="{% url 'onepageordervehicle_live_history'  o.tracking_session.pk %}"
-                                class="btn btn-secondary btn-sm"
-                                data-bs-toggle="collapse"
-                                title="Location History"
-                                role="button"
-                                aria-expanded="false">
-                                    <i class="bi bi-clock-history"></i>
-                                </a> -->
-                                <a
-                                    href="#history{{ o.id }}"
-                                    class="btn btn-secondary btn-sm"
-                                    data-bs-toggle="collapse"
-                                    role="button"
-                                    aria-expanded="false"
-                                    aria-controls="history{{ o.id }}"
-                                    title="Location History">
-                                    <i class="bi bi-clock-history"></i>
-                                </a>
-
-                               {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
-
-                                <a href="{% url 'delete_tracking' o.tracking_session.id %}"
-                                class="btn btn-danger btn-sm"
-                                title="Delete Tracking"
-                                onclick="return confirm('Are you sure you want to delete this tracking?');">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                                {% endif %}
-                        </td>
                     </tr>
-                   {% if o.tracking_session %}
 
-<tr class="collapse" id="history{{ o.id }}">
+                </thead>
 
-    <td colspan="8" class="p-0">
 
-        <div class="history-wrapper">
+                <tbody>
 
-            {% if o.tracking_session.locations.exists %}
+                {% for o in order %}
 
-                <div class="table-responsive">
+                    <!-- =================================================
+                         MAIN ROW
+                    ================================================== -->
 
-                    <table class="table table-sm table-bordered mb-0 history-table">
+                    <tr class="main-row">
 
-                        <thead>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
 
-                            <tr>
 
-                                <th>#</th>
+                        <!-- TRIP NO -->
 
-                                <th>Date & Time</th>
+                        <td>
 
-                                <th>Latitude</th>
+                            <span class="trip-number">
+                                {{ o.trip_number|default:"-" }}
+                            </span>
 
-                                <th>Longitude</th>
+                        </td>
 
-                                <th>Location</th>
 
-                            </tr>
+                        <!-- VEHICLE -->
 
-                        </thead>
+                        <td>
 
-                        <tbody>
+                            <span class="vehicle-number">
+                                {{ o.vehicle_number|default:"-" }}
+                            </span>
 
-                            {% for loc in o.tracking_session.locations.all %}
+                        </td>
 
-                            <tr>
 
-                                <td>
-                                    {{ forloop.counter }}
-                                </td>
+                        <!-- DRIVER -->
 
-                                <td class="text-nowrap">
-                                    {{ loc.received_at|date:"d-m-Y H:i:s" }}
-                                </td>
+                        <td>
 
-                                <td>
-                                    {{ loc.latitude|default:"--" }}
-                                </td>
+                            <span class="driver-number">
+                                {{ o.driver_number|default:"-" }}
+                            </span>
 
-                                <td>
-                                    {{ loc.longitude|default:"--" }}
-                                </td>
+                        </td>
 
-                                <td>
 
-                                    {% if loc.location_name %}
+                        <!-- STATUS -->
 
-                                        {{ loc.location_name }}
+                        <td>
 
-                                    {% elif loc.address %}
+                            {% if not o.tracking_session %}
 
-                                        {{ loc.address }}
+                                <span class="status-badge disabled">
+                                    Not Enabled
+                                </span>
+
+                            {% elif not o.tracking_session.tracking_enabled %}
+
+                                <span class="status-badge disabled">
+                                    Not Enabled
+                                </span>
+
+                            {% elif o.tracking_session.status == "active" %}
+
+                                <span class="status-badge live">
+                                    Live
+                                </span>
+
+                            {% elif o.tracking_session.status == "consent_received" %}
+
+                                <span class="status-badge waiting">
+                                    Consent Received
+                                </span>
+
+                            {% elif o.tracking_session.status == "waiting_location" %}
+
+                                <span class="status-badge waiting">
+                                    Waiting
+                                </span>
+
+                            {% elif o.tracking_session.status == "sms_sent" %}
+
+                                <span class="status-badge waiting">
+                                    SMS Sent
+                                </span>
+
+                            {% elif o.tracking_session.status == "paused" %}
+
+                                <span class="status-badge unknown">
+                                    Paused
+                                </span>
+
+                            {% elif o.tracking_session.status == "stopped" %}
+
+                                <span class="status-badge stopped">
+                                    Stopped
+                                </span>
+
+                            {% elif o.tracking_session.status == "deleted" %}
+
+                                <span class="status-badge stopped">
+                                    Deleted
+                                </span>
+
+                            {% elif o.tracking_session.status == "error" %}
+
+                                <span class="status-badge stopped">
+                                    Error
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge unknown">
+                                    Unknown
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CURRENT LOCATION -->
+
+                        <td class="location-cell">
+
+                            {% if o.tracking_session and o.tracking_session.last_location %}
+
+                                <div class="location-text">
+
+                                    <i class="bi bi-geo-alt-fill"></i>
+
+                                    <span>
+                                        {{ o.tracking_session.last_location }}
+                                    </span>
+
+                                </div>
+
+                            {% elif o.tracking_session and o.tracking_session.latitude %}
+
+                                <div class="location-text">
+
+                                    <i class="bi bi-geo-alt-fill"></i>
+
+                                    <span>
+                                        {{ o.tracking_session.latitude }},
+                                        {{ o.tracking_session.longitude }}
+                                    </span>
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="no-location">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- LAST UPDATED -->
+
+                        <td>
+
+                            {% if o.tracking_session and o.tracking_session.last_updated %}
+
+                                <span class="updated-text">
+
+                                    {{ o.tracking_session.last_updated|date:"d-m-Y H:i" }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="no-location">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <div class="action-group">
+
+                                {% if o.tracking_session %}
+
+                                    <!-- LIVE LOCATION -->
+
+                                    <a
+                                        href="{% url 'onepageordervehicle_live' o.tracking_session.pk %}"
+                                        class="action-btn live-btn"
+                                        title="View Live Location"
+                                    >
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </a>
+
+
+                                    <!-- HISTORY -->
+
+                                    <a
+                                        href="#history{{ o.id }}"
+                                        class="action-btn history-btn"
+                                        data-bs-toggle="collapse"
+                                        role="button"
+                                        aria-expanded="false"
+                                        aria-controls="history{{ o.id }}"
+                                        title="Location History"
+                                    >
+                                        <i class="bi bi-clock-history"></i>
+                                    </a>
+
+                                {% else %}
+
+                                    <span
+                                        class="action-btn disabled-btn"
+                                        title="Tracking not enabled"
+                                    >
+                                        <i class="bi bi-cloud-slash"></i>
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- =================================================
+                         INLINE LOCATION HISTORY
+                    ================================================== -->
+
+                    {% if o.tracking_session %}
+
+                    <tr
+                        class="collapse history-row"
+                        id="history{{ o.id }}"
+                    >
+
+                        <td colspan="8">
+
+                            <div class="history-wrapper">
+
+                                <div class="history-title">
+
+                                    <i class="bi bi-clock-history"></i>
+
+                                    Location History —
+                                    <strong>
+                                        {{ o.trip_number }}
+                                    </strong>
+
+                                </div>
+
+
+                                {% with history=o.tracking_session.tracking_history %}
+
+                                    {% if history %}
+
+                                    <div class="table-responsive">
+
+                                        <table class="history-table w-100">
+
+                                            <thead>
+
+                                                <tr>
+
+                                                    <th style="width:50px;">
+                                                        #
+                                                    </th>
+
+                                                    <th>
+                                                        Date & Time
+                                                    </th>
+
+                                                    <th>
+                                                        Latitude
+                                                    </th>
+
+                                                    <th>
+                                                        Longitude
+                                                    </th>
+
+                                                    <th>
+                                                        Location
+                                                    </th>
+
+                                                    <th>
+                                                        Status
+                                                    </th>
+
+                                                </tr>
+
+                                            </thead>
+
+
+                                            <tbody>
+
+                                            {% for loc in history %}
+
+                                                <tr>
+
+                                                    <td>
+                                                        {{ forloop.counter }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ loc.received_at|date:"d-m-Y H:i:s" }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ loc.latitude|default:"-" }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ loc.longitude|default:"-" }}
+                                                    </td>
+
+                                                    <td>
+
+                                                        {% if loc.location_name %}
+
+                                                            {{ loc.location_name }}
+
+                                                        {% elif loc.address %}
+
+                                                            {{ loc.address }}
+
+                                                        {% else %}
+
+                                                            <span class="no-location">
+                                                                Location unavailable
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        {% if loc.tracked %}
+
+                                                            <span class="history-status">
+                                                                Tracked
+                                                            </span>
+
+                                                        {% else %}
+
+                                                            <span class="no-location">
+                                                                Not Tracked
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                </tr>
+
+                                            {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
 
                                     {% else %}
 
-                                        <span class="text-muted">
-                                            Location not available
-                                        </span>
+                                        <div class="no-history">
+
+                                            <i class="bi bi-clock-history me-1"></i>
+
+                                            No location history available for
+                                            <strong>{{ o.trip_number }}</strong>.
+
+                                        </div>
 
                                     {% endif %}
 
-                                </td>
+                                {% endwith %}
 
-                            </tr>
+                            </div>
 
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            {% else %}
-
-                <div class="history-empty">
-
-                    <i class="bi bi-geo-alt fs-3"></i>
-
-                    <div class="mt-2">
-                        No location history available.
-                    </div>
-
-                </div>
-
-            {% endif %}
-
-        </div>
-
-    </td>
-
-</tr>
-
-{% endif %}
-                    {% endif %}
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-5">
-                            <i class="bi bi-broadcast-pin fs-1"></i>
-                            <br><br>
-                            No Assigned Vehicles Found.
                         </td>
+
                     </tr>
-                    {% endfor %}
+
+                    {% endif %}
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="8">
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+
+                                <h6>
+                                    No trips found
+                                </h6>
+
+                                <p>
+                                    Try searching with another Trip No,
+                                    vehicle number or driver number.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const tooltipTriggerList = [].slice.call(
-        document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
-    tooltipTriggerList.forEach(function (el) {
-        new bootstrap.Tooltip(el, {
-            delay: { show: 200, hide: 50 }
-        });
-    });
-
-});
-</script>
 
 {% endblock %}
