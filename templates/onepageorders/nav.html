@@ -36,7 +36,9 @@
         aria-expanded="false"
         aria-label="Toggle navigation"
     >
+
         <span class="navbar-toggler-icon"></span>
+
     </button>
 
 
@@ -51,58 +53,99 @@
 
         <div class="navbar-nav ms-auto">
 
-            <!-- ORDERS -->
+            <!-- =================================================
+                 ORDERS
+                 ================================================= -->
 
             <a
-                class="nav-link"
+                class="nav-link {% if request.resolver_match.url_name == 'onepageorder_list' %}active{% endif %}"
                 href="{% url 'onepageorder_list' %}"
             >
+
                 <i class="bi bi-box-seam me-1"></i>
+
                 Orders
+
             </a>
 
 
-            <!-- VEHICLE PAYMENTS -->
+            <!-- =================================================
+                 LIVE TRACKING
+                 ================================================= -->
 
             <a
-                class="nav-link"
+                class="nav-link {% if request.resolver_match.url_name == 'tracking-list' %}active{% endif %}"
+                href="{% url 'tracking-list' %}"
+            >
+
+                <i class="bi bi-broadcast-pin me-1"></i>
+
+                Live Tracking
+
+            </a>
+
+
+            <!-- =================================================
+                 VEHICLE PAYMENTS
+                 ================================================= -->
+
+            <a
+                class="nav-link {% if request.resolver_match.url_name == 'vehicle_payments' %}active{% endif %}"
                 href="{% url 'vehicle_payments' %}"
             >
+
                 <i class="bi bi-truck me-1"></i>
+
                 Vehicle Payments
+
             </a>
 
 
-            <!-- CUSTOMER PAYMENTS -->
+            <!-- =================================================
+                 CUSTOMER PAYMENTS
+                 ================================================= -->
 
             <a
-                class="nav-link"
+                class="nav-link {% if request.resolver_match.url_name == 'customer_payments' %}active{% endif %}"
                 href="{% url 'customer_payments' %}"
             >
+
                 <i class="bi bi-person-lines-fill me-1"></i>
+
                 Customer Payments
+
             </a>
 
 
-            <!-- ADMIN MARGIN -->
+            <!-- =================================================
+                 ADMIN MARGIN
+                 ================================================= -->
 
             <a
-                class="nav-link"
+                class="nav-link {% if request.resolver_match.url_name == 'admin_margin' %}active{% endif %}"
                 href="{% url 'admin_margin' %}"
             >
+
                 <i class="bi bi-graph-up-arrow me-1"></i>
+
                 Admin Margin
+
             </a>
 
 
-            <!-- REPORTS -->
+            <!-- =================================================
+                 REPORTS
+                 ================================================= -->
 
             <a
                 class="nav-link"
                 href="#"
             >
+
                 <i class="bi bi-bar-chart-line me-1"></i>
+
                 Reports
+
             </a>
 
         </div>
@@ -121,13 +164,16 @@
    ========================================================= */
 
 .navbar {
+
     background: #ffffff;
 
     border-bottom: 1px solid #e9ecef;
 
     min-height: 64px;
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04);
+
 }
 
 
@@ -148,10 +194,13 @@
     text-decoration: none;
 
     margin-right: 25px;
+
 }
 
 .navbar-brand:hover {
+
     color: #654321;
+
 }
 
 
@@ -166,6 +215,7 @@
     align-items: center;
 
     gap: 5px;
+
 }
 
 
@@ -195,6 +245,7 @@
         background 0.2s ease,
         color 0.2s ease,
         transform 0.2s ease;
+
 }
 
 
@@ -216,6 +267,7 @@
     color: #654321 !important;
 
     transform: translateY(-1px);
+
 }
 
 
@@ -230,6 +282,14 @@
     color: #212529 !important;
 
     font-weight: 600;
+
+}
+
+
+.nav-link.active i {
+
+    color: #212529;
+
 }
 
 
@@ -244,12 +304,15 @@
     border-radius: 6px;
 
     padding: 6px 9px;
+
 }
+
 
 .navbar-toggler:focus {
 
     box-shadow:
         0 0 0 3px rgba(253, 184, 27, 0.15);
+
 }
 
 
@@ -268,7 +331,9 @@
         gap: 2px;
 
         padding-top: 10px;
+
     }
+
 
     .nav-link {
 
@@ -277,6 +342,7 @@
         justify-content: flex-start;
 
         padding: 10px 12px !important;
+
     }
 
 }
