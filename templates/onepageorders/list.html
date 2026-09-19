@@ -160,17 +160,15 @@
                                 aria-expanded="false">
                                     <i class="bi bi-clock-history"></i>
                                 </a> -->
-                                <a href="{% url 'onepageordervehicle_history' o.id }"
+                                <a href="{% url 'onepageordervehicle_history' o.tracking_session.id }"
                                     class="btn btn-secondary btn-sm"
                                     data-bs-toggle="collapse"
                                     role="button"
                                     aria-expanded="false"
                                     aria-controls="history{{ o.id }}"
                                     title="Location History">
-
                                         <i class="bi bi-clock-history"></i>
-
-                                    </a>
+                                </a>
 
                                {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
 
