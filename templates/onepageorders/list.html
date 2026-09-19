@@ -153,15 +153,15 @@
                                     <i class="bi bi-geo-alt-fill"></i>
                                 </a>
                                
-                                <!-- <a href="{% url 'onepageordervehicle_tracking_history'  o.tracking_session.pk %}"
+                                <a href="{% url 'onepageordervehicle_tracking_history'  o.tracking_session.pk %}"
                                 class="btn btn-secondary btn-sm"
                                 data-bs-toggle="collapse"
                                 title="Location History"
                                 role="button"
                                 aria-expanded="false">
                                     <i class="bi bi-clock-history"></i>
-                                </a> -->
-                                <a href="#history{{ o.id }}"
+                                </a>
+                                <!-- <a href="#history{{ o.id }}"
                                     class="btn btn-secondary btn-sm"
                                     data-bs-toggle="collapse"
                                     role="button"
@@ -171,7 +171,7 @@
 
                                         <i class="bi bi-clock-history"></i>
 
-                                    </a>
+                                    </a> -->
 
                                {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
 
