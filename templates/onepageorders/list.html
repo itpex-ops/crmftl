@@ -1,375 +1,167 @@
 {% extends "layouts/base.html" %}
 {% load static %}
-
 {% block title %}Live Tracking{% endblock %}
-
 {% block content %}
-
-<link rel="stylesheet"
-      href="{% static 'assets/common/css/common.css' %}">
-
+<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
 <div class="container-fluid mt-1">
-
-    <!-- =========================================================
-         HEADER
-    ========================================================== -->
-
+    <!-- Header -->
     <div class="page-header d-flex justify-content-between align-items-center mb-4">
 
         <div>
-
             <h4>
                 <i class="bi bi-broadcast-pin text-primary me-2"></i>
                 Live Tracking
             </h4>
-
             <small class="text-muted">
                 Monitor all vehicles with SIM Tracking
             </small>
-
         </div>
-
-
-        <a href="{% url 'live_tracking_dashboard' %}"
-           class="btn btn-primary">
-
+        <a href="{% url 'live_tracking_dashboard' %}" class="btn btn-primary">
             <i class="bi bi-speedometer2 me-1"></i>
             Dashboard
-
         </a>
-
     </div>
-
-
-    <!-- =========================================================
-         SEARCH
-    ========================================================== -->
-
+    <!-- Search -->
     <div class="card shadow-sm mb-3">
-
         <div class="card-body">
-
             <form method="get">
-
-                <div class="row g-2">
-
+                <div class="row">
                     <div class="col-md-4">
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="q"
-                            placeholder="Search Trip / Vehicle / Driver"
-                            value="{{ request.GET.q }}"
-                        >
-
+                        <input type="text"
+                               class="form-control"
+                               name="q"
+                               placeholder="Search Trip / Vehicle / Driver"
+                               value="{{ request.GET.q }}">
                     </div>
-
 
                     <div class="col-md-2">
-
-                        <button
-                            type="submit"
-                            class="btn btn-primary w-100">
-
-                            <i class="bi bi-search me-1"></i>
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i>
                             Search
-
                         </button>
-
                     </div>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-
-    <!-- =========================================================
-         TRACKING TABLE
-    ========================================================== -->
-
+    <!-- Table -->
     <div class="card shadow-sm">
-
         <div class="card-body table-responsive">
-
             <table class="table table-hover align-middle">
-
                 <thead class="custom-table-head">
-
                     <tr class="main-head-row">
-
                         <th>#</th>
-
-                        <th>Trip No</th>
-
+                        <th>TRIP No</th>
                         <th>Vehicle</th>
-
                         <th>Driver</th>
-
                         <th>Status</th>
-
                         <th>Current Location</th>
-
                         <th>Last Updated</th>
-
                         <th width="220">Action</th>
-
                     </tr>
-
                 </thead>
-
-
                 <tbody>
-
-                    {% for o in orders %}
-
-                    <!-- =================================================
-                         MAIN TRIP ROW
-                    ================================================== -->
-
+                    {% for o in order %}
                     <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ o.trip_number }}</strong>
+</td>
+                        <td>{{ o.vehicle_number }}</td>
+                        <td>{{ o.driver_number }}</td>
+                        <!-- Status -->
+                       <td>
 
-                        <!-- # -->
+{% if o.tracking_session %}
 
+    {% if o.tracking_session.status == "active" %}
+        <span class="badge bg-success">
+            <i class="bi bi-broadcast"></i> Live
+        </span>
+
+    {% elif o.tracking_session.location_status == "Not Retrieved" %}
+        <span class="badge bg-warning text-dark">
+            <i class="bi bi-hourglass-split"></i>
+            Waiting Location
+        </span>
+
+    {% elif o.tracking_session.status == "pending" %}
+        <span class="badge bg-info">
+            <i class="bi bi-envelope"></i>
+            SMS Sent
+        </span>
+
+    {% elif o.tracking_session.status == "error" %}
+        <span class="badge bg-danger">
+            <i class="bi bi-x-circle"></i>
+            Failed
+        </span>
+
+    {% elif o.tracking_session.status == "stopped" %}
+        <span class="badge bg-secondary">
+            Deleted
+        </span>
+
+    {% else %}
+        <span class="badge bg-dark">
+            Unknown
+        </span>
+
+    {% endif %}
+
+{% else %}
+
+<span class="badge bg-dark">
+    Not Enabled
+</span>
+
+{% endif %}
+
+</td>
+
+                        <!-- Location -->
                         <td>
-                            {{ forloop.counter }}
-                        </td>
-
-
-                        <!-- TRIP NO -->
-
-                        <td>
-
-                            <strong>
-                                {{ o.trip_number }}
-                            </strong>
-
-                        </td>
-
-
-                        <!-- VEHICLE -->
-
-                        <td>
-                            {{ o.vehicle_number|default:"--" }}
-                        </td>
-
-
-                        <!-- DRIVER -->
-
-                        <td>
-                            {{ o.driver_number|default:"--" }}
-                        </td>
-
-
-                        <!-- =================================================
-                             STATUS
-                        ================================================== -->
-
-                        <td>
-
                             {% if o.tracking_session %}
-
-                                {% if o.tracking_session.status == "active" %}
-
-                                    <span class="badge bg-success">
-
-                                        <i class="bi bi-broadcast me-1"></i>
-                                        Live
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "waiting_location" %}
-
-                                    <span class="badge bg-warning text-dark">
-
-                                        <i class="bi bi-hourglass-split me-1"></i>
-                                        Waiting Location
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "sms_sent" %}
-
-                                    <span class="badge bg-info">
-
-                                        <i class="bi bi-envelope me-1"></i>
-                                        SMS Sent
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "consent_received" %}
-
-                                    <span class="badge bg-primary">
-
-                                        <i class="bi bi-check-circle me-1"></i>
-                                        Consent Received
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "error" %}
-
-                                    <span class="badge bg-danger">
-
-                                        <i class="bi bi-x-circle me-1"></i>
-                                        Failed
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "stopped" %}
-
-                                    <span class="badge bg-secondary">
-
-                                        <i class="bi bi-stop-circle me-1"></i>
-                                        Stopped
-
-                                    </span>
-
-
-                                {% elif o.tracking_session.status == "deleted" %}
-
-                                    <span class="badge bg-dark">
-
-                                        <i class="bi bi-trash me-1"></i>
-                                        Deleted
-
-                                    </span>
-
-
-                                {% else %}
-
-                                    <span class="badge bg-secondary">
-
-                                        {{ o.tracking_session.get_status_display }}
-
-                                    </span>
-
-                                {% endif %}
-
+                                {{ o.tracking_session.last_location|default:"--" }}
                             {% else %}
-
-                                <span class="badge bg-dark">
-
-                                    <i class="bi bi-dash-circle me-1"></i>
-                                    Not Enabled
-
-                                </span>
-
+                                --
                             {% endif %}
-
                         </td>
-
-
-                        <!-- =================================================
-                             CURRENT LOCATION
-                        ================================================== -->
-
+                        <!-- Last Updated -->
                         <td>
-
                             {% if o.tracking_session %}
-
-                                {% if o.tracking_session.last_location %}
-
-                                    {{ o.tracking_session.last_location }}
-
-                                {% else %}
-
-                                    <span class="text-muted">
-                                        --
-                                    </span>
-
-                                {% endif %}
-
+                                {{ o.tracking_session.last_updated|date:"d-m-Y H:i" }}
                             {% else %}
-
-                                <span class="text-muted">
-                                    --
-                                </span>
-
+                                --
                             {% endif %}
-
                         </td>
-
-
-                        <!-- =================================================
-                             LAST UPDATED
-                        ================================================== -->
-
-                        <td>
-
-                            {% if o.tracking_session %}
-
-                                {% if o.tracking_session.last_updated %}
-
-                                    {{ o.tracking_session.last_updated|date:"d-m-Y H:i" }}
-
-                                {% else %}
-
-                                    <span class="text-muted">
-                                        --
-                                    </span>
-
-                                {% endif %}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    --
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- =================================================
-                             ACTIONS
-                        ================================================== -->
-
+                        <!-- Actions -->
                         <td class="text-nowrap">
-
                             {% if not o.tracking_session %}
-
-                                <!-- IMPORT DRIVER -->
-
-                                <a
-                                    href="{% url 'import_driver' o.id %}"
-                                    class="btn btn-primary btn-sm"
-                                    data-bs-toggle="tooltip"
-                                    title="Import Driver">
-
+                                <a href="{% url 'import_driver' o.id %}"
+                                   class="btn btn-primary btn-sm"
+                                   data-bs-toggle="tooltip"
+                                   title="Import Driver">
                                     <i class="bi bi-cloud-upload"></i>
-
                                 </a>
-
                             {% else %}
 
-                                <!-- VIEW LIVE -->
-
-                                <a
-                                    href="{% url 'onepageordervehicle_live' o.tracking_session.pk %}"
-                                    class="btn btn-info btn-sm"
-                                    data-bs-toggle="tooltip"
-                                    title="View Live">
-
+                                <a href="{% url 'onepageordervehicle_live' o.tracking_session.pk %}"
+                                   class="btn btn-info btn-sm"
+                                   data-bs-toggle="tooltip"
+                                   title="View Live">
                                     <i class="bi bi-geo-alt-fill"></i>
-
                                 </a>
-
-
-                                <!-- =================================================
-                                     LOCATION HISTORY
-                                ================================================== -->
-
-                                <a
-                                    href="#history{{ o.id }}"
+                               
+                                <!-- <a href="{% url 'onepageordervehicle_tracking_history'  o.tracking_session.pk %}"
+                                class="btn btn-secondary btn-sm"
+                                data-bs-toggle="collapse"
+                                title="Location History"
+                                role="button"
+                                aria-expanded="false">
+                                    <i class="bi bi-clock-history"></i>
+                                </a> -->
+                                <a href="#history{{ o.id }}"
                                     class="btn btn-secondary btn-sm"
                                     data-bs-toggle="collapse"
                                     role="button"
@@ -377,315 +169,154 @@
                                     aria-controls="history{{ o.id }}"
                                     title="Location History">
 
-                                    <i class="bi bi-clock-history"></i>
-
-                                </a>
-
-
-                                <!-- =================================================
-                                     DELETE TRACKING
-                                ================================================== -->
-
-                                {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
-
-                                    <a
-                                        href="{% url 'delete_tracking' o.tracking_session.id %}"
-                                        class="btn btn-danger btn-sm"
-                                        title="Delete Tracking"
-                                        onclick="return confirm('Are you sure you want to delete this tracking?');">
-
-                                        <i class="bi bi-trash"></i>
+                                        <i class="bi bi-clock-history"></i>
 
                                     </a>
 
+                               {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
+
+                                <a href="{% url 'delete_tracking' o.tracking_session.id %}"
+                                class="btn btn-danger btn-sm"
+                                title="Delete Tracking"
+                                onclick="return confirm('Are you sure you want to delete this tracking?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                                 {% endif %}
-
-                            {% endif %}
-
                         </td>
-
                     </tr>
+                   {% if o.tracking_session %}
 
+<tr class="collapse" id="history{{ o.id }}">
 
-                    <!-- =========================================================
-                         INLINE LOCATION HISTORY
-                    ========================================================== -->
+    <td colspan="8" class="p-0">
 
-                    {% if o.tracking_session %}
+        <div class="history-wrapper">
 
-                    <tr
-                        class="collapse"
-                        id="history{{ o.id }}">
+            {% if o.tracking_session.locations.exists %}
 
-                        <td colspan="8" class="p-0">
+                <div class="table-responsive">
 
-                            <div class="history-wrapper">
+                    <table class="table table-sm table-bordered mb-0 history-table">
 
-                                {% if o.tracking_session.locations.exists %}
+                        <thead>
 
-                                    <div class="table-responsive">
+                            <tr>
 
-                                        <table class="table table-sm table-bordered mb-0 history-table">
+                                <th>#</th>
 
-                                            <thead>
+                                <th>Date & Time</th>
 
-                                                <tr>
+                                <th>Latitude</th>
 
-                                                    <th>#</th>
+                                <th>Longitude</th>
 
-                                                    <th>Date & Time</th>
+                                <th>Location</th>
 
-                                                    <th>Latitude</th>
+                            </tr>
 
-                                                    <th>Longitude</th>
+                        </thead>
 
-                                                    <th>Location</th>
+                        <tbody>
 
-                                                </tr>
+                            {% for loc in o.tracking_session.locations.all %}
 
-                                            </thead>
+                            <tr>
 
+                                <td>
+                                    {{ forloop.counter }}
+                                </td>
 
-                                            <tbody>
+                                <td class="text-nowrap">
+                                    {{ loc.received_at|date:"d-m-Y H:i:s" }}
+                                </td>
 
-                                                {% for loc in o.tracking_session.locations.all %}
+                                <td>
+                                    {{ loc.latitude|default:"--" }}
+                                </td>
 
-                                                <tr>
+                                <td>
+                                    {{ loc.longitude|default:"--" }}
+                                </td>
 
-                                                    <td>
-                                                        {{ forloop.counter }}
-                                                    </td>
+                                <td>
 
+                                    {% if loc.location_name %}
 
-                                                    <td class="text-nowrap">
+                                        {{ loc.location_name }}
 
-                                                        {{ loc.received_at|date:"d-m-Y H:i:s" }}
+                                    {% elif loc.address %}
 
-                                                    </td>
+                                        {{ loc.address }}
 
+                                    {% else %}
 
-                                                    <td>
+                                        <span class="text-muted">
+                                            Location not available
+                                        </span>
 
-                                                        {% if loc.latitude %}
-                                                            {{ loc.latitude }}
-                                                        {% else %}
-                                                            --
-                                                        {% endif %}
+                                    {% endif %}
 
-                                                    </td>
+                                </td>
 
+                            </tr>
 
-                                                    <td>
+                            {% endfor %}
 
-                                                        {% if loc.longitude %}
-                                                            {{ loc.longitude }}
-                                                        {% else %}
-                                                            --
-                                                        {% endif %}
+                        </tbody>
 
-                                                    </td>
+                    </table>
 
+                </div>
 
-                                                    <td>
+            {% else %}
 
-                                                        {% if loc.location_name %}
+                <div class="history-empty">
 
-                                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                    <i class="bi bi-geo-alt fs-3"></i>
 
-                                                            {{ loc.location_name }}
+                    <div class="mt-2">
+                        No location history available.
+                    </div>
 
-                                                        {% elif loc.address %}
+                </div>
 
-                                                            <i class="bi bi-geo-alt text-primary me-1"></i>
-
-                                                            {{ loc.address }}
-
-                                                        {% else %}
-
-                                                            <span class="text-muted">
-                                                                Location not available
-                                                            </span>
-
-                                                        {% endif %}
-
-                                                    </td>
-
-                                                </tr>
-
-                                                {% endfor %}
-
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-
-                                {% else %}
-
-                                    <div class="history-empty">
-
-                                        <i class="bi bi-geo-alt fs-3"></i>
-
-                                        <div class="mt-2">
-
-                                            No location history available.
-
-                                        </div>
-
-                                    </div>
-
-                                {% endif %}
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                    {% endif %}
-
-
-                    {% empty %}
-
-                    <!-- =========================================================
-                         NO RECORDS
-                    ========================================================== -->
-
-                    <tr>
-
-                        <td
-                            colspan="8"
-                            class="text-center text-muted py-5">
-
-                            <i class="bi bi-broadcast-pin fs-1"></i>
-
-                            <br><br>
-
-                            No Trips Found.
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
+            {% endif %}
 
         </div>
 
-    </div>
+    </td>
 
+</tr>
+
+{% endif %}
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="bi bi-broadcast-pin fs-1"></i>
+                            <br><br>
+                            No Assigned Vehicles Found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-
-<!-- =========================================================
-     HISTORY CSS
-========================================================== -->
-
-<style>
-
-.history-wrapper {
-
-    background: #ffffff;
-
-    padding: 0 10px 10px 10px;
-
-    border-left: 3px solid #FDB81B;
-
-    border-right: 3px solid #FDB81B;
-
-    border-bottom: 3px solid #FDB81B;
-
-}
-
-
-.history-table {
-
-    margin: 0 !important;
-
-    font-size: 12px;
-
-}
-
-
-.history-table thead th {
-
-    background: #f8f9fa;
-
-    color: #495057;
-
-    font-weight: 600;
-
-    white-space: nowrap;
-
-    padding: 8px 10px;
-
-}
-
-
-.history-table tbody td {
-
-    padding: 7px 10px;
-
-    vertical-align: middle;
-
-}
-
-
-.history-table tbody tr:hover {
-
-    background: #fff8e6;
-
-}
-
-
-.history-empty {
-
-    text-align: center;
-
-    padding: 30px;
-
-    color: #6c757d;
-
-    background: #fafafa;
-
-}
-
-</style>
-
-
-<!-- =========================================================
-     TOOLTIPS
-========================================================== -->
-
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
-
-    const tooltipTriggerList =
-        [].slice.call(
-            document.querySelectorAll(
-                '[data-bs-toggle="tooltip"]'
-            )
-        );
-
+    const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
     tooltipTriggerList.forEach(function (el) {
-
         new bootstrap.Tooltip(el, {
-
-            delay: {
-                show: 200,
-                hide: 50
-            }
-
+            delay: { show: 200, hide: 50 }
         });
-
     });
 
 });
-
 </script>
 
 {% endblock %}
