@@ -739,17 +739,13 @@
         </div>
 
 
-        <a
-            href="#"
-            class="export-btn"
-            onclick="window.print(); return false;"
-        >
-
-            <i class="bi bi-printer"></i>
-
-            Print Report
-
-        </a>
+      <a
+    href="{% url 'payment_report_pdf' %}?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&from_date={{ from_date|urlencode }}&to_date={{ to_date|urlencode }}"
+    class="export-btn"
+>
+    <i class="bi bi-file-earmark-pdf me-1"></i>
+    Download PDF
+</a>
 
     </div>
 
