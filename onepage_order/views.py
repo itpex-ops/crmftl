@@ -2769,6 +2769,7 @@ def tracking_history(request, pk):
     session = get_object_or_404(
         TrackingSession.objects.select_related(
             "order",
+            "order__customer",
         ),
         pk=pk,
     )
@@ -2788,8 +2789,6 @@ def tracking_history(request, pk):
             "history": history,
         },
     )
-
-
 # =============================================================
 # REFRESH LOCATION
 # pk = TRACKING SESSION PK
