@@ -32,7 +32,7 @@ urlpatterns = [
     path('', lambda request: redirect('auth')),
     path('dashboards/',include('dashboards.urls')),
     path('live-tracking/',include('live_tracking.urls')),
-    #path("reports/",include("reports.urls"),),
+    path("reports/",include("reports.urls"),),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
