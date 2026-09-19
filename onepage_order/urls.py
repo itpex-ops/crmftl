@@ -43,7 +43,11 @@ urlpatterns = [
         name="onepageorder_detail",
     ),
 
-
+    path(
+        "reports/payments/",
+        views.payment_report,
+        name="payment_report",
+    ),
     # =========================================================
     # PAYMENTS
     # =========================================================

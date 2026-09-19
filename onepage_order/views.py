@@ -3024,3 +3024,454 @@ def api_token_status(request):
             "consent": consent,
         }
     )
+
+from decimal import Decimal
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import render
+
+from .models import Order
+
+
+@login_required
+def payment_report(request):
+
+    query = request.GET.get("q", "").strip()
+
+    status_filter = request.GET.get("status", "").strip().lower()
+
+    from_date = request.GET.get("from_date", "").strip()
+    to_date = request.GET.get("to_date", "").strip()
+
+    # =========================================================
+    # BASE ORDERS
+    # =========================================================
+
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .order_by("-id")
+    )
+
+    # =========================================================
+    # SEARCH
+    # =========================================================
+
+    if query:
+        orders = orders.filter(
+            Q(trip_number__icontains=query)
+            | Q(vehicle_number__icontains=query)
+            | Q(driver_number__icontains=query)
+            | Q(origin__icontains=query)
+            | Q(destination__icontains=query)
+            | Q(customer__name__icontains=query)
+        )
+
+    # =========================================================
+    # FIND DATE FIELD
+    # =========================================================
+
+    date_field = None
+
+    possible_date_fields = [
+        "vehicle_place_date",
+        "trip_date",
+        "order_date",
+        "created_at",
+    ]
+
+    existing_fields = {
+        field.name
+        for field in Order._meta.get_fields()
+    }
+
+    for field_name in possible_date_fields:
+        if field_name in existing_fields:
+            date_field = field_name
+            break
+
+    # =========================================================
+    # DATE FILTER
+    # =========================================================
+
+    if date_field:
+
+        if from_date:
+            orders = orders.filter(
+                **{
+                    f"{date_field}__date__gte": from_date
+                }
+            )
+
+        if to_date:
+            orders = orders.filter(
+                **{
+                    f"{date_field}__date__lte": to_date
+                }
+            )
+
+    # =========================================================
+    # REPORT DATA
+    # =========================================================
+
+    report_rows = []
+
+    total_billing = Decimal("0")
+    total_paid = Decimal("0")
+    total_advance = Decimal("0")
+    total_balance = Decimal("0")
+    total_recovery = Decimal("0")
+    total_outstanding = Decimal("0")
+
+    today = __import__("datetime").date.today()
+
+    for order in orders:
+
+        # -----------------------------------------------------
+        # CUSTOMER
+        # -----------------------------------------------------
+
+        customer_name = "-"
+
+        if getattr(order, "customer", None):
+            customer_name = getattr(
+                order.customer,
+                "name",
+                "-"
+            ) or "-"
+
+        # -----------------------------------------------------
+        # BILLING AMOUNT
+        # -----------------------------------------------------
+
+        billing_amount = (
+            getattr(order, "total_rate", None)
+            or getattr(order, "freight_amount", None)
+            or getattr(order, "finalized_rate", None)
+            or Decimal("0")
+        )
+
+        try:
+            billing_amount = Decimal(str(billing_amount))
+        except Exception:
+            billing_amount = Decimal("0")
+
+        # -----------------------------------------------------
+        # ADVANCE
+        # -----------------------------------------------------
+
+        advance = (
+            getattr(order, "advance", None)
+            or Decimal("0")
+        )
+
+        try:
+            advance = Decimal(str(advance))
+        except Exception:
+            advance = Decimal("0")
+
+        # -----------------------------------------------------
+        # BALANCE
+        # -----------------------------------------------------
+
+        balance_value = getattr(order, "balance", None)
+
+        if balance_value is None:
+
+            balance = billing_amount - advance
+
+        else:
+
+            try:
+                balance = Decimal(str(balance_value))
+            except Exception:
+                balance = billing_amount - advance
+
+        if balance < 0:
+            balance = Decimal("0")
+
+        # -----------------------------------------------------
+        # PAID AMOUNT
+        # -----------------------------------------------------
+
+        paid_amount = billing_amount - balance
+
+        if paid_amount < 0:
+            paid_amount = Decimal("0")
+
+        # -----------------------------------------------------
+        # PAID TO PARTY
+        #
+        # If your model has paid_to_party, it will be used.
+        # Otherwise vehicle/freight related value is checked.
+        # -----------------------------------------------------
+
+        paid_to_party = getattr(
+            order,
+            "paid_to_party",
+            None
+        )
+
+        if paid_to_party is None:
+
+            paid_to_party = (
+                getattr(order, "vehicle_paid", None)
+                or Decimal("0")
+            )
+
+        try:
+            paid_to_party = Decimal(str(paid_to_party))
+        except Exception:
+            paid_to_party = Decimal("0")
+
+        # -----------------------------------------------------
+        # RECOVERY AMOUNT
+        # -----------------------------------------------------
+
+        recovery_amount = getattr(
+            order,
+            "recovery_amount",
+            None
+        )
+
+        if recovery_amount is None:
+            recovery_amount = Decimal("0")
+
+        try:
+            recovery_amount = Decimal(
+                str(recovery_amount)
+            )
+        except Exception:
+            recovery_amount = Decimal("0")
+
+        # -----------------------------------------------------
+        # OUTSTANDING
+        # -----------------------------------------------------
+
+        outstanding_value = getattr(
+            order,
+            "outstanding",
+            None
+        )
+
+        if outstanding_value is None:
+
+            outstanding = balance - recovery_amount
+
+        else:
+
+            try:
+                outstanding = Decimal(
+                    str(outstanding_value)
+                )
+            except Exception:
+                outstanding = balance - recovery_amount
+
+        if outstanding < 0:
+            outstanding = Decimal("0")
+
+        # -----------------------------------------------------
+        # PROMISE DATE
+        # -----------------------------------------------------
+
+        promise_date = getattr(
+            order,
+            "promise_date",
+            None
+        )
+
+        # -----------------------------------------------------
+        # PAYMENT STATUS
+        # -----------------------------------------------------
+
+        if outstanding <= 0:
+
+            payment_status = "paid"
+
+        elif promise_date:
+
+            try:
+
+                promise_day = (
+                    promise_date.date()
+                    if hasattr(promise_date, "date")
+                    else promise_date
+                )
+
+                if promise_day < today:
+                    payment_status = "overdue"
+                else:
+                    payment_status = "promised"
+
+            except Exception:
+
+                payment_status = "due"
+
+        elif balance > 0:
+
+            payment_status = "due"
+
+        else:
+
+            payment_status = "paid"
+
+        # -----------------------------------------------------
+        # PAYMENT TERM
+        # -----------------------------------------------------
+
+        payment_terms = getattr(
+            order,
+            "payment_terms",
+            None
+        ) or "-"
+
+        # -----------------------------------------------------
+        # TRIP DATE
+        # -----------------------------------------------------
+
+        trip_date = None
+
+        if date_field:
+            trip_date = getattr(
+                order,
+                date_field,
+                None
+            )
+
+        # -----------------------------------------------------
+        # STATUS FILTER
+        # -----------------------------------------------------
+
+        if status_filter:
+
+            if status_filter != payment_status:
+                continue
+
+        # -----------------------------------------------------
+        # TOTALS
+        # -----------------------------------------------------
+
+        total_billing += billing_amount
+        total_paid += paid_amount
+        total_advance += advance
+        total_balance += balance
+        total_recovery += recovery_amount
+        total_outstanding += outstanding
+
+        # -----------------------------------------------------
+        # REPORT ROW
+        # -----------------------------------------------------
+
+        report_rows.append(
+            {
+                "id": order.pk,
+
+                "trip_number": (
+                    getattr(
+                        order,
+                        "trip_number",
+                        None
+                    ) or "-"
+                ),
+
+                "trip_date": trip_date,
+
+                "customer": customer_name,
+
+                "contact": (
+                    getattr(
+                        order,
+                        "customer_contact",
+                        None
+                    )
+                    or getattr(
+                        order.customer,
+                        "contact",
+                        None
+                    )
+                    if getattr(order, "customer", None)
+                    else "-"
+                ),
+
+                "billing_amount": billing_amount,
+
+                "paid_to_party": paid_to_party,
+
+                "paid_amount": paid_amount,
+
+                "advance": advance,
+
+                "balance": balance,
+
+                "recovery_amount": recovery_amount,
+
+                "outstanding": outstanding,
+
+                "promise_date": promise_date,
+
+                "payment_status": payment_status,
+
+                "payment_terms": payment_terms,
+            }
+        )
+
+    # =========================================================
+    # STATUS COUNTS
+    # =========================================================
+
+    overdue_count = sum(
+        1
+        for row in report_rows
+        if row["payment_status"] == "overdue"
+    )
+
+    due_count = sum(
+        1
+        for row in report_rows
+        if row["payment_status"] == "due"
+    )
+
+    promised_count = sum(
+        1
+        for row in report_rows
+        if row["payment_status"] == "promised"
+    )
+
+    paid_count = sum(
+        1
+        for row in report_rows
+        if row["payment_status"] == "paid"
+    )
+
+    # =========================================================
+    # CONTEXT
+    # =========================================================
+
+    context = {
+        "report_rows": report_rows,
+
+        "total_billing": total_billing,
+        "total_paid": total_paid,
+        "total_advance": total_advance,
+        "total_balance": total_balance,
+        "total_recovery": total_recovery,
+        "total_outstanding": total_outstanding,
+
+        "overdue_count": overdue_count,
+        "due_count": due_count,
+        "promised_count": promised_count,
+        "paid_count": paid_count,
+
+        "query": query,
+        "status_filter": status_filter,
+
+        "from_date": from_date,
+        "to_date": to_date,
+    }
+
+    return render(
+        request,
+        "reports/payment_report.html",
+        context
+    )
