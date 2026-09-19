@@ -3027,17 +3027,31 @@ def api_token_status(request):
 
 from decimal import Decimal
 from datetime import date
+import os
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from openpyxl import Workbook
+from openpyxl.styles import (
+    Font,
+    PatternFill,
+    Border,
+    Side,
+    Alignment,
+)
+from openpyxl.utils import get_column_letter
+
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
     SimpleDocTemplate,
     Table,
@@ -3049,18 +3063,113 @@ from reportlab.platypus import (
 from .models import Order
 
 
-@login_required
-def payment_report_pdf(request):
+# ============================================================
+# PDF FONT
+# ============================================================
 
-    query = request.GET.get("q", "").strip()
-    status_filter = request.GET.get("status", "").strip().lower()
+FONT_DIR = os.path.join(
+    settings.BASE_DIR,
+    "static",
+    "fonts",
+)
 
-    from_date = request.GET.get("from_date", "").strip()
-    to_date = request.GET.get("to_date", "").strip()
+DEJAVU_REGULAR = os.path.join(
+    FONT_DIR,
+    "DejaVuSans.ttf",
+)
 
-    # =========================================================
+DEJAVU_BOLD = os.path.join(
+    FONT_DIR,
+    "DejaVuSans-Bold.ttf",
+)
+
+if os.path.exists(DEJAVU_REGULAR):
+
+    try:
+        pdfmetrics.registerFont(
+            TTFont(
+                "DejaVu",
+                DEJAVU_REGULAR,
+            )
+        )
+    except Exception:
+        pass
+
+
+if os.path.exists(DEJAVU_BOLD):
+
+    try:
+        pdfmetrics.registerFont(
+            TTFont(
+                "DejaVu-Bold",
+                DEJAVU_BOLD,
+            )
+        )
+    except Exception:
+        pass
+
+
+# ============================================================
+# SAFE PDF FONT
+# ============================================================
+
+PDF_FONT = (
+    "DejaVu"
+    if os.path.exists(DEJAVU_REGULAR)
+    else "Helvetica"
+)
+
+PDF_FONT_BOLD = (
+    "DejaVu-Bold"
+    if os.path.exists(DEJAVU_BOLD)
+    else "Helvetica-Bold"
+)
+
+
+# ============================================================
+# DECIMAL HELPER
+# ============================================================
+
+def safe_decimal(value):
+
+    if value is None:
+        return Decimal("0")
+
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return Decimal("0")
+
+
+# ============================================================
+# REPORT DATA BUILDER
+# ============================================================
+
+def build_payment_report(request):
+
+    query = request.GET.get(
+        "q",
+        ""
+    ).strip()
+
+    status_filter = request.GET.get(
+        "status",
+        ""
+    ).strip().lower()
+
+    from_date = request.GET.get(
+        "from_date",
+        ""
+    ).strip()
+
+    to_date = request.GET.get(
+        "to_date",
+        ""
+    ).strip()
+
+    # ========================================================
     # ORDERS
-    # =========================================================
+    # ========================================================
 
     orders = (
         Order.objects
@@ -3068,23 +3177,53 @@ def payment_report_pdf(request):
         .order_by("-id")
     )
 
-    # =========================================================
+    # ========================================================
     # SEARCH
-    # =========================================================
+    # ========================================================
 
     if query:
+
         orders = orders.filter(
-            Q(trip_number__icontains=query)
-            | Q(vehicle_number__icontains=query)
-            | Q(driver_number__icontains=query)
-            | Q(origin__icontains=query)
-            | Q(destination__icontains=query)
-            | Q(customer__name__icontains=query)
+
+            Q(
+                trip_number__icontains=query
+            )
+
+            |
+
+            Q(
+                vehicle_number__icontains=query
+            )
+
+            |
+
+            Q(
+                driver_number__icontains=query
+            )
+
+            |
+
+            Q(
+                origin__icontains=query
+            )
+
+            |
+
+            Q(
+                destination__icontains=query
+            )
+
+            |
+
+            Q(
+                customer__name__icontains=query
+            )
+
         )
 
-    # =========================================================
-    # DATE FIELD
-    # =========================================================
+    # ========================================================
+    # FIND AVAILABLE DATE FIELD
+    # ========================================================
 
     existing_fields = {
         field.name
@@ -3099,17 +3238,21 @@ def payment_report_pdf(request):
         "order_date",
         "created_at",
     ]:
+
         if field_name in existing_fields:
+
             date_field = field_name
+
             break
 
-    # =========================================================
+    # ========================================================
     # DATE FILTER
-    # =========================================================
+    # ========================================================
 
     if date_field:
 
         if from_date:
+
             orders = orders.filter(
                 **{
                     f"{date_field}__date__gte": from_date
@@ -3117,888 +3260,16 @@ def payment_report_pdf(request):
             )
 
         if to_date:
+
             orders = orders.filter(
                 **{
                     f"{date_field}__date__lte": to_date
                 }
             )
 
-    # =========================================================
-    # PDF DATA
-    # =========================================================
-
-    rows = []
-
-    total_billing = Decimal("0")
-    total_paid = Decimal("0")
-    total_advance = Decimal("0")
-    total_balance = Decimal("0")
-    total_recovery = Decimal("0")
-    total_outstanding = Decimal("0")
-
-    today = date.today()
-
-    for order in orders:
-
-        # -----------------------------------------------------
-        # CUSTOMER
-        # -----------------------------------------------------
-
-        customer_name = "-"
-
-        if order.customer:
-            customer_name = (
-                getattr(order.customer, "name", None)
-                or "-"
-            )
-
-        # -----------------------------------------------------
-        # BILLING
-        # -----------------------------------------------------
-
-        billing_amount = (
-            getattr(order, "total_rate", None)
-            or getattr(order, "freight_amount", None)
-            or getattr(order, "finalized_rate", None)
-            or Decimal("0")
-        )
-
-        try:
-            billing_amount = Decimal(str(billing_amount))
-        except Exception:
-            billing_amount = Decimal("0")
-
-        # -----------------------------------------------------
-        # ADVANCE
-        # -----------------------------------------------------
-
-        advance = (
-            getattr(order, "advance", None)
-            or Decimal("0")
-        )
-
-        try:
-            advance = Decimal(str(advance))
-        except Exception:
-            advance = Decimal("0")
-
-        # -----------------------------------------------------
-        # BALANCE
-        # -----------------------------------------------------
-
-        balance_value = getattr(order, "balance", None)
-
-        if balance_value is None:
-            balance = billing_amount - advance
-        else:
-            try:
-                balance = Decimal(str(balance_value))
-            except Exception:
-                balance = billing_amount - advance
-
-        if balance < 0:
-            balance = Decimal("0")
-
-        # -----------------------------------------------------
-        # PAID
-        # -----------------------------------------------------
-
-        paid_amount = billing_amount - balance
-
-        if paid_amount < 0:
-            paid_amount = Decimal("0")
-
-        # -----------------------------------------------------
-        # PAID TO PARTY
-        # -----------------------------------------------------
-
-        paid_to_party = (
-            getattr(order, "paid_to_party", None)
-            or getattr(order, "vehicle_paid", None)
-            or Decimal("0")
-        )
-
-        try:
-            paid_to_party = Decimal(str(paid_to_party))
-        except Exception:
-            paid_to_party = Decimal("0")
-
-        # -----------------------------------------------------
-        # RECOVERY
-        # -----------------------------------------------------
-
-        recovery_amount = (
-            getattr(order, "recovery_amount", None)
-            or Decimal("0")
-        )
-
-        try:
-            recovery_amount = Decimal(
-                str(recovery_amount)
-            )
-        except Exception:
-            recovery_amount = Decimal("0")
-
-        # -----------------------------------------------------
-        # OUTSTANDING
-        # -----------------------------------------------------
-
-        outstanding_value = getattr(
-            order,
-            "outstanding",
-            None
-        )
-
-        if outstanding_value is None:
-            outstanding = balance - recovery_amount
-        else:
-            try:
-                outstanding = Decimal(
-                    str(outstanding_value)
-                )
-            except Exception:
-                outstanding = balance - recovery_amount
-
-        if outstanding < 0:
-            outstanding = Decimal("0")
-
-        # -----------------------------------------------------
-        # PROMISE DATE
-        # -----------------------------------------------------
-
-        promise_date = getattr(
-            order,
-            "promise_date",
-            None
-        )
-
-        # -----------------------------------------------------
-        # STATUS
-        # -----------------------------------------------------
-
-        if outstanding <= 0:
-
-            payment_status = "Paid"
-
-        elif promise_date:
-
-            try:
-                promise_day = (
-                    promise_date.date()
-                    if hasattr(promise_date, "date")
-                    else promise_date
-                )
-
-                if promise_day < today:
-                    payment_status = "Overdue"
-                else:
-                    payment_status = "Promised"
-
-            except Exception:
-                payment_status = "Due"
-
-        else:
-
-            payment_status = "Due"
-
-        # -----------------------------------------------------
-        # STATUS FILTER
-        # -----------------------------------------------------
-
-        if status_filter:
-
-            if status_filter != payment_status.lower():
-                continue
-
-        # -----------------------------------------------------
-        # DATE
-        # -----------------------------------------------------
-
-        trip_date = None
-
-        if date_field:
-            trip_date = getattr(
-                order,
-                date_field,
-                None
-            )
-
-        # -----------------------------------------------------
-        # TOTALS
-        # -----------------------------------------------------
-
-        total_billing += billing_amount
-        total_paid += paid_amount
-        total_advance += advance
-        total_balance += balance
-        total_recovery += recovery_amount
-        total_outstanding += outstanding
-
-        rows.append([
-            getattr(order, "trip_number", None) or "-",
-
-            (
-                trip_date.strftime("%d-%m-%Y")
-                if trip_date
-                else "-"
-            ),
-
-            customer_name,
-
-            billing_amount,
-
-            paid_amount,
-
-            advance,
-
-            balance,
-
-            recovery_amount,
-
-            outstanding,
-
-            (
-                promise_date.strftime("%d-%m-%Y")
-                if promise_date
-                else "-"
-            ),
-
-            payment_status,
-        ])
-
-    # =========================================================
-    # HTTP RESPONSE
-    # =========================================================
-
-    response = HttpResponse(
-        content_type="application/pdf"
-    )
-
-    response[
-        "Content-Disposition"
-    ] = (
-        'attachment; '
-        'filename="payment_report.pdf"'
-    )
-
-    # =========================================================
-    # DOCUMENT
-    # =========================================================
-
-    doc = SimpleDocTemplate(
-    response,
-    pagesize=landscape(A4),
-
-    rightMargin=8 * mm,
-    leftMargin=8 * mm,
-    topMargin=8 * mm,
-    bottomMargin=8 * mm,
-)
-
-    styles = getSampleStyleSheet()
-
-    title_style = ParagraphStyle(
-        "ReportTitle",
-        parent=styles["Title"],
-        fontName="Helvetica-Bold",
-        fontSize=17,
-        leading=20,
-        textColor=colors.HexColor("#172033"),
-        alignment=TA_LEFT,
-        spaceAfter=3,
-    )
-
-    subtitle_style = ParagraphStyle(
-        "ReportSubtitle",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=8,
-        textColor=colors.HexColor("#667085"),
-        alignment=TA_LEFT,
-        spaceAfter=10,
-    )
-
-    normal_style = ParagraphStyle(
-        "NormalSmall",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=7,
-        leading=9,
-    )
-
-    elements = []
-
-    # =========================================================
-    # TITLE
-    # =========================================================
-
-    elements.append(
-        Paragraph(
-            "PAYMENT & RECOVERY REPORT",
-            title_style
-        )
-    )
-
-    elements.append(
-        Paragraph(
-            "Overdue payments, customer recovery and outstanding balances",
-            subtitle_style
-        )
-    )
-
-    # =========================================================
-    # SUMMARY
-    # =========================================================
-
-    summary_data = [
-        [
-            "TOTAL BILLING",
-            "TOTAL COLLECTED",
-            "BALANCE",
-            "RECOVERY",
-            "OUTSTANDING",
-        ],
-        [
-            f"₹ {total_billing:,.2f}",
-            f"₹ {total_paid:,.2f}",
-            f"₹ {total_balance:,.2f}",
-            f"₹ {total_recovery:,.2f}",
-            f"₹ {total_outstanding:,.2f}",
-        ],
-    ]
-
-    summary_table = Table(
-        summary_data,
-        colWidths=[
-            52 * mm,
-            52 * mm,
-            52 * mm,
-            52 * mm,
-            52 * mm,
-        ],
-    )
-
-    summary_table.setStyle(
-        TableStyle([
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#f8fafc"),
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#667085"),
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 1),
-                (-1, 1),
-                colors.HexColor("#172033"),
-            ),
-
-            (
-                "FONTNAME",
-                (0, 0),
-                (-1, 0),
-                "Helvetica-Bold",
-            ),
-
-            (
-                "FONTNAME",
-                (0, 1),
-                (-1, 1),
-                "Helvetica-Bold",
-            ),
-
-            (
-                "FONTSIZE",
-                (0, 0),
-                (-1, -1),
-                8,
-            ),
-
-            (
-                "ALIGN",
-                (0, 0),
-                (-1, -1),
-                "CENTER",
-            ),
-
-            (
-                "BOX",
-                (0, 0),
-                (-1, -1),
-                0.5,
-                colors.HexColor("#e4e7ec"),
-            ),
-
-            (
-                "INNERGRID",
-                (0, 0),
-                (-1, -1),
-                0.5,
-                colors.HexColor("#e4e7ec"),
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                7,
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                7,
-            ),
-        ])
-    )
-
-    elements.append(summary_table)
-
-    elements.append(
-        Spacer(1, 8 * mm)
-    )
-
-    # =========================================================
-    # REPORT TABLE
-    # =========================================================
-
-    header_style = ParagraphStyle(
-    "TableHeader",
-    parent=styles["Normal"],
-    fontName="Helvetica-Bold",
-    fontSize=6.5,
-    leading=7,
-    textColor=colors.white,
-    alignment=1,
-)
-
-    header_style = ParagraphStyle(
-        "TableHeader",
-        parent=styles["Normal"],
-        fontName="Helvetica-Bold",
-        fontSize=6.5,
-        leading=7,
-        textColor=colors.white,
-        alignment=1,
-    )
-
-    table_data = [
-    [
-        Paragraph("Trip No", header_style),
-        Paragraph("Date", header_style),
-        Paragraph("Customer", header_style),
-        Paragraph("Billing", header_style),
-        Paragraph("Paid", header_style),
-        Paragraph("Advance", header_style),
-        Paragraph("Balance", header_style),
-        Paragraph("Recovery", header_style),
-        Paragraph("Outstanding", header_style),
-        Paragraph("Promise<br/>Date", header_style),
-        Paragraph("Status", header_style),
-    ]
-]
-
-    for row in rows:
-
-        table_data.append([
-            row[0],
-            row[1],
-            row[2],
-            f"₹ {row[3]:,.2f}",
-            f"₹ {row[4]:,.2f}",
-            f"₹ {row[5]:,.2f}",
-            f"₹ {row[6]:,.2f}",
-            f"₹ {row[7]:,.2f}",
-            f"₹ {row[8]:,.2f}",
-            row[9],
-            row[10],
-        ])
-
-    # =========================================================
-    # TOTAL ROW
-    # =========================================================
-
-    table_data.append([
-        "TOTAL",
-        "",
-        "",
-        f"₹ {total_billing:,.2f}",
-        f"₹ {total_paid:,.2f}",
-        f"₹ {total_advance:,.2f}",
-        f"₹ {total_balance:,.2f}",
-        f"₹ {total_recovery:,.2f}",
-        f"₹ {total_outstanding:,.2f}",
-        "",
-        "",
-    ])
-
-    col_widths = [
-    23 * mm,   # Trip No
-    21 * mm,   # Date
-    39 * mm,   # Customer
-    25 * mm,   # Billing
-    25 * mm,   # Paid
-    25 * mm,   # Advance
-    25 * mm,   # Balance
-    25 * mm,   # Recovery
-    28 * mm,   # Outstanding
-    22 * mm,   # Promise Date
-    19 * mm,   # Status
-]
-
-    report_table = Table(
-    table_data,
-    colWidths=col_widths,
-    repeatRows=1,
-    hAlign="LEFT",
-)
-
-    table_style = [
-        (
-            "BACKGROUND",
-            (0, 0),
-            (-1, 0),
-            colors.HexColor("#172033"),
-        ),
-
-        (
-            "TEXTCOLOR",
-            (0, 0),
-            (-1, 0),
-            colors.white,
-        ),
-
-        (
-            "FONTNAME",
-            (0, 0),
-            (-1, 0),
-            "Helvetica-Bold",
-        ),
-
-        (
-            "FONTSIZE",
-            (0, 0),
-            (-1, 0),
-            7,
-        ),
-
-        (
-            "ALIGN",
-            (0, 0),
-            (-1, 0),
-            "CENTER",
-        ),
-
-        (
-            "VALIGN",
-            (0, 0),
-            (-1, -1),
-            "MIDDLE",
-        ),
-
-        (
-            "GRID",
-            (0, 0),
-            (-1, -1),
-            0.4,
-            colors.HexColor("#e4e7ec"),
-        ),
-
-        (
-            "FONTNAME",
-            (0, 1),
-            (-1, -2),
-            "Helvetica",
-        ),
-(
-    "FONTSIZE",
-    (0, 0),
-    (-1, 0),
-    6.5,
-),
-       (
-    "TOPPADDING",
-    (0, 0),
-    (-1, -1),
-    4,
-),
-
-(
-    "BOTTOMPADDING",
-    (0, 0),
-    (-1, -1),
-    4,
-),
-
-        (
-            "TEXTCOLOR",
-            (0, 1),
-            (-1, -2),
-            colors.HexColor("#344054"),
-        ),
-
-        (
-            "BACKGROUND",
-            (0, 1),
-            (-1, -2),
-            colors.white,
-        ),
-
-        (
-            "BACKGROUND",
-            (0, -1),
-            (-1, -1),
-            colors.HexColor("#f2f4f7"),
-        ),
-
-        (
-            "FONTNAME",
-            (0, -1),
-            (-1, -1),
-            "Helvetica-Bold",
-        ),
-
-        (
-            "TEXTCOLOR",
-            (0, -1),
-            (-1, -1),
-            colors.HexColor("#172033"),
-        ),
-
-        (
-            "ALIGN",
-            (3, 1),
-            (8, -1),
-            "RIGHT",
-        ),
-
-        (
-            "ALIGN",
-            (10, 1),
-            (10, -1),
-            "CENTER",
-        ),
-
-        (
-            "TOPPADDING",
-            (0, 0),
-            (-1, -1),
-            5,
-        ),
-
-        (
-            "BOTTOMPADDING",
-            (0, 0),
-            (-1, -1),
-            5,
-        ),
-    ]
-
-    # ---------------------------------------------------------
-    # STATUS COLORS
-    # ---------------------------------------------------------
-
-    for row_index, row in enumerate(rows, start=1):
-
-        status = row[10].lower()
-
-        if status == "overdue":
-
-            table_style.extend([
-                (
-                    "TEXTCOLOR",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#b42318"),
-                ),
-
-                (
-                    "BACKGROUND",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#fef3f2"),
-                ),
-            ])
-
-        elif status == "paid":
-
-            table_style.extend([
-                (
-                    "TEXTCOLOR",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#087443"),
-                ),
-
-                (
-                    "BACKGROUND",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#ecfdf3"),
-                ),
-            ])
-
-        elif status == "promised":
-
-            table_style.extend([
-                (
-                    "TEXTCOLOR",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#175cd3"),
-                ),
-
-                (
-                    "BACKGROUND",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#eff8ff"),
-                ),
-            ])
-
-        else:
-
-            table_style.extend([
-                (
-                    "TEXTCOLOR",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#b54708"),
-                ),
-
-                (
-                    "BACKGROUND",
-                    (10, row_index),
-                    (10, row_index),
-                    colors.HexColor("#fff7ed"),
-                ),
-            ])
-
-    report_table.setStyle(
-        TableStyle(table_style)
-    )
-
-    elements.append(report_table)
-
-    elements.append(
-        Spacer(1, 8 * mm)
-    )
-
-    # =========================================================
-    # FOOTER
-    # =========================================================
-
-    elements.append(
-        Paragraph(
-            f"Generated on {today.strftime('%d-%m-%Y')}",
-            ParagraphStyle(
-                "Footer",
-                parent=styles["Normal"],
-                fontSize=7,
-                textColor=colors.HexColor("#98a2b3"),
-                alignment=TA_RIGHT,
-            )
-        )
-    )
-
-    # =========================================================
-    # BUILD
-    # =========================================================
-
-    doc.build(elements)
-
-    return response
-
-
-@login_required
-def payment_report(request):
-
-    query = request.GET.get("q", "").strip()
-
-    status_filter = request.GET.get("status", "").strip().lower()
-
-    from_date = request.GET.get("from_date", "").strip()
-    to_date = request.GET.get("to_date", "").strip()
-
-    # =========================================================
-    # BASE ORDERS
-    # =========================================================
-
-    orders = (
-        Order.objects
-        .select_related("customer")
-        .order_by("-id")
-    )
-
-    # =========================================================
-    # SEARCH
-    # =========================================================
-
-    if query:
-        orders = orders.filter(
-            Q(trip_number__icontains=query)
-            | Q(vehicle_number__icontains=query)
-            | Q(driver_number__icontains=query)
-            | Q(origin__icontains=query)
-            | Q(destination__icontains=query)
-            | Q(customer__name__icontains=query)
-        )
-
-    # =========================================================
-    # FIND DATE FIELD
-    # =========================================================
-
-    date_field = None
-
-    possible_date_fields = [
-        "vehicle_place_date",
-        "trip_date",
-        "order_date",
-        "created_at",
-    ]
-
-    existing_fields = {
-        field.name
-        for field in Order._meta.get_fields()
-    }
-
-    for field_name in possible_date_fields:
-        if field_name in existing_fields:
-            date_field = field_name
-            break
-
-    # =========================================================
-    # DATE FILTER
-    # =========================================================
-
-    if date_field:
-
-        if from_date:
-            orders = orders.filter(
-                **{
-                    f"{date_field}__date__gte": from_date
-                }
-            )
-
-        if to_date:
-            orders = orders.filter(
-                **{
-                    f"{date_field}__date__lte": to_date
-                }
-            )
-
-    # =========================================================
-    # REPORT DATA
-    # =========================================================
+    # ========================================================
+    # REPORT
+    # ========================================================
 
     report_rows = []
 
@@ -4009,130 +3280,173 @@ def payment_report(request):
     total_recovery = Decimal("0")
     total_outstanding = Decimal("0")
 
-    today = __import__("datetime").date.today()
+    today = date.today()
+
+    # ========================================================
+    # LOOP
+    # ========================================================
 
     for order in orders:
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # CUSTOMER
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         customer_name = "-"
 
         if getattr(order, "customer", None):
-            customer_name = getattr(
-                order.customer,
-                "name",
-                "-"
-            ) or "-"
 
-        # -----------------------------------------------------
-        # BILLING AMOUNT
-        # -----------------------------------------------------
+            customer_name = (
+                getattr(
+                    order.customer,
+                    "name",
+                    None
+                )
+                or "-"
+            )
+
+        # ----------------------------------------------------
+        # CONTACT
+        # ----------------------------------------------------
+
+        contact = (
+            getattr(
+                order,
+                "customer_contact",
+                None
+            )
+            or getattr(
+                order.customer,
+                "contact",
+                None
+            )
+            if getattr(order, "customer", None)
+            else "-"
+        )
+
+        contact = contact or "-"
+
+        # ----------------------------------------------------
+        # BILLING
+        # ----------------------------------------------------
 
         billing_amount = (
-            getattr(order, "total_rate", None)
-            or getattr(order, "freight_amount", None)
-            or getattr(order, "finalized_rate", None)
+            getattr(
+                order,
+                "total_rate",
+                None
+            )
+
+            or getattr(
+                order,
+                "freight_amount",
+                None
+            )
+
+            or getattr(
+                order,
+                "finalized_rate",
+                None
+            )
+
             or Decimal("0")
         )
 
-        try:
-            billing_amount = Decimal(str(billing_amount))
-        except Exception:
-            billing_amount = Decimal("0")
+        billing_amount = safe_decimal(
+            billing_amount
+        )
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # ADVANCE
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
-        advance = (
-            getattr(order, "advance", None)
-            or Decimal("0")
+        advance = safe_decimal(
+            getattr(
+                order,
+                "advance",
+                None
+            )
         )
 
-        try:
-            advance = Decimal(str(advance))
-        except Exception:
-            advance = Decimal("0")
-
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # BALANCE
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
-        balance_value = getattr(order, "balance", None)
+        balance_value = getattr(
+            order,
+            "balance",
+            None
+        )
 
         if balance_value is None:
 
-            balance = billing_amount - advance
+            balance = (
+                billing_amount
+                - advance
+            )
 
         else:
 
-            try:
-                balance = Decimal(str(balance_value))
-            except Exception:
-                balance = billing_amount - advance
+            balance = safe_decimal(
+                balance_value
+            )
 
         if balance < 0:
+
             balance = Decimal("0")
 
-        # -----------------------------------------------------
-        # PAID AMOUNT
-        # -----------------------------------------------------
+        # ----------------------------------------------------
+        # PAID
+        # ----------------------------------------------------
 
-        paid_amount = billing_amount - balance
+        paid_amount = (
+            billing_amount
+            - balance
+        )
 
         if paid_amount < 0:
+
             paid_amount = Decimal("0")
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # PAID TO PARTY
-        #
-        # If your model has paid_to_party, it will be used.
-        # Otherwise vehicle/freight related value is checked.
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
-        paid_to_party = getattr(
-            order,
-            "paid_to_party",
-            None
-        )
-
-        if paid_to_party is None:
-
-            paid_to_party = (
-                getattr(order, "vehicle_paid", None)
-                or Decimal("0")
+        paid_to_party = (
+            getattr(
+                order,
+                "paid_to_party",
+                None
             )
 
-        try:
-            paid_to_party = Decimal(str(paid_to_party))
-        except Exception:
-            paid_to_party = Decimal("0")
+            or getattr(
+                order,
+                "vehicle_paid",
+                None
+            )
 
-        # -----------------------------------------------------
-        # RECOVERY AMOUNT
-        # -----------------------------------------------------
-
-        recovery_amount = getattr(
-            order,
-            "recovery_amount",
-            None
+            or Decimal("0")
         )
 
-        if recovery_amount is None:
-            recovery_amount = Decimal("0")
+        paid_to_party = safe_decimal(
+            paid_to_party
+        )
 
-        try:
-            recovery_amount = Decimal(
-                str(recovery_amount)
+        # ----------------------------------------------------
+        # RECOVERY
+        # ----------------------------------------------------
+
+        recovery_amount = safe_decimal(
+            getattr(
+                order,
+                "recovery_amount",
+                None
             )
-        except Exception:
-            recovery_amount = Decimal("0")
+        )
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # OUTSTANDING
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         outstanding_value = getattr(
             order,
@@ -4142,23 +3456,24 @@ def payment_report(request):
 
         if outstanding_value is None:
 
-            outstanding = balance - recovery_amount
+            outstanding = (
+                balance
+                - recovery_amount
+            )
 
         else:
 
-            try:
-                outstanding = Decimal(
-                    str(outstanding_value)
-                )
-            except Exception:
-                outstanding = balance - recovery_amount
+            outstanding = safe_decimal(
+                outstanding_value
+            )
 
         if outstanding < 0:
+
             outstanding = Decimal("0")
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # PROMISE DATE
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         promise_date = getattr(
             order,
@@ -4166,9 +3481,9 @@ def payment_report(request):
             None
         )
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # PAYMENT STATUS
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         if outstanding <= 0:
 
@@ -4180,62 +3495,56 @@ def payment_report(request):
 
                 promise_day = (
                     promise_date.date()
-                    if hasattr(promise_date, "date")
+                    if hasattr(
+                        promise_date,
+                        "date"
+                    )
                     else promise_date
                 )
 
                 if promise_day < today:
+
                     payment_status = "overdue"
+
                 else:
+
                     payment_status = "promised"
 
             except Exception:
 
                 payment_status = "due"
 
-        elif balance > 0:
+        else:
 
             payment_status = "due"
 
-        else:
+        # ----------------------------------------------------
+        # STATUS FILTER
+        # ----------------------------------------------------
 
-            payment_status = "paid"
+        if status_filter:
 
-        # -----------------------------------------------------
-        # PAYMENT TERM
-        # -----------------------------------------------------
+            if status_filter != payment_status:
 
-        payment_terms = getattr(
-            order,
-            "payment_terms",
-            None
-        ) or "-"
+                continue
 
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # TRIP DATE
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         trip_date = None
 
         if date_field:
+
             trip_date = getattr(
                 order,
                 date_field,
                 None
             )
 
-        # -----------------------------------------------------
-        # STATUS FILTER
-        # -----------------------------------------------------
-
-        if status_filter:
-
-            if status_filter != payment_status:
-                continue
-
-        # -----------------------------------------------------
+        # ----------------------------------------------------
         # TOTALS
-        # -----------------------------------------------------
+        # ----------------------------------------------------
 
         total_billing += billing_amount
         total_paid += paid_amount
@@ -4244,9 +3553,9 @@ def payment_report(request):
         total_recovery += recovery_amount
         total_outstanding += outstanding
 
-        # -----------------------------------------------------
-        # REPORT ROW
-        # -----------------------------------------------------
+        # ----------------------------------------------------
+        # ROW
+        # ----------------------------------------------------
 
         report_rows.append(
             {
@@ -4257,27 +3566,15 @@ def payment_report(request):
                         order,
                         "trip_number",
                         None
-                    ) or "-"
+                    )
+                    or "-"
                 ),
 
                 "trip_date": trip_date,
 
                 "customer": customer_name,
 
-                "contact": (
-                    getattr(
-                        order,
-                        "customer_contact",
-                        None
-                    )
-                    or getattr(
-                        order.customer,
-                        "contact",
-                        None
-                    )
-                    if getattr(order, "customer", None)
-                    else "-"
-                ),
+                "contact": contact,
 
                 "billing_amount": billing_amount,
 
@@ -4297,13 +3594,20 @@ def payment_report(request):
 
                 "payment_status": payment_status,
 
-                "payment_terms": payment_terms,
+                "payment_terms": (
+                    getattr(
+                        order,
+                        "payment_terms",
+                        None
+                    )
+                    or "-"
+                ),
             }
         )
 
-    # =========================================================
-    # STATUS COUNTS
-    # =========================================================
+    # ========================================================
+    # COUNTS
+    # ========================================================
 
     overdue_count = sum(
         1
@@ -4329,11 +3633,11 @@ def payment_report(request):
         if row["payment_status"] == "paid"
     )
 
-    # =========================================================
-    # CONTEXT
-    # =========================================================
+    # ========================================================
+    # RETURN
+    # ========================================================
 
-    context = {
+    return {
         "report_rows": report_rows,
 
         "total_billing": total_billing,
@@ -4355,8 +3659,1464 @@ def payment_report(request):
         "to_date": to_date,
     }
 
+
+# ============================================================
+# PAYMENT REPORT PAGE
+# ============================================================
+
+@login_required
+def payment_report(request):
+
+    context = build_payment_report(
+        request
+    )
+
     return render(
         request,
-        "onepageorders/payment_report.html",
-        context
+        "reports/payment_report.html",
+        context,
     )
+
+
+# ============================================================
+# PDF REPORT
+# ============================================================
+
+@login_required
+def payment_report_pdf(request):
+
+    context = build_payment_report(
+        request
+    )
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        'attachment; '
+        'filename="payment_report.pdf"'
+    )
+
+    # ========================================================
+    # A4 LANDSCAPE
+    # ========================================================
+
+    doc = SimpleDocTemplate(
+
+        response,
+
+        pagesize=landscape(A4),
+
+        leftMargin=8 * mm,
+        rightMargin=8 * mm,
+
+        topMargin=8 * mm,
+        bottomMargin=8 * mm,
+    )
+
+    # ========================================================
+    # STYLES
+    # ========================================================
+
+    title_style = ParagraphStyle(
+
+        "ReportTitle",
+
+        fontName=PDF_FONT_BOLD,
+
+        fontSize=17,
+
+        leading=20,
+
+        textColor=colors.HexColor(
+            "#172033"
+        ),
+
+        alignment=TA_LEFT,
+
+        spaceAfter=3,
+    )
+
+    subtitle_style = ParagraphStyle(
+
+        "ReportSubtitle",
+
+        fontName=PDF_FONT,
+
+        fontSize=8,
+
+        leading=10,
+
+        textColor=colors.HexColor(
+            "#667085"
+        ),
+
+        alignment=TA_LEFT,
+
+        spaceAfter=10,
+    )
+
+    header_style = ParagraphStyle(
+
+        "TableHeader",
+
+        fontName=PDF_FONT_BOLD,
+
+        fontSize=6.2,
+
+        leading=7,
+
+        textColor=colors.white,
+
+        alignment=TA_CENTER,
+    )
+
+    text_style = ParagraphStyle(
+
+        "TableText",
+
+        fontName=PDF_FONT,
+
+        fontSize=6.2,
+
+        leading=7.5,
+
+        textColor=colors.HexColor(
+            "#344054"
+        ),
+
+        alignment=TA_LEFT,
+    )
+
+    number_style = ParagraphStyle(
+
+        "TableNumber",
+
+        fontName=PDF_FONT,
+
+        fontSize=6.2,
+
+        leading=7,
+
+        textColor=colors.HexColor(
+            "#344054"
+        ),
+
+        alignment=TA_RIGHT,
+    )
+
+    status_style = ParagraphStyle(
+
+        "TableStatus",
+
+        fontName=PDF_FONT_BOLD,
+
+        fontSize=6.2,
+
+        leading=7,
+
+        alignment=TA_CENTER,
+    )
+
+    summary_label_style = ParagraphStyle(
+
+        "SummaryLabel",
+
+        fontName=PDF_FONT_BOLD,
+
+        fontSize=7,
+
+        leading=8,
+
+        textColor=colors.HexColor(
+            "#667085"
+        ),
+
+        alignment=TA_CENTER,
+    )
+
+    summary_value_style = ParagraphStyle(
+
+        "SummaryValue",
+
+        fontName=PDF_FONT_BOLD,
+
+        fontSize=9,
+
+        leading=11,
+
+        textColor=colors.HexColor(
+            "#172033"
+        ),
+
+        alignment=TA_CENTER,
+    )
+
+    elements = []
+
+    # ========================================================
+    # TITLE
+    # ========================================================
+
+    elements.append(
+        Paragraph(
+            "PAYMENT & RECOVERY REPORT",
+            title_style,
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "Overdue payments, customer recovery and outstanding balances",
+            subtitle_style,
+        )
+    )
+
+    # ========================================================
+    # SUMMARY
+    # ========================================================
+
+    summary_data = [
+
+        [
+
+            Paragraph(
+                "TOTAL BILLING",
+                summary_label_style,
+            ),
+
+            Paragraph(
+                "TOTAL COLLECTED",
+                summary_label_style,
+            ),
+
+            Paragraph(
+                "BALANCE",
+                summary_label_style,
+            ),
+
+            Paragraph(
+                "RECOVERY",
+                summary_label_style,
+            ),
+
+            Paragraph(
+                "OUTSTANDING",
+                summary_label_style,
+            ),
+
+        ],
+
+        [
+
+            Paragraph(
+                f"₹ {context['total_billing']:,.2f}",
+                summary_value_style,
+            ),
+
+            Paragraph(
+                f"₹ {context['total_paid']:,.2f}",
+                summary_value_style,
+            ),
+
+            Paragraph(
+                f"₹ {context['total_balance']:,.2f}",
+                summary_value_style,
+            ),
+
+            Paragraph(
+                f"₹ {context['total_recovery']:,.2f}",
+                summary_value_style,
+            ),
+
+            Paragraph(
+                f"₹ {context['total_outstanding']:,.2f}",
+                summary_value_style,
+            ),
+
+        ],
+    ]
+
+    summary_table = Table(
+
+        summary_data,
+
+        colWidths=[
+            54 * mm,
+            54 * mm,
+            54 * mm,
+            54 * mm,
+            54 * mm,
+        ],
+    )
+
+    summary_table.setStyle(
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor(
+                    "#f8fafc"
+                ),
+            ),
+
+            (
+                "BOX",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.HexColor(
+                    "#e4e7ec"
+                ),
+            ),
+
+            (
+                "INNERGRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.HexColor(
+                    "#e4e7ec"
+                ),
+            ),
+
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE",
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                6,
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                6,
+            ),
+
+        ])
+    )
+
+    elements.append(
+        summary_table
+    )
+
+    elements.append(
+        Spacer(
+            1,
+            7 * mm
+        )
+    )
+
+    # ========================================================
+    # TABLE HEADER
+    # ========================================================
+
+    table_data = [
+
+        [
+
+            Paragraph(
+                "Trip No",
+                header_style,
+            ),
+
+            Paragraph(
+                "Date",
+                header_style,
+            ),
+
+            Paragraph(
+                "Customer",
+                header_style,
+            ),
+
+            Paragraph(
+                "Billing",
+                header_style,
+            ),
+
+            Paragraph(
+                "Paid",
+                header_style,
+            ),
+
+            Paragraph(
+                "Advance",
+                header_style,
+            ),
+
+            Paragraph(
+                "Balance",
+                header_style,
+            ),
+
+            Paragraph(
+                "Recovery",
+                header_style,
+            ),
+
+            Paragraph(
+                "Outstanding",
+                header_style,
+            ),
+
+            Paragraph(
+                "Promise<br/>Date",
+                header_style,
+            ),
+
+            Paragraph(
+                "Status",
+                header_style,
+            ),
+
+        ]
+    ]
+
+    # ========================================================
+    # DATA
+    # ========================================================
+
+    for row in context["report_rows"]:
+
+        trip_date = row["trip_date"]
+
+        promise_date = row["promise_date"]
+
+        table_data.append([
+
+            Paragraph(
+                str(row["trip_number"]),
+                text_style,
+            ),
+
+            Paragraph(
+                (
+                    trip_date.strftime(
+                        "%d-%m-%Y"
+                    )
+                    if trip_date
+                    else "-"
+                ),
+                text_style,
+            ),
+
+            # LONG CUSTOMER NAME WRAPS
+            Paragraph(
+                str(row["customer"]),
+                text_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['billing_amount']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['paid_amount']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['advance']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['balance']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['recovery_amount']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                f"₹ {row['outstanding']:,.2f}",
+                number_style,
+            ),
+
+            Paragraph(
+                (
+                    promise_date.strftime(
+                        "%d-%m-%Y"
+                    )
+                    if promise_date
+                    else "-"
+                ),
+                text_style,
+            ),
+
+            Paragraph(
+                row["payment_status"].title(),
+                status_style,
+            ),
+
+        ])
+
+    # ========================================================
+    # TOTAL
+    # ========================================================
+
+    table_data.append([
+
+        Paragraph(
+            "TOTAL",
+            ParagraphStyle(
+                "Total",
+                fontName=PDF_FONT_BOLD,
+                fontSize=6.5,
+                leading=7,
+            ),
+        ),
+
+        "",
+        "",
+
+        Paragraph(
+            f"₹ {context['total_billing']:,.2f}",
+            number_style,
+        ),
+
+        Paragraph(
+            f"₹ {context['total_paid']:,.2f}",
+            number_style,
+        ),
+
+        Paragraph(
+            f"₹ {context['total_advance']:,.2f}",
+            number_style,
+        ),
+
+        Paragraph(
+            f"₹ {context['total_balance']:,.2f}",
+            number_style,
+        ),
+
+        Paragraph(
+            f"₹ {context['total_recovery']:,.2f}",
+            number_style,
+        ),
+
+        Paragraph(
+            f"₹ {context['total_outstanding']:,.2f}",
+            number_style,
+        ),
+
+        "",
+        "",
+    ])
+
+    # ========================================================
+    # COLUMN WIDTH
+    #
+    # TOTAL = 277 MM
+    # ========================================================
+
+    col_widths = [
+
+        23 * mm,   # Trip
+
+        21 * mm,   # Date
+
+        39 * mm,   # Customer
+
+        25 * mm,   # Billing
+
+        25 * mm,   # Paid
+
+        25 * mm,   # Advance
+
+        25 * mm,   # Balance
+
+        25 * mm,   # Recovery
+
+        28 * mm,   # Outstanding
+
+        22 * mm,   # Promise
+
+        19 * mm,   # Status
+
+    ]
+
+    report_table = Table(
+
+        table_data,
+
+        colWidths=col_widths,
+
+        repeatRows=1,
+
+        hAlign="LEFT",
+    )
+
+    table_style = [
+
+        (
+            "BACKGROUND",
+            (0, 0),
+            (-1, 0),
+            colors.HexColor(
+                "#172033"
+            ),
+        ),
+
+        (
+            "TEXTCOLOR",
+            (0, 0),
+            (-1, 0),
+            colors.white,
+        ),
+
+        (
+            "GRID",
+            (0, 0),
+            (-1, -1),
+            0.4,
+            colors.HexColor(
+                "#e4e7ec"
+            ),
+        ),
+
+        (
+            "VALIGN",
+            (0, 0),
+            (-1, -1),
+            "MIDDLE",
+        ),
+
+        (
+            "BACKGROUND",
+            (0, -1),
+            (-1, -1),
+            colors.HexColor(
+                "#f2f4f7"
+            ),
+        ),
+
+        (
+            "FONTNAME",
+            (0, -1),
+            (-1, -1),
+            PDF_FONT_BOLD,
+        ),
+
+        (
+            "LEFTPADDING",
+            (0, 0),
+            (-1, -1),
+            4,
+        ),
+
+        (
+            "RIGHTPADDING",
+            (0, 0),
+            (-1, -1),
+            4,
+        ),
+
+        (
+            "TOPPADDING",
+            (0, 0),
+            (-1, -1),
+            4,
+        ),
+
+        (
+            "BOTTOMPADDING",
+            (0, 0),
+            (-1, -1),
+            4,
+        ),
+    ]
+
+    # ========================================================
+    # STATUS COLORS
+    # ========================================================
+
+    for index, row in enumerate(
+        context["report_rows"],
+        start=1,
+    ):
+
+        status = row[
+            "payment_status"
+        ]
+
+        if status == "overdue":
+
+            table_style.extend([
+
+                (
+                    "TEXTCOLOR",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#b42318"
+                    ),
+                ),
+
+                (
+                    "BACKGROUND",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#fef3f2"
+                    ),
+                ),
+
+            ])
+
+        elif status == "paid":
+
+            table_style.extend([
+
+                (
+                    "TEXTCOLOR",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#087443"
+                    ),
+                ),
+
+                (
+                    "BACKGROUND",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#ecfdf3"
+                    ),
+                ),
+
+            ])
+
+        elif status == "promised":
+
+            table_style.extend([
+
+                (
+                    "TEXTCOLOR",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#175cd3"
+                    ),
+                ),
+
+                (
+                    "BACKGROUND",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#eff8ff"
+                    ),
+                ),
+
+            ])
+
+        else:
+
+            table_style.extend([
+
+                (
+                    "TEXTCOLOR",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#b54708"
+                    ),
+                ),
+
+                (
+                    "BACKGROUND",
+                    (10, index),
+                    (10, index),
+                    colors.HexColor(
+                        "#fff7ed"
+                    ),
+                ),
+
+            ])
+
+    report_table.setStyle(
+        TableStyle(table_style)
+    )
+
+    elements.append(
+        report_table
+    )
+
+    elements.append(
+        Spacer(
+            1,
+            5 * mm
+        )
+    )
+
+    # ========================================================
+    # FOOTER
+    # ========================================================
+
+    footer_style = ParagraphStyle(
+
+        "Footer",
+
+        fontName=PDF_FONT,
+
+        fontSize=6.5,
+
+        textColor=colors.HexColor(
+            "#98a2b3"
+        ),
+
+        alignment=TA_RIGHT,
+    )
+
+    elements.append(
+        Paragraph(
+            f"Generated on {date.today().strftime('%d-%m-%Y')}",
+            footer_style,
+        )
+    )
+
+    # ========================================================
+    # BUILD
+    # ========================================================
+
+    doc.build(
+        elements
+    )
+
+    return response
+
+
+# ============================================================
+# EXCEL REPORT
+# ============================================================
+
+@login_required
+def payment_report_excel(request):
+
+    context = build_payment_report(
+        request
+    )
+
+    # ========================================================
+    # WORKBOOK
+    # ========================================================
+
+    workbook = Workbook()
+
+    worksheet = workbook.active
+
+    worksheet.title = "Payment Report"
+
+    # ========================================================
+    # TITLE
+    # ========================================================
+
+    worksheet.merge_cells(
+        "A1:K1"
+    )
+
+    worksheet["A1"] = (
+        "PAYMENT & RECOVERY REPORT"
+    )
+
+    worksheet["A1"].font = Font(
+        name="Calibri",
+        size=16,
+        bold=True,
+    )
+
+    worksheet["A1"].alignment = Alignment(
+        horizontal="left",
+        vertical="center",
+    )
+
+    worksheet.row_dimensions[1].height = 26
+
+    # ========================================================
+    # SUBTITLE
+    # ========================================================
+
+    worksheet.merge_cells(
+        "A2:K2"
+    )
+
+    worksheet["A2"] = (
+        "Overdue payments, customer recovery "
+        "and outstanding balances"
+    )
+
+    worksheet["A2"].font = Font(
+        name="Calibri",
+        size=10,
+        color="667085",
+    )
+
+    worksheet["A2"].alignment = Alignment(
+        horizontal="left"
+    )
+
+    # ========================================================
+    # SUMMARY
+    # ========================================================
+
+    summary_row = 4
+
+    summary_headers = [
+        "TOTAL BILLING",
+        "TOTAL COLLECTED",
+        "BALANCE",
+        "RECOVERY",
+        "OUTSTANDING",
+    ]
+
+    summary_values = [
+        context["total_billing"],
+        context["total_paid"],
+        context["total_balance"],
+        context["total_recovery"],
+        context["total_outstanding"],
+    ]
+
+    summary_columns = [
+        1,
+        3,
+        5,
+        7,
+        9,
+    ]
+
+    for column, header, value in zip(
+        summary_columns,
+        summary_headers,
+        summary_values,
+    ):
+
+        cell = worksheet.cell(
+            row=summary_row,
+            column=column,
+        )
+
+        cell.value = header
+
+        cell.font = Font(
+            bold=True,
+            size=9,
+            color="667085",
+        )
+
+        cell.fill = PatternFill(
+            "solid",
+            fgColor="F8FAFC",
+        )
+
+        cell.alignment = Alignment(
+            horizontal="center"
+        )
+
+        value_cell = worksheet.cell(
+            row=summary_row + 1,
+            column=column,
+        )
+
+        value_cell.value = value
+
+        value_cell.font = Font(
+            bold=True,
+            size=11,
+            color="172033",
+        )
+
+        value_cell.number_format = (
+            '₹ #,##0.00'
+        )
+
+        value_cell.alignment = Alignment(
+            horizontal="center"
+        )
+
+    # ========================================================
+    # TABLE START
+    # ========================================================
+
+    table_start = 7
+
+    headers = [
+
+        "Trip No",
+
+        "Date",
+
+        "Customer",
+
+        "Contact",
+
+        "Billing",
+
+        "Paid",
+
+        "Advance",
+
+        "Balance",
+
+        "Recovery",
+
+        "Outstanding",
+
+        "Promise Date",
+
+        "Status",
+
+    ]
+
+    # ========================================================
+    # HEADER
+    # ========================================================
+
+    for column, header in enumerate(
+        headers,
+        start=1,
+    ):
+
+        cell = worksheet.cell(
+            row=table_start,
+            column=column,
+        )
+
+        cell.value = header
+
+        cell.font = Font(
+            bold=True,
+            color="FFFFFF",
+            size=10,
+        )
+
+        cell.fill = PatternFill(
+            "solid",
+            fgColor="172033",
+        )
+
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True,
+        )
+
+    worksheet.row_dimensions[
+        table_start
+    ].height = 30
+
+    # ========================================================
+    # DATA
+    # ========================================================
+
+    current_row = table_start + 1
+
+    for row in context[
+        "report_rows"
+    ]:
+
+        trip_date = row[
+            "trip_date"
+        ]
+
+        promise_date = row[
+            "promise_date"
+        ]
+
+        values = [
+
+            row["trip_number"],
+
+            (
+                trip_date
+                if trip_date
+                else ""
+            ),
+
+            row["customer"],
+
+            row["contact"],
+
+            row["billing_amount"],
+
+            row["paid_amount"],
+
+            row["advance"],
+
+            row["balance"],
+
+            row["recovery_amount"],
+
+            row["outstanding"],
+
+            (
+                promise_date
+                if promise_date
+                else ""
+            ),
+
+            row["payment_status"].title(),
+
+        ]
+
+        for column, value in enumerate(
+            values,
+            start=1,
+        ):
+
+            cell = worksheet.cell(
+                row=current_row,
+                column=column,
+            )
+
+            cell.value = value
+
+            cell.alignment = Alignment(
+                vertical="top",
+                wrap_text=True,
+            )
+
+            cell.font = Font(
+                size=9,
+                color="344054",
+            )
+
+            # ---------------------------------------------
+            # DATE
+            # ---------------------------------------------
+
+            if column in [2, 11]:
+
+                if value:
+
+                    cell.number_format = (
+                        "dd-mm-yyyy"
+                    )
+
+            # ---------------------------------------------
+            # MONEY
+            # ---------------------------------------------
+
+            if column in [
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+            ]:
+
+                cell.number_format = (
+                    '₹ #,##0.00'
+                )
+
+                cell.alignment = Alignment(
+                    horizontal="right",
+                    vertical="top",
+                )
+
+        # ----------------------------------------------------
+        # STATUS
+        # ----------------------------------------------------
+
+        status = row[
+            "payment_status"
+        ]
+
+        status_cell = worksheet.cell(
+            row=current_row,
+            column=12,
+        )
+
+        status_cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+        )
+
+        if status == "overdue":
+
+            status_cell.font = Font(
+                bold=True,
+                color="B42318",
+            )
+
+            status_cell.fill = PatternFill(
+                "solid",
+                fgColor="FEF3F2",
+            )
+
+        elif status == "paid":
+
+            status_cell.font = Font(
+                bold=True,
+                color="087443",
+            )
+
+            status_cell.fill = PatternFill(
+                "solid",
+                fgColor="ECFDF3",
+            )
+
+        elif status == "promised":
+
+            status_cell.font = Font(
+                bold=True,
+                color="175CD3",
+            )
+
+            status_cell.fill = PatternFill(
+                "solid",
+                fgColor="EFF8FF",
+            )
+
+        else:
+
+            status_cell.font = Font(
+                bold=True,
+                color="B54708",
+            )
+
+            status_cell.fill = PatternFill(
+                "solid",
+                fgColor="FFF7ED",
+            )
+
+        current_row += 1
+
+    # ========================================================
+    # TOTAL
+    # ========================================================
+
+    total_row = current_row
+
+    total_values = [
+
+        "TOTAL",
+
+        "",
+
+        "",
+
+        "",
+
+        context["total_billing"],
+
+        context["total_paid"],
+
+        context["total_advance"],
+
+        context["total_balance"],
+
+        context["total_recovery"],
+
+        context["total_outstanding"],
+
+        "",
+
+        "",
+
+    ]
+
+    for column, value in enumerate(
+        total_values,
+        start=1,
+    ):
+
+        cell = worksheet.cell(
+            row=total_row,
+            column=column,
+        )
+
+        cell.value = value
+
+        cell.font = Font(
+            bold=True,
+            size=9,
+            color="172033",
+        )
+
+        cell.fill = PatternFill(
+            "solid",
+            fgColor="F2F4F7",
+        )
+
+        cell.alignment = Alignment(
+            vertical="center",
+            wrap_text=True,
+        )
+
+        if column in [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+        ]:
+
+            cell.number_format = (
+                '₹ #,##0.00'
+            )
+
+            cell.alignment = Alignment(
+                horizontal="right",
+                vertical="center",
+            )
+
+    # ========================================================
+    # BORDERS
+    # ========================================================
+
+    thin_border = Border(
+
+        left=Side(
+            style="thin",
+            color="D0D5DD",
+        ),
+
+        right=Side(
+            style="thin",
+            color="D0D5DD",
+        ),
+
+        top=Side(
+            style="thin",
+            color="D0D5DD",
+        ),
+
+        bottom=Side(
+            style="thin",
+            color="D0D5DD",
+        ),
+    )
+
+    for row_cells in worksheet.iter_rows(
+        min_row=table_start,
+        max_row=total_row,
+        min_col=1,
+        max_col=12,
+    ):
+
+        for cell in row_cells:
+
+            cell.border = thin_border
+
+    # ========================================================
+    # COLUMN WIDTHS
+    # ========================================================
+
+    widths = {
+
+        "A": 16,   # Trip
+
+        "B": 14,   # Date
+
+        "C": 30,   # Customer
+
+        "D": 18,   # Contact
+
+        "E": 16,   # Billing
+
+        "F": 16,   # Paid
+
+        "G": 16,   # Advance
+
+        "H": 16,   # Balance
+
+        "I": 16,   # Recovery
+
+        "J": 18,   # Outstanding
+
+        "K": 16,   # Promise
+
+        "L": 14,   # Status
+
+    }
+
+    for column, width in widths.items():
+
+        worksheet.column_dimensions[
+            column
+        ].width = width
+
+    # ========================================================
+    # FREEZE
+    # ========================================================
+
+    worksheet.freeze_panes = "A8"
+
+    # ========================================================
+    # FILTER
+    # ========================================================
+
+    worksheet.auto_filter.ref = (
+        f"A{table_start}:L{total_row}"
+    )
+
+    # ========================================================
+    # PRINT SETTINGS
+    # ========================================================
+
+    worksheet.sheet_properties.pageSetUpPr.fitToPage = True
+
+    worksheet.page_setup.orientation = (
+        "landscape"
+    )
+
+    worksheet.page_setup.paperSize = (
+        worksheet.PAPERSIZE_A4
+    )
+
+    worksheet.page_setup.fitToWidth = 1
+
+    worksheet.page_setup.fitToHeight = 0
+
+    worksheet.print_title_rows = (
+        f"{table_start}:{table_start}"
+    )
+
+    worksheet.sheet_view.showGridLines = False
+
+    # ========================================================
+    # RESPONSE
+    # ========================================================
+
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        'attachment; '
+        'filename="payment_report.xlsx"'
+    )
+
+    workbook.save(
+        response
+    )
+
+    return response
+

@@ -44,12 +44,24 @@ urlpatterns = [
     ),
 
     path(
-        "reports/payments/",
+        "payments/",
         views.payment_report,
         name="payment_report",
     ),
 
-    path("payment_report_pdf/",views.payment_report_pdf,name='payment_report_pdf'),
+    path(
+        "payments/pdf/",
+        views.payment_report_pdf,
+        name="payment_report_pdf",
+    ),
+
+    path(
+        "payments/excel/",
+        views.payment_report_excel,
+        name="payment_report_excel",
+    ),
+
+
     # =========================================================
     # PAYMENTS
     # =========================================================
