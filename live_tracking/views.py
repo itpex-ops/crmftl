@@ -76,7 +76,6 @@ def delete_tracking(request, pk):
 
     return redirect("live_tracking_list")
 
-
 def send_consent(request, session_id):
 
     session = get_object_or_404(
