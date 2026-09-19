@@ -3386,14 +3386,14 @@ def payment_report_pdf(request):
     # =========================================================
 
     doc = SimpleDocTemplate(
-        response,
-        pagesize=landscape(A4),
+    response,
+    pagesize=landscape(A4),
 
-        rightMargin=10 * mm,
-        leftMargin=10 * mm,
-        topMargin=10 * mm,
-        bottomMargin=10 * mm,
-    )
+    rightMargin=8 * mm,
+    leftMargin=8 * mm,
+    topMargin=8 * mm,
+    bottomMargin=8 * mm,
+)
 
     styles = getSampleStyleSheet()
 
@@ -3571,21 +3571,41 @@ def payment_report_pdf(request):
     # REPORT TABLE
     # =========================================================
 
+    header_style = ParagraphStyle(
+    "TableHeader",
+    parent=styles["Normal"],
+    fontName="Helvetica-Bold",
+    fontSize=6.5,
+    leading=7,
+    textColor=colors.white,
+    alignment=1,
+)
+
+    header_style = ParagraphStyle(
+        "TableHeader",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=6.5,
+        leading=7,
+        textColor=colors.white,
+        alignment=1,
+    )
+
     table_data = [
-        [
-            "Trip No",
-            "Date",
-            "Customer",
-            "Billing",
-            "Paid",
-            "Advance",
-            "Balance",
-            "Recovery",
-            "Outstanding",
-            "Promise Date",
-            "Status",
-        ]
+    [
+        Paragraph("Trip No", header_style),
+        Paragraph("Date", header_style),
+        Paragraph("Customer", header_style),
+        Paragraph("Billing", header_style),
+        Paragraph("Paid", header_style),
+        Paragraph("Advance", header_style),
+        Paragraph("Balance", header_style),
+        Paragraph("Recovery", header_style),
+        Paragraph("Outstanding", header_style),
+        Paragraph("Promise<br/>Date", header_style),
+        Paragraph("Status", header_style),
     ]
+]
 
     for row in rows:
 
@@ -3622,24 +3642,25 @@ def payment_report_pdf(request):
     ])
 
     col_widths = [
-        25 * mm,   # Trip
-        23 * mm,   # Date
-        43 * mm,   # Customer
-        29 * mm,   # Billing
-        29 * mm,   # Paid
-        29 * mm,   # Advance
-        29 * mm,   # Balance
-        29 * mm,   # Recovery
-        31 * mm,   # Outstanding
-        27 * mm,   # Promise
-        24 * mm,   # Status
-    ]
+    23 * mm,   # Trip No
+    21 * mm,   # Date
+    39 * mm,   # Customer
+    25 * mm,   # Billing
+    25 * mm,   # Paid
+    25 * mm,   # Advance
+    25 * mm,   # Balance
+    25 * mm,   # Recovery
+    28 * mm,   # Outstanding
+    22 * mm,   # Promise Date
+    19 * mm,   # Status
+]
 
     report_table = Table(
-        table_data,
-        colWidths=col_widths,
-        repeatRows=1,
-    )
+    table_data,
+    colWidths=col_widths,
+    repeatRows=1,
+    hAlign="LEFT",
+)
 
     table_style = [
         (
@@ -3698,13 +3719,25 @@ def payment_report_pdf(request):
             (-1, -2),
             "Helvetica",
         ),
+(
+    "FONTSIZE",
+    (0, 0),
+    (-1, 0),
+    6.5,
+),
+       (
+    "TOPPADDING",
+    (0, 0),
+    (-1, -1),
+    4,
+),
 
-        (
-            "FONTSIZE",
-            (0, 1),
-            (-1, -1),
-            6.5,
-        ),
+(
+    "BOTTOMPADDING",
+    (0, 0),
+    (-1, -1),
+    4,
+),
 
         (
             "TEXTCOLOR",
