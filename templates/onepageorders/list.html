@@ -162,12 +162,14 @@
                                 aria-expanded="false">
                                     <i class="bi bi-clock-history"></i>
                                 </a> -->
-                                 <a
-                        href="{% url 'onepageordervehicle_tracking_history' o.tracking_session.pk %}"
-                        class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-clock-history me-1"></i>
-                        History
-                    </a>
+                                <a href="#history{{ vehicle.id }}"
+                                        class="btn btn-secondary btn-sm"
+                                        data-bs-toggle="collapse"
+                                        title="Location History"
+                                        role="button"
+                                        aria-expanded="false">
+                                            <i class="bi bi-clock-history"></i>
+                                        </a>
 
                                {% if o.tracking_session.entity_id and o.tracking_session.status != "active" and o.is_trip_completed %}
 
