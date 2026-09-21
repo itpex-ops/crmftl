@@ -1537,6 +1537,61 @@ def onepageorder_edit(request, pk):
         },
     )
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.db.models import Count, Q
+
+from .models import TrackingSession
+
+
+@login_required
+def tracking_dashboard(request):
+
+    tracking_qs = (
+        TrackingSession.objects
+        .select_related("order")
+        .order_by("-last_updated", "-id")
+    )
+
+    stats = tracking_qs.aggregate(
+        total=Count("id"),
+
+        active=Count(
+            "id",
+            filter=Q(status="active")
+        ),
+
+        waiting=Count(
+            "id",
+            filter=Q(status="waiting_location")
+        ),
+
+        paused=Count(
+            "id",
+            filter=Q(status="paused")
+        ),
+
+        stopped=Count(
+            "id",
+            filter=Q(status="stopped")
+        ),
+    )
+
+    context = {
+        "tracking_list": tracking_qs,
+
+        "total_tracking": stats["total"],
+        "active_tracking": stats["active"],
+        "waiting_tracking": stats["waiting"],
+        "paused_tracking": stats["paused"],
+        "stopped_tracking": stats["stopped"],
+    }
+
+    return render(
+        request,
+        "onepageorders/tracking_dashboard.html",
+        context,
+    )
 
 # =============================================================
 # VEHICLE PAYMENTS

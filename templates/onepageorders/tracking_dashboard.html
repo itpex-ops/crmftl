@@ -1,0 +1,828 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Tracking Dashboard{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{% static 'assets/common/css/common.css' %}">
+
+<style>
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.tracking-dashboard {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    padding: 22px 28px 40px;
+    background: #f8f9fb;
+    font-family: "Poppins", sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.dashboard-title {
+    margin: 0;
+    color: #212529;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.dashboard-subtitle {
+    display: block;
+    margin-top: 4px;
+    color: #6c757d;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   STAT CARDS
+   ========================================================= */
+
+.tracking-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.tracking-stat-card {
+    position: relative;
+    min-height: 105px;
+    padding: 17px;
+    background: #ffffff;
+    border: 1px solid #e2e5e8;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.035);
+}
+
+.tracking-stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #654321;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 9px;
+
+    border-radius: 7px;
+
+    background: #fff4d6;
+    color: #654321;
+
+    font-size: 17px;
+}
+
+.stat-label {
+    color: #777;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.stat-value {
+    margin-top: 2px;
+    color: #212529;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   ACTIVE CARD
+   ========================================================= */
+
+.stat-active::before {
+    background: #198754;
+}
+
+.stat-active .stat-icon {
+    background: #d1e7dd;
+    color: #146c43;
+}
+
+
+/* =========================================================
+   WAITING
+   ========================================================= */
+
+.stat-waiting::before {
+    background: #ffc107;
+}
+
+.stat-waiting .stat-icon {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+
+/* =========================================================
+   PAUSED
+   ========================================================= */
+
+.stat-paused::before {
+    background: #0dcaf0;
+}
+
+.stat-paused .stat-icon {
+    background: #cff4fc;
+    color: #055160;
+}
+
+
+/* =========================================================
+   STOPPED
+   ========================================================= */
+
+.stat-stopped::before {
+    background: #dc3545;
+}
+
+.stat-stopped .stat-icon {
+    background: #f8d7da;
+    color: #842029;
+}
+
+
+/* =========================================================
+   LOCATION CARD
+   ========================================================= */
+
+.location-stat::before {
+    background: #654321;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.tracking-main-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.tracking-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.tracking-card-title {
+    margin: 0;
+    color: #212529;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tracking-card-title i {
+    margin-right: 7px;
+    color: #654321;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.tracking-dashboard-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.tracking-dashboard-table thead th {
+    padding: 11px 12px;
+
+    background: #654321;
+    color: #ffffff;
+
+    border: none;
+
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tracking-dashboard-table tbody td {
+    padding: 11px 12px;
+
+    border-bottom: 1px solid #eeeeee;
+
+    vertical-align: middle;
+    color: #343a40;
+}
+
+.tracking-dashboard-table tbody tr:hover {
+    background: #fffaf0;
+}
+
+.tracking-dashboard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   TRIP
+   ========================================================= */
+
+.trip-number {
+    color: #654321;
+    font-weight: 600;
+}
+
+.vehicle-number {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   LOCATION
+   ========================================================= */
+
+.location {
+    max-width: 280px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.no-location {
+    color: #999;
+    font-style: italic;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+
+    font-size: 9.5px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.status-active {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-waiting {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.status-paused {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.status-stopped {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.status-consent {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.status-sms {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.status-deleted {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    min-width: 70px;
+    padding: 6px 11px;
+
+    background: #654321;
+    color: #ffffff;
+
+    border-radius: 5px;
+
+    text-decoration: none;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    transition: .2s ease;
+}
+
+.view-btn:hover {
+    background: #4d3218;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-row {
+    padding: 40px !important;
+
+    text-align: center;
+
+    color: #888;
+}
+
+.empty-row i {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #654321;
+
+    font-size: 28px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .tracking-stat-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+@media (max-width: 800px) {
+
+    .tracking-dashboard {
+        padding: 18px 15px 30px;
+    }
+
+    .tracking-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tracking-main-card {
+        overflow-x: auto;
+    }
+
+    .tracking-dashboard-table {
+        min-width: 900px;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .tracking-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+
+<div class="tracking-dashboard">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1 class="dashboard-title">
+
+                <i class="bi bi-geo-alt-fill me-2"></i>
+
+                Tracking Dashboard
+
+            </h1>
+
+            <span class="dashboard-subtitle">
+                Live vehicle tracking and trip monitoring
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <div class="tracking-stat-grid">
+
+
+        <!-- TOTAL -->
+
+        <div class="tracking-stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-truck"></i>
+            </div>
+
+            <div class="stat-label">
+                Total Trips
+            </div>
+
+            <div class="stat-value">
+                {{ total_tracking|default:0 }}
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+
+        <div class="tracking-stat-card stat-active">
+
+            <div class="stat-icon">
+                <i class="bi bi-broadcast-pin"></i>
+            </div>
+
+            <div class="stat-label">
+                Active Tracking
+            </div>
+
+            <div class="stat-value">
+                {{ active_tracking|default:0 }}
+            </div>
+
+        </div>
+
+
+        <!-- WAITING -->
+
+        <div class="tracking-stat-card stat-waiting">
+
+            <div class="stat-icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+
+            <div class="stat-label">
+                Waiting Location
+            </div>
+
+            <div class="stat-value">
+                {{ waiting_tracking|default:0 }}
+            </div>
+
+        </div>
+
+
+        <!-- PAUSED -->
+
+        <div class="tracking-stat-card stat-paused">
+
+            <div class="stat-icon">
+                <i class="bi bi-pause-circle"></i>
+            </div>
+
+            <div class="stat-label">
+                Paused
+            </div>
+
+            <div class="stat-value">
+                {{ paused_tracking|default:0 }}
+            </div>
+
+        </div>
+
+
+        <!-- STOPPED -->
+
+        <div class="tracking-stat-card stat-stopped">
+
+            <div class="stat-icon">
+                <i class="bi bi-stop-circle"></i>
+            </div>
+
+            <div class="stat-label">
+                Stopped
+            </div>
+
+            <div class="stat-value">
+                {{ stopped_tracking|default:0 }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TRACKING TABLE
+         ===================================================== -->
+
+    <div class="tracking-main-card">
+
+
+        <div class="tracking-card-header">
+
+            <h5 class="tracking-card-title">
+
+                <i class="bi bi-broadcast"></i>
+
+                Live Tracking
+
+            </h5>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="tracking-dashboard-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Trip No</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Driver</th>
+
+                        <th>Status</th>
+
+                        <th>Current Location</th>
+
+                        <th>Last Updated</th>
+
+                        <th class="text-center">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for track in tracking_list %}
+
+                    <tr>
+
+
+                        <!-- TRIP -->
+
+                        <td>
+
+                            <span class="trip-number">
+
+                                {{ track.order.trip_number|default:"-" }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- VEHICLE -->
+
+                        <td>
+
+                            <span class="vehicle-number">
+
+                                {{ track.order.vehicle_number|default:"-" }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- DRIVER -->
+
+                        <td>
+
+                            {{ track.driver_mobile|default:"-" }}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if track.status == "active" %}
+
+                                <span class="status status-active">
+                                    <i class="bi bi-broadcast-pin"></i>
+                                    Active
+                                </span>
+
+                            {% elif track.status == "waiting_location" %}
+
+                                <span class="status status-waiting">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    Waiting
+                                </span>
+
+                            {% elif track.status == "sms_sent" %}
+
+                                <span class="status status-sms">
+                                    <i class="bi bi-chat-dots"></i>
+                                    SMS Sent
+                                </span>
+
+                            {% elif track.status == "consent_received" %}
+
+                                <span class="status status-consent">
+                                    <i class="bi bi-check-circle"></i>
+                                    Consent Received
+                                </span>
+
+                            {% elif track.status == "paused" %}
+
+                                <span class="status status-paused">
+                                    <i class="bi bi-pause-circle"></i>
+                                    Paused
+                                </span>
+
+                            {% elif track.status == "stopped" %}
+
+                                <span class="status status-stopped">
+                                    <i class="bi bi-stop-circle"></i>
+                                    Stopped
+                                </span>
+
+                            {% elif track.status == "deleted" %}
+
+                                <span class="status status-deleted">
+                                    <i class="bi bi-trash"></i>
+                                    Deleted
+                                </span>
+
+                            {% elif track.status == "error" %}
+
+                                <span class="status status-error">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Error
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-waiting">
+                                    {{ track.status|default:"Unknown" }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- LOCATION -->
+
+                        <td>
+
+                            {% if track.last_location %}
+
+                                <div class="location">
+
+                                    {{ track.last_location }}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="no-location">
+                                    Location not available
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- LAST UPDATED -->
+
+                        <td>
+
+                            {% if track.last_updated %}
+
+                                {{ track.last_updated|date:"d-m-Y H:i" }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td class="text-center">
+
+                            <a
+                                href="{% url 'live_tracking:vehicle_live' track.pk %}"
+                                class="view-btn"
+                            >
+
+                                <i class="bi bi-eye"></i>
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7" class="empty-row">
+
+                            <i class="bi bi-geo-alt"></i>
+
+                            No tracking records available.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

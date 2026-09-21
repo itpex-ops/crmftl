@@ -197,4 +197,9 @@ urlpatterns = [
         views.api_token_status,
         name="onepageorder_api_token_status",
     ),
+    path(
+        "dashboard/",
+        views.tracking_dashboard,
+        name="tracking_dashboard",
+    ),
 ]
