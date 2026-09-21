@@ -252,16 +252,7 @@
 
                 </div>
 
-<!-- LOGOUT -->
-                    <a
-                        class="nav-link
-                        {% if request.resolver_match.url_name == 'customer_payments' %}
-                            active
-                        {% endif %}"
-                        href="{% url 'customer_payments' %}">
-                        <i class="bi bi-person-lines-fill me-1"></i>
-                        Customer Payments
-                    </a>
+                <!-- LOGOUT -->
                     <a class="nav-link {% if request.resolver_match.url_name == 'logout' %}
                         active
                         {% endif %}"
