@@ -260,7 +260,6 @@
 
             </a>
 
-
             <!-- =================================================
                  LIVE TRACKING
                  ================================================= -->
@@ -299,13 +298,9 @@
 
             <a
                 class="nav-link {% if request.resolver_match.url_name == 'customer_payments' %}active{% endif %}"
-                href="{% url 'customer_payments' %}"
-            >
-
+                href="{% url 'customer_payments' %}">
                 <i class="bi bi-person-lines-fill me-1"></i>
-
                 Customer Payments
-
             </a>
 
 
@@ -328,18 +323,14 @@
             <!-- =================================================
                  REPORTS
                  ================================================= -->
-
+            {% if user.role == "superadmin" %}
             <a
-                class="nav-link" {% if request.resolver_match.url_name == 'payment_report' %}active{% endif %}"
-                href="{% url 'onepageorder_payment_report' %}"
-            >
-
+                class="nav-link" {% if request.resolver_match.url_name == 'onepageorder_payment_report' %}active{% endif %}"
+                href="{% url 'onepageorder_payment_report' %}">
                 <i class="bi bi-bar-chart-line me-1"></i>
-
                 Reports
-
             </a>
-
+            {% endif %}
         </div>
 
     </div>

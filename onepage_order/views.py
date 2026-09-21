@@ -5347,7 +5347,6 @@ def payment_report_excel(request):
 
     )
 
-
     response[
         "Content-Disposition"
     ] = (
