@@ -1,8 +1,6 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
     <meta charset="UTF-8">
@@ -10,12 +8,11 @@
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
-    >
+    >,ll
 
     <title>
         {% block title %}Parcelex{% endblock %}
     </title>
-
 
     <!-- =====================================================
          COMMON CSS
@@ -91,13 +88,10 @@
 
             <a
                 class="navbar-brand"
-                href="{% url 'onepageorder_list' %}"
-            >
-
+                href="{% url 'onepageorder_list' %}">
                 <span class="brand-name">
                     PARCELEX
                 </span>
-
             </a>
 
 
@@ -135,19 +129,13 @@
                     <!-- =========================================
                          ORDERS
                     ========================================== -->
-
-                    <a
-                        class="nav-link
+                    <a class="nav-link
                         {% if request.resolver_match.url_name == 'onepageorder_list' %}
                             active
                         {% endif %}"
-                        href="{% url 'onepageorder_list' %}"
-                    >
-
+                        href="{% url 'onepageorder_list' %}">
                         <i class="bi bi-box-seam me-1"></i>
-
                         Orders
-
                     </a>
 
 
@@ -248,8 +236,6 @@
                         </a>
 
                     {% endif %}
-
-
                 </div>
 
                 <!-- LOGOUT -->
@@ -263,10 +249,7 @@
                 <!-- =================================================
                      USER AREA
                 ================================================== -->
-
                 <div class="navbar-user-area">
-
-
                     <!-- =============================================
                          NOTIFICATION
                     ============================================== -->
@@ -348,8 +331,6 @@
         </div>
 
     </nav>
-
-
     <!-- =====================================================
          PAGE CONTENT
     ====================================================== -->
@@ -360,11 +341,7 @@
         {% endblock %}
 
     </main>
-
-
 </div>
-
-
 <!-- =========================================================
      BOOTSTRAP JS
 ========================================================== -->
@@ -739,14 +716,13 @@ body {
 
     height: 64px;
 
-    padding:
-        0 13px;
+    padding:0 13px;
 
     color:
         var(--parcelex-brown)
         !important;
 
-    font-size: 12px;
+    font-size: 15px;
 
     font-weight: 500;
 
@@ -1208,11 +1184,7 @@ body {
 
 </style>
 
-
 {% block extra_js %}
 {% endblock %}
-
-
 </body>
-
 </html>
