@@ -28,6 +28,7 @@ from .services.consent_service import ConsentService
 from .services.location_service import LocationService
 from .services.delete_service import DeleteService
 from .services.modify_service import ModifyService
+from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 # =============================================================
@@ -268,6 +269,26 @@ def onepageorder_delete(request, pk):
 
     return redirect("onepageorder_list")
 
+def excel_datetime(value):
+    """
+    Convert Django timezone-aware datetime to
+    timezone-naive datetime for Excel.
+    """
+
+    if value is None:
+        return None
+
+    if hasattr(value, "tzinfo"):
+
+        if value.tzinfo is not None:
+
+            value = timezone.localtime(value)
+
+            value = value.replace(
+                tzinfo=None
+            )
+
+    return value
 
 # Backward-compatible name if an old URL still points to delete_vehicle.
 @login_required
