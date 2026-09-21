@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 {% load static %}
 
 {% block title %}Tracking Dashboard{% endblock %}
@@ -14,11 +14,10 @@
    PAGE
    ========================================================= */
 
-.tracking-dashboard {
-    width: 100%;
+.tracking-saas {
     min-height: calc(100vh - 70px);
-    padding: 22px 28px 40px;
-    background: #f8f9fb;
+    padding: 24px 28px 40px;
+    background: #f6f7f9;
     font-family: "Poppins", sans-serif;
 }
 
@@ -27,152 +26,138 @@
    HEADER
    ========================================================= */
 
-.dashboard-header {
+.saas-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 22px;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
-.dashboard-title {
+.saas-title {
     margin: 0;
-    color: #212529;
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 600;
+    color: #1f2937;
 }
 
-.dashboard-subtitle {
-    display: block;
-    margin-top: 4px;
-    color: #6c757d;
+.saas-subtitle {
+    margin-top: 5px;
     font-size: 11px;
+    color: #8a8f98;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.header-btn {
+    height: 36px;
+    padding: 0 13px;
+    border: 1px solid #e1e4e8;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #495057;
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-btn:hover {
+    background: #fafafa;
+    color: #654321;
 }
 
 
 /* =========================================================
-   STAT CARDS
+   KPI CARDS
    ========================================================= */
 
-.tracking-stat-grid {
+.kpi-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 14px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
-.tracking-stat-card {
+.kpi-card {
     position: relative;
-    min-height: 105px;
-    padding: 17px;
     background: #ffffff;
-    border: 1px solid #e2e5e8;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 7px rgba(0,0,0,0.035);
+    border: 1px solid #e7e9ec;
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 108px;
+    transition: .2s ease;
 }
 
-.tracking-stat-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: #654321;
+.kpi-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(0,0,0,.05);
 }
 
-.stat-icon {
-    width: 36px;
-    height: 36px;
+.kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kpi-icon {
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 9px;
-
-    border-radius: 7px;
-
+    border-radius: 8px;
     background: #fff4d6;
     color: #654321;
-
-    font-size: 17px;
+    font-size: 15px;
 }
 
-.stat-label {
-    color: #777;
+.kpi-label {
+    margin-top: 12px;
+    color: #8a8f98;
     font-size: 10px;
     font-weight: 500;
 }
 
-.stat-value {
+.kpi-value {
     margin-top: 2px;
-    color: #212529;
-    font-size: 22px;
+    color: #20252b;
+    font-size: 23px;
     font-weight: 700;
 }
 
-
-/* =========================================================
-   ACTIVE CARD
-   ========================================================= */
-
-.stat-active::before {
-    background: #198754;
-}
-
-.stat-active .stat-icon {
-    background: #d1e7dd;
-    color: #146c43;
+.kpi-change {
+    color: #7b818a;
+    font-size: 9px;
 }
 
 
 /* =========================================================
-   WAITING
+   STATUS COLORS
    ========================================================= */
 
-.stat-waiting::before {
-    background: #ffc107;
+.kpi-active .kpi-icon {
+    background: #e8f7ef;
+    color: #198754;
 }
 
-.stat-waiting .stat-icon {
-    background: #fff3cd;
-    color: #664d03;
+.kpi-waiting .kpi-icon {
+    background: #fff5d9;
+    color: #a66b00;
 }
 
-
-/* =========================================================
-   PAUSED
-   ========================================================= */
-
-.stat-paused::before {
-    background: #0dcaf0;
+.kpi-paused .kpi-icon {
+    background: #e8f7fa;
+    color: #087990;
 }
 
-.stat-paused .stat-icon {
-    background: #cff4fc;
-    color: #055160;
-}
-
-
-/* =========================================================
-   STOPPED
-   ========================================================= */
-
-.stat-stopped::before {
-    background: #dc3545;
-}
-
-.stat-stopped .stat-icon {
-    background: #f8d7da;
-    color: #842029;
-}
-
-
-/* =========================================================
-   LOCATION CARD
-   ========================================================= */
-
-.location-stat::before {
-    background: #654321;
+.kpi-stopped .kpi-icon {
+    background: #fdebed;
+    color: #c92a3a;
 }
 
 
@@ -180,39 +165,83 @@
    MAIN CARD
    ========================================================= */
 
-.tracking-main-card {
+.saas-table-card {
     background: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 
 /* =========================================================
-   CARD HEADER
+   TABLE HEADER
    ========================================================= */
 
-.tracking-card-header {
+.table-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    padding: 13px 16px;
-
-    border-bottom: 1px solid #e5e5e5;
+    gap: 15px;
+    padding: 15px 18px;
+    border-bottom: 1px solid #eceef1;
 }
 
-.tracking-card-title {
+.table-title {
     margin: 0;
-    color: #212529;
     font-size: 14px;
     font-weight: 600;
+    color: #252a31;
 }
 
-.tracking-card-title i {
-    margin-right: 7px;
-    color: #654321;
+.table-title small {
+    margin-left: 5px;
+    color: #9298a1;
+    font-size: 9px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.filter-area {
+    display: flex;
+    gap: 8px;
+}
+
+.search-box {
+    width: 230px;
+    height: 34px;
+    padding: 0 11px 0 34px;
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+    outline: none;
+    font-size: 10.5px;
+    background: #ffffff;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 11px;
+    top: 9px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.filter-select {
+    height: 34px;
+    min-width: 120px;
+    padding: 0 9px;
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 10.5px;
+    color: #495057;
 }
 
 
@@ -220,41 +249,33 @@
    TABLE
    ========================================================= */
 
-.tracking-dashboard-table {
+.saas-table {
     width: 100%;
-    margin: 0;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 10.5px;
 }
 
-.tracking-dashboard-table thead th {
-    padding: 11px 12px;
-
-    background: #654321;
-    color: #ffffff;
-
-    border: none;
-
-    font-size: 10.5px;
+.saas-table thead th {
+    padding: 11px 14px;
+    background: #fafbfc;
+    color: #7b818a;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 9.5px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .25px;
     white-space: nowrap;
 }
 
-.tracking-dashboard-table tbody td {
-    padding: 11px 12px;
-
-    border-bottom: 1px solid #eeeeee;
-
-    vertical-align: middle;
+.saas-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f1f3;
     color: #343a40;
+    vertical-align: middle;
 }
 
-.tracking-dashboard-table tbody tr:hover {
-    background: #fffaf0;
-}
-
-.tracking-dashboard-table tbody tr:last-child td {
-    border-bottom: none;
+.saas-table tbody tr:hover {
+    background: #fffdf7;
 }
 
 
@@ -262,29 +283,57 @@
    TRIP
    ========================================================= */
 
-.trip-number {
+.trip-code {
     color: #654321;
     font-weight: 600;
 }
 
-.vehicle-number {
+.vehicle-code {
+    color: #30353b;
     font-weight: 500;
 }
 
 
 /* =========================================================
-   LOCATION
+   ROUTE
    ========================================================= */
 
-.location {
-    max-width: 280px;
+.route {
+    max-width: 210px;
+    color: #59616b;
     line-height: 1.4;
-    word-break: break-word;
 }
 
-.no-location {
-    color: #999;
-    font-style: italic;
+.route-from,
+.route-to {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.route-arrow {
+    color: #b0b5bc;
+    margin: 0 4px;
+}
+
+
+/* =========================================================
+   DRIVER
+   ========================================================= */
+
+.driver-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.driver-number {
+    color: #343a40;
+    font-weight: 500;
+}
+
+.driver-label {
+    color: #9aa0a8;
+    font-size: 8.5px;
 }
 
 
@@ -292,91 +341,136 @@
    STATUS
    ========================================================= */
 
-.status {
+.status-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-
-    padding: 4px 9px;
-
+    padding: 5px 9px;
     border-radius: 20px;
-
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 600;
-
     white-space: nowrap;
 }
 
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
 .status-active {
-    background: #d1e7dd;
-    color: #0f5132;
+    background: #e9f7ef;
+    color: #147a4d;
+}
+
+.status-active .status-dot {
+    background: #198754;
 }
 
 .status-waiting {
-    background: #fff3cd;
-    color: #664d03;
+    background: #fff6dc;
+    color: #946200;
+}
+
+.status-waiting .status-dot {
+    background: #e0a800;
 }
 
 .status-paused {
-    background: #cff4fc;
-    color: #055160;
+    background: #e9f8fb;
+    color: #087990;
+}
+
+.status-paused .status-dot {
+    background: #0dcaf0;
 }
 
 .status-stopped {
-    background: #f8d7da;
-    color: #842029;
+    background: #fdebed;
+    color: #b42333;
+}
+
+.status-stopped .status-dot {
+    background: #dc3545;
 }
 
 .status-consent {
-    background: #e2e3e5;
-    color: #41464b;
+    background: #f0f1f3;
+    color: #59616b;
+}
+
+.status-consent .status-dot {
+    background: #6c757d;
 }
 
 .status-sms {
-    background: #cff4fc;
-    color: #055160;
+    background: #edf8fa;
+    color: #087990;
+}
+
+.status-sms .status-dot {
+    background: #0dcaf0;
 }
 
 .status-error {
-    background: #f8d7da;
-    color: #842029;
+    background: #fdebed;
+    color: #b42333;
 }
 
-.status-deleted {
-    background: #e2e3e5;
-    color: #41464b;
+.status-error .status-dot {
+    background: #dc3545;
 }
 
 
 /* =========================================================
-   VIEW BUTTON
+   LOCATION
    ========================================================= */
 
-.view-btn {
+.location-cell {
+    max-width: 230px;
+}
+
+.location-name {
+    color: #343a40;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.location-time {
+    margin-top: 2px;
+    color: #9aa0a8;
+    font-size: 8.5px;
+}
+
+
+/* =========================================================
+   ACTION
+   ========================================================= */
+
+.view-action {
+    width: 31px;
+    height: 31px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
 
-    min-width: 70px;
-    padding: 6px 11px;
+    border: 1px solid #dedfe2;
+    border-radius: 6px;
 
-    background: #654321;
-    color: #ffffff;
-
-    border-radius: 5px;
+    background: #ffffff;
+    color: #654321;
 
     text-decoration: none;
 
-    font-size: 10px;
-    font-weight: 500;
-
-    transition: .2s ease;
+    font-size: 12px;
 }
 
-.view-btn:hover {
-    background: #4d3218;
+.view-action:hover {
+    background: #654321;
     color: #ffffff;
+    border-color: #654321;
 }
 
 
@@ -384,22 +478,39 @@
    EMPTY
    ========================================================= */
 
-.empty-row {
-    padding: 40px !important;
-
+.empty-state {
+    padding: 55px 20px !important;
     text-align: center;
-
-    color: #888;
+    color: #9298a1;
 }
 
-.empty-row i {
+.empty-state i {
     display: block;
-
-    margin-bottom: 8px;
-
+    margin-bottom: 10px;
     color: #654321;
+    font-size: 30px;
+}
 
-    font-size: 28px;
+.empty-state strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #555b63;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 16px;
+    background: #fafbfc;
+    color: #9298a1;
+    font-size: 9px;
 }
 
 
@@ -409,36 +520,57 @@
 
 @media (max-width: 1200px) {
 
-    .tracking-stat-grid {
+    .kpi-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 
 }
 
-@media (max-width: 800px) {
+@media (max-width: 850px) {
 
-    .tracking-dashboard {
+    .tracking-saas {
         padding: 18px 15px 30px;
     }
 
-    .tracking-stat-grid {
+    .saas-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .kpi-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .tracking-main-card {
+    .table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-area {
+        width: 100%;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .saas-table-card {
         overflow-x: auto;
     }
 
-    .tracking-dashboard-table {
-        min-width: 900px;
+    .saas-table {
+        min-width: 1050px;
     }
-
 }
 
-@media (max-width: 500px) {
+@media (max-width: 550px) {
 
-    .tracking-stat-grid {
+    .kpi-grid {
         grid-template-columns: 1fr;
+    }
+
+    .filter-area {
+        flex-direction: column;
     }
 
 }
@@ -446,27 +578,36 @@
 </style>
 
 
-<div class="tracking-dashboard">
+<div class="tracking-saas">
 
     <!-- =====================================================
          HEADER
          ===================================================== -->
 
-    <div class="dashboard-header">
+    <div class="saas-header">
 
         <div>
 
-            <h1 class="dashboard-title">
-
-                <i class="bi bi-geo-alt-fill me-2"></i>
-
+            <h1 class="saas-title">
                 Tracking Dashboard
-
             </h1>
 
-            <span class="dashboard-subtitle">
-                Live vehicle tracking and trip monitoring
-            </span>
+            <div class="saas-subtitle">
+                Real-time visibility of your fleet and active trips
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a
+                href="{% url 'live_tracking:tracking_dashboard' %}"
+                class="header-btn"
+            >
+                <i class="bi bi-arrow-clockwise"></i>
+                Refresh
+            </a>
 
         </div>
 
@@ -474,25 +615,29 @@
 
 
     <!-- =====================================================
-         STATISTICS
+         KPI
          ===================================================== -->
 
-    <div class="tracking-stat-grid">
+    <div class="kpi-grid">
 
 
         <!-- TOTAL -->
 
-        <div class="tracking-stat-card">
+        <div class="kpi-card">
 
-            <div class="stat-icon">
-                <i class="bi bi-truck"></i>
+            <div class="kpi-top">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-truck"></i>
+                </div>
+
             </div>
 
-            <div class="stat-label">
+            <div class="kpi-label">
                 Total Trips
             </div>
 
-            <div class="stat-value">
+            <div class="kpi-value">
                 {{ total_tracking|default:0 }}
             </div>
 
@@ -501,17 +646,21 @@
 
         <!-- ACTIVE -->
 
-        <div class="tracking-stat-card stat-active">
+        <div class="kpi-card kpi-active">
 
-            <div class="stat-icon">
-                <i class="bi bi-broadcast-pin"></i>
+            <div class="kpi-top">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+
             </div>
 
-            <div class="stat-label">
+            <div class="kpi-label">
                 Active Tracking
             </div>
 
-            <div class="stat-value">
+            <div class="kpi-value">
                 {{ active_tracking|default:0 }}
             </div>
 
@@ -520,17 +669,21 @@
 
         <!-- WAITING -->
 
-        <div class="tracking-stat-card stat-waiting">
+        <div class="kpi-card kpi-waiting">
 
-            <div class="stat-icon">
-                <i class="bi bi-hourglass-split"></i>
+            <div class="kpi-top">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
             </div>
 
-            <div class="stat-label">
+            <div class="kpi-label">
                 Waiting Location
             </div>
 
-            <div class="stat-value">
+            <div class="kpi-value">
                 {{ waiting_tracking|default:0 }}
             </div>
 
@@ -539,17 +692,21 @@
 
         <!-- PAUSED -->
 
-        <div class="tracking-stat-card stat-paused">
+        <div class="kpi-card kpi-paused">
 
-            <div class="stat-icon">
-                <i class="bi bi-pause-circle"></i>
+            <div class="kpi-top">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-pause-circle"></i>
+                </div>
+
             </div>
 
-            <div class="stat-label">
+            <div class="kpi-label">
                 Paused
             </div>
 
-            <div class="stat-value">
+            <div class="kpi-value">
                 {{ paused_tracking|default:0 }}
             </div>
 
@@ -558,17 +715,21 @@
 
         <!-- STOPPED -->
 
-        <div class="tracking-stat-card stat-stopped">
+        <div class="kpi-card kpi-stopped">
 
-            <div class="stat-icon">
-                <i class="bi bi-stop-circle"></i>
+            <div class="kpi-top">
+
+                <div class="kpi-icon">
+                    <i class="bi bi-stop-circle"></i>
+                </div>
+
             </div>
 
-            <div class="stat-label">
+            <div class="kpi-label">
                 Stopped
             </div>
 
-            <div class="stat-value">
+            <div class="kpi-value">
                 {{ stopped_tracking|default:0 }}
             </div>
 
@@ -578,28 +739,85 @@
 
 
     <!-- =====================================================
-         TRACKING TABLE
+         TABLE CARD
          ===================================================== -->
 
-    <div class="tracking-main-card">
+    <div class="saas-table-card">
 
 
-        <div class="tracking-card-header">
+        <div class="table-toolbar">
 
-            <h5 class="tracking-card-title">
+            <div>
 
-                <i class="bi bi-broadcast"></i>
+                <h5 class="table-title">
+                    Live Trips
 
-                Live Tracking
+                    <small>
+                        {{ total_tracking|default:0 }} records
+                    </small>
+                </h5>
 
-            </h5>
+            </div>
+
+
+            <div class="filter-area">
+
+                <div class="search-wrapper">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        id="trackingSearch"
+                        class="search-box"
+                        placeholder="Search trip, vehicle or driver..."
+                    >
+
+                </div>
+
+
+                <select
+                    id="statusFilter"
+                    class="filter-select"
+                >
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option value="active">
+                        Active
+                    </option>
+
+                    <option value="waiting">
+                        Waiting
+                    </option>
+
+                    <option value="paused">
+                        Paused
+                    </option>
+
+                    <option value="stopped">
+                        Stopped
+                    </option>
+
+                </select>
+
+            </div>
 
         </div>
 
 
+        <!-- =================================================
+             TABLE
+             ================================================= -->
+
         <div class="table-responsive">
 
-            <table class="tracking-dashboard-table">
+            <table
+                class="saas-table"
+                id="trackingTable"
+            >
 
                 <thead>
 
@@ -609,6 +827,8 @@
 
                         <th>Vehicle</th>
 
+                        <th>Route</th>
+
                         <th>Driver</th>
 
                         <th>Status</th>
@@ -617,9 +837,7 @@
 
                         <th>Last Updated</th>
 
-                        <th class="text-center">
-                            Action
-                        </th>
+                        <th></th>
 
                     </tr>
 
@@ -628,19 +846,25 @@
 
                 <tbody>
 
-                    {% for track in tracking_list %}
 
-                    <tr>
+                {% for track in tracking_list %}
+
+                    <tr
+                        data-search="
+                            {{ track.order.trip_number|default:'' }}
+                            {{ track.order.vehicle_number|default:'' }}
+                            {{ track.driver_mobile|default:'' }}
+                        "
+                        data-status="{{ track.status }}"
+                    >
 
 
                         <!-- TRIP -->
 
                         <td>
 
-                            <span class="trip-number">
-
+                            <span class="trip-code">
                                 {{ track.order.trip_number|default:"-" }}
-
                             </span>
 
                         </td>
@@ -650,11 +874,32 @@
 
                         <td>
 
-                            <span class="vehicle-number">
-
+                            <span class="vehicle-code">
                                 {{ track.order.vehicle_number|default:"-" }}
-
                             </span>
+
+                        </td>
+
+
+                        <!-- ROUTE -->
+
+                        <td>
+
+                            <div class="route">
+
+                                <div class="route-from">
+
+                                    {{ track.order.origin|default:"-" }}
+
+                                    <span class="route-arrow">
+                                        →
+                                    </span>
+
+                                    {{ track.order.destination|default:"-" }}
+
+                                </div>
+
+                            </div>
 
                         </td>
 
@@ -663,7 +908,17 @@
 
                         <td>
 
-                            {{ track.driver_mobile|default:"-" }}
+                            <div class="driver-info">
+
+                                <span class="driver-number">
+                                    {{ track.driver_mobile|default:"-" }}
+                                </span>
+
+                                <span class="driver-label">
+                                    Driver
+                                </span>
+
+                            </div>
 
                         </td>
 
@@ -674,63 +929,57 @@
 
                             {% if track.status == "active" %}
 
-                                <span class="status status-active">
-                                    <i class="bi bi-broadcast-pin"></i>
+                                <span class="status-pill status-active">
+                                    <span class="status-dot"></span>
                                     Active
                                 </span>
 
                             {% elif track.status == "waiting_location" %}
 
-                                <span class="status status-waiting">
-                                    <i class="bi bi-hourglass-split"></i>
+                                <span class="status-pill status-waiting">
+                                    <span class="status-dot"></span>
                                     Waiting
                                 </span>
 
                             {% elif track.status == "sms_sent" %}
 
-                                <span class="status status-sms">
-                                    <i class="bi bi-chat-dots"></i>
+                                <span class="status-pill status-sms">
+                                    <span class="status-dot"></span>
                                     SMS Sent
                                 </span>
 
                             {% elif track.status == "consent_received" %}
 
-                                <span class="status status-consent">
-                                    <i class="bi bi-check-circle"></i>
+                                <span class="status-pill status-consent">
+                                    <span class="status-dot"></span>
                                     Consent Received
                                 </span>
 
                             {% elif track.status == "paused" %}
 
-                                <span class="status status-paused">
-                                    <i class="bi bi-pause-circle"></i>
+                                <span class="status-pill status-paused">
+                                    <span class="status-dot"></span>
                                     Paused
                                 </span>
 
                             {% elif track.status == "stopped" %}
 
-                                <span class="status status-stopped">
-                                    <i class="bi bi-stop-circle"></i>
+                                <span class="status-pill status-stopped">
+                                    <span class="status-dot"></span>
                                     Stopped
-                                </span>
-
-                            {% elif track.status == "deleted" %}
-
-                                <span class="status status-deleted">
-                                    <i class="bi bi-trash"></i>
-                                    Deleted
                                 </span>
 
                             {% elif track.status == "error" %}
 
-                                <span class="status status-error">
-                                    <i class="bi bi-exclamation-triangle"></i>
+                                <span class="status-pill status-error">
+                                    <span class="status-dot"></span>
                                     Error
                                 </span>
 
                             {% else %}
 
-                                <span class="status status-waiting">
+                                <span class="status-pill status-consent">
+                                    <span class="status-dot"></span>
                                     {{ track.status|default:"Unknown" }}
                                 </span>
 
@@ -743,21 +992,38 @@
 
                         <td>
 
-                            {% if track.last_location %}
+                            <div class="location-cell">
 
-                                <div class="location">
+                                {% if track.last_location %}
 
-                                    {{ track.last_location }}
+                                    <div class="location-name">
 
-                                </div>
+                                        <i class="bi bi-geo-alt me-1"></i>
 
-                            {% else %}
+                                        {{ track.last_location }}
 
-                                <span class="no-location">
-                                    Location not available
-                                </span>
+                                    </div>
 
-                            {% endif %}
+                                {% else %}
+
+                                    <div class="location-name text-muted">
+                                        Location not available
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if track.last_updated %}
+
+                                    <div class="location-time">
+
+                                        {{ track.last_updated|date:"d M Y, H:i" }}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
 
                         </td>
 
@@ -779,41 +1045,49 @@
                         </td>
 
 
-                        <!-- ACTION -->
+                        <!-- VIEW -->
 
                         <td class="text-center">
 
                             <a
-                                href="{% url 'vehicle_live' track.pk %}"
-                                class="view-btn"
+                                href="{% url 'live_tracking:vehicle_live' track.pk %}"
+                                class="view-action"
+                                title="View Tracking"
                             >
 
-                                <i class="bi bi-eye"></i>
-
-                                View
+                                <i class="bi bi-arrow-right"></i>
 
                             </a>
 
                         </td>
 
+
                     </tr>
 
 
-                    {% empty %}
+                {% empty %}
 
                     <tr>
 
-                        <td colspan="7" class="empty-row">
+                        <td
+                            colspan="8"
+                            class="empty-state"
+                        >
 
                             <i class="bi bi-geo-alt"></i>
 
-                            No tracking records available.
+                            <strong>
+                                No tracking records
+                            </strong>
+
+                            There are currently no vehicle tracking sessions.
 
                         </td>
 
                     </tr>
 
-                    {% endfor %}
+                {% endfor %}
+
 
                 </tbody>
 
@@ -821,8 +1095,131 @@
 
         </div>
 
+
+        <!-- =================================================
+             FOOTER
+             ================================================= -->
+
+        <div class="table-footer">
+
+            <span>
+                Live tracking records
+            </span>
+
+            <span>
+                Last refreshed:
+                {% now "d-m-Y H:i" %}
+            </span>
+
+        </div>
+
     </div>
 
 </div>
+
+
+<script>
+
+/* =========================================================
+   SEARCH + STATUS FILTER
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const search =
+            document.getElementById(
+                "trackingSearch"
+            );
+
+        const status =
+            document.getElementById(
+                "statusFilter"
+            );
+
+        const rows =
+            document.querySelectorAll(
+                "#trackingTable tbody tr[data-search]"
+            );
+
+
+        function filterTable() {
+
+            const searchValue =
+                search.value
+                    .toLowerCase()
+                    .trim();
+
+            const statusValue =
+                status.value
+                    .toLowerCase()
+                    .trim();
+
+
+            rows.forEach(function (row) {
+
+                const rowSearch =
+                    row.dataset.search
+                        .toLowerCase();
+
+                const rowStatus =
+                    row.dataset.status
+                        .toLowerCase();
+
+
+                const matchesSearch =
+                    !searchValue ||
+                    rowSearch.includes(
+                        searchValue
+                    );
+
+
+                let matchesStatus = true;
+
+
+                if (statusValue) {
+
+                    if (statusValue === "waiting") {
+
+                        matchesStatus =
+                            rowStatus ===
+                            "waiting_location";
+
+                    } else {
+
+                        matchesStatus =
+                            rowStatus ===
+                            statusValue;
+                    }
+                }
+
+
+                row.style.display =
+                    matchesSearch &&
+                    matchesStatus
+                        ? ""
+                        : "none";
+
+            });
+
+        }
+
+
+        search.addEventListener(
+            "input",
+            filterTable
+        );
+
+
+        status.addEventListener(
+            "change",
+            filterTable
+        );
+
+    }
+);
+
+</script>
 
 {% endblock %}
