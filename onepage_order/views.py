@@ -4553,16 +4553,60 @@ def payment_report_pdf(request):
 # EXCEL REPORT
 # ============================================================
 
+from django.http import HttpResponse
+from django.utils import timezone
+
+from openpyxl import Workbook
+from openpyxl.styles import (
+    Font,
+    PatternFill,
+    Border,
+    Side,
+    Alignment,
+)
+
+
+# =========================================================
+# EXCEL DATETIME HELPER
+# =========================================================
+
+def excel_safe_datetime(value):
+    """
+    Convert Django timezone-aware datetime to a
+    timezone-naive datetime that Excel/openpyxl accepts.
+    """
+
+    if value is None:
+        return None
+
+    # DateTimeField
+    if hasattr(value, "tzinfo"):
+
+        if value.tzinfo is not None:
+
+            # Convert to Django current timezone first
+            value = timezone.localtime(value)
+
+            # Remove timezone information
+            value = value.replace(
+                tzinfo=None
+            )
+
+    return value
+
+
+# =========================================================
+# PAYMENT REPORT - EXCEL
+# =========================================================
+
 @login_required
 def payment_report_excel(request):
 
-    context = build_payment_report(
-        request
-    )
+    context = build_payment_report(request)
 
-    # ========================================================
+    # =====================================================
     # WORKBOOK
-    # ========================================================
+    # =====================================================
 
     workbook = Workbook()
 
@@ -4570,13 +4614,12 @@ def payment_report_excel(request):
 
     worksheet.title = "Payment Report"
 
-    # ========================================================
-    # TITLE
-    # ========================================================
 
-    worksheet.merge_cells(
-        "A1:K1"
-    )
+    # =====================================================
+    # TITLE
+    # =====================================================
+
+    worksheet.merge_cells("A1:L1")
 
     worksheet["A1"] = (
         "PAYMENT & RECOVERY REPORT"
@@ -4586,6 +4629,7 @@ def payment_report_excel(request):
         name="Calibri",
         size=16,
         bold=True,
+        color="172033",
     )
 
     worksheet["A1"].alignment = Alignment(
@@ -4595,13 +4639,12 @@ def payment_report_excel(request):
 
     worksheet.row_dimensions[1].height = 26
 
-    # ========================================================
-    # SUBTITLE
-    # ========================================================
 
-    worksheet.merge_cells(
-        "A2:K2"
-    )
+    # =====================================================
+    # SUBTITLE
+    # =====================================================
+
+    worksheet.merge_cells("A2:L2")
 
     worksheet["A2"] = (
         "Overdue payments, customer recovery "
@@ -4615,38 +4658,55 @@ def payment_report_excel(request):
     )
 
     worksheet["A2"].alignment = Alignment(
-        horizontal="left"
+        horizontal="left",
+        vertical="center",
     )
 
-    # ========================================================
+
+    # =====================================================
     # SUMMARY
-    # ========================================================
+    # =====================================================
 
     summary_row = 4
 
     summary_headers = [
+
         "TOTAL BILLING",
+
         "TOTAL COLLECTED",
+
         "BALANCE",
+
         "RECOVERY",
+
         "OUTSTANDING",
+
     ]
 
     summary_values = [
+
         context["total_billing"],
+
         context["total_paid"],
+
         context["total_balance"],
+
         context["total_recovery"],
+
         context["total_outstanding"],
+
     ]
 
     summary_columns = [
+
         1,
         3,
         5,
         7,
         9,
+
     ]
+
 
     for column, header, value in zip(
         summary_columns,
@@ -4654,6 +4714,7 @@ def payment_report_excel(request):
         summary_values,
     ):
 
+        # Header
         cell = worksheet.cell(
             row=summary_row,
             column=column,
@@ -4673,9 +4734,12 @@ def payment_report_excel(request):
         )
 
         cell.alignment = Alignment(
-            horizontal="center"
+            horizontal="center",
+            vertical="center",
         )
 
+
+        # Value
         value_cell = worksheet.cell(
             row=summary_row + 1,
             column=column,
@@ -4694,14 +4758,17 @@ def payment_report_excel(request):
         )
 
         value_cell.alignment = Alignment(
-            horizontal="center"
+            horizontal="center",
+            vertical="center",
         )
 
-    # ========================================================
-    # TABLE START
-    # ========================================================
+
+    # =====================================================
+    # TABLE
+    # =====================================================
 
     table_start = 7
+
 
     headers = [
 
@@ -4731,9 +4798,10 @@ def payment_report_excel(request):
 
     ]
 
-    # ========================================================
-    # HEADER
-    # ========================================================
+
+    # =====================================================
+    # TABLE HEADER
+    # =====================================================
 
     for column, header in enumerate(
         headers,
@@ -4764,53 +4832,113 @@ def payment_report_excel(request):
             wrap_text=True,
         )
 
+
     worksheet.row_dimensions[
         table_start
     ].height = 30
 
-    # ========================================================
+
+    # =====================================================
     # DATA
-    # ========================================================
+    # =====================================================
 
     current_row = table_start + 1
 
-    for row in context[
-        "report_rows"
-    ]:
 
-        trip_date = row[
-            "trip_date"
-        ]
+    for row in context["report_rows"]:
 
-        promise_date = row[
-            "promise_date"
-        ]
+        # -------------------------------------------------
+        # SAFE DATE / DATETIME
+        # -------------------------------------------------
+
+        trip_date = excel_safe_datetime(
+            row.get("trip_date")
+        )
+
+        promise_date = excel_safe_datetime(
+            row.get("promise_date")
+        )
+
+
+        # -------------------------------------------------
+        # IMPORTANT:
+        # 12 values for 12 columns
+        # -------------------------------------------------
 
         values = [
 
+            # 1
+            row.get(
+                "trip_number",
+                "-"
+            ),
+
+            # 2
             trip_date,
 
-            row["customer"],
+            # 3
+            row.get(
+                "customer",
+                "-"
+            ),
 
-            row["contact"],
+            # 4
+            row.get(
+                "contact",
+                "-"
+            ),
 
-            row["billing_amount"],
+            # 5
+            row.get(
+                "billing_amount",
+                0
+            ),
 
-            row["paid_amount"],
+            # 6
+            row.get(
+                "paid_amount",
+                0
+            ),
 
-            row["advance"],
+            # 7
+            row.get(
+                "advance",
+                0
+            ),
 
-            row["balance"],
+            # 8
+            row.get(
+                "balance",
+                0
+            ),
 
-            row["recovery_amount"],
+            # 9
+            row.get(
+                "recovery_amount",
+                0
+            ),
 
-            row["outstanding"],
+            # 10
+            row.get(
+                "outstanding",
+                0
+            ),
 
+            # 11
             promise_date,
 
-            row["payment_status"].title(),
+            # 12
+            row.get(
+                "payment_status",
+                "due",
+            ).title(),
 
         ]
+
+
+        # -------------------------------------------------
+        # WRITE CELLS
+        # -------------------------------------------------
 
         for column, value in enumerate(
             values,
@@ -4824,19 +4952,21 @@ def payment_report_excel(request):
 
             cell.value = value
 
+            cell.font = Font(
+                name="Calibri",
+                size=9,
+                color="344054",
+            )
+
             cell.alignment = Alignment(
                 vertical="top",
                 wrap_text=True,
             )
 
-            cell.font = Font(
-                size=9,
-                color="344054",
-            )
 
-            # ---------------------------------------------
+            # -------------------------------------------------
             # DATE
-            # ---------------------------------------------
+            # -------------------------------------------------
 
             if column in [2, 11]:
 
@@ -4846,17 +4976,23 @@ def payment_report_excel(request):
                         "dd-mm-yyyy"
                     )
 
-            # ---------------------------------------------
+                    cell.alignment = Alignment(
+                        horizontal="center",
+                        vertical="top",
+                    )
+
+
+            # -------------------------------------------------
             # MONEY
-            # ---------------------------------------------
+            # -------------------------------------------------
 
             if column in [
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
+                5,   # Billing
+                6,   # Paid
+                7,   # Advance
+                8,   # Balance
+                9,   # Recovery
+                10,  # Outstanding
             ]:
 
                 cell.number_format = (
@@ -4868,23 +5004,33 @@ def payment_report_excel(request):
                     vertical="top",
                 )
 
-        # ----------------------------------------------------
-        # STATUS
-        # ----------------------------------------------------
 
-        status = row[
-            "payment_status"
-        ]
+        # =================================================
+        # STATUS
+        # =================================================
+
+        status = (
+            row.get(
+                "payment_status",
+                "due",
+            )
+            .lower()
+        )
 
         status_cell = worksheet.cell(
             row=current_row,
             column=12,
         )
 
+        status_cell.value = (
+            status.title()
+        )
+
         status_cell.alignment = Alignment(
             horizontal="center",
             vertical="center",
         )
+
 
         if status == "overdue":
 
@@ -4898,6 +5044,7 @@ def payment_report_excel(request):
                 fgColor="FEF3F2",
             )
 
+
         elif status == "paid":
 
             status_cell.font = Font(
@@ -4909,6 +5056,7 @@ def payment_report_excel(request):
                 "solid",
                 fgColor="ECFDF3",
             )
+
 
         elif status == "promised":
 
@@ -4922,6 +5070,7 @@ def payment_report_excel(request):
                 fgColor="EFF8FF",
             )
 
+
         else:
 
             status_cell.font = Font(
@@ -4934,41 +5083,57 @@ def payment_report_excel(request):
                 fgColor="FFF7ED",
             )
 
+
         current_row += 1
 
-    # ========================================================
-    # TOTAL
-    # ========================================================
+
+    # =====================================================
+    # TOTAL ROW
+    # =====================================================
 
     total_row = current_row
 
+
     total_values = [
 
+        # 1
         "TOTAL",
 
+        # 2
         "",
 
+        # 3
         "",
 
+        # 4
         "",
 
+        # 5
         context["total_billing"],
 
+        # 6
         context["total_paid"],
 
+        # 7
         context["total_advance"],
 
+        # 8
         context["total_balance"],
 
+        # 9
         context["total_recovery"],
 
+        # 10
         context["total_outstanding"],
 
+        # 11
         "",
 
+        # 12
         "",
 
     ]
+
 
     for column, value in enumerate(
         total_values,
@@ -4998,6 +5163,7 @@ def payment_report_excel(request):
             wrap_text=True,
         )
 
+
         if column in [
             5,
             6,
@@ -5016,9 +5182,10 @@ def payment_report_excel(request):
                 vertical="center",
             )
 
-    # ========================================================
+
+    # =====================================================
     # BORDERS
-    # ========================================================
+    # =====================================================
 
     thin_border = Border(
 
@@ -5041,50 +5208,59 @@ def payment_report_excel(request):
             style="thin",
             color="D0D5DD",
         ),
+
     )
 
+
     for row_cells in worksheet.iter_rows(
+
         min_row=table_start,
+
         max_row=total_row,
+
         min_col=1,
+
         max_col=12,
+
     ):
 
         for cell in row_cells:
 
             cell.border = thin_border
 
-    # ========================================================
+
+    # =====================================================
     # COLUMN WIDTHS
-    # ========================================================
+    # =====================================================
 
     widths = {
 
-        "A": 16,   # Trip
+        "A": 16,    # Trip No
 
-        "B": 14,   # Date
+        "B": 14,    # Date
 
-        "C": 30,   # Customer
+        "C": 32,    # Customer
 
-        "D": 18,   # Contact
+        "D": 18,    # Contact
 
-        "E": 16,   # Billing
+        "E": 17,    # Billing
 
-        "F": 16,   # Paid
+        "F": 17,    # Paid
 
-        "G": 16,   # Advance
+        "G": 17,    # Advance
 
-        "H": 16,   # Balance
+        "H": 17,    # Balance
 
-        "I": 16,   # Recovery
+        "I": 17,    # Recovery
 
-        "J": 18,   # Outstanding
+        "J": 19,    # Outstanding
 
-        "K": 16,   # Promise
+        "K": 16,    # Promise Date
 
-        "L": 14,   # Status
+        "L": 14,    # Status
 
     }
+
 
     for column, width in widths.items():
 
@@ -5092,23 +5268,40 @@ def payment_report_excel(request):
             column
         ].width = width
 
-    # ========================================================
+
+    # =====================================================
+    # ROW HEIGHT
+    # =====================================================
+
+    for row_number in range(
+        table_start + 1,
+        total_row + 1,
+    ):
+
+        worksheet.row_dimensions[
+            row_number
+        ].height = 30
+
+
+    # =====================================================
     # FREEZE
-    # ========================================================
+    # =====================================================
 
     worksheet.freeze_panes = "A8"
 
-    # ========================================================
+
+    # =====================================================
     # FILTER
-    # ========================================================
+    # =====================================================
 
     worksheet.auto_filter.ref = (
         f"A{table_start}:L{total_row}"
     )
 
-    # ========================================================
+
+    # =====================================================
     # PRINT SETTINGS
-    # ========================================================
+    # =====================================================
 
     worksheet.sheet_properties.pageSetUpPr.fitToPage = True
 
@@ -5130,16 +5323,30 @@ def payment_report_excel(request):
 
     worksheet.sheet_view.showGridLines = False
 
-    # ========================================================
+
+    # =====================================================
+    # PAGE MARGINS
+    # =====================================================
+
+    worksheet.page_margins.left = 0.25
+    worksheet.page_margins.right = 0.25
+    worksheet.page_margins.top = 0.5
+    worksheet.page_margins.bottom = 0.5
+
+
+    # =====================================================
     # RESPONSE
-    # ========================================================
+    # =====================================================
 
     response = HttpResponse(
+
         content_type=(
             "application/vnd.openxmlformats-officedocument."
             "spreadsheetml.sheet"
         )
+
     )
+
 
     response[
         "Content-Disposition"
@@ -5151,6 +5358,4 @@ def payment_report_excel(request):
     workbook.save(
         response
     )
-
     return response
-
