@@ -501,7 +501,6 @@
                     </div>
                     <div class="order-form-control">
                         <select name="lead_source" class="form-select">
-                            <option value="">Select</option>
                             <option value="justdial">Just Dial</option>
                             <option value="inbound">Inbound</option>
                             <option value="outbound">Outbound</option>
@@ -1017,14 +1016,10 @@
                 </div>
 
             </div>
-
-
-
-  
+ 
 <!-- =================================================
      PAYMENT TERMS BY CUSTOMER
      ================================================= -->
-
 <div class="order-card">
 
     <div class="order-card-title">
@@ -1038,19 +1033,15 @@
         </div>
 
         <div class="order-form-control">
-
             <select
                 name="customer_billing_type"
                 id="customer_billing_type">
-                <option value="">Select</option>
-
                 <option value="Retail"
                     {% if request.POST.customer_billing_type == "Retail" %}
                         selected
                     {% endif %}>
                     Retail
                 </option>
-
                 <option value="Credit"
                     {% if request.POST.customer_billing_type == "Credit" %}
                         selected
@@ -1059,63 +1050,58 @@
                 </option>
             </select>
         </div>
-
     </div>
-
 
     <!-- Customer Payment Type -->
     <div class="order-form-row">
-
         <div class="order-form-label">
             Payment Type
         </div>
-
         <div class="order-form-control">
-
             <select
                 name="customer_payment_type"
-                id="customer_payment_type"
-            >
-                <option value="">Select</option>
+                id="customer_payment_type">
             </select>
-
-        </div>
-
-    </div>
-
-
-    <!-- Customer Advance -->
-    <div class="order-form-row">
-        <div class="order-form-label">
-            Customer Advance Amount
-        </div>
-        <div class="order-form-control">
-            <input
-                type="number"
-                name="customer_advance_amount"
-                step="0.01"
-                min="0"
-                value="{{ request.POST.customer_advance_amount|default:'0' }}"
-            >
         </div>
     </div>
 
-
-    <!-- Customer Balance -->
-    <div class="order-form-row">
-        <div class="order-form-label">
-            Customer Balance Amount
-        </div>
-        <div class="order-form-control">
-            <input
-                type="number"
-                name="customer_balance_amount"
-                step="0.01"
-                min="0"
-                value="{{ request.POST.customer_balance_amount|default:'0' }}"
-            >
-        </div>
+<!-- Customer Advance -->
+<div class="order-form-row">
+    <div class="order-form-label">
+        Customer Advance Amount
     </div>
+
+    <div class="order-form-control">
+        <input
+            type="number"
+            name="customer_advance_amount"
+            id="customer_advance_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.customer_advance_amount|default:'0' }}"
+        >
+    </div>
+</div>
+
+
+<!-- Customer Balance -->
+<div class="order-form-row">
+    <div class="order-form-label">
+        Customer Balance Amount
+    </div>
+
+    <div class="order-form-control">
+        <input
+            type="number"
+            name="customer_balance_amount"
+            id="customer_balance_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.customer_balance_amount|default:'0' }}"
+            readonly
+        >
+    </div>
+</div>
 
     <!-- Customer Payment Method -->
     <div class="order-form-row">
@@ -1127,11 +1113,7 @@
         <div class="order-form-control">
 
             <select
-                name="customer_payment_method"
-            >
-
-                <option value="">Select</option>
-
+                name="customer_payment_method">
                 <option value="Cash"
                     {% if request.POST.customer_payment_method == "Cash" %}
                         selected
@@ -1643,25 +1625,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 <!-- Vehicle Advance -->
 
-                <div class="order-form-row">
+                <!-- Vehicle Advance -->
+<div class="order-form-row">
+    <div class="order-form-label">
+        Vehicle Advance Amount
+    </div>
 
-                    <div class="order-form-label">
-                        Vehicle Advance Amount
-                    </div>
+    <div class="order-form-control">
+        <input
+            type="number"
+            name="vehicle_advance_amount"
+            id="vehicle_advance_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
+        >
+    </div>
+</div>
 
-                    <div class="order-form-control">
 
-                        <input
-                            type="number"
-                            name="vehicle_advance_amount"
-                            step="0.01"
-                            min="0"
-                            value="{{ request.POST.vehicle_advance_amount|default:'0' }}"
-                        >
+<!-- Vehicle Balance -->
+<div class="order-form-row">
+    <div class="order-form-label">
+        Vehicle Balance Amount
+    </div>
 
-                    </div>
-
-                </div>
+    <div class="order-form-control">
+        <input
+            type="number"
+            name="vehicle_balance_amount"
+            id="vehicle_balance_amount"
+            step="0.01"
+            min="0"
+            value="{{ request.POST.vehicle_balance_amount|default:'0' }}"
+            readonly
+        >
+    </div>
+</div>
 
 
                 <!-- Vehicle Balance -->
@@ -1723,8 +1723,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             value="{{ request.POST.pan_card|default:'' }}"
                             maxlength="10" style="text-transform: uppercase;" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                             title="[A-Z]{5}[0-9]{4}[A-Z]{1}">
-                        >
-
+                    
                     </div>
 
                 </div>
@@ -1843,11 +1842,11 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* =====================================================
-       HELPER
-       ===================================================== */
+    /* =========================================================
+       GENERIC NUMBER HELPER
+       ========================================================= */
 
-    function getNumber(id) {
+    function getNumberById(id) {
 
         const element = document.getElementById(id);
 
@@ -1861,30 +1860,51 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       TOTAL TRIP COST
-       Freight + Loading + Halting + Other
-       ===================================================== */
+    function getNumberByName(name) {
+
+        const element =
+            document.querySelector(`input[name="${name}"]`);
+
+        if (!element) {
+            return 0;
+        }
+
+        const value = parseFloat(element.value);
+
+        return Number.isFinite(value) ? value : 0;
+    }
+
+
+    /* =========================================================
+       1. TOTAL TRIP COST
+       
+       Freight
+       + Loading / Unloading
+       + Halting
+       + Other
+       ========================================================= */
 
     function calculateTripCost() {
 
         const freight =
-            getNumber("id_freight_amount");
+            getNumberById("id_freight_amount");
 
         const loading =
-            getNumber("id_loading_unloading_charges");
+            getNumberById("id_loading_unloading_charges");
 
         const halting =
-            getNumber("id_halting_charges");
+            getNumberById("id_halting_charges");
 
         const other =
-            getNumber("id_other_charges");
+            getNumberById("id_other_charges");
 
-        const total =
+
+        const totalTripCost =
             freight +
             loading +
             halting +
             other;
+
 
         const totalField =
             document.getElementById("total_trip_cost");
@@ -1892,69 +1912,83 @@ document.addEventListener("DOMContentLoaded", function () {
         if (totalField) {
 
             totalField.value =
-                total.toFixed(2);
-
+                totalTripCost.toFixed(2);
         }
+
+
+        // Vehicle balance depends on Total Trip Cost
+        calculateVehicleBalance();
     }
 
 
-    /* =====================================================
-       GST + TOTAL SELLING AMOUNT
-       ===================================================== */
+    /* =========================================================
+       2. GST + TOTAL SELLING AMOUNT
+       
+       Selling Amount
+       + GST
+       = Total Selling Amount
+       ========================================================= */
 
     function calculateSellingAmount() {
 
         const sellingAmount =
-            getNumber("id_selling_amount");
+            getNumberById("id_selling_amount");
 
 
-        /* Get selected GST */
+        /* Selected GST */
 
         const selectedGST =
-            document.querySelector(".gst-option:checked");
+            document.querySelector(
+                ".gst-option:checked"
+            );
 
 
         const gstPercent =
             selectedGST
-                ? parseFloat(selectedGST.value)
+                ? parseFloat(selectedGST.value) || 0
                 : 0;
 
 
-        /* Calculate GST */
+        /* GST */
 
         const gstAmount =
-            sellingAmount * gstPercent / 100;
+            sellingAmount *
+            gstPercent /
+            100;
 
 
-        /* Calculate total selling amount */
+        /* Total Selling */
 
         const totalSellingAmount =
-            sellingAmount + gstAmount;
+            sellingAmount +
+            gstAmount;
 
 
-        /* Visible GST amount */
+        /* Visible GST */
 
         const gstDisplay =
-            document.getElementById("gst_amount_display");
+            document.getElementById(
+                "gst_amount_display"
+            );
 
         if (gstDisplay) {
 
             gstDisplay.value =
                 gstAmount.toFixed(2);
-
         }
 
 
-        /* Hidden GST amount submitted to Django */
+        /* Hidden GST */
 
         const gstHidden =
-            document.getElementById("gst_amount");
+            document.getElementById(
+                "gst_amount"
+            );
 
         if (gstHidden) {
 
             gstHidden.value =
                 gstAmount.toFixed(2);
-
         }
 
 
@@ -1969,14 +2003,119 @@ document.addEventListener("DOMContentLoaded", function () {
 
             totalSellingField.value =
                 totalSellingAmount.toFixed(2);
+        }
 
+
+        // Customer balance depends on Total Selling Amount
+        calculateCustomerBalance();
+    }
+
+
+    /* =========================================================
+       3. CUSTOMER BALANCE
+       
+       Total Selling Amount
+       - Customer Advance
+       = Customer Balance
+       ========================================================= */
+
+    function calculateCustomerBalance() {
+
+        const totalSelling =
+            getNumberById(
+                "id_total_selling_amount"
+            );
+
+
+        const customerAdvance =
+            getNumberById(
+                "customer_advance_amount"
+            );
+
+
+        let customerBalance =
+            totalSelling -
+            customerAdvance;
+
+
+        /*
+         * Prevent negative balance.
+         */
+
+        if (customerBalance < 0) {
+
+            customerBalance = 0;
+        }
+
+
+        const balanceField =
+            document.getElementById(
+                "customer_balance_amount"
+            );
+
+
+        if (balanceField) {
+
+            balanceField.value =
+                customerBalance.toFixed(2);
         }
     }
 
 
-    /* =====================================================
-       TRIP COST EVENTS
-       ===================================================== */
+    /* =========================================================
+       4. VEHICLE BALANCE
+       
+       Total Trip Cost
+       - Vehicle Advance
+       = Vehicle Balance
+       ========================================================= */
+
+    function calculateVehicleBalance() {
+
+        const totalTripCost =
+            getNumberById(
+                "total_trip_cost"
+            );
+
+
+        const vehicleAdvance =
+            getNumberById(
+                "vehicle_advance_amount"
+            );
+
+
+        let vehicleBalance =
+            totalTripCost -
+            vehicleAdvance;
+
+
+        /*
+         * Prevent negative balance.
+         */
+
+        if (vehicleBalance < 0) {
+
+            vehicleBalance = 0;
+        }
+
+
+        const balanceField =
+            document.getElementById(
+                "vehicle_balance_amount"
+            );
+
+
+        if (balanceField) {
+
+            balanceField.value =
+                vehicleBalance.toFixed(2);
+        }
+    }
+
+
+    /* =========================================================
+       5. TRIP COST INPUT EVENTS
+       ========================================================= */
 
     const tripCostFields = [
 
@@ -1996,14 +2135,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const field =
             document.getElementById(id);
 
+
         if (!field) {
             return;
         }
+
 
         field.addEventListener(
             "input",
             calculateTripCost
         );
+
 
         field.addEventListener(
             "change",
@@ -2013,9 +2155,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    /* =====================================================
-       SELLING AMOUNT EVENTS
-       ===================================================== */
+    /* =========================================================
+       6. SELLING AMOUNT EVENTS
+       ========================================================= */
 
     const sellingAmountField =
         document.getElementById(
@@ -2030,6 +2172,7 @@ document.addEventListener("DOMContentLoaded", function () {
             calculateSellingAmount
         );
 
+
         sellingAmountField.addEventListener(
             "change",
             calculateSellingAmount
@@ -2038,10 +2181,61 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       GST CHECKBOXES
-       Only ONE GST percentage can be selected
-       ===================================================== */
+    /* =========================================================
+       7. CUSTOMER ADVANCE EVENTS
+       ========================================================= */
+
+    const customerAdvanceField =
+        document.getElementById(
+            "customer_advance_amount"
+        );
+
+
+    if (customerAdvanceField) {
+
+        customerAdvanceField.addEventListener(
+            "input",
+            calculateCustomerBalance
+        );
+
+
+        customerAdvanceField.addEventListener(
+            "change",
+            calculateCustomerBalance
+        );
+
+    }
+
+
+    /* =========================================================
+       8. VEHICLE ADVANCE EVENTS
+       ========================================================= */
+
+    const vehicleAdvanceField =
+        document.getElementById(
+            "vehicle_advance_amount"
+        );
+
+
+    if (vehicleAdvanceField) {
+
+        vehicleAdvanceField.addEventListener(
+            "input",
+            calculateVehicleBalance
+        );
+
+
+        vehicleAdvanceField.addEventListener(
+            "change",
+            calculateVehicleBalance
+        );
+
+    }
+
+
+    /* =========================================================
+       9. GST EVENTS
+       ========================================================= */
 
     const gstOptions =
         document.querySelectorAll(
@@ -2055,6 +2249,11 @@ document.addEventListener("DOMContentLoaded", function () {
             "change",
             function () {
 
+                /*
+                 * Only one GST percentage
+                 * can be selected.
+                 */
+
                 if (this.checked) {
 
                     gstOptions.forEach(
@@ -2066,29 +2265,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                 otherCheckbox.checked =
                                     false;
-
                             }
 
                         }
                     );
-
                 }
 
-                calculateSellingAmount();
 
+                calculateSellingAmount();
             }
         );
 
     });
 
 
-    /* =====================================================
-       INITIAL CALCULATIONS
-       ===================================================== */
+    /* =========================================================
+       10. INITIAL CALCULATION
+       ========================================================= */
 
     calculateTripCost();
 
     calculateSellingAmount();
+
+    calculateCustomerBalance();
+
+    calculateVehicleBalance();
 
 });
 </script>
