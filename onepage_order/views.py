@@ -3162,6 +3162,26 @@ def safe_decimal(value):
         return Decimal("0")
 
 
+def excel_datetime(value):
+
+    if value is None:
+        return None
+
+    # Django DateTimeField
+    if hasattr(value, "tzinfo"):
+
+        if value.tzinfo is not None:
+
+            value = timezone.localtime(
+                value
+            )
+
+            value = value.replace(
+                tzinfo=None
+            )
+
+    return value
+
 # ============================================================
 # REPORT DATA BUILDER
 # ============================================================
@@ -4113,10 +4133,13 @@ def payment_report_pdf(request):
 
     for row in context["report_rows"]:
 
-        trip_date = row["trip_date"]
+        trip_date = excel_datetime(
+            row["trip_date"]
+        )
 
-        promise_date = row["promise_date"]
-
+        promise_date = excel_datetime(
+            row["promise_date"]
+        )
         table_data.append([
 
             Paragraph(
@@ -4765,13 +4788,7 @@ def payment_report_excel(request):
 
         values = [
 
-            row["trip_number"],
-
-            (
-                trip_date
-                if trip_date
-                else ""
-            ),
+            trip_date,
 
             row["customer"],
 
@@ -4789,11 +4806,7 @@ def payment_report_excel(request):
 
             row["outstanding"],
 
-            (
-                promise_date
-                if promise_date
-                else ""
-            ),
+            promise_date,
 
             row["payment_status"].title(),
 
