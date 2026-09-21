@@ -735,7 +735,7 @@
         <div class="report-actions">
 
             <a
-                href="{% url 'payment_report_pdf' %}?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&from_date={{ from_date|urlencode }}&to_date={{ to_date|urlencode }}"
+                href="{% url 'onepageorder_payment_report_pdf' %}?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&from_date={{ from_date|urlencode }}&to_date={{ to_date|urlencode }}"
                 class="export-btn export-pdf"
             >
 
@@ -747,7 +747,7 @@
 
 
             <a
-                href="{% url 'payment_report_excel' %}?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&from_date={{ from_date|urlencode }}&to_date={{ to_date|urlencode }}"
+                href="{% url 'onepageorder_payment_report_excel' %}?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&from_date={{ from_date|urlencode }}&to_date={{ to_date|urlencode }}"
                 class="export-btn export-excel"
             >
 
@@ -994,7 +994,7 @@
 
 
             <a
-                href="{% url 'payment_report' %}"
+                href="{% url 'onepageorder_payment_report' %}"
                 class="reset-btn"
             >
 
