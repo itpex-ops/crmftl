@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
 
     # =========================================================
@@ -42,6 +43,11 @@ urlpatterns = [
         views.onepageorder_detail,
         name="onepageorder_detail",
     ),
+
+
+    # =========================================================
+    # PAYMENT REPORT
+    # =========================================================
 
     path(
         "payment-report/",
@@ -86,7 +92,7 @@ urlpatterns = [
 
 
     # =========================================================
-    # ONE PAGE ORDER LIVE TRACKING
+    # LIVE TRACKING
     # =========================================================
 
     path(
@@ -95,7 +101,6 @@ urlpatterns = [
         name="onepageorder_tracking_list",
     ),
 
-    # pk = Order PK
     path(
         "<int:pk>/setup/",
         views.onepageorder_tracking_setup,
@@ -108,7 +113,6 @@ urlpatterns = [
         name="onepageorder_import_driver",
     ),
 
-    # pk = TrackingSession PK
     path(
         "vehicle-live/<int:pk>/",
         views.vehicle_live,
@@ -160,7 +164,6 @@ urlpatterns = [
 
     # =========================================================
     # CONSENT
-    # pk = TrackingSession PK
     # =========================================================
 
     path(
@@ -197,4 +200,5 @@ urlpatterns = [
         views.api_token_status,
         name="onepageorder_api_token_status",
     ),
+
 ]

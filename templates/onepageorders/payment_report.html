@@ -1013,65 +1013,46 @@
 
     <div class="status-tabs">
 
-        <a
-            href="{% url 'payment_report' %}"
-            class="status-tab
-            {% if not status_filter %}
-                active
-            {% endif %}"
-        >
-            All
-        </a>
+    <a
+        href="{% url 'onepageorder_payment_report' %}"
+        class="status-tab {% if not status_filter %}active{% endif %}"
+    >
+        All
+    </a>
 
 
-        <a
-            href="?status=overdue"
-            class="status-tab overdue
-            {% if status_filter == 'overdue' %}
-                active
-            {% endif %}"
-        >
-            Overdue
-            ({{ overdue_count }})
-        </a>
+    <a
+        href="{% url 'onepageorder_payment_report' %}?status=overdue"
+        class="status-tab overdue {% if status_filter == 'overdue' %}active{% endif %}"
+    >
+        Overdue ({{ overdue_count }})
+    </a>
 
 
-        <a
-            href="?status=due"
-            class="status-tab
-            {% if status_filter == 'due' %}
-                active
-            {% endif %}"
-        >
-            Due
-            ({{ due_count }})
-        </a>
+    <a
+        href="{% url 'onepageorder_payment_report' %}?status=due"
+        class="status-tab {% if status_filter == 'due' %}active{% endif %}"
+    >
+        Due ({{ due_count }})
+    </a>
 
 
-        <a
-            href="?status=promised"
-            class="status-tab
-            {% if status_filter == 'promised' %}
-                active
-            {% endif %}"
-        >
-            Promised
-            ({{ promised_count }})
-        </a>
+    <a
+        href="{% url 'onepageorder_payment_report' %}?status=promised"
+        class="status-tab {% if status_filter == 'promised' %}active{% endif %}"
+    >
+        Promised ({{ promised_count }})
+    </a>
 
 
-        <a
-            href="?status=paid"
-            class="status-tab
-            {% if status_filter == 'paid' %}
-                active
-            {% endif %}"
-        >
-            Paid
-            ({{ paid_count }})
-        </a>
+    <a
+        href="{% url 'onepageorder_payment_report' %}?status=paid"
+        class="status-tab {% if status_filter == 'paid' %}active{% endif %}"
+    >
+        Paid ({{ paid_count }})
+    </a>
 
-    </div>
+</div>
 
 
     <!-- =====================================================
