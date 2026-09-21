@@ -1,58 +1,508 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+
+{% block title %}Live Vehicle Tracking{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'assets/common/css/common.css' %}">
-<div class="container-fluid mt-4">
-    <div class="card">
-        <div class="page-header">
-            <h4><i class="bi bi-geo-alt-fill"></i>
-                Live Vehicle Tracking </h4>
-            <small>Monitor and track vehicle locations in real-time</small>
+
+<link rel="stylesheet"
+      href="{% static 'assets/common/css/common.css' %}">
+
+<style>
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.tracking-page {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    padding: 22px 28px 35px;
+    background: #f8f9fb;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.tracking-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.tracking-title {
+    margin: 0;
+    color: #212529;
+    font-family: "Poppins", sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.tracking-subtitle {
+    display: block;
+    margin-top: 4px;
+    color: #6c757d;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.tracking-card {
+    width: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.tracking-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    font-family: "Poppins", sans-serif;
+    font-size: 11.5px;
+}
+
+.tracking-table thead th {
+    padding: 11px 12px;
+    background: #654321;
+    color: #ffffff;
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tracking-table tbody td {
+    padding: 11px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eeeeee;
+    color: #343a40;
+}
+
+.tracking-table tbody tr:hover {
+    background: #fffaf0;
+}
+
+.tracking-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   TRIP
+   ========================================================= */
+
+.trip-number {
+    color: #654321;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.vehicle-number {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   LOCATION
+   ========================================================= */
+
+.location-text {
+    max-width: 300px;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.location-empty {
+    color: #999999;
+    font-style: italic;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.tracking-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-waiting {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.status-sms {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.status-consent {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.status-active {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-paused {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.status-stopped {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.status-deleted {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #842029;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.view-tracking-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    min-width: 75px;
+    padding: 6px 12px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #654321;
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 10.5px;
+    font-weight: 500;
+
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.view-tracking-btn:hover {
+    background: #4d3218;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-tracking {
+    padding: 45px 20px;
+    text-align: center;
+    color: #777777;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+}
+
+.empty-tracking i {
+    display: block;
+    margin-bottom: 10px;
+    color: #654321;
+    font-size: 30px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .tracking-page {
+        padding: 18px 15px 30px;
+    }
+
+    .tracking-card {
+        overflow-x: auto;
+    }
+
+    .tracking-table {
+        min-width: 850px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .tracking-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .tracking-title {
+        font-size: 18px;
+    }
+}
+</style>
+
+
+<div class="tracking-page">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="tracking-header">
+
+        <div>
+
+            <h4 class="tracking-title">
+                <i class="bi bi-geo-alt-fill me-2"></i>
+                Live Vehicle Tracking
+            </h4>
+
+            <span class="tracking-subtitle">
+                Monitor and track vehicle locations in real-time
+            </span>
+
         </div>
-        <div class="card-body">
-            <table class="table table-hover align-middle">
-                <thead class="custom-table-head">
-                    <tr class="main-head-row">
-                        <th>FTL No</th>
-                        <th>Vehicle</th>
-                        <th>Driver</th>
-                        <th>Status</th>
-                        <th>Current Location</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for track in tracking_list %}
-                    <tr>
-                        <td>{{ track.vehicle.ftl_no }}</td>
-                        <td>{{ track.vehicle.vehicle_number }}</td>
-                        <td>{{ track.driver_mobile }}</td>
-                        <td>
-                            {% if track.status == "active" %}
-                            <span class="badge bg-success">
-                                Active
-                            </span>
-                            {% elif track.status == "pending" %}
-                            <span class="badge bg-warning">
-                                Pending
-                            </span>
-                            {% else %}
-                            <span class="badge bg-danger">
-                                Stopped
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td>{{ track.last_location }}</td>
-                        <td>
-                            <a href="{% url 'live_tracking:vehicle_live' track.pk %}" class="btn btn-primary btn-sm">
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
     </div>
+
+
+    <!-- =====================================================
+         TRACKING TABLE
+         ===================================================== -->
+
+    <div class="tracking-card">
+
+        <div class="table-responsive">
+
+            <table class="tracking-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Trip No</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Driver</th>
+
+                        <th>Status</th>
+
+                        <th>Current Location</th>
+
+                        <th class="text-center">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for track in tracking_list %}
+
+                    <tr>
+
+                        <!-- Trip Number -->
+
+                        <td>
+                            <span class="trip-number">
+                                {{ track.order.trip_number|default:"-" }}
+                            </span>
+                        </td>
+
+
+                        <!-- Vehicle -->
+
+                        <td>
+                            <span class="vehicle-number">
+                                {{ track.order.vehicle_number|default:"-" }}
+                            </span>
+                        </td>
+
+
+                        <!-- Driver -->
+
+                        <td>
+                            {{ track.driver_mobile|default:"-" }}
+                        </td>
+
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if track.status == "active" %}
+
+                                <span class="tracking-status status-active">
+                                    <i class="bi bi-broadcast-pin"></i>
+                                    Active
+                                </span>
+
+                            {% elif track.status == "waiting_location" %}
+
+                                <span class="tracking-status status-waiting">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    Waiting Location
+                                </span>
+
+                            {% elif track.status == "sms_sent" %}
+
+                                <span class="tracking-status status-sms">
+                                    <i class="bi bi-chat-dots"></i>
+                                    SMS Sent
+                                </span>
+
+                            {% elif track.status == "consent_received" %}
+
+                                <span class="tracking-status status-consent">
+                                    <i class="bi bi-check-circle"></i>
+                                    Consent Received
+                                </span>
+
+                            {% elif track.status == "paused" %}
+
+                                <span class="tracking-status status-paused">
+                                    <i class="bi bi-pause-circle"></i>
+                                    Paused
+                                </span>
+
+                            {% elif track.status == "stopped" %}
+
+                                <span class="tracking-status status-stopped">
+                                    <i class="bi bi-stop-circle"></i>
+                                    Stopped
+                                </span>
+
+                            {% elif track.status == "deleted" %}
+
+                                <span class="tracking-status status-deleted">
+                                    <i class="bi bi-trash"></i>
+                                    Deleted
+                                </span>
+
+                            {% elif track.status == "error" %}
+
+                                <span class="tracking-status status-error">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Error
+                                </span>
+
+                            {% else %}
+
+                                <span class="tracking-status status-waiting">
+                                    <i class="bi bi-question-circle"></i>
+                                    {{ track.status|default:"Unknown" }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Current Location -->
+
+                        <td>
+
+                            {% if track.last_location %}
+
+                                <div class="location-text">
+                                    {{ track.last_location }}
+                                </div>
+
+                            {% else %}
+
+                                <span class="location-empty">
+                                    Location not available
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Action -->
+
+                        <td class="text-center">
+
+                            <a
+                                href="{% url 'live_tracking:vehicle_live' track.pk %}"
+                                class="view-tracking-btn"
+                            >
+
+                                <i class="bi bi-eye"></i>
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            <div class="empty-tracking">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                                No active vehicle tracking records found.
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}
