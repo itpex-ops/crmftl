@@ -5,6 +5,141 @@
 {% block content %}
 
 <style>
+/* =========================================================
+   PAYMENT HISTORY SEARCH
+   ========================================================= */
+
+.veh-history-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.veh-payment-search {
+
+    position: relative;
+
+    width: 280px;
+}
+
+
+.veh-payment-search > i {
+
+    position: absolute;
+
+    left: 11px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #98a2b3;
+
+    font-size: 12px;
+
+    pointer-events: none;
+}
+
+
+.veh-payment-search input {
+
+    width: 100%;
+
+    height: 34px;
+
+    padding: 0 34px 0 32px;
+
+    border: 1px solid #dfe4ea;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 10px;
+
+    outline: none;
+
+    transition: all .2s ease;
+
+    box-sizing: border-box;
+}
+
+
+.veh-payment-search input::placeholder {
+
+    color: #98a2b3;
+}
+
+
+.veh-payment-search input:focus {
+
+    border-color: var(--brand-yellow);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 184, 19, .12);
+}
+
+
+.veh-payment-search button {
+
+    position: absolute;
+
+    right: 7px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 20px;
+
+    height: 20px;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 5px;
+
+    background: #f2f4f7;
+
+    color: #667085;
+
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+
+.veh-payment-search button:hover {
+
+    background: #e4e7ec;
+
+    color: #344054;
+}
+
+
+.veh-history-count {
+
+    flex-shrink: 0;
+
+    white-space: nowrap;
+}
+
+
 
 /* =========================================================
    VEHICLE PAYMENT SaaS PAGE
@@ -1129,7 +1264,52 @@
 
     cursor: not-allowed;
 }
+@media (max-width: 900px) {
 
+    .veh-history-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 12px;
+
+        padding: 14px 16px;
+    }
+
+
+    .veh-history-right {
+
+        width: 100%;
+    }
+
+
+    .veh-payment-search {
+
+        flex: 1;
+
+        width: auto;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .veh-history-right {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .veh-payment-search {
+
+        width: 100%;
+    }
+
+}
 </style>
 
 
@@ -1598,221 +1778,57 @@
 
     <div class="veh-card">
 
+    <!-- =====================================================
+         HISTORY HEADER
+         ===================================================== -->
 
-        <!-- HISTORY HEADER -->
+    <div class="veh-history-header">
 
-        <div class="veh-history-header">
+        <div>
 
-            <div>
+            <h5 class="veh-history-title">
+                Payment History
+            </h5>
 
-                <h5 class="veh-history-title">
-                    Payment History
-                </h5>
+            <div class="veh-history-subtitle">
+                Recent vehicle payment transactions
+            </div>
 
-                <div class="veh-history-subtitle">
-                    Recent vehicle payment transactions
-                </div>
+        </div>
+
+        <div class="veh-history-right">
+
+            <div class="veh-payment-search">
+
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="vehiclePaymentSearch"
+                    placeholder="Search trip, vehicle, transaction..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="clearVehiclePaymentSearch"
+                    title="Clear search"
+                >
+                    <i class="bi bi-x"></i>
+                </button>
 
             </div>
 
 
             <span class="veh-history-count">
 
-                {{ payments|length }}
+                <span id="visiblePaymentCount">
+                    {{ payments|length }}
+                </span>
 
                 Payment{{ payments|length|pluralize }}
 
             </span>
-
-        </div>
-
-
-
-        <!-- TABLE -->
-
-        <div class="veh-table-wrapper">
-
-            <table class="veh-table">
-
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Trip
-                        </th>
-
-                        <th>
-                            Vehicle
-                        </th>
-
-                        <th>
-                            Type
-                        </th>
-
-                        <th class="text-end">
-                            Amount
-                        </th>
-
-                        <th>
-                            Transaction
-                        </th>
-
-                        <th>
-                            Paid At
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-
-                    {% for p in payments %}
-
-                        <tr>
-
-
-                            <!-- TRIP -->
-
-                            <td>
-
-                                <div class="trip-number">
-
-                                    <span class="trip-icon">
-
-                                        <i class="bi bi-receipt"></i>
-
-                                    </span>
-
-                                    {{ p.order.trip_number }}
-
-                                </div>
-
-                            </td>
-
-
-
-                            <!-- VEHICLE -->
-
-                            <td>
-
-                                <span class="vehicle-number">
-
-                                    {{ p.vehicle_number|default:"-" }}
-
-                                </span>
-
-                            </td>
-
-
-
-                            <!-- PAYMENT TYPE -->
-
-                            <td>
-
-                                {% if p.payment_type == "Advance" %}
-
-                                    <span class="payment-type-badge advance">
-
-                                        <i class="bi bi-arrow-up-circle me-1"></i>
-
-                                        Advance
-
-                                    </span>
-
-                                {% elif p.payment_type == "Balance" %}
-
-                                    <span class="payment-type-badge balance">
-
-                                        <i class="bi bi-check-circle me-1"></i>
-
-                                        Balance
-
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="payment-type-badge others">
-
-                                        {{ p.payment_type|default:"Others" }}
-
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-
-
-                            <!-- AMOUNT -->
-
-                            <td class="amount">
-
-                                ₹{{ p.amount|floatformat:2 }}
-
-                            </td>
-
-
-
-                            <!-- TRANSACTION -->
-
-                            <td>
-
-                                <span
-                                    class="transaction-reference"
-                                    title="{{ p.transaction_reference|default:'-' }}"
-                                >
-
-                                    {{ p.transaction_reference|default:"-" }}
-
-                                </span>
-
-                            </td>
-
-
-
-                            <!-- PAID AT -->
-
-                            <td>
-
-                                {{ p.paid_at|date:"d/m/Y H:i" }}
-
-                            </td>
-
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="empty-row"
-                            >
-
-                                <div class="empty-icon">
-
-                                    <i class="bi bi-credit-card"></i>
-
-                                </div>
-
-                                No vehicle payments found.
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-
-                </tbody>
-
-            </table>
 
         </div>
 
