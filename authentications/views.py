@@ -12,9 +12,12 @@ import json
 User = get_user_model()
 from django.contrib.auth.decorators import login_required
 from  onepage_order.models import Order, Tracking, TrackingSession
+from datetime import datetime,timezone
+
 
 @login_required
 def home(request):
+
     total_orders = Order.objects.count()
 
     vehicle_placements = Tracking.objects.filter(
@@ -24,6 +27,7 @@ def home(request):
     live_tracking = TrackingSession.objects.filter(
         tracking_enabled=True
     ).count()
+    now = datetime.now().date()
     return render(
         request,
         "dashboards/home.html",
@@ -33,6 +37,7 @@ def home(request):
             "live_tracking": live_tracking,
             # "cancelled_orders": cancelled_orders,
             # "total_vehicles": total_vehicles,
+             "now": timezone.now(),
         },
     )
 

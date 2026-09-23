@@ -79,13 +79,12 @@
         </div>
 
         <div class="d-flex gap-2">
-
             <span class="badge bg-primary rounded-pill px-3 py-2">
                 {{ request.user.role|title }}
             </span>
 
             <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
-                {{ now|date:"d M Y" }}
+                {{ now|date:"d M Y, h:i A" }}
             </span>
 
         </div>
