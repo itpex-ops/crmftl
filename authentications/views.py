@@ -29,9 +29,6 @@ def home(request):
     live_tracking = TrackingSession.objects.filter(
         tracking_enabled=True
     ).count()
-
-    ?
-
     return render(
         request,
         "dashboards/home.html",
