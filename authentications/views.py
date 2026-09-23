@@ -13,12 +13,9 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.shortcuts import render, redirect
 import json
 User = get_user_model()
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-
 from  onepage_order.models import Order, Tracking, TrackingSession
-
 
 @login_required
 def home(request):
@@ -138,7 +135,6 @@ def redirect_user_dashboard(user):
 
     return redirect(url_name)
 
-
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
@@ -148,7 +144,6 @@ from authentications.models import User
 from enquiries.models import Enquiry
 from orders.models import Order
 from vehicles.models import Vehicle, Tracking
-
 
 def user_dashboard(request):
     today = timezone.now()
@@ -186,7 +181,6 @@ def user_dashboard(request):
             "total_vehicles": total_vehicles,
         },
     )
-
 
 def auth_page0(request):
     # 🔁 Redirect if already logged in
