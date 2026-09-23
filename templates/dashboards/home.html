@@ -1,4 +1,7 @@
 {% extends 'layouts/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
 
 <style>
@@ -9,216 +12,645 @@
     .dash-card {
         border: 0;
         border-radius: 18px;
-        transition: all 0.25s ease;
         background: #fff;
+        transition: all 0.25s ease;
     }
 
     .dash-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     }
 
     .kpi-value {
-        font-size: 1.8rem;
+        font-size: 1.9rem;
         font-weight: 700;
-        letter-spacing: -0.5px;
+        line-height: 1.2;
+    }
+
+    .kpi-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .kpi-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
     }
 
     .soft-shadow {
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
     }
 
-    .gradient-primary {
-        background: linear-gradient(135deg, #4f46e5, #3b82f6);
-        color: #fff;
+    .chart-title {
+        font-size: 15px;
+        font-weight: 600;
     }
 
-    .gradient-success {
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        color: #fff;
+    .chart-box {
+        position: relative;
+        height: 300px;
     }
 
-    .muted-small {
-        font-size: 12px;
-        opacity: 0.8;
+    .dashboard-header {
+        margin-bottom: 20px;
     }
 </style>
 
+
 <div class="container-fluid">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap ">
-        <div>
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
 
-            <p class="text-muted mb-0">Welcome back, {{ request.user.username }}</p>
+    <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+        <div>
+            <h4 class="fw-bold mb-1">Dashboard</h4>
+            <p class="text-muted mb-0">
+                Order and vehicle overview
+            </p>
         </div>
 
         <div class="d-flex gap-2">
-            <span class="badge gradient-primary rounded-pill px-3 py-2">
+
+            <span class="badge bg-primary rounded-pill px-3 py-2">
                 {{ request.user.role|title }}
             </span>
-            <span class="badge bg-white text-dark soft-shadow rounded-pill px-3 py-2">
+
+            <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
                 {{ now|date:"d M Y" }}
             </span>
+
         </div>
+
     </div>
 
-    <!-- KPI Cards -->
+
+    <!-- ===================================================== -->
+    <!-- KPI CARDS -->
+    <!-- ===================================================== -->
+
     <div class="row g-3 mb-4">
 
-        <div class="col-6 col-xl-3">
-            <div class="card dash-card soft-shadow">
+        <!-- TOTAL ORDERS -->
+        <div class="col-6 col-xl">
+
+            <div class="card dash-card soft-shadow h-100">
+
                 <div class="card-body">
-                    <div class="muted-small text-muted">Total Enquiries</div>
-                    <div class="kpi-value">{{ total_enquiries }}</div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="kpi-label">
+                                Total Orders
+                            </div>
+
+                            <div class="kpi-value">
+                                {{ total_orders }}
+                            </div>
+                        </div>
+
+                        <div class="kpi-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <div class="col-6 col-xl-3">
-            <div class="card dash-card soft-shadow">
+
+        <!-- VEHICLE PLACEMENTS -->
+        <div class="col-6 col-xl">
+
+            <div class="card dash-card soft-shadow h-100">
+
                 <div class="card-body">
-                    <div class="muted-small text-muted">Total Orders</div>
-                    <div class="kpi-value">{{ total_orders }}</div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="kpi-label">
+                                Vehicle Placements
+                            </div>
+
+                            <div class="kpi-value">
+                                {{ vehicle_placements }}
+                            </div>
+                        </div>
+
+                        <div class="kpi-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-truck"></i>
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <div class="col-6 col-xl-3">
-            <div class="card dash-card gradient-primary">
+
+        <!-- LIVE TRACKING -->
+        <div class="col-6 col-xl">
+
+            <div class="card dash-card soft-shadow h-100">
+
                 <div class="card-body">
-                    <div class="muted-small">Running Vehicles</div>
-                    <div class="kpi-value">{{ running_vehicles }}</div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="kpi-label">
+                                Live Tracking
+                            </div>
+
+                            <div class="kpi-value">
+                                {{ live_tracking }}
+                            </div>
+                        </div>
+
+                        <div class="kpi-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
+        </div>
+
+
+        <!-- CANCELLED ORDERS -->
+        <div class="col-6 col-xl">
+
+            <div class="card dash-card soft-shadow h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="kpi-label">
+                                Cancelled Orders
+                            </div>
+
+                            <div class="kpi-value">
+                                {{ cancelled_orders }}
+                            </div>
+                        </div>
+
+                        <div class="kpi-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VEHICLES -->
+        <div class="col-6 col-xl">
+
+            <div class="card dash-card soft-shadow h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="kpi-label">
+                                Vehicles
+                            </div>
+
+                            <div class="kpi-value">
+                                {{ total_vehicles }}
+                            </div>
+                        </div>
+
+                        <div class="kpi-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-truck-front"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
 
-    <!-- Chart + Overview -->
+
+    <!-- ===================================================== -->
+    <!-- CHARTS -->
+    <!-- ===================================================== -->
+
     <div class="row g-4 mb-4">
 
-        <!-- Chart -->
-        <div class="col-lg-8">
+
+        <!-- LINE CHART -->
+        <div class="col-xl-8">
+
             <div class="card dash-card soft-shadow h-100">
+
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h6 class="fw-bold mb-0">Orders Trend</h6>
-                        <small class="text-muted">Last 7 Days</small>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div>
+                            <div class="chart-title">
+                                Orders Trend
+                            </div>
+
+                            <small class="text-muted">
+                                Last 7 days
+                            </small>
+                        </div>
+
                     </div>
-                    <canvas id="ordersChart" height="110"></canvas>
+
+                    <div class="chart-box">
+
+                        <canvas id="ordersLineChart"></canvas>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- Side -->
-        <div class="col-lg-4">
+
+        <!-- DOUGHNUT CHART -->
+        <div class="col-xl-4">
+
             <div class="card dash-card soft-shadow h-100">
+
                 <div class="card-body">
-                    <h6 class="fw-bold mb-3">Overview</h6>
 
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted">Delivered</span>
-                        <strong class="text-success">{{ delivered_orders }}</strong>
+                    <div class="chart-title mb-1">
+                        Order Status
                     </div>
 
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted">Pending Payments</span>
-                        <strong class="text-danger">{{ pending_payments }}</strong>
-                    </div>
+                    <small class="text-muted">
+                        Current order distribution
+                    </small>
 
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted">Manual Orders</span>
-                        <strong>{{ manual_orders }}</strong>
-                    </div>
+                    <div class="chart-box">
 
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted">Outstanding</span>
-                        <strong class="text-danger">₹{{ pending_amount }}</strong>
-                    </div>
+                        <canvas id="orderStatusChart"></canvas>
 
-                    <div class="d-flex justify-content-between py-2">
-                        <span class="text-muted">Users</span>
-                        <strong>{{ total_users }}</strong>
                     </div>
 
                 </div>
+
             </div>
+
         </div>
 
     </div>
 
-    <!-- Recent Orders -->
-    <div class="card dash-card soft-shadow">
-        <div class="card-body">
 
-            <div class="d-flex justify-content-between mb-3">
-                <h6 class="fw-bold">Recent Orders</h6>
-                <a href="/orders/" class="btn btn-sm btn-outline-primary rounded-pill">
-                    View All
-                </a>
-            </div>
+    <!-- ===================================================== -->
+    <!-- BAR CHART -->
+    <!-- ===================================================== -->
 
-            <div class="table-responsive">
-                <table class="table align-middle">
+    <div class="row g-4">
 
-                    <thead class="custom-table-head">
-                        <tr class="main-head-row">
-                            <th>Order No</th>
-                            <th>Customer</th>
-                            <th>Vehicle</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
+        <div class="col-xl-7">
 
-                    <tbody>
-                        {% for order in recent_orders %}
-                        <tr>
-                            <td class="fw-semibold">{{ order.order_no }}</td>
-                            <td>{{ order.customer_name }}</td>
-                            <td>{{ order.vehicle_type }}</td>
-                            <td class="text-success fw-semibold">
-                                ₹{{ order.total_rate }}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                No recent orders found
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+            <div class="card dash-card soft-shadow">
 
-                </table>
+                <div class="card-body">
+
+                    <div class="chart-title mb-1">
+                        Vehicle Placement
+                    </div>
+
+                    <small class="text-muted">
+                        Vehicle placement over the last 7 days
+                    </small>
+
+                    <div class="chart-box">
+
+                        <canvas id="vehicleBarChart"></canvas>
+
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
+
+
+        <!-- SIMPLE SUMMARY -->
+        <div class="col-xl-5">
+
+            <div class="card dash-card soft-shadow">
+
+                <div class="card-body">
+
+                    <div class="chart-title mb-3">
+                        Order Summary
+                    </div>
+
+                    <div class="d-flex justify-content-between py-3 border-bottom">
+                        <span class="text-muted">
+                            Total Orders
+                        </span>
+
+                        <strong>
+                            {{ total_orders }}
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-3 border-bottom">
+                        <span class="text-muted">
+                            Vehicle Placements
+                        </span>
+
+                        <strong class="text-success">
+                            {{ vehicle_placements }}
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-3 border-bottom">
+                        <span class="text-muted">
+                            Live Tracking
+                        </span>
+
+                        <strong class="text-info">
+                            {{ live_tracking }}
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-3 border-bottom">
+                        <span class="text-muted">
+                            Cancelled Orders
+                        </span>
+
+                        <strong class="text-danger">
+                            {{ cancelled_orders }}
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-3">
+                        <span class="text-muted">
+                            Total Vehicles
+                        </span>
+
+                        <strong>
+                            {{ total_vehicles }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
+{{ total_orders|default:0|json_script:"total-orders-data" }}
+{{ vehicle_placements|default:0|json_script:"vehicle-placements-data" }}
+{{ live_tracking|default:0|json_script:"live-tracking-data" }}
+{{ cancelled_orders|default:0|json_script:"cancelled-orders-data" }}
 
-<!-- Chart -->
+{{ weekly_labels|json_script:"weekly-labels-data" }}
+{{ weekly_orders|json_script:"weekly-orders-data" }}
+{{ weekly_vehicle_placements|json_script:"weekly-vehicle-placements-data" }}
+
+<!-- ===================================================== -->
+<!-- CHART.JS -->
+<!-- ===================================================== -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    const labels = JSON.parse('{{ weekly_labels|safe|escapejs }}');
-    const dataValues = JSON.parse('{{ weekly_orders|safe|escapejs }}');
 
-    new Chart(document.getElementById('ordersChart'), {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: dataValues,
-                borderWidth: 2,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } }
+    // =====================================================
+    // DASHBOARD DATA FROM DJANGO
+    // =====================================================
+
+    const totalOrders = JSON.parse(
+        document.getElementById("total-orders-data").textContent
+    );
+
+    const vehiclePlacements = JSON.parse(
+        document.getElementById("vehicle-placements-data").textContent
+    );
+
+    const liveTracking = JSON.parse(
+        document.getElementById("live-tracking-data").textContent
+    );
+
+    const cancelledOrders = JSON.parse(
+        document.getElementById("cancelled-orders-data").textContent
+    );
+
+    const weeklyLabels = JSON.parse(
+        document.getElementById("weekly-labels-data").textContent
+    );
+
+    const weeklyOrders = JSON.parse(
+        document.getElementById("weekly-orders-data").textContent
+    );
+
+    const weeklyVehiclePlacements = JSON.parse(
+        document.getElementById("weekly-vehicle-placements-data").textContent
+    );
+
+
+    // =====================================================
+    // LINE CHART - ORDERS
+    // =====================================================
+
+    new Chart(
+        document.getElementById("ordersLineChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: weeklyLabels,
+
+                datasets: [{
+                    label: "Orders",
+                    data: weeklyOrders,
+
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: false,
+
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+
+                }
+
+            }
         }
-    });
-</script>
+    );
 
+
+    // =====================================================
+    // DOUGHNUT CHART
+    // =====================================================
+
+    new Chart(
+        document.getElementById("orderStatusChart"),
+        {
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Orders",
+                    "Vehicle Placed",
+                    "Live Tracking",
+                    "Cancelled"
+                ],
+
+                datasets: [{
+
+                    data: [
+                        totalOrders,
+                        vehiclePlacements,
+                        liveTracking,
+                        cancelledOrders
+                    ],
+
+                    borderWidth: 2
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "65%",
+
+                plugins: {
+
+                    legend: {
+                        position: "bottom"
+                    }
+
+                }
+
+            }
+        }
+    );
+
+
+    // =====================================================
+    // BAR CHART - VEHICLE PLACEMENTS
+    // =====================================================
+
+    new Chart(
+        document.getElementById("vehicleBarChart"),
+        {
+            type: "bar",
+
+            data: {
+
+                labels: weeklyLabels,
+
+                datasets: [{
+
+                    label: "Vehicle Placements",
+
+                    data: weeklyVehiclePlacements,
+
+                    borderRadius: 8,
+
+                    borderWidth: 0
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+    );
+
+</script>
 {% endblock %}
