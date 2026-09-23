@@ -153,70 +153,39 @@ from vehicles.models import Vehicle, Tracking
 def user_dashboard(request):
     today = timezone.now()
 
-    # KPI Cards
-    total_users = User.objects.count()
-    total_enquiries = Enquiry.objects.count()
-    converted_enquiries = Enquiry.objects.filter(
-        is_converted_to_order=True
-    ).count()
-
     total_orders = Order.objects.count()
-    total_vehicles = Vehicle.objects.count()
 
-    running_vehicles = Tracking.objects.filter(
-        fleet_departed=True,
-        delivered=False
+    vehicle_placements = Tracking.objects.filter(
+        vehicle_placed=True
     ).count()
 
-    delivered_orders = Tracking.objects.filter(
-        delivered=True
+    live_tracking = TrackingSession.objects.filter(
+        tracking_enabled=True
     ).count()
 
-    revenue = Order.objects.aggregate(
-        total=Sum('total_rate')
-    )['total'] or 0
+    cancelled_orders = Order.objects.filter(
+        status="cancelled"
+    ).count()
 
-    pending_amount = Order.objects.aggregate(
-        total=Sum('balance')
-    )['total'] or 0
+    total_vehicles = Order.objects.exclude(
+        vehicle_number__isnull=True
+    ).exclude(
+        vehicle_number=""
+    ).values(
+        "vehicle_number"
+    ).distinct().count()
 
-    # Recent Orders
-    recent_orders = Order.objects.order_by('-created_at')[:10]
-
-    # Weekly Chart Data
-    weekly_orders = []
-    weekly_labels = []
-
-    for i in range(6, -1, -1):
-        day = today - timedelta(days=i)
-
-        count = Order.objects.filter(
-            created_at__date=day.date()
-        ).count()
-
-        weekly_orders.append(count)
-        weekly_labels.append(day.strftime("%d %b"))
-
-    context = {
-        "total_users": total_users,
-        "total_enquiries": total_enquiries,
-        "converted_enquiries": converted_enquiries,
-        "total_orders": total_orders,
-        "total_vehicles": total_vehicles,
-        "running_vehicles": running_vehicles,
-        "delivered_orders": delivered_orders,
-        "revenue": revenue,
-        "pending_amount": pending_amount,
-        "recent_orders": recent_orders,
-
-        # Chart Safe JSON
-        "weekly_orders": json.dumps(weekly_orders),
-        "weekly_labels": json.dumps(weekly_labels),
-
-        "now": today,
-    }
-    return render(request, "dashboards/home.html", context)
-
+    return render(
+        request,
+        "dashboards/home.html",
+        {
+            "total_orders": total_orders,
+            "vehicle_placements": vehicle_placements,
+            "live_tracking": live_tracking,
+            "cancelled_orders": cancelled_orders,
+            "total_vehicles": total_vehicles,
+        },
+    )
 
 
 def auth_page0(request):
