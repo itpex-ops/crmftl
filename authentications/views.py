@@ -45,7 +45,7 @@ def auth_page(request):
     # ✅ If already logged in → go to dashboard (no loop)
     if request.user.is_authenticated:
         if request.path == '/auth/':  # or your auth URL
-            return redirect('user_dashboard')
+            return redirect('home')
     context = {}
 
     if request.method == "POST":
@@ -66,7 +66,7 @@ def auth_page(request):
                 if next_url:
                     return redirect(next_url)
                 else:
-                    return redirect ('user_dashboard') # ✅' correct
+                    return redirect ('home') # ✅' correct
 
             else:
                 context['login_error'] = "Invalid username or password"
