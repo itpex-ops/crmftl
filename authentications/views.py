@@ -12,7 +12,7 @@ import json
 User = get_user_model()
 from django.contrib.auth.decorators import login_required
 from  onepage_order.models import Order, Tracking, TrackingSession
-from datetime import datetime,timezone
+from datetime import datetime
 
 
 @login_required
@@ -37,7 +37,7 @@ def home(request):
             "live_tracking": live_tracking,
             # "cancelled_orders": cancelled_orders,
             # "total_vehicles": total_vehicles,
-             "now": timezone.now(),
+            "now"  : now
         },
     )
 
