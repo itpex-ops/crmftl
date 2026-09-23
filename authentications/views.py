@@ -57,10 +57,6 @@ def home(request):
         },
     )
 
-
-
-
-
 def auth_page(request):
     # ✅ If already logged in → go to dashboard (no loop)
     if request.user.is_authenticated:

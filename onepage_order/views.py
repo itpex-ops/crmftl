@@ -35,6 +35,43 @@ logger = logging.getLogger(__name__)
 # COMMON HELPERS
 # =============================================================
 
+@login_required
+def home(request):
+
+    total_orders = Order.objects.count()
+
+    vehicle_placements = Tracking.objects.filter(
+        vehicle_placed=True
+    ).count()
+
+    live_tracking = TrackingSession.objects.filter(
+        tracking_enabled=True
+    ).count()
+
+    cancelled_orders = Order.objects.filter(
+        status="cancelled"
+    ).count()
+
+    total_vehicles = Order.objects.exclude(
+        vehicle_number__isnull=True
+    ).exclude(
+        vehicle_number=""
+    ).values(
+        "vehicle_number"
+    ).distinct().count()
+
+    return render(
+        request,
+        "dashboards/home.html",
+        {
+            "total_orders": total_orders,
+            "vehicle_placements": vehicle_placements,
+            "live_tracking": live_tracking,
+            "cancelled_orders": cancelled_orders,
+            "total_vehicles": total_vehicles,
+        },
+    )
+
 def get_post_value(request, field, default=""):
     """Return a cleaned POST string."""
     value = request.POST.get(field, default)
