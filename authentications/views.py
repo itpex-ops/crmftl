@@ -158,9 +158,9 @@ def user_dashboard(request):
         tracking_enabled=True
     ).count()
 
-    cancelled_orders = Order.objects.filter(
-        status="cancelled"
-    ).count()
+    # cancelled_orders = Order.objects.filter(
+    #     status="cancelled"
+    # ).count()
 
     total_vehicles = Order.objects.exclude(
         vehicle_number__isnull=True
@@ -177,7 +177,7 @@ def user_dashboard(request):
             "total_orders": total_orders,
             "vehicle_placements": vehicle_placements,
             "live_tracking": live_tracking,
-            "cancelled_orders": cancelled_orders,
+            #"cancelled_orders": cancelled_orders,
             "total_vehicles": total_vehicles,
         },
     )
