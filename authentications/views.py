@@ -162,13 +162,13 @@ def user_dashboard(request):
     #     status="cancelled"
     # ).count()
 
-    total_vehicles = Order.objects.exclude(
-        vehicle_number__isnull=True
-    ).exclude(
-        vehicle_number=""
-    ).values(
-        "vehicle_number"
-    ).distinct().count()
+    # total_vehicles = Order.objects.exclude(
+    #     vehicle_number__isnull=True
+    # ).exclude(
+    #     vehicle_number=""
+    # ).values(
+    #     "vehicle_number"
+    # ).distinct().count()
 
     return render(
         request,
@@ -178,7 +178,7 @@ def user_dashboard(request):
             "vehicle_placements": vehicle_placements,
             "live_tracking": live_tracking,
             #"cancelled_orders": cancelled_orders,
-            "total_vehicles": total_vehicles,
+            #"total_vehicles": total_vehicles,
         },
     )
 
