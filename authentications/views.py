@@ -30,17 +30,7 @@ def home(request):
         tracking_enabled=True
     ).count()
 
-    cancelled_orders = Order.objects.filter(
-        status="cancelled"
-    ).count()
-
-    total_vehicles = Order.objects.exclude(
-        vehicle_number__isnull=True
-    ).exclude(
-        vehicle_number=""
-    ).values(
-        "vehicle_number"
-    ).distinct().count()
+    ?
 
     return render(
         request,
@@ -49,8 +39,8 @@ def home(request):
             "total_orders": total_orders,
             "vehicle_placements": vehicle_placements,
             "live_tracking": live_tracking,
-            "cancelled_orders": cancelled_orders,
-            "total_vehicles": total_vehicles,
+            # "cancelled_orders": cancelled_orders,
+            # "total_vehicles": total_vehicles,
         },
     )
 
