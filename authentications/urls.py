@@ -8,7 +8,7 @@ urlpatterns = [
         views.auth_page,
         name="auth",
     ),
-
+    
     path(
         "logout/",
         views.logout_user,
