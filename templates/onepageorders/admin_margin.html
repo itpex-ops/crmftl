@@ -460,7 +460,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    max-width: 120px;
+    max-width: none;
     padding: 4px 7px;
     background: #f2f4f7;
     border: 1px solid #e4e7ec;
@@ -1244,6 +1244,124 @@ body.column-resizing * {
         width: 100%;
         justify-content: center;
         height: 38px;
+    }
+}
+
+
+/* =========================================================
+   DATA VISIBILITY / NO CLIPPING
+   Column width adjustment stays enabled.
+========================================================= */
+
+/* Never clip normal table cell text */
+.admin-margin-table tbody td {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Customer names */
+.customer-name {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* Pickup / Drop route cards */
+.route-modern {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.route-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    height: auto !important;
+    min-height: 27px;
+}
+
+/* Location text */
+.location-text {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Vehicle type */
+.vehicle-type-cell {
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Payment status badges */
+.status {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Amounts and margin should remain on one line when possible,
+   but must not be clipped if the user narrows the column. */
+.amount,
+.margin-positive,
+.margin-negative {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* On desktop, let the row height expand naturally */
+.admin-margin-table tbody td {
+    height: auto !important;
+    vertical-align: top;
+}
+
+/* Keep the route visually aligned near the top of its row */
+.admin-margin-table tbody td[data-label="Route"] {
+    vertical-align: top;
+}
+
+/* Mobile already uses card-style fields */
+@media (max-width: 767.98px) {
+
+    .admin-margin-table tbody td {
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+
+    .route-modern {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .route-chip {
+        width: auto !important;
+        max-width: 100% !important;
     }
 }
 
