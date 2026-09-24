@@ -247,50 +247,259 @@
 
 
 /* =========================================================
-   LOCATION
+   ROUTE / LOCATION STYLE
+========================================================= */
+
+.route-modern {
+    width: 225px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-top: 5px;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   ROUTE CARD
+========================================================= */
+
+.route-card {
+    width: 100%;
+
+    padding: 7px 9px 9px;
+
+    background: #edf8f1;
+
+    border-radius: 0 17px 17px 0;
+
+    box-sizing: border-box;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   PICKUP CARD
+========================================================= */
+
+.pickup-card {
+    border-left: 3px solid #2563eb;
+}
+
+
+/* =========================================================
+   DROP CARD
+========================================================= */
+
+.drop-card {
+    border-left: 3px solid #039855;
+}
+
+
+/* =========================================================
+   ROUTE TITLE
+========================================================= */
+
+.route-title {
+    margin: 0 0 5px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: .25px;
+
+    text-transform: uppercase;
+
+    text-align: left;
+}
+
+.pickup-card .route-title {
+    color: #039855;
+}
+
+.drop-card .route-title {
+    color: #ea580c;
+}
+
+
+/* =========================================================
+   ROUTE CHIP
+========================================================= */
+
+.route-chip {
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 100%;
+
+    min-height: 27px;
+
+    padding: 4px 9px;
+
+    background: #ffffff;
+
+    border-radius: 7px;
+
+    font-size: 8.5px;
+
+    font-weight: 600;
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
+}
+
+.route-chip i {
+    flex-shrink: 0;
+
+    margin-right: 5px;
+
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   PICKUP CHIP
+========================================================= */
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc;
+
+    color: #027a48;
+}
+
+
+/* =========================================================
+   DROP CHIP
+========================================================= */
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892;
+
+    color: #e85d04;
+}
+
+
+/* =========================================================
+   REMOVE OLD ARROW
+========================================================= */
+
+.route-direction {
+    display: none;
+}
+
+
+/* =========================================================
+   VEHICLE TYPE
+========================================================= */
+
+.vehicle-type-route {
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 225px;
+
+    margin-top: 0;
+
+    padding: 3px 7px;
+
+    background: #f2f4f7;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 5px;
+
+    color: #667085;
+
+    font-size: 7.5px;
+
+    font-weight: 500;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   KEEP LOCATION CELLS CONSISTENT
 ========================================================= */
 
 .location-cell {
     display: flex;
+
     align-items: center;
-    gap: 6px;
-    max-width: 145px;
+
+    gap: 0;
+
+    max-width: 100%;
 }
 
 .location-icon {
-    width: 24px;
-    height: 24px;
+    width: auto;
+    height: auto;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
-    border-radius: 6px;
-    font-size: 9px;
+
+    border: 0 !important;
+
+    background: transparent !important;
+
+    font-size: 8px;
 }
 
 .location-text {
     display: block;
-    max-width: 108px;
+
+    max-width: 100%;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
+
     white-space: nowrap;
+
     color: #475467;
+
     font-size: 9px;
+
     font-weight: 500;
 }
 
 .pickup-icon {
-    background: #ecfdf3;
-    border: 1px solid #d1fadf;
     color: #039855;
 }
 
 .drop-icon {
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
     color: #ea580c;
 }
-
 
 /* =========================================================
    VEHICLE TYPE
@@ -413,6 +622,42 @@
 
 
 @media (max-width: 767.98px) {
+    /* Route cards */
+    .route-modern {
+        width: 100%;
+        max-width: 225px;
+        margin-top: 0;
+        gap: 7px;
+    }
+
+    .route-card {
+        padding: 7px 8px 8px;
+        border-radius: 0 16px 16px 0;
+    }
+
+    .route-title {
+        font-size: 7.5px;
+        margin-bottom: 5px;
+    }
+
+    .route-chip {
+        min-height: 27px;
+        max-width: 100%;
+        padding: 4px 8px;
+        font-size: 8px;
+    }
+
+    .route-chip i {
+        font-size: 7.5px;
+        margin-right: 4px;
+    }
+
+    .vehicle-type-route {
+        max-width: 225px;
+        font-size: 7px;
+    }
+
+
 
     .admin-margin-page {
         min-height: calc(100vh - 60px);
@@ -672,6 +917,148 @@
 .admin-margin-table col:nth-child(9) { width: 145px; }
 .admin-margin-table col:nth-child(10) { width: 110px; }
 
+
+/* =========================================================
+   FINAL ROUTE OVERRIDE
+   Rounded cards matching the requested visual
+========================================================= */
+
+.route-modern {
+    width: 225px !important;
+    min-height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    margin-top: 5px !important;
+}
+
+.route-card {
+    width: 225px !important;
+
+    padding: 7px 9px 9px !important;
+
+    margin: 0 !important;
+
+    background: #edf8f1 !important;
+
+    border-radius: 0 17px 17px 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+.pickup-card {
+    border-left: 3px solid #2563eb !important;
+}
+
+.drop-card {
+    border-left: 3px solid #039855 !important;
+}
+
+.route-title {
+    margin: 0 0 5px !important;
+
+    font-size: 8px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    letter-spacing: .25px !important;
+
+    text-transform: uppercase !important;
+}
+
+.pickup-card .route-title {
+    color: #039855 !important;
+}
+
+.drop-card .route-title {
+    color: #ea580c !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    max-width: 100% !important;
+
+    min-height: 27px !important;
+
+    padding: 4px 9px !important;
+
+    background: #ffffff !important;
+
+    border-radius: 7px !important;
+
+    font-size: 8.5px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.25 !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc !important;
+    color: #027a48 !important;
+}
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892 !important;
+    color: #e85d04 !important;
+}
+
+.route-chip i {
+    flex-shrink: 0 !important;
+    margin-right: 5px !important;
+    font-size: 8px !important;
+}
+
+.route-direction {
+    display: none !important;
+}
+
+@media (max-width: 767.98px) {
+    .route-modern {
+        width: 100% !important;
+        max-width: 225px !important;
+        gap: 7px !important;
+        margin-top: 0 !important;
+    }
+
+    .route-card {
+        width: 100% !important;
+        max-width: 225px !important;
+        padding: 7px 8px 8px !important;
+        border-radius: 0 16px 16px 0 !important;
+    }
+
+    .route-title {
+        font-size: 7.5px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .route-chip {
+        min-height: 27px !important;
+        padding: 4px 8px !important;
+        font-size: 8px !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+}
+
 </style>
 
 
@@ -837,21 +1224,21 @@
 
                         <td
                             data-label="Pickup"
-                            data-column-cell="pickup"
                         >
 
                             {% if o.origin %}
 
-                                <div class="location-cell">
+                                <div class="route-card pickup-card">
 
-                                    <span class="location-icon pickup-icon">
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                    </span>
+                                    <div class="route-title">
+                                        PICKUP
+                                    </div>
 
                                     <span
-                                        class="location-text"
+                                        class="route-chip"
                                         title="{{ o.origin }}"
                                     >
+                                        <i class="bi bi-geo-alt-fill"></i>
                                         {{ o.origin }}
                                     </span>
 
@@ -859,7 +1246,9 @@
 
                             {% else %}
 
-                                <span class="text-muted">—</span>
+                                <span class="text-muted">
+                                    —
+                                </span>
 
                             {% endif %}
 
@@ -872,21 +1261,21 @@
 
                         <td
                             data-label="Drop"
-                            data-column-cell="drop"
                         >
 
                             {% if o.destination %}
 
-                                <div class="location-cell">
+                                <div class="route-card drop-card">
 
-                                    <span class="location-icon drop-icon">
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                    </span>
+                                    <div class="route-title">
+                                        DROP
+                                    </div>
 
                                     <span
-                                        class="location-text"
+                                        class="route-chip"
                                         title="{{ o.destination }}"
                                     >
+                                        <i class="bi bi-geo-alt-fill"></i>
                                         {{ o.destination }}
                                     </span>
 
@@ -894,7 +1283,9 @@
 
                             {% else %}
 
-                                <span class="text-muted">—</span>
+                                <span class="text-muted">
+                                    —
+                                </span>
 
                             {% endif %}
 
