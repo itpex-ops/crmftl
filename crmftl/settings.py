@@ -94,8 +94,8 @@ TELENITY_CONSENT_CHECK_API = "https://india-agw.telenity.com/apigw/NOFBconsent/v
 TELENITY_TIMEOUT = 60
 
 LOGIN_URL = 'auth'
-LOGIN_REDIRECT_URL = 'user_dashboard'
-LOGOUT_REDIRECT_URL = 'auth'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/home/"
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 TEMPLATES = [
