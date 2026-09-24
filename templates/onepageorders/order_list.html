@@ -5,8 +5,6 @@
 
 {% block content %}
 
-
-
 <style>
 /* =========================================================
    ORDERS SaaS PAGE
@@ -843,7 +841,168 @@
     font-size: 11px;
 }
 
+/* =========================================================
+   ROUTE - SAME STYLE AS ENQUIRY TEMPLATE
+========================================================= */
 
+.route-modern {
+
+    width: 180px;
+    min-height: 72px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 2px;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   ROUTE CARD
+========================================================= */
+
+.route-card {
+
+    width: 100%;
+
+    padding: 4px 5px;
+
+    margin: 0;
+
+    text-align: left;
+
+}
+
+
+/* =========================================================
+   ROUTE TITLE
+========================================================= */
+
+.route-title {
+
+    margin-bottom: 3px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .4px;
+
+    color: #667085;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   ROUTE CHIP
+========================================================= */
+
+.route-chip {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 100%;
+
+    padding: 4px 8px;
+
+    margin: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe4ea;
+
+    border-radius: 6px;
+
+    color: #344054;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+
+/* =========================================================
+   PICKUP
+========================================================= */
+
+.pickup-card .route-title {
+
+    color: #039855;
+
+}
+
+.pickup-card .route-chip {
+
+    background: #ecfdf3;
+
+    border-color: #d1fadf;
+
+    color: #027a48;
+
+}
+
+
+/* =========================================================
+   DROP
+========================================================= */
+
+.drop-card .route-title {
+
+    color: #ea580c;
+
+}
+
+.drop-card .route-chip {
+
+    background: #fff7ed;
+
+    border-color: #fed7aa;
+
+    color: #c2410c;
+
+}
+
+
+/* =========================================================
+   ROUTE DIRECTION
+========================================================= */
+
+.route-direction {
+
+    width: 100%;
+
+    padding-left: 18px;
+
+    height: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    color: #98a2b3;
+
+    font-size: 10px;
+
+}
 /* =========================================================
    RESPONSIVE
 ========================================================= */
@@ -1175,8 +1334,6 @@
     ====================================================== -->
 
     <div class="orders-card">
-
-
         <!-- CARD HEADER -->
 
         <div class="orders-card-header">
@@ -1193,7 +1350,6 @@
 
             </div>
 
-
             <span class="orders-count">
 
                 {{ orders|length }}
@@ -1202,7 +1358,6 @@
             </span>
 
         </div>
-
 
         <!-- TABLE -->
 
@@ -1246,17 +1401,9 @@
                     </tr>
 
                 </thead>
-
-
                 <tbody>
-
-
                 {% for o in orders %}
-
-
                     <tr>
-
-
                         <!-- =================================================
                              TRIP
                         ================================================== -->
@@ -1310,31 +1457,72 @@
                              ROUTE
                         ================================================== -->
 
-                        <td>
+<!-- =================================================
+     ROUTE
+================================================== -->
 
-                            <div class="route-wrapper">
+<td>
 
-                                <span
-                                    class="route-place"
-                                    title="{{ o.origin }}"
-                                >
-                                    {{ o.origin|default:"-" }}
-                                </span>
+    <div class="route-modern">
 
-                                <span class="route-arrow">
-                                    <i class="bi bi-arrow-right"></i>
-                                </span>
+        <!-- PICKUP -->
+        {% if o.origin %}
 
-                                <span
-                                    class="route-place"
-                                    title="{{ o.destination }}"
-                                >
-                                    {{ o.destination|default:"-" }}
-                                </span>
+            <div class="route-card pickup-card">
 
-                            </div>
+                <div class="route-title">
+                    PICKUP
+                </div>
 
-                        </td>
+                <span
+                    class="route-chip"
+                    title="{{ o.origin }}"
+                >
+                    <i class="bi bi-geo-alt-fill me-1"></i>
+                    {{ o.origin }}
+                </span>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ROUTE ARROW -->
+
+        {% if o.origin and o.destination %}
+
+            <div class="route-direction">
+                <i class="bi bi-arrow-down"></i>
+            </div>
+
+        {% endif %}
+
+
+        <!-- DROP -->
+
+        {% if o.destination %}
+
+            <div class="route-card drop-card">
+
+                <div class="route-title">
+                    DROP
+                </div>
+
+                <span
+                    class="route-chip"
+                    title="{{ o.destination }}"
+                >
+                    <i class="bi bi-geo-alt-fill me-1"></i>
+                    {{ o.destination }}
+                </span>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</td>
 
 
                         <!-- =================================================
