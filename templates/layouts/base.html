@@ -87,8 +87,6 @@
                     PARCELEX
                 </span>
             </a>
-
-
             <!-- =================================================
                  MOBILE TOGGLE
             ================================================== -->
@@ -106,20 +104,13 @@
                 <span class="navbar-toggler-icon"></span>
 
             </button>
-
-
             <!-- =================================================
                  NAVIGATION
             ================================================== -->
 
             <div
-                class="collapse navbar-collapse"
-                id="mainNavbarMenu"
-            >
-
+                class="collapse navbar-collapse" id="mainNavbarMenu">
                 <div class="navbar-nav ms-auto">
-
-
                     <!-- =========================================
                          ORDERS
                     ========================================== -->
@@ -131,8 +122,6 @@
                         <i class="bi bi-box-seam me-1"></i>
                         Orders
                     </a>
-
-
                     <!-- =========================================
                          LIVE TRACKING
                     ========================================== -->
@@ -142,8 +131,7 @@
                         {% if request.resolver_match.url_name == 'onepageorder_tracking_list' %}
                             active
                         {% endif %}"
-                        href="{% url 'onepageorder_tracking_list' %}"
-                    >
+                        href="{% url 'onepageorder_tracking_list' %}">
 
                         <i class="bi bi-broadcast-pin me-1"></i>
 
@@ -152,44 +140,65 @@
                     </a>
 
 
-                    <!-- =========================================
-                         VEHICLE PAYMENTS
-                    ========================================== -->
+<!-- =========================================
+     PAYMENTS DROPDOWN
+========================================== -->
 
-                    <a
-                        class="nav-link
-                        {% if request.resolver_match.url_name == 'vehicle_payments' %}
-                            active
-                        {% endif %}"
-                        href="{% url 'vehicle_payments' %}"
-                    >
+<li class="nav-item dropdown">
 
-                        <i class="bi bi-truck me-1"></i>
+    <a
+        class="nav-link dropdown-toggle
+        {% if request.resolver_match.url_name == 'customer_payments' or request.resolver_match.url_name == 'vehicle_payments' %}
+            active
+        {% endif %}"
+        href="#"
+        id="paymentsDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+    >
+        <i class="bi bi-wallet2 me-1"></i>
+        Payments
+    </a>
 
-                        Vehicle Payments
+    <ul
+        class="dropdown-menu dropdown-menu-end payments-dropdown"
+        aria-labelledby="paymentsDropdown"
+    >
 
-                    </a>
+        <!-- Customer Payments -->
+        <li>
+            <a
+                class="dropdown-item
+                {% if request.resolver_match.url_name == 'customer_payments' %}
+                    active
+                {% endif %}"
+                href="{% url 'customer_payments' %}"
+            >
+                <i class="bi bi-person-lines-fill me-2"></i>
+                Customer
+            </a>
+        </li>
 
+        <!-- Vehicle Payments -->
+        <li>
+            <a
+                class="dropdown-item
+                {% if request.resolver_match.url_name == 'vehicle_payments' %}
+                    active
+                {% endif %}"
+                href="{% url 'vehicle_payments' %}"
+            >
+                <i class="bi bi-truck me-2"></i>
+                Vehicle
+            </a>
+        </li>
 
-                    <!-- =========================================
-                         CUSTOMER PAYMENTS
-                    ========================================== -->
+    </ul>
 
-                    <a
-                        class="nav-link
-                        {% if request.resolver_match.url_name == 'customer_payments' %}
-                            active
-                        {% endif %}"
-                        href="{% url 'customer_payments' %}"
-                    >
+</li>
 
-                        <i class="bi bi-person-lines-fill me-1"></i>
-
-                        Customer Payments
-
-                    </a>
-
-
+ 
                     <!-- =========================================
                          ADMIN MARGIN
                     ========================================== -->
@@ -330,7 +339,6 @@
     ====================================================== -->
 
     <main class="page-content">
-
         {% block content %}
         {% endblock %}
 
@@ -1179,6 +1187,70 @@ body {
 </style>
 
 {% block extra_js %}
+<style>
+/* =========================================================
+   PAYMENTS DROPDOWN
+========================================================= */
+
+.nav-item.dropdown {
+    display: flex;
+    align-items: center;
+}
+
+.payments-dropdown {
+    min-width: 190px;
+    margin-top: 4px !important;
+
+    padding: 8px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 24px rgba(101, 67, 33, .15);
+}
+
+/* Dropdown items */
+
+.payments-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+
+    padding: 10px 12px;
+
+    border-radius: 7px;
+
+    color: var(--text-dark);
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
+
+.payments-dropdown .dropdown-item i {
+    font-size: 15px;
+}
+
+/* Hover */
+
+.payments-dropdown .dropdown-item:hover {
+    background: var(--parcelex-yellow-light);
+    color: var(--parcelex-brown);
+}
+
+/* Active */
+
+.payments-dropdown .dropdown-item.active {
+    background: var(--parcelex-yellow);
+    color: var(--parcelex-brown);
+    font-weight: 600;
+}
+</style>
 {% endblock %}
 </body>
 </html>

@@ -1,14 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from onepage_order.models import Order, Tracking, TrackingSession
 from datetime import datetime
-
 User = get_user_model()
-
-from django.contrib.auth.decorators import login_required
-
-
 @login_required(login_url="/auth/")
 def home(request):
 
