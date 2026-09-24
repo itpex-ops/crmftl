@@ -122,7 +122,7 @@
 
 
 /* =========================================================
-   COLUMN MENU
+   COLUMN ADJUSTMENT
 ========================================================= */
 
 .column-tools {
@@ -131,17 +131,23 @@
 
 .column-tools-btn {
     height: 40px;
+
     display: inline-flex;
     align-items: center;
     gap: 7px;
+
     padding: 0 13px;
+
     border: 1px solid #dfe4ea;
     border-radius: 8px;
+
     background: #ffffff;
     color: #344054;
+
     font-family: "Poppins", sans-serif;
     font-size: 10px;
     font-weight: 500;
+
     cursor: pointer;
     transition: .18s ease;
 }
@@ -154,15 +160,23 @@
 
 .column-tools-menu {
     position: absolute;
+
     top: calc(100% + 7px);
     right: 0;
-    width: 235px;
-    padding: 10px;
+
+    width: 255px;
+
+    padding: 11px;
+
     background: #ffffff;
+
     border: 1px solid #e4e7ec;
     border-radius: 10px;
+
     box-shadow: 0 12px 30px rgba(15, 23, 42, .12);
+
     z-index: 1200;
+
     display: none;
 }
 
@@ -171,54 +185,109 @@
 }
 
 .column-tools-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 2px 2px 8px;
+
     border-bottom: 1px solid #eef1f4;
-    margin-bottom: 7px;
+
+    margin-bottom: 8px;
 }
 
 .column-tools-title strong {
+    display: block;
+
     color: #172033;
+
     font-size: 10px;
     font-weight: 600;
 }
 
-.column-reset-btn {
-    border: 0;
-    background: transparent;
-    color: #2563eb;
+.column-tools-help {
+    margin-top: 3px;
+
+    color: #98a2b3;
+
+    font-size: 8px;
+
+    line-height: 1.4;
+}
+
+.column-adjust-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.column-adjust-row {
+    display: grid;
+
+    grid-template-columns: 1fr 72px;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.column-adjust-label {
+    color: #475467;
+
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.column-width-input {
+    width: 100%;
+
+    height: 27px;
+
+    padding: 0 6px;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 5px;
+
+    background: #ffffff;
+    color: #344054;
+
     font-family: "Poppins", sans-serif;
     font-size: 9px;
-    cursor: pointer;
-    padding: 2px 0;
+
+    outline: none;
+    box-sizing: border-box;
 }
 
-.column-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 4px;
-    border-radius: 5px;
-    color: #475467;
-    font-size: 9px;
-    cursor: pointer;
+.column-width-input:focus {
+    border-color: #2563eb;
+
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, .08);
 }
 
-.column-option:hover {
+.column-reset-btn {
+    width: 100%;
+
+    height: 30px;
+
+    margin-top: 9px;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 6px;
+
     background: #f8fafc;
+    color: #475467;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+
+    cursor: pointer;
 }
 
-.column-option input {
-    accent-color: #2563eb;
-    width: 13px;
-    height: 13px;
+.column-reset-btn:hover {
+    background: #eef4ff;
+    border-color: #cbd5e1;
 }
-
 
 /* =========================================================
    RESULTS COUNT
+
 ========================================================= */
 
 .admin-margin-result {
@@ -291,13 +360,6 @@
 .admin-margin-table tbody tr:last-child td {
     border-bottom: none;
 }
-
-/* hidden columns */
-.admin-margin-table .col-hidden {
-    display: none !important;
-}
-
-
 /* =========================================================
    TRIP
 ========================================================= */
@@ -748,6 +810,96 @@
     background: #94a3b8;
 }
 
+
+/* =========================================================
+   RESIZABLE TABLE HEADERS
+========================================================= */
+
+.admin-margin-table {
+    table-layout: fixed;
+}
+
+.admin-margin-table thead th {
+    position: relative;
+    user-select: none;
+}
+
+.column-header-label {
+    display: inline-block;
+    padding-right: 8px;
+}
+
+.column-resizer {
+    position: absolute;
+
+    top: 0;
+    right: -3px;
+
+    width: 8px;
+    height: 100%;
+
+    cursor: col-resize;
+
+    z-index: 20;
+}
+
+.column-resizer::after {
+    content: "";
+
+    position: absolute;
+
+    top: 25%;
+    left: 3px;
+
+    width: 2px;
+    height: 50%;
+
+    border-radius: 2px;
+
+    background: transparent;
+
+    transition: background .15s ease;
+}
+
+.admin-margin-table thead th:hover .column-resizer::after {
+    background: #cbd5e1;
+}
+
+body.column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.column-resizing * {
+    cursor: col-resize !important;
+}
+
+@media (max-width: 767.98px) {
+
+    .column-resizer {
+        display: none;
+    }
+
+    .admin-margin-table {
+        table-layout: auto;
+    }
+
+    .column-tools-menu {
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+
+    .column-tools {
+        width: 100%;
+    }
+
+    .column-tools-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 </style>
 
 
@@ -810,8 +962,8 @@
                 id="columnToolsBtn"
                 class="column-tools-btn"
             >
-                <i class="bi bi-layout-three-columns"></i>
-                Column Settings
+                <i class="bi bi-arrows-expand-vertical"></i>
+                Adjust Columns
                 <i class="bi bi-chevron-down"></i>
             </button>
 
@@ -822,67 +974,95 @@
 
                 <div class="column-tools-title">
 
-                    <strong>Show / Hide Columns</strong>
+                    <strong>Column Width</strong>
 
-                    <button
-                        type="button"
-                        id="resetColumns"
-                        class="column-reset-btn"
-                    >
-                        Reset
-                    </button>
+                    <div class="column-tools-help">
+                        Drag the divider in the table header or set width manually.
+                    </div>
 
                 </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="trip" checked>
-                    <span>Trip</span>
-                </label>
+                <div class="column-adjust-list">
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="customer" checked>
-                    <span>Customer</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Trip</span>
+                        <input class="column-width-input" type="number"
+                               min="90" max="320" step="5"
+                               data-width-column="trip">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="pickup" checked>
-                    <span>Pickup</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Customer</span>
+                        <input class="column-width-input" type="number"
+                               min="100" max="350" step="5"
+                               data-width-column="customer">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="drop" checked>
-                    <span>Drop</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Pickup</span>
+                        <input class="column-width-input" type="number"
+                               min="100" max="320" step="5"
+                               data-width-column="pickup">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="vehicle_type" checked>
-                    <span>Vehicle Type</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Drop</span>
+                        <input class="column-width-input" type="number"
+                               min="100" max="320" step="5"
+                               data-width-column="drop">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="vehicle_cost" checked>
-                    <span>Vehicle Cost</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Vehicle Type</span>
+                        <input class="column-width-input" type="number"
+                               min="90" max="280" step="5"
+                               data-width-column="vehicle_type">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="vehicle_payment" checked>
-                    <span>Vehicle Payment</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Vehicle Cost</span>
+                        <input class="column-width-input" type="number"
+                               min="90" max="250" step="5"
+                               data-width-column="vehicle_cost">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="customer_selling" checked>
-                    <span>Customer Selling</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Vehicle Payment</span>
+                        <input class="column-width-input" type="number"
+                               min="110" max="320" step="5"
+                               data-width-column="vehicle_payment">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="customer_payment" checked>
-                    <span>Customer Payment</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Customer Selling</span>
+                        <input class="column-width-input" type="number"
+                               min="90" max="280" step="5"
+                               data-width-column="customer_selling">
+                    </div>
 
-                <label class="column-option">
-                    <input type="checkbox" data-column="margin" checked>
-                    <span>Margin</span>
-                </label>
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Customer Payment</span>
+                        <input class="column-width-input" type="number"
+                               min="110" max="320" step="5"
+                               data-width-column="customer_payment">
+                    </div>
+
+                    <div class="column-adjust-row">
+                        <span class="column-adjust-label">Margin</span>
+                        <input class="column-width-input" type="number"
+                               min="90" max="250" step="5"
+                               data-width-column="margin">
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="resetColumns"
+                    class="column-reset-btn"
+                >
+                    Reset Column Widths
+                </button>
 
             </div>
 
@@ -906,49 +1086,43 @@
 
             <table class="admin-margin-table" id="marginTable">
 
+                <colgroup>
+                    <col data-column-width="trip">
+                    <col data-column-width="customer">
+                    <col data-column-width="pickup">
+                    <col data-column-width="drop">
+                    <col data-column-width="vehicle_type">
+                    <col data-column-width="vehicle_cost">
+                    <col data-column-width="vehicle_payment">
+                    <col data-column-width="customer_selling">
+                    <col data-column-width="customer_payment">
+                    <col data-column-width="margin">
+                </colgroup>
+
+
                 <thead>
 
                     <tr>
 
-                        <th data-column-cell="trip">
-                            Trip
-                        </th>
+                        <th data-column-cell="trip"><span class="column-header-label">Trip</span><span class="column-resizer" data-resize-column="trip" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer">
-                            Customer
-                        </th>
+                        <th data-column-cell="customer"><span class="column-header-label">Customer</span><span class="column-resizer" data-resize-column="customer" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="pickup">
-                            Pickup
-                        </th>
+                        <th data-column-cell="pickup"><span class="column-header-label">Pickup</span><span class="column-resizer" data-resize-column="pickup" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="drop">
-                            Drop
-                        </th>
+                        <th data-column-cell="drop"><span class="column-header-label">Drop</span><span class="column-resizer" data-resize-column="drop" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_type">
-                            Vehicle Type
-                        </th>
+                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span><span class="column-resizer" data-resize-column="vehicle_type" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_cost" class="text-end">
-                            Vehicle Cost
-                        </th>
+                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span><span class="column-resizer" data-resize-column="vehicle_cost" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_payment">
-                            Vehicle Payment
-                        </th>
+                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span><span class="column-resizer" data-resize-column="vehicle_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_selling" class="text-end">
-                            Customer Selling
-                        </th>
+                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span><span class="column-resizer" data-resize-column="customer_selling" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_payment">
-                            Customer Payment
-                        </th>
+                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span><span class="column-resizer" data-resize-column="customer_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="margin" class="text-end">
-                            Margin
-                        </th>
+                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span><span class="column-resizer" data-resize-column="margin" title="Drag to resize"></span></th>
 
                     </tr>
 
@@ -1294,37 +1468,37 @@
 
 <script>
 
-/* =========================================================
-   VEHICLE VS CUSTOMER TABLE
-   SEARCH + COLUMN SETTINGS
-========================================================= */
-
 document.addEventListener("DOMContentLoaded", function () {
-
-    const searchInput = document.getElementById("marginSearch");
-    const clearSearch = document.getElementById("clearMarginSearch");
-    const tableBody = document.getElementById("marginTableBody");
-    const resultText = document.getElementById("marginResult");
-    const searchEmptyRow = document.getElementById("searchEmptyRow");
-    const columnToolsBtn = document.getElementById("columnToolsBtn");
-    const columnToolsMenu = document.getElementById("columnToolsMenu");
-    const resetColumns = document.getElementById("resetColumns");
-    const columnCheckboxes = document.querySelectorAll(
-        '.column-option input[type="checkbox"]'
-    );
-
-    const rows = Array.from(
-        tableBody.querySelectorAll("tr.margin-row")
-    );
-
 
     /* =====================================================
        SEARCH
     ====================================================== */
 
+    const searchInput =
+        document.getElementById("marginSearch");
+
+    const clearSearch =
+        document.getElementById("clearMarginSearch");
+
+    const tableBody =
+        document.getElementById("marginTableBody");
+
+    const resultText =
+        document.getElementById("marginResult");
+
+    const searchEmptyRow =
+        document.getElementById("searchEmptyRow");
+
+    const rows =
+        Array.from(
+            tableBody.querySelectorAll("tr.margin-row")
+        );
+
+
     function applySearch() {
 
-        const term = (searchInput.value || "")
+        const term =
+            (searchInput.value || "")
             .trim()
             .toLowerCase();
 
@@ -1332,13 +1506,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         rows.forEach(function (row) {
 
-            const rowText = (row.innerText || "")
+            const rowText =
+                (row.innerText || "")
                 .replace(/\s+/g, " ")
                 .toLowerCase();
 
-            const matches = !term || rowText.includes(term);
+            const matches =
+                !term ||
+                rowText.includes(term);
 
-            row.style.display = matches ? "" : "none";
+            row.style.display =
+                matches ? "" : "none";
 
             if (matches) {
                 visibleCount++;
@@ -1347,12 +1525,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (searchEmptyRow) {
-            searchEmptyRow.style.display = (
-                rows.length > 0 && visibleCount === 0
-            ) ? "table-row" : "none";
+
+            searchEmptyRow.style.display =
+                rows.length > 0 &&
+                visibleCount === 0
+                    ? "table-row"
+                    : "none";
         }
 
         if (resultText) {
+
             resultText.textContent =
                 "Showing " +
                 visibleCount +
@@ -1362,171 +1544,551 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    searchInput.addEventListener("input", applySearch);
+    searchInput.addEventListener(
+        "input",
+        applySearch
+    );
 
 
-    clearSearch.addEventListener("click", function () {
+    clearSearch.addEventListener(
+        "click",
+        function () {
 
-        searchInput.value = "";
+            searchInput.value = "";
 
-        applySearch();
+            applySearch();
 
-        searchInput.focus();
-    });
+            searchInput.focus();
+        }
+    );
 
 
     /* =====================================================
-       COLUMN SETTINGS
+       COLUMN WIDTHS
     ====================================================== */
 
-    function applyColumn(columnName, visible) {
+    const defaultWidths = {
 
+        trip: 125,
+        customer: 150,
+        pickup: 145,
+        drop: 145,
+        vehicle_type: 120,
+        vehicle_cost: 115,
+        vehicle_payment: 150,
+        customer_selling: 120,
+        customer_payment: 145,
+        margin: 110
+    };
+
+
+    const minWidths = {
+
+        trip: 90,
+        customer: 100,
+        pickup: 100,
+        drop: 100,
+        vehicle_type: 90,
+        vehicle_cost: 90,
+        vehicle_payment: 110,
+        customer_selling: 90,
+        customer_payment: 110,
+        margin: 90
+    };
+
+
+    const maxWidths = {
+
+        trip: 320,
+        customer: 350,
+        pickup: 320,
+        drop: 320,
+        vehicle_type: 280,
+        vehicle_cost: 250,
+        vehicle_payment: 320,
+        customer_selling: 280,
+        customer_payment: 320,
+        margin: 250
+    };
+
+
+    const columns = {};
+
+    document.querySelectorAll(
+        "[data-column-width]"
+    ).forEach(function (column) {
+
+        columns[
+            column.dataset.columnWidth
+        ] = column;
+    });
+
+
+    const widthInputs =
         document.querySelectorAll(
-            '[data-column-cell="' + columnName + '"]'
-        ).forEach(function (element) {
+            ".column-width-input"
+        );
 
-            element.classList.toggle("col-hidden", !visible);
 
-        });
+    function clampWidth(
+        columnName,
+        value
+    ) {
+
+        const number =
+            parseInt(value, 10);
+
+        if (!Number.isFinite(number)) {
+
+            return defaultWidths[columnName];
+        }
+
+        return Math.max(
+            minWidths[columnName],
+            Math.min(
+                maxWidths[columnName],
+                number
+            )
+        );
     }
 
 
-    function saveColumns() {
+    function setColumnWidth(
+        columnName,
+        width,
+        save = true
+    ) {
+
+        const column =
+            columns[columnName];
+
+        if (!column) {
+            return;
+        }
+
+        const safeWidth =
+            clampWidth(
+                columnName,
+                width
+            );
+
+        column.style.width =
+            safeWidth + "px";
+
+        const input =
+            document.querySelector(
+                '[data-width-column="' +
+                columnName +
+                '"]'
+            );
+
+        if (input) {
+            input.value =
+                safeWidth;
+        }
+
+        if (save) {
+            saveColumnWidths();
+        }
+    }
+
+
+    function saveColumnWidths() {
 
         const state = {};
 
-        columnCheckboxes.forEach(function (checkbox) {
-            state[checkbox.dataset.column] = checkbox.checked;
-        });
+        Object.keys(columns).forEach(
+            function (columnName) {
+
+                state[columnName] =
+                    Math.round(
+                        columns[columnName]
+                        .getBoundingClientRect()
+                        .width
+                    );
+            }
+        );
 
         localStorage.setItem(
-            "vehicleCustomerColumnState",
+            "vehicleCustomerColumnWidths",
             JSON.stringify(state)
         );
     }
 
 
-    function loadColumns() {
+    function loadColumnWidths() {
+
+        let saved = {};
 
         try {
 
-            const saved = JSON.parse(
-                localStorage.getItem("vehicleCustomerColumnState") || "{}"
+            saved = JSON.parse(
+                localStorage.getItem(
+                    "vehicleCustomerColumnWidths"
+                ) || "{}"
             );
-
-            columnCheckboxes.forEach(function (checkbox) {
-
-                const column = checkbox.dataset.column;
-
-                if (
-                    Object.prototype.hasOwnProperty.call(saved, column)
-                ) {
-                    checkbox.checked = !!saved[column];
-                }
-
-                applyColumn(
-                    column,
-                    checkbox.checked
-                );
-
-            });
 
         } catch (error) {
 
-            columnCheckboxes.forEach(function (checkbox) {
-                applyColumn(
-                    checkbox.dataset.column,
-                    checkbox.checked
-                );
-            });
-
+            saved = {};
         }
+
+
+        Object.keys(defaultWidths).forEach(
+            function (columnName) {
+
+                setColumnWidth(
+                    columnName,
+                    saved[columnName] ||
+                        defaultWidths[columnName],
+                    false
+                );
+            }
+        );
+
+        syncWidthInputs();
     }
 
 
-    columnCheckboxes.forEach(function (checkbox) {
+    function syncWidthInputs() {
 
-        checkbox.addEventListener("change", function () {
+        widthInputs.forEach(
+            function (input) {
 
-            /* Keep at least one column visible */
+                const columnName =
+                    input.dataset.widthColumn;
 
-            const checkedCount = Array.from(columnCheckboxes)
-                .filter(function (item) {
-                    return item.checked;
-                })
-                .length;
+                if (
+                    columnName &&
+                    columns[columnName]
+                ) {
 
-            if (checkedCount === 0) {
-                checkbox.checked = true;
-                return;
+                    input.value =
+                        Math.round(
+                            columns[columnName]
+                            .getBoundingClientRect()
+                            .width
+                        );
+                }
             }
-
-            applyColumn(
-                checkbox.dataset.column,
-                checkbox.checked
-            );
-
-            saveColumns();
-
-        });
-
-    });
-
-
-    resetColumns.addEventListener("click", function () {
-
-        columnCheckboxes.forEach(function (checkbox) {
-
-            checkbox.checked = true;
-
-            applyColumn(
-                checkbox.dataset.column,
-                true
-            );
-
-        });
-
-        localStorage.removeItem("vehicleCustomerColumnState");
-
-    });
+        );
+    }
 
 
     /* =====================================================
-       DROPDOWN
+       WIDTH INPUT
     ====================================================== */
 
-    columnToolsBtn.addEventListener("click", function (event) {
+    widthInputs.forEach(
+        function (input) {
 
-        event.stopPropagation();
+            input.addEventListener(
+                "change",
+                function () {
 
-        columnToolsMenu.classList.toggle("show");
+                    setColumnWidth(
+                        this.dataset.widthColumn,
+                        this.value
+                    );
+                }
+            );
+        }
+    );
 
-        columnToolsBtn.classList.toggle(
-            "active",
-            columnToolsMenu.classList.contains("show")
+
+    /* =====================================================
+       DRAG TO RESIZE
+    ====================================================== */
+
+    let resizing = false;
+
+    let activeColumn = null;
+
+    let startX = 0;
+
+    let startWidth = 0;
+
+
+    document.querySelectorAll(
+        ".column-resizer"
+    ).forEach(function (handle) {
+
+        handle.addEventListener(
+            "mousedown",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                resizing = true;
+
+                startX =
+                    event.clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+                document.body.classList.add(
+                    "column-resizing"
+                );
+            }
+        );
+
+
+        handle.addEventListener(
+            "dblclick",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                setColumnWidth(
+                    this.dataset.resizeColumn,
+                    defaultWidths[
+                        this.dataset.resizeColumn
+                    ]
+                );
+            }
         );
 
     });
 
 
-    columnToolsMenu.addEventListener("click", function (event) {
-        event.stopPropagation();
+    document.addEventListener(
+        "mousemove",
+        function (event) {
+
+            if (
+                !resizing ||
+                !activeColumn
+            ) {
+                return;
+            }
+
+            const delta =
+                event.clientX - startX;
+
+            const newWidth =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            columns[activeColumn]
+                .style.width =
+                newWidth + "px";
+
+            const input =
+                document.querySelector(
+                    '[data-width-column="' +
+                    activeColumn +
+                    '"]'
+                );
+
+            if (input) {
+                input.value =
+                    Math.round(newWidth);
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "mouseup",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            document.body.classList.remove(
+                "column-resizing"
+            );
+
+            saveColumnWidths();
+        }
+    );
+
+
+    /* =====================================================
+       TOUCH
+    ====================================================== */
+
+    document.querySelectorAll(
+        ".column-resizer"
+    ).forEach(function (handle) {
+
+        handle.addEventListener(
+            "touchstart",
+            function (event) {
+
+                if (!event.touches.length) {
+                    return;
+                }
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                resizing = true;
+
+                startX =
+                    event.touches[0].clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+            },
+            { passive: true }
+        );
     });
 
 
-    document.addEventListener("click", function () {
+    document.addEventListener(
+        "touchmove",
+        function (event) {
 
-        columnToolsMenu.classList.remove("show");
-        columnToolsBtn.classList.remove("active");
+            if (
+                !resizing ||
+                !activeColumn ||
+                !event.touches.length
+            ) {
+                return;
+            }
 
-    });
+            const delta =
+                event.touches[0].clientX -
+                startX;
+
+            const newWidth =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            columns[activeColumn]
+                .style.width =
+                newWidth + "px";
+        },
+        { passive: true }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            saveColumnWidths();
+
+            syncWidthInputs();
+        }
+    );
+
+
+    /* =====================================================
+       RESET
+    ====================================================== */
+
+    resetColumns.addEventListener(
+        "click",
+        function () {
+
+            Object.keys(defaultWidths)
+                .forEach(
+                    function (columnName) {
+
+                        setColumnWidth(
+                            columnName,
+                            defaultWidths[columnName],
+                            false
+                        );
+                    }
+                );
+
+            localStorage.removeItem(
+                "vehicleCustomerColumnWidths"
+            );
+
+            syncWidthInputs();
+        }
+    );
+
+
+    /* =====================================================
+       ADJUST COLUMNS MENU
+    ====================================================== */
+
+    if (
+        columnToolsBtn &&
+        columnToolsMenu
+    ) {
+
+        columnToolsBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                columnToolsMenu
+                    .classList.toggle("show");
+
+                columnToolsBtn
+                    .classList.toggle(
+                        "active",
+                        columnToolsMenu
+                            .classList
+                            .contains("show")
+                    );
+            }
+        );
+
+
+        columnToolsMenu.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+            }
+        );
+
+
+        document.addEventListener(
+            "click",
+            function () {
+
+                columnToolsMenu
+                    .classList.remove("show");
+
+                columnToolsBtn
+                    .classList.remove("active");
+            }
+        );
+    }
 
 
     /* =====================================================
        INITIALIZE
     ====================================================== */
 
-    loadColumns();
+    loadColumnWidths();
 
     applySearch();
 
