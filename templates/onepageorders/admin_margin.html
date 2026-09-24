@@ -14,7 +14,7 @@
     width: 100%;
     min-height: calc(100vh - 64px);
 
-    padding: 14px 28px 40px;
+    padding: 12px 24px 35px;
 
     background: #f8f9fb;
 
@@ -33,9 +33,7 @@
     align-items: center;
     justify-content: space-between;
 
-    gap: 15px;
-
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .admin-margin-title {
@@ -45,22 +43,19 @@
 
     font-size: 21px;
     font-weight: 600;
-
-    line-height: 1.3;
 }
 
 .admin-margin-subtitle {
-    margin-top: 4px;
+    margin-top: 3px;
 
     color: #8a94a6;
 
-    font-size: 11px;
-    line-height: 1.4;
+    font-size: 10px;
 }
 
 
 /* =========================================================
-   MAIN CARD
+   CARD
 ========================================================= */
 
 .admin-margin-card {
@@ -97,25 +92,24 @@
 .admin-margin-table {
     width: 100%;
 
-    min-width: 1050px;
+    min-width: 1250px;
 
     margin: 0;
 
     border-collapse: separate;
+
     border-spacing: 0;
 
     font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
 }
 
 
 /* =========================================================
-   TABLE HEADER
+   HEADER
 ========================================================= */
 
 .admin-margin-table thead th {
-    padding: 12px 12px;
+    padding: 11px 10px;
 
     background: #f8fafc;
 
@@ -123,13 +117,13 @@
 
     color: #667085;
 
-    font-size: 9.5px;
+    font-size: 9px;
 
     font-weight: 600;
 
     text-transform: uppercase;
 
-    letter-spacing: .3px;
+    letter-spacing: .25px;
 
     white-space: nowrap;
 
@@ -138,17 +132,19 @@
 
 
 /* =========================================================
-   TABLE BODY
+   BODY
 ========================================================= */
 
 .admin-margin-table tbody td {
-    padding: 13px 12px;
+    padding: 11px 10px;
 
     border-bottom: 1px solid #eef1f4;
 
     color: #475467;
 
     background: #ffffff;
+
+    font-size: 10.5px;
 
     vertical-align: middle;
 
@@ -165,26 +161,98 @@
 
 
 /* =========================================================
-   TRIP NUMBER
+   COLUMN WIDTHS
 ========================================================= */
 
-.trip-number {
+/* Trip */
+.admin-margin-table th:nth-child(1),
+.admin-margin-table td:nth-child(1) {
+    min-width: 125px;
+}
+
+/* Customer */
+.admin-margin-table th:nth-child(2),
+.admin-margin-table td:nth-child(2) {
+    min-width: 150px;
+}
+
+/* Pickup */
+.admin-margin-table th:nth-child(3),
+.admin-margin-table td:nth-child(3) {
+    min-width: 145px;
+}
+
+/* Drop */
+.admin-margin-table th:nth-child(4),
+.admin-margin-table td:nth-child(4) {
+    min-width: 145px;
+}
+
+/* Vehicle Type */
+.admin-margin-table th:nth-child(5),
+.admin-margin-table td:nth-child(5) {
+    min-width: 120px;
+}
+
+/* Vehicle Cost */
+.admin-margin-table th:nth-child(6),
+.admin-margin-table td:nth-child(6) {
+    min-width: 115px;
+}
+
+/* Vehicle Payment */
+.admin-margin-table th:nth-child(7),
+.admin-margin-table td:nth-child(7) {
+    min-width: 150px;
+}
+
+/* Customer Selling */
+.admin-margin-table th:nth-child(8),
+.admin-margin-table td:nth-child(8) {
+    min-width: 120px;
+}
+
+/* Customer Payment */
+.admin-margin-table th:nth-child(9),
+.admin-margin-table td:nth-child(9) {
+    min-width: 145px;
+}
+
+/* Margin */
+.admin-margin-table th:nth-child(10),
+.admin-margin-table td:nth-child(10) {
+    min-width: 110px;
+}
+
+
+/* =========================================================
+   TRIP
+========================================================= */
+
+.trip-link {
     display: inline-flex;
 
     align-items: center;
 
-    gap: 5px;
+    gap: 6px;
 
     color: #2563eb;
 
-    font-size: 11px;
+    font-size: 10.5px;
 
     font-weight: 600;
+
+    text-decoration: none;
 
     white-space: nowrap;
 }
 
-.trip-number-icon {
+.trip-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.trip-icon {
     width: 25px;
     height: 25px;
 
@@ -206,111 +274,74 @@
 
 
 /* =========================================================
-   ROUTE
-   SAME STYLE AS ENQUIRY ROUTE
+   CUSTOMER
 ========================================================= */
 
-.route-modern {
-    width: 165px;
+.customer-name {
+    display: block;
 
-    min-height: auto;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    justify-content: center;
-
-    gap: 2px;
-
-    margin-top: 5px;
-
-    text-align: left;
-}
-
-
-/* =========================================================
-   ROUTE CARD
-========================================================= */
-
-.route-card {
-    width: 100%;
-
-    padding: 2px 4px;
-
-    margin: 0;
-
-    box-sizing: border-box;
-
-    text-align: left;
-}
-
-
-/* =========================================================
-   ROUTE TITLE
-========================================================= */
-
-.route-title {
-    margin-bottom: 2px;
-
-    color: #667085;
-
-    font-size: 8px;
-
-    font-weight: 700;
-
-    line-height: 1.2;
-
-    letter-spacing: .35px;
-
-    text-transform: uppercase;
-
-    text-align: left;
-}
-
-
-/* =========================================================
-   ROUTE CHIP
-========================================================= */
-
-.route-chip {
-    display: inline-flex;
-
-    align-items: center;
-
-    max-width: 100%;
-
-    padding: 3px 7px;
-
-    background: #ffffff;
-
-    border: 1px solid #dfe4ea;
-
-    border-radius: 5px;
-
-    color: #344054;
-
-    font-size: 8.5px;
-
-    font-weight: 600;
-
-    line-height: 1.35;
-
-    white-space: nowrap;
+    max-width: 150px;
 
     overflow: hidden;
 
     text-overflow: ellipsis;
 
-    box-sizing: border-box;
+    white-space: nowrap;
+
+    color: #344054;
+
+    font-size: 10px;
+
+    font-weight: 500;
 }
 
-.route-chip i {
+
+/* =========================================================
+   LOCATION CELL
+========================================================= */
+
+.location-cell {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    max-width: 145px;
+}
+
+.location-icon {
+    width: 25px;
+    height: 25px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
     flex-shrink: 0;
 
-    font-size: 7px;
+    border-radius: 6px;
+
+    font-size: 10px;
+}
+
+.location-text {
+    display: block;
+
+    max-width: 105px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 9.5px;
+
+    font-weight: 500;
+
+    color: #475467;
 }
 
 
@@ -318,16 +349,12 @@
    PICKUP
 ========================================================= */
 
-.pickup-card .route-title {
-    color: #039855;
-}
-
-.pickup-card .route-chip {
+.pickup-icon {
     background: #ecfdf3;
 
-    border-color: #d1fadf;
+    border: 1px solid #d1fadf;
 
-    color: #027a48;
+    color: #039855;
 }
 
 
@@ -335,78 +362,47 @@
    DROP
 ========================================================= */
 
-.drop-card .route-title {
+.drop-icon {
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+
     color: #ea580c;
 }
 
-.drop-card .route-chip {
-    background: #fff7ed;
-
-    border-color: #fed7aa;
-
-    color: #c2410c;
-}
-
 
 /* =========================================================
-   ROUTE DIRECTION
+   VEHICLE
 ========================================================= */
 
-.route-direction {
-    width: 100%;
-
-    height: 9px;
-
-    padding-left: 17px;
-
-    display: flex;
-
-    align-items: center;
-
-    color: #98a2b3;
-
-    font-size: 8px;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================================
-   VEHICLE TYPE
-========================================================= */
-
-.vehicle-type-route {
+.vehicle-type-cell {
     display: inline-flex;
 
     align-items: center;
 
-    max-width: 165px;
+    gap: 5px;
 
-    margin-top: 2px;
+    max-width: 120px;
 
-    padding: 2px 6px;
+    padding: 4px 7px;
 
     background: #f2f4f7;
 
     border: 1px solid #e4e7ec;
 
-    border-radius: 4px;
+    border-radius: 5px;
 
     color: #667085;
 
-    font-size: 7.5px;
+    font-size: 8.5px;
 
     font-weight: 500;
-
-    line-height: 1.3;
 
     white-space: nowrap;
 
     overflow: hidden;
 
     text-overflow: ellipsis;
-
-    box-sizing: border-box;
 }
 
 
@@ -417,7 +413,7 @@
 .amount {
     color: #344054;
 
-    font-size: 11px;
+    font-size: 10.5px;
 
     font-weight: 500;
 
@@ -435,23 +431,26 @@
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
-    min-height: 25px;
+    max-width: 145px;
 
-    padding: 4px 9px;
+    min-height: 24px;
+
+    padding: 4px 8px;
 
     border-radius: 20px;
 
-    font-size: 8.5px;
+    font-size: 8px;
 
     font-weight: 600;
 
-    line-height: 1.3;
-
-    white-space: nowrap;
+    line-height: 1.25;
 
     text-align: center;
+
+    white-space: nowrap;
 }
 
 .status-success {
@@ -478,7 +477,7 @@
 .margin-positive {
     color: #039855;
 
-    font-size: 11px;
+    font-size: 10.5px;
 
     font-weight: 700;
 
@@ -490,7 +489,7 @@
 .margin-negative {
     color: #d92d20;
 
-    font-size: 11px;
+    font-size: 10.5px;
 
     font-weight: 700;
 
@@ -505,50 +504,23 @@
 ========================================================= */
 
 .empty-table {
-    padding: 55px 20px !important;
+    padding: 50px 20px !important;
 
     color: #98a2b3 !important;
 
     font-size: 11px;
 
     text-align: center !important;
-
-    background: #ffffff !important;
 }
 
+.empty-icon {
+    display: block;
 
-/* =========================================================
-   COLUMN WIDTHS
-========================================================= */
+    margin-bottom: 8px;
 
-.admin-margin-table th:nth-child(1),
-.admin-margin-table td:nth-child(1) {
-    width: 24%;
-}
+    color: #cbd5e1;
 
-.admin-margin-table th:nth-child(2),
-.admin-margin-table td:nth-child(2) {
-    width: 12%;
-}
-
-.admin-margin-table th:nth-child(3),
-.admin-margin-table td:nth-child(3) {
-    width: 15%;
-}
-
-.admin-margin-table th:nth-child(4),
-.admin-margin-table td:nth-child(4) {
-    width: 14%;
-}
-
-.admin-margin-table th:nth-child(5),
-.admin-margin-table td:nth-child(5) {
-    width: 18%;
-}
-
-.admin-margin-table th:nth-child(6),
-.admin-margin-table td:nth-child(6) {
-    width: 10%;
+    font-size: 25px;
 }
 
 
@@ -559,15 +531,15 @@
 @media (max-width: 1100px) {
 
     .admin-margin-page {
-        padding-left: 18px;
-        padding-right: 18px;
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
 }
 
 
 /* =========================================================
-   MOBILE CARD VIEW
+   MOBILE
 ========================================================= */
 
 @media (max-width: 767.98px) {
@@ -582,8 +554,6 @@
     /* HEADER */
 
     .admin-margin-header {
-        align-items: flex-start;
-
         margin-bottom: 10px;
     }
 
@@ -592,9 +562,7 @@
     }
 
     .admin-margin-subtitle {
-        margin-top: 3px;
-
-        font-size: 9px;
+        font-size: 8.5px;
     }
 
 
@@ -643,7 +611,7 @@
     }
 
 
-    /* ORDER CARD */
+    /* ROW */
 
     .admin-margin-table tbody tr {
         display: block;
@@ -652,7 +620,7 @@
 
         margin-bottom: 10px;
 
-        padding: 9px 12px;
+        padding: 8px 12px;
 
         background: #ffffff;
 
@@ -667,23 +635,20 @@
     }
 
 
-    .admin-margin-table tbody tr:hover {
-        background: #ffffff;
-    }
-
-
     /* CELLS */
 
     .admin-margin-table tbody td {
         display: grid;
 
-        grid-template-columns: 95px minmax(0, 1fr);
+        grid-template-columns: 100px minmax(0, 1fr);
 
         align-items: center;
 
         gap: 8px;
 
         width: 100%;
+
+        min-width: 0 !important;
 
         min-height: 38px;
 
@@ -711,27 +676,25 @@
 
         color: #98a2b3;
 
-        font-size: 8px;
+        font-size: 7.5px;
 
         font-weight: 600;
 
+        letter-spacing: .25px;
+
         line-height: 1.2;
 
-        letter-spacing: .3px;
-
         text-transform: uppercase;
-
-        text-align: left;
     }
 
 
     /* TRIP */
 
-    .trip-number {
+    .trip-link {
         font-size: 10px;
     }
 
-    .trip-number-icon {
+    .trip-icon {
         width: 23px;
         height: 23px;
 
@@ -739,73 +702,62 @@
     }
 
 
-    /* ROUTE */
+    /* CUSTOMER */
 
-    .route-modern {
-        width: 100%;
-
-        min-height: auto;
-
-        margin-top: 3px;
-
-        align-items: flex-start;
-
-        gap: 1px;
-    }
-
-    .route-card {
-        width: 100%;
-
-        padding: 2px 0;
-    }
-
-    .route-title {
-        font-size: 7px;
-
-        margin-bottom: 2px;
-    }
-
-    .route-chip {
+    .customer-name {
         max-width: 100%;
 
-        padding: 4px 7px;
-
-        font-size: 8px;
-
-        line-height: 1.3;
+        font-size: 9px;
 
         white-space: normal;
-
-        overflow: visible;
-
-        text-overflow: clip;
 
         word-break: break-word;
     }
 
-    .route-direction {
-        height: 9px;
 
-        padding-left: 14px;
+    /* LOCATION */
+
+    .location-cell {
+        max-width: 100%;
+
+        gap: 5px;
+    }
+
+    .location-icon {
+        width: 22px;
+        height: 22px;
 
         font-size: 8px;
     }
 
-    .vehicle-type-route {
+    .location-text {
         max-width: 100%;
 
-        margin-top: 3px;
-
-        font-size: 7.5px;
+        font-size: 8.5px;
 
         white-space: normal;
+
+        word-break: break-word;
+    }
+
+
+    /* VEHICLE */
+
+    .vehicle-type-cell {
+        max-width: 100%;
+
+        font-size: 8px;
+
+        white-space: normal;
+
+        word-break: break-word;
     }
 
 
     /* AMOUNT */
 
     .amount {
-        font-size: 10px;
+        font-size: 9.5px;
 
         text-align: left;
     }
@@ -816,11 +768,15 @@
     .status {
         justify-self: start;
 
-        min-height: 23px;
+        max-width: 100%;
 
-        padding: 4px 8px;
+        min-height: 22px;
 
-        font-size: 8px;
+        padding: 4px 7px;
+
+        font-size: 7.5px;
+
+        white-space: normal;
     }
 
 
@@ -828,7 +784,7 @@
 
     .margin-positive,
     .margin-negative {
-        font-size: 10px;
+        font-size: 9.5px;
 
         text-align: left;
     }
@@ -842,8 +798,6 @@
         width: 100%;
 
         padding: 45px 15px !important;
-
-        border: none !important;
 
         text-align: center !important;
     }
@@ -859,6 +813,7 @@
 
     .admin-margin-page {
         padding-left: 8px;
+
         padding-right: 8px;
     }
 
@@ -872,17 +827,14 @@
 
     .admin-margin-table tbody tr {
         padding-left: 10px;
-        padding-right: 10px;
 
-        border-radius: 10px;
+        padding-right: 10px;
     }
 
     .admin-margin-table tbody td {
-        grid-template-columns: 82px minmax(0, 1fr);
+        grid-template-columns: 85px minmax(0, 1fr);
 
         gap: 7px;
-
-        min-height: 36px;
     }
 
     .admin-margin-table tbody td[data-label]::before {
@@ -942,7 +894,7 @@
 
 
     <!-- =====================================================
-         TABLE CARD
+         MAIN CARD
     ====================================================== -->
 
     <div class="admin-margin-card">
@@ -961,7 +913,23 @@
                     <tr>
 
                         <th>
-                            Trip Details
+                            Trip
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th>
+                            Pickup
+                        </th>
+
+                        <th>
+                            Drop
+                        </th>
+
+                        <th>
+                            Vehicle Type
                         </th>
 
                         <th class="text-end">
@@ -969,7 +937,7 @@
                         </th>
 
                         <th>
-                            Vehicle Payment Status
+                            Vehicle Payment
                         </th>
 
                         <th class="text-end">
@@ -977,7 +945,7 @@
                         </th>
 
                         <th>
-                            Customer Payment Status
+                            Customer Payment
                         </th>
 
                         <th class="text-end">
@@ -1001,110 +969,148 @@
 
 
                         <!-- =========================================
-                             TRIP DETAILS
+                             TRIP
                         ========================================== -->
 
-                        <td data-label="Trip Details">
+                        <td data-label="Trip">
 
-                            <div class="trip-number">
+                            <a
+                                href="{% url 'onepageorder_detail' o.pk %}"
+                                class="trip-link"
+                            >
 
-                                <span class="trip-number-icon">
+                                <span class="trip-icon">
                                     <i class="bi bi-arrow-up-right"></i>
                                 </span>
 
                                 {{ o.trip_number }}
 
-                            </div>
+                            </a>
+
+                        </td>
 
 
-                            <!-- =====================================
-                                 ROUTE
-                            ====================================== -->
+                        <!-- =========================================
+                             CUSTOMER
+                        ========================================== -->
 
-                            <div class="route-modern">
+                        <td data-label="Customer">
+
+                            {% if o.customer %}
+
+                                <span
+                                    class="customer-name"
+                                    title="{{ o.customer.name }}"
+                                >
+                                    {{ o.customer.name }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
 
 
-                                <!-- PICKUP -->
+                        <!-- =========================================
+                             PICKUP
+                        ========================================== -->
 
-                                {% if o.origin %}
+                        <td data-label="Pickup">
 
-                                <div class="route-card pickup-card">
+                            {% if o.origin %}
 
-                                    <div class="route-title">
-                                        PICKUP
-                                    </div>
+                                <div class="location-cell">
+
+                                    <span class="location-icon pickup-icon">
+
+                                        <i class="bi bi-geo-alt-fill"></i>
+
+                                    </span>
 
                                     <span
-                                        class="route-chip"
+                                        class="location-text"
                                         title="{{ o.origin }}"
                                     >
-
-                                        <i class="bi bi-geo-alt-fill me-1"></i>
-
                                         {{ o.origin }}
-
                                     </span>
 
                                 </div>
 
-                                {% endif %}
+                            {% else %}
+
+                                <span class="text-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
 
 
-                                <!-- ROUTE ARROW -->
+                        <!-- =========================================
+                             DROP
+                        ========================================== -->
 
-                                {% if o.origin and o.destination %}
+                        <td data-label="Drop">
 
-                                <div class="route-direction">
+                            {% if o.destination %}
 
-                                    <i class="bi bi-arrow-down"></i>
+                                <div class="location-cell">
 
-                                </div>
+                                    <span class="location-icon drop-icon">
 
-                                {% endif %}
+                                        <i class="bi bi-geo-alt-fill"></i>
 
-
-                                <!-- DROP -->
-
-                                {% if o.destination %}
-
-                                <div class="route-card drop-card">
-
-                                    <div class="route-title">
-                                        DROP
-                                    </div>
+                                    </span>
 
                                     <span
-                                        class="route-chip"
+                                        class="location-text"
                                         title="{{ o.destination }}"
                                     >
-
-                                        <i class="bi bi-geo-alt-fill me-1"></i>
-
                                         {{ o.destination }}
-
                                     </span>
 
                                 </div>
 
-                                {% endif %}
+                            {% else %}
+
+                                <span class="text-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
 
 
-                                <!-- VEHICLE TYPE -->
+                        <!-- =========================================
+                             VEHICLE TYPE
+                        ========================================== -->
 
-                                {% if o.vehicle_type %}
+                        <td data-label="Vehicle Type">
 
-                                <div class="vehicle-type-route">
+                            {% if o.vehicle_type %}
 
-                                    <i class="bi bi-truck me-1"></i>
+                                <span class="vehicle-type-cell">
+
+                                    <i class="bi bi-truck"></i>
 
                                     {{ o.vehicle_type }}
 
-                                </div>
+                                </span>
 
-                                {% endif %}
+                            {% else %}
 
+                                <span class="text-muted">
+                                    —
+                                </span>
 
-                            </div>
+                            {% endif %}
 
                         </td>
 
@@ -1124,7 +1130,7 @@
 
 
                         <!-- =========================================
-                             VEHICLE PAYMENT STATUS
+                             VEHICLE PAYMENT
                         ========================================== -->
 
                         <td data-label="Vehicle Payment">
@@ -1132,13 +1138,17 @@
                             {% if o.vehicle_cost > 0 %}
 
                                 <span class="status status-success">
+
                                     Advance / Payment Made
+
                                 </span>
 
                             {% else %}
 
                                 <span class="status status-warning">
+
                                     No Payment Done
+
                                 </span>
 
                             {% endif %}
@@ -1161,7 +1171,7 @@
 
 
                         <!-- =========================================
-                             CUSTOMER PAYMENT STATUS
+                             CUSTOMER PAYMENT
                         ========================================== -->
 
                         <td data-label="Customer Payment">
@@ -1173,13 +1183,17 @@
                                     {% if p.status == "Payment Cleared" %}
 
                                         <span class="status status-success">
+
                                             {{ p.status }}
+
                                         </span>
 
                                     {% else %}
 
                                         <span class="status status-warning">
+
                                             {{ p.status }}
+
                                         </span>
 
                                     {% endif %}
@@ -1187,7 +1201,9 @@
                                 {% else %}
 
                                     <span class="status status-warning">
+
                                         Pending
+
                                     </span>
 
                                 {% endif %}
@@ -1234,24 +1250,17 @@
                     {% empty %}
 
                     <!-- =================================================
-                         EMPTY STATE
+                         EMPTY
                     ================================================== -->
 
                     <tr>
 
                         <td
-                            colspan="6"
+                            colspan="10"
                             class="empty-table"
                         >
 
-                            <i
-                                class="bi bi-bar-chart-line"
-                                style="
-                                    font-size:24px;
-                                    display:block;
-                                    margin-bottom:8px;
-                                "
-                            ></i>
+                            <i class="bi bi-bar-chart-line empty-icon"></i>
 
                             No orders available.
 
