@@ -251,19 +251,36 @@
 
 
 /* =========================================================
+   ROUTE
+========================================================= */
+
+.route-modern {
+    width: 165px;
+    min-height: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 2px;
+
+    text-align: left;
+}
+
+
+/* =========================================================
    ROUTE CARD
 ========================================================= */
 
 .route-card {
-
     width: 100%;
 
-    padding: 3px 4px;
-
+    padding: 2px 4px;
     margin: 0;
 
     text-align: left;
-
     box-sizing: border-box;
 }
 
@@ -273,18 +290,14 @@
 ========================================================= */
 
 .route-title {
-
     margin-bottom: 2px;
 
-    color: #667085;
-
     font-size: 8px;
-
     font-weight: 700;
 
     line-height: 1.2;
 
-    letter-spacing: .4px;
+    letter-spacing: .35px;
 
     text-transform: uppercase;
 
@@ -297,25 +310,22 @@
 ========================================================= */
 
 .route-chip {
-
     display: inline-flex;
-
     align-items: center;
 
     max-width: 100%;
 
-    padding: 4px 8px;
-
-    border: 1px solid #dfe4ea;
-
-    border-radius: 6px;
+    padding: 3px 7px;
 
     background: #ffffff;
 
+    border: 1px solid #dfe4ea;
+
+    border-radius: 5px;
+
     color: #344054;
 
-    font-size: 9px;
-
+    font-size: 8.5px;
     font-weight: 600;
 
     line-height: 1.35;
@@ -323,17 +333,104 @@
     white-space: nowrap;
 
     overflow: hidden;
-
     text-overflow: ellipsis;
 
     box-sizing: border-box;
 }
 
 .route-chip i {
-
     flex-shrink: 0;
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   PICKUP
+========================================================= */
+
+.pickup-card .route-title {
+    color: #039855;
+}
+
+.pickup-card .route-chip {
+    background: #ecfdf3;
+
+    border-color: #d1fadf;
+
+    color: #027a48;
+}
+
+
+/* =========================================================
+   DROP
+========================================================= */
+
+.drop-card .route-title {
+    color: #ea580c;
+}
+
+.drop-card .route-chip {
+    background: #fff7ed;
+
+    border-color: #fed7aa;
+
+    color: #c2410c;
+}
+
+
+/* =========================================================
+   ROUTE DIRECTION
+========================================================= */
+
+.route-direction {
+    width: 100%;
+
+    height: 9px;
+
+    padding-left: 17px;
+
+    display: flex;
+    align-items: center;
+
+    color: #98a2b3;
 
     font-size: 8px;
+}
+
+
+/* =========================================================
+   VEHICLE TYPE
+========================================================= */
+
+.vehicle-type-route {
+    display: inline-flex;
+    align-items: center;
+
+    max-width: 165px;
+
+    margin-top: 2px;
+
+    padding: 2px 6px;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 4px;
+
+    background: #f2f4f7;
+
+    color: #667085;
+
+    font-size: 7.5px;
+    font-weight: 500;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
 }
 
 
@@ -1095,83 +1192,80 @@
 
 
                             <!-- ROUTE -->
+<div class="route-modern">
 
-                            <div class="route-modern">
+    <!-- PICKUP -->
 
-                                <!-- PICKUP -->
+    {% if o.origin %}
 
-                                {% if o.origin %}
+    <div class="route-card pickup-card">
 
-                                <div class="route-card pickup-card">
+        <div class="route-title">
+            PICKUP
+        </div>
 
-                                    <div class="route-title">
-                                        PICKUP
-                                    </div>
+        <span
+            class="route-chip"
+            title="{{ o.origin }}"
+        >
+            <i class="bi bi-geo-alt-fill me-1"></i>
+            {{ o.origin }}
+        </span>
 
-                                    <span
-                                        class="route-chip"
-                                        title="{{ o.origin }}"
-                                    >
-                                        <i class="bi bi-geo-alt-fill me-1"></i>
-                                        {{ o.origin }}
-                                    </span>
+    </div>
 
-                                </div>
-
-                                {% endif %}
-
-
-                                <!-- DIRECTION -->
-
-                                {% if o.origin and o.destination %}
-
-                                <div class="route-direction">
-
-                                    <i class="bi bi-arrow-down"></i>
-
-                                </div>
-
-                                {% endif %}
+    {% endif %}
 
 
-                                <!-- DROP -->
+    <!-- DIRECTION -->
 
-                                {% if o.destination %}
+    {% if o.origin and o.destination %}
 
-                                <div class="route-card drop-card">
+    <div class="route-direction">
+        <i class="bi bi-arrow-down"></i>
+    </div>
 
-                                    <div class="route-title">
-                                        DROP
-                                    </div>
-
-                                    <span
-                                        class="route-chip"
-                                        title="{{ o.destination }}"
-                                    >
-                                        <i class="bi bi-geo-alt-fill me-1"></i>
-                                        {{ o.destination }}
-                                    </span>
-
-                                </div>
-
-                                {% endif %}
+    {% endif %}
 
 
-                                <!-- VEHICLE TYPE -->
+    <!-- DROP -->
 
-                                {% if o.vehicle_type %}
+    {% if o.destination %}
 
-                                <div class="vehicle-type-route">
+    <div class="route-card drop-card">
 
-                                    <i class="bi bi-truck me-1"></i>
+        <div class="route-title">
+            DROP
+        </div>
 
-                                    {{ o.vehicle_type }}
+        <span
+            class="route-chip"
+            title="{{ o.destination }}"
+        >
+            <i class="bi bi-geo-alt-fill me-1"></i>
+            {{ o.destination }}
+        </span>
 
-                                </div>
+    </div>
 
-                                {% endif %}
+    {% endif %}
 
-                            </div>
+
+    <!-- VEHICLE TYPE -->
+
+    {% if o.vehicle_type %}
+
+    <div class="vehicle-type-route">
+
+        <i class="bi bi-truck me-1"></i>
+
+        {{ o.vehicle_type }}
+
+    </div>
+
+    {% endif %}
+
+</div>
 
                         </td>
 
