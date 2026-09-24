@@ -1118,6 +1118,135 @@
     }
 }
 
+
+/* =========================================================
+   TABLE COLUMN ADJUSTMENT
+========================================================= */
+
+.admin-margin-table {
+    table-layout: fixed;
+}
+
+.admin-margin-table thead th {
+    position: relative;
+    user-select: none;
+}
+
+.column-header-label {
+    display: inline-block;
+    padding-right: 8px;
+}
+
+.column-resizer {
+    position: absolute;
+
+    top: 0;
+    right: -4px;
+
+    width: 9px;
+    height: 100%;
+
+    cursor: col-resize;
+
+    z-index: 30;
+}
+
+.column-resizer::after {
+    content: "";
+
+    position: absolute;
+
+    top: 25%;
+    left: 3px;
+
+    width: 2px;
+    height: 50%;
+
+    border-radius: 2px;
+
+    background: transparent;
+
+    transition: background .15s ease;
+}
+
+.admin-margin-table thead th:hover .column-resizer::after {
+    background: #cbd5e1;
+}
+
+body.column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.column-resizing * {
+    cursor: col-resize !important;
+}
+
+/* Keep the Route column comfortable */
+.admin-margin-table col[data-column-width="route"] {
+    min-width: 160px;
+}
+
+/* Mobile: use normal card layout; drag handles are desktop-only */
+@media (max-width: 767.98px) {
+
+    .column-resizer {
+        display: none;
+    }
+
+    .admin-margin-table {
+        table-layout: auto;
+    }
+
+    .admin-margin-table col {
+        width: auto !important;
+    }
+}
+
+
+/* =========================================================
+   RESET WIDTHS BUTTON
+========================================================= */
+
+.column-reset-inline {
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 0 11px;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #667085;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.column-reset-inline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #344054;
+}
+
+@media (max-width: 767.98px) {
+
+    .column-reset-inline {
+        width: 100%;
+        justify-content: center;
+        height: 38px;
+    }
+}
+
 </style>
 
 
@@ -1173,7 +1302,18 @@
         </div>
 
 
-        <div id="marginResult" class="admin-margin-result">
+        
+        <button
+            type="button"
+            id="resetColumnWidths"
+            class="column-reset-inline"
+            title="Reset table column widths"
+        >
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset widths
+        </button>
+
+<div id="marginResult" class="admin-margin-result">
             Showing {{ orders|length }} order{{ orders|length|pluralize }}
         </div>
 
@@ -1189,27 +1329,39 @@
         <div class="admin-margin-table-wrapper">
 
             <table class="admin-margin-table" id="marginTable">
+                <colgroup>
+                    <col data-column-width="trip" style="width:125px;">
+                    <col data-column-width="customer" style="width:150px;">
+                    <col data-column-width="route" style="width:225px;">
+                    <col data-column-width="vehicle_type" style="width:120px;">
+                    <col data-column-width="vehicle_cost" style="width:115px;">
+                    <col data-column-width="vehicle_payment" style="width:150px;">
+                    <col data-column-width="customer_selling" style="width:120px;">
+                    <col data-column-width="customer_payment" style="width:145px;">
+                    <col data-column-width="margin" style="width:110px;">
+                </colgroup>
+
 <thead>
 
                     <tr>
 
-                        <th data-column-cell="trip">Trip</th>
+                        <th data-column-cell="trip"><span class="column-header-label">Trip</span><span class="column-resizer" data-resize-column="trip" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer">Customer</th>
+                        <th data-column-cell="customer"><span class="column-header-label">Customer</span><span class="column-resizer" data-resize-column="customer" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="route">Route</th>
+                        <th data-column-cell="route"><span class="column-header-label">Route</span><span class="column-resizer" data-resize-column="route" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_type">Vehicle Type</th>
+                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span><span class="column-resizer" data-resize-column="vehicle_type" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_cost" class="text-end">Vehicle Cost</th>
+                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span><span class="column-resizer" data-resize-column="vehicle_cost" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_payment">Vehicle Payment</th>
+                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span><span class="column-resizer" data-resize-column="vehicle_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_selling" class="text-end">Customer Selling</th>
+                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span><span class="column-resizer" data-resize-column="customer_selling" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_payment">Customer Payment</th>
+                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span><span class="column-resizer" data-resize-column="customer_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="margin" class="text-end">Margin</th>
+                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span><span class="column-resizer" data-resize-column="margin" title="Drag to resize"></span></th>
 
                     </tr>
 
@@ -1543,6 +1695,10 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    /* =====================================================
+       SEARCH
+    ====================================================== */
+
     const searchInput =
         document.getElementById("marginSearch");
 
@@ -1558,21 +1714,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchEmptyRow =
         document.getElementById("searchEmptyRow");
 
-    if (!searchInput || !tableBody) {
+
+    if (!tableBody) {
         return;
     }
 
-    const rows =
-        Array.from(
-            tableBody.querySelectorAll(
-                "tr.margin-row"
-            )
-        );
+
+    const rows = Array.from(
+        tableBody.querySelectorAll("tr.margin-row")
+    );
+
 
     function applySearch() {
 
         const term =
-            (searchInput.value || "")
+            (searchInput?.value || "")
             .trim()
             .toLowerCase();
 
@@ -1597,14 +1753,18 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+
         if (searchEmptyRow) {
 
             searchEmptyRow.style.display =
-                rows.length > 0 &&
-                visibleCount === 0
+                (
+                    rows.length > 0 &&
+                    visibleCount === 0
+                )
                     ? "table-row"
                     : "none";
         }
+
 
         if (resultText) {
 
@@ -1616,10 +1776,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    searchInput.addEventListener(
-        "input",
-        applySearch
-    );
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            applySearch
+        );
+    }
+
 
     if (clearSearch) {
 
@@ -1627,14 +1792,428 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             function () {
 
-                searchInput.value = "";
+                if (searchInput) {
+                    searchInput.value = "";
+                }
 
                 applySearch();
 
-                searchInput.focus();
+                if (searchInput) {
+                    searchInput.focus();
+                }
             }
         );
     }
+
+
+    /* =====================================================
+       COLUMN RESIZING
+    ====================================================== */
+
+    const defaultWidths = {
+        trip: 125,
+        customer: 150,
+        route: 225,
+        vehicle_type: 120,
+        vehicle_cost: 115,
+        vehicle_payment: 150,
+        customer_selling: 120,
+        customer_payment: 145,
+        margin: 110
+    };
+
+
+    const minWidths = {
+        trip: 90,
+        customer: 100,
+        route: 160,
+        vehicle_type: 90,
+        vehicle_cost: 90,
+        vehicle_payment: 110,
+        customer_selling: 90,
+        customer_payment: 110,
+        margin: 90
+    };
+
+
+    const maxWidths = {
+        trip: 280,
+        customer: 320,
+        route: 380,
+        vehicle_type: 260,
+        vehicle_cost: 240,
+        vehicle_payment: 320,
+        customer_selling: 260,
+        customer_payment: 320,
+        margin: 240
+    };
+
+
+    const columns = {};
+
+    document.querySelectorAll(
+        "[data-column-width]"
+    ).forEach(function (col) {
+
+        columns[
+            col.dataset.columnWidth
+        ] = col;
+    });
+
+
+    const resizeHandles =
+        document.querySelectorAll(
+            ".column-resizer"
+        );
+
+
+    function clampWidth(columnName, value) {
+
+        const number =
+            parseInt(value, 10);
+
+        if (!Number.isFinite(number)) {
+
+            return defaultWidths[columnName];
+        }
+
+        return Math.max(
+            minWidths[columnName],
+            Math.min(
+                maxWidths[columnName],
+                number
+            )
+        );
+    }
+
+
+    function applyColumnWidth(
+        columnName,
+        width
+    ) {
+
+        if (!columns[columnName]) {
+            return;
+        }
+
+        const safeWidth =
+            clampWidth(
+                columnName,
+                width
+            );
+
+        columns[columnName].style.width =
+            safeWidth + "px";
+    }
+
+
+    function saveColumnWidths() {
+
+        const state = {};
+
+        Object.keys(columns).forEach(
+            function (columnName) {
+
+                const width =
+                    columns[columnName]
+                    .getBoundingClientRect()
+                    .width;
+
+                state[columnName] =
+                    Math.round(width);
+            }
+        );
+
+        localStorage.setItem(
+            "vehicleCustomerRouteColumnWidths",
+            JSON.stringify(state)
+        );
+    }
+
+
+    function loadColumnWidths() {
+
+        let saved = {};
+
+        try {
+
+            saved = JSON.parse(
+                localStorage.getItem(
+                    "vehicleCustomerRouteColumnWidths"
+                ) || "{}"
+            );
+
+        } catch (error) {
+
+            saved = {};
+        }
+
+
+        Object.keys(defaultWidths).forEach(
+            function (columnName) {
+
+                applyColumnWidth(
+                    columnName,
+                    saved[columnName] ||
+                    defaultWidths[columnName]
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       MOUSE RESIZE
+    ====================================================== */
+
+    let resizing = false;
+    let activeColumn = null;
+    let startX = 0;
+    let startWidth = 0;
+
+
+    resizeHandles.forEach(function (handle) {
+
+        handle.addEventListener(
+            "mousedown",
+            function (event) {
+
+                if (window.innerWidth <= 767) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                if (!columns[activeColumn]) {
+                    return;
+                }
+
+                resizing = true;
+
+                startX =
+                    event.clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+                document.body.classList.add(
+                    "column-resizing"
+                );
+            }
+        );
+
+
+        /* Double click = reset only this column */
+
+        handle.addEventListener(
+            "dblclick",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const columnName =
+                    this.dataset.resizeColumn;
+
+                applyColumnWidth(
+                    columnName,
+                    defaultWidths[columnName]
+                );
+
+                saveColumnWidths();
+            }
+        );
+
+    });
+
+
+    document.addEventListener(
+        "mousemove",
+        function (event) {
+
+            if (
+                !resizing ||
+                !activeColumn
+            ) {
+                return;
+            }
+
+            const delta =
+                event.clientX - startX;
+
+            const width =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            applyColumnWidth(
+                activeColumn,
+                width
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        "mouseup",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            document.body.classList.remove(
+                "column-resizing"
+            );
+
+            saveColumnWidths();
+        }
+    );
+
+
+    /* =====================================================
+       TOUCH RESIZE
+    ====================================================== */
+
+    resizeHandles.forEach(function (handle) {
+
+        handle.addEventListener(
+            "touchstart",
+            function (event) {
+
+                if (
+                    window.innerWidth <= 767 ||
+                    !event.touches.length
+                ) {
+                    return;
+                }
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                if (!columns[activeColumn]) {
+                    return;
+                }
+
+                resizing = true;
+
+                startX =
+                    event.touches[0].clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+            },
+            { passive: true }
+        );
+    });
+
+
+    document.addEventListener(
+        "touchmove",
+        function (event) {
+
+            if (
+                !resizing ||
+                !activeColumn ||
+                !event.touches.length
+            ) {
+                return;
+            }
+
+            const delta =
+                event.touches[0].clientX - startX;
+
+            const width =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            applyColumnWidth(
+                activeColumn,
+                width
+            );
+        },
+        { passive: true }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            document.body.classList.remove(
+                "column-resizing"
+            );
+
+            saveColumnWidths();
+        }
+    );
+
+
+    /* =====================================================
+       RESET WIDTHS
+    ====================================================== */
+
+    const resetButton =
+        document.getElementById(
+            "resetColumnWidths"
+        );
+
+    if (resetButton) {
+
+        resetButton.addEventListener(
+            "click",
+            function () {
+
+                Object.keys(defaultWidths)
+                    .forEach(
+                        function (columnName) {
+
+                            applyColumnWidth(
+                                columnName,
+                                defaultWidths[
+                                    columnName
+                                ]
+                            );
+                        }
+                    );
+
+                localStorage.removeItem(
+                    "vehicleCustomerRouteColumnWidths"
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       INITIALIZE
+    ====================================================== */
+
+    loadColumnWidths();
 
     applySearch();
 
