@@ -246,27 +246,24 @@
 }
 
 
+
 /* =========================================================
-   ROUTE / LOCATION STYLE
+   ROUTE
 ========================================================= */
 
 .route-modern {
     width: 225px;
+    max-width: 100%;
 
     display: flex;
     flex-direction: column;
 
-    gap: 7px;
+    align-items: flex-start;
 
-    margin-top: 5px;
+    gap: 7px;
 
     text-align: left;
 }
-
-
-/* =========================================================
-   ROUTE CARD
-========================================================= */
 
 .route-card {
     width: 100%;
@@ -282,34 +279,18 @@
     text-align: left;
 }
 
-
-/* =========================================================
-   PICKUP CARD
-========================================================= */
-
 .pickup-card {
     border-left: 3px solid #2563eb;
 }
-
-
-/* =========================================================
-   DROP CARD
-========================================================= */
 
 .drop-card {
     border-left: 3px solid #039855;
 }
 
-
-/* =========================================================
-   ROUTE TITLE
-========================================================= */
-
 .route-title {
     margin: 0 0 5px;
 
     font-size: 8px;
-
     font-weight: 700;
 
     line-height: 1;
@@ -317,8 +298,6 @@
     letter-spacing: .25px;
 
     text-transform: uppercase;
-
-    text-align: left;
 }
 
 .pickup-card .route-title {
@@ -329,18 +308,11 @@
     color: #ea580c;
 }
 
-
-/* =========================================================
-   ROUTE CHIP
-========================================================= */
-
 .route-chip {
     display: inline-flex;
-
     align-items: center;
 
     max-width: 100%;
-
     min-height: 27px;
 
     padding: 4px 9px;
@@ -350,7 +322,6 @@
     border-radius: 7px;
 
     font-size: 8.5px;
-
     font-weight: 600;
 
     line-height: 1.25;
@@ -358,49 +329,29 @@
     white-space: nowrap;
 
     overflow: hidden;
-
     text-overflow: ellipsis;
 
     box-sizing: border-box;
 }
 
-.route-chip i {
-    flex-shrink: 0;
-
-    margin-right: 5px;
-
-    font-size: 8px;
-}
-
-
-/* =========================================================
-   PICKUP CHIP
-========================================================= */
-
 .pickup-card .route-chip {
     border: 1px solid #b7efcc;
-
     color: #027a48;
 }
 
-
-/* =========================================================
-   DROP CHIP
-========================================================= */
-
 .drop-card .route-chip {
     border: 1px solid #f7c892;
-
     color: #e85d04;
 }
 
-
-/* =========================================================
-   REMOVE OLD ARROW
-========================================================= */
+.route-chip i {
+    flex-shrink: 0;
+    margin-right: 5px;
+    font-size: 8px;
+}
 
 .route-direction {
-    display: none;
+    display: none !important;
 }
 
 
@@ -908,8 +859,7 @@
 
 .admin-margin-table col:nth-child(1) { width: 125px; }
 .admin-margin-table col:nth-child(2) { width: 150px; }
-.admin-margin-table col:nth-child(3) { width: 145px; }
-.admin-margin-table col:nth-child(4) { width: 145px; }
+.admin-margin-table col:nth-child(3) { width: 225px; }
 .admin-margin-table col:nth-child(5) { width: 120px; }
 .admin-margin-table col:nth-child(6) { width: 115px; }
 .admin-margin-table col:nth-child(7) { width: 150px; }
@@ -1059,6 +1009,115 @@
     }
 }
 
+
+/* =========================================================
+   FINAL ROUTE PRESENTATION
+========================================================= */
+
+.route-modern {
+    width: 225px !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 7px !important;
+}
+
+.route-card {
+    width: 100% !important;
+    padding: 7px 9px 9px !important;
+    margin: 0 !important;
+    background: #edf8f1 !important;
+    border-radius: 0 17px 17px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.pickup-card {
+    border-left: 3px solid #2563eb !important;
+}
+
+.drop-card {
+    border-left: 3px solid #039855 !important;
+}
+
+.route-title {
+    margin: 0 0 5px !important;
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: .25px !important;
+    text-transform: uppercase !important;
+}
+
+.pickup-card .route-title {
+    color: #039855 !important;
+}
+
+.drop-card .route-title {
+    color: #ea580c !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    min-height: 27px !important;
+    padding: 4px 9px !important;
+    background: #ffffff !important;
+    border-radius: 7px !important;
+    font-size: 8.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc !important;
+    color: #027a48 !important;
+}
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892 !important;
+    color: #e85d04 !important;
+}
+
+.route-chip i {
+    flex-shrink: 0 !important;
+    margin-right: 5px !important;
+    font-size: 8px !important;
+}
+
+.route-direction {
+    display: none !important;
+}
+
+@media (max-width: 767.98px) {
+
+    .route-modern {
+        width: 225px !important;
+        max-width: 100% !important;
+    }
+
+    .route-card {
+        width: 100% !important;
+        padding: 7px 8px 8px !important;
+    }
+
+    .route-title {
+        font-size: 7.5px !important;
+    }
+
+    .route-chip {
+        min-height: 27px !important;
+        font-size: 8px !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+}
+
 </style>
 
 
@@ -1099,7 +1158,7 @@
             <input
                 type="text"
                 id="marginSearch"
-                placeholder="Search trip, customer, pickup, drop, vehicle..."
+                placeholder="Search trip, customer, route, vehicle..."
                 autocomplete="off"
             >
 
@@ -1138,9 +1197,7 @@
 
                         <th data-column-cell="customer">Customer</th>
 
-                        <th data-column-cell="pickup">Pickup</th>
-
-                        <th data-column-cell="drop">Drop</th>
+                        <th data-column-cell="route">Route</th>
 
                         <th data-column-cell="vehicle_type">Vehicle Type</th>
 
@@ -1223,10 +1280,13 @@
                         ========================================== -->
 
                         <td
-                            data-label="Pickup"
+                            data-label="Route"
+                            data-column-cell="route"
                         >
 
-                            {% if o.origin %}
+                            <div class="route-modern">
+
+                                {% if o.origin %}
 
                                 <div class="route-card pickup-card">
 
@@ -1244,26 +1304,9 @@
 
                                 </div>
 
-                            {% else %}
+                                {% endif %}
 
-                                <span class="text-muted">
-                                    —
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- =========================================
-                             DROP
-                        ========================================== -->
-
-                        <td
-                            data-label="Drop"
-                        >
-
-                            {% if o.destination %}
+                                {% if o.destination %}
 
                                 <div class="route-card drop-card">
 
@@ -1281,13 +1324,9 @@
 
                                 </div>
 
-                            {% else %}
+                                {% endif %}
 
-                                <span class="text-muted">
-                                    —
-                                </span>
-
-                            {% endif %}
+                            </div>
 
                         </td>
 
@@ -1455,7 +1494,7 @@
                     <tr id="emptyServerRow">
 
                         <td
-                            colspan="10"
+                            colspan="9"
                             class="empty-table"
                         >
 
@@ -1477,7 +1516,7 @@
                     >
 
                         <td
-                            colspan="10"
+                            colspan="9"
                             class="empty-table"
                         >
 
@@ -1504,10 +1543,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* =====================================================
-       SEARCH
-    ====================================================== */
-
     const searchInput =
         document.getElementById("marginSearch");
 
@@ -1527,10 +1562,12 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const rows = Array.from(
-        tableBody.querySelectorAll("tr.margin-row")
-    );
-
+    const rows =
+        Array.from(
+            tableBody.querySelectorAll(
+                "tr.margin-row"
+            )
+        );
 
     function applySearch() {
 
@@ -1549,7 +1586,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 .toLowerCase();
 
             const matches =
-                !term || rowText.includes(term);
+                !term ||
+                rowText.includes(term);
 
             row.style.display =
                 matches ? "" : "none";
@@ -1559,18 +1597,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-
         if (searchEmptyRow) {
 
             searchEmptyRow.style.display =
-                (
-                    rows.length > 0 &&
-                    visibleCount === 0
-                )
+                rows.length > 0 &&
+                visibleCount === 0
                     ? "table-row"
                     : "none";
         }
-
 
         if (resultText) {
 
@@ -1582,12 +1616,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     searchInput.addEventListener(
         "input",
         applySearch
     );
-
 
     if (clearSearch) {
 
@@ -1603,11 +1635,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
-
-
-    /* =====================================================
-       INITIAL SEARCH
-    ====================================================== */
 
     applySearch();
 
