@@ -6,6 +6,10 @@ from datetime import datetime
 
 User = get_user_model()
 
+from django.contrib.auth.decorators import login_required
+
+
+@login_required(login_url="/auth/")
 def home(request):
 
     total_orders = Order.objects.count()
