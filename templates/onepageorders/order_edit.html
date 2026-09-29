@@ -3,439 +3,109 @@
 {% block content %}
 
 <style>
-
 /* =========================================================
-   EDIT ORDER PAGE
+   EDIT ORDER — SAAS / ERP STYLE
    ========================================================= */
-
-.edit-order-page {
-    width: 100%;
-    padding: 6px 28px 40px;
-    box-sizing: border-box;
-    background: #f8f9fb;
-    min-height: calc(100vh - 70px);
+.edit-order-page{
+    width:100%;
+    padding:10px 28px 40px;
+    box-sizing:border-box;
+    background:#f5f7fa;
+    min-height:calc(100vh - 70px);
 }
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.edit-order-header {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-bottom: 20px;
+.edit-order-header{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
 }
-
-.edit-order-heading {
-    margin: 0;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 22px;
-    font-weight: 600;
-
-    color: #212529;
+.edit-order-heading{
+    margin:0; font-family:"Poppins",sans-serif; font-size:21px; font-weight:600; color:#20242a;
 }
-
-.edit-order-subtitle {
-    margin-top: 4px;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-
-    color: #8a9199;
+.edit-order-subtitle{
+    margin-top:3px; font-family:"Poppins",sans-serif; font-size:11px; color:#8b929b;
 }
-
-
-/* =========================================================
-   BACK BUTTON
-   ========================================================= */
-
-.edit-back-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 38px;
-    padding: 0 16px;
-
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-
-    background: #ffffff;
-    color: #495057;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
+.edit-back-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:36px; padding:0 15px; border:1px solid #dfe3e8; border-radius:7px;
+    background:#fff; color:#495057; font-family:"Poppins",sans-serif; font-size:11.5px;
+    font-weight:500; text-decoration:none; transition:all .2s ease;
+    box-shadow:0 1px 2px rgba(25,35,45,.03);
 }
-
-.edit-back-btn:hover {
-    background: #f4f5f7;
-    border-color: #cfd4da;
-    color: #212529;
+.edit-back-btn:hover{background:#f8f9fa;border-color:#cfd4da;color:#212529;}
+.edit-message{
+    margin-bottom:14px; padding:9px 13px; border:1px solid #e2e6ea; border-radius:8px;
+    background:#fff; color:#495057; font-family:"Poppins",sans-serif; font-size:11px;
+    box-shadow:0 2px 8px rgba(31,41,55,.03);
 }
-
-
-/* =========================================================
-   ALERT
-   ========================================================= */
-
-.edit-message {
-    margin-bottom: 15px;
-
-    padding: 10px 14px;
-
-    border: 1px solid #d9dde2;
-    border-radius: 6px;
-
-    background: #ffffff;
-
-    color: #495057;
-
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
+.edit-order-layout{
+    width:100%; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    column-gap:20px; row-gap:14px; align-items:start;
 }
-
-
-/* =========================================================
-   TWO COLUMN LAYOUT
-   ========================================================= */
-
-.edit-order-layout {
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        minmax(0, 1fr);
-
-    column-gap: 22px;
-    row-gap: 14px;
-
-    align-items: start;
+.edit-category-card{
+    width:100%; margin:0; border:1px solid #e1e5e9; border-radius:9px;
+    background:#fff; overflow:hidden; box-sizing:border-box;
+    box-shadow:0 2px 10px rgba(31,41,55,.045);
 }
-
-
-/* =========================================================
-   CARD
-   ========================================================= */
-
-.edit-category-card {
-    width: 100%;
-
-    margin: 0 0 14px;
-
-    border: 1px solid #8d8d8d;
-
-    background: #ffffff;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
+.edit-category-title{
+    min-height:40px; display:flex; align-items:center; justify-content:flex-start;
+    padding:8px 14px; background:#fff; border-bottom:1px solid #e9ecef;
+    color:#252a30; font-family:"Poppins",sans-serif; font-size:12px; font-weight:600;
+    text-transform:uppercase; text-align:left; line-height:1.2;
+    position:relative; box-sizing:border-box;
 }
-
-
-/* =========================================================
-   CARD TITLE
-   ========================================================= */
-
-.edit-category-title {
-    min-height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 7px 10px;
-
-    background: #ffc000;
-
-    border-bottom: 1px solid #777;
-
-    color: #111111;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 13px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    text-align: center;
-
-    line-height: 1.2;
+.edit-category-title::before{
+    content:""; width:4px; height:19px; border-radius:3px; background:#FDB81B;
+    margin-right:9px; flex:0 0 auto;
 }
-
-
-/* =========================================================
-   FORM ROW
-   ========================================================= */
-
-.edit-form-row {
-    display: grid;
-
-    grid-template-columns:
-        42%
-        58%;
-
-    min-height: 39px;
-
-    border-bottom: 1px solid #b8b8b8;
-
-    box-sizing: border-box;
+.edit-form-row{
+    display:grid; grid-template-columns:40% 60%; min-height:43px;
+    border-bottom:1px solid #edf0f2; box-sizing:border-box;
 }
-
-.edit-form-row:last-child {
-    border-bottom: none;
+.edit-form-row:last-child{border-bottom:none;}
+.edit-form-label{
+    display:flex; align-items:center; padding:6px 11px; border-right:1px solid #edf0f2;
+    background:#fafbfc; color:#59616b; font-family:"Poppins",sans-serif;
+    font-size:10.8px; font-weight:500; line-height:1.25; box-sizing:border-box;
 }
-
-
-/* =========================================================
-   LABEL
-   ========================================================= */
-
-.edit-form-label {
-    display: flex;
-    align-items: center;
-
-    padding: 5px 9px;
-
-    border-right: 1px solid #b8b8b8;
-
-    background: #ffffff;
-
-    color: #172033;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11.5px;
-
-    line-height: 1.25;
-
-    box-sizing: border-box;
+.edit-form-control{
+    min-width:0; padding:5px 8px; display:flex; flex-direction:column; justify-content:center;
+    box-sizing:border-box;
 }
-
-
-/* =========================================================
-   CONTROL
-   ========================================================= */
-
-.edit-form-control {
-    min-width: 0;
-
-    padding: 3px 5px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================================
-   INPUT / SELECT / TEXTAREA
-   ========================================================= */
-
 .edit-form-control input,
 .edit-form-control select,
-.edit-form-control textarea {
-
-    width: 100%;
-    min-width: 0;
-
-    height: 30px;
-
-    padding: 4px 7px;
-
-    border: 1px solid #d5d5d5;
-    border-radius: 3px;
-
-    background: #ffffff;
-
-    color: #222222;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11.5px;
-
-    outline: none;
-    box-shadow: none;
-
-    box-sizing: border-box;
+.edit-form-control textarea{
+    width:100%; min-width:0; height:31px; padding:5px 8px;
+    border:1px solid #dfe3e8; border-radius:5px; background:#fff; color:#30353b;
+    font-family:"Poppins",sans-serif; font-size:11px; outline:none; box-shadow:none;
+    box-sizing:border-box; transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
 }
-
-.edit-form-control textarea {
-    min-height: 48px;
-    height: auto;
-
-    resize: vertical;
-}
-
-
-/* =========================================================
-   FOCUS
-   ========================================================= */
-
+.edit-form-control textarea{min-height:52px;height:auto;resize:vertical;}
+.edit-form-control input::placeholder,.edit-form-control textarea::placeholder{color:#adb5bd;}
 .edit-form-control input:focus,
 .edit-form-control select:focus,
-.edit-form-control textarea:focus {
-
-    border-color: #FDB81B;
-
-    background: #fffef0;
-
-    outline: none;
-
-    box-shadow:
-        0 0 0 2px rgba(253, 184, 27, 0.10);
+.edit-form-control textarea:focus{
+    border-color:#FDB81B; background:#fffdf2; outline:none;
+    box-shadow:0 0 0 2px rgba(253,184,27,.12);
 }
-
-
-/* =========================================================
-   READONLY
-   ========================================================= */
-
-.edit-form-control input[readonly] {
-
-    background: #eef0f2;
-
-    font-weight: 600;
-
+.edit-form-control input[readonly]{background:#f1f3f5;color:#495057;font-weight:600;border-color:#e0e3e6;}
+.edit-field-error{margin-top:2px;color:#dc3545;font-family:"Poppins",sans-serif;font-size:9px;line-height:1.2;}
+.edit-order-footer{
+    width:100%; display:flex; justify-content:center; align-items:center; gap:9px; padding:16px 0 20px;
 }
-
-
-/* =========================================================
-   ERROR
-   ========================================================= */
-
-.edit-field-error {
-
-    margin-top: 2px;
-
-    color: #dc3545;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 9px;
-
-    line-height: 1.2;
+.edit-update-btn{
+    min-width:135px; height:38px; padding:0 19px; border:1px solid #FDB81B; border-radius:7px;
+    background:#FDB81B; color:#20242a; font-family:"Poppins",sans-serif; font-size:11.5px;
+    font-weight:600; cursor:pointer; transition:all .2s ease; box-shadow:0 2px 5px rgba(253,184,27,.18);
 }
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.edit-order-footer {
-
-    width: 100%;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 14px 0 20px;
-
+.edit-update-btn:hover{background:#e7a800;border-color:#e7a800;color:#fff;transform:translateY(-1px);}
+@media(max-width:950px){.edit-order-layout{grid-template-columns:1fr;}}
+@media(max-width:600px){
+    .edit-order-page{padding:12px 15px 30px;}
+    .edit-order-header{align-items:flex-start;gap:10px;}
+    .edit-order-heading{font-size:19px;}
+    .edit-form-row{grid-template-columns:44% 56%;}
+    .edit-form-label,.edit-form-control input,.edit-form-control select,.edit-form-control textarea{font-size:10.5px;}
+    .edit-back-btn{height:35px;padding:0 11px;}
 }
-
-
-/* =========================================================
-   UPDATE BUTTON
-   ========================================================= */
-
-.edit-update-btn {
-
-    min-width: 130px;
-
-    height: 38px;
-
-    padding: 0 18px;
-
-    border: 1px solid #0d6efd;
-
-    border-radius: 5px;
-
-    background: #0d6efd;
-
-    color: #ffffff;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
-.edit-update-btn:hover {
-
-    background: #0b5ed7;
-
-    border-color: #0a58ca;
-
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 950px) {
-
-    .edit-order-layout {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-
-@media (max-width: 600px) {
-
-    .edit-order-page {
-        padding: 15px;
-    }
-
-    .edit-order-header {
-        align-items: flex-start;
-
-        gap: 10px;
-    }
-
-    .edit-form-row {
-        grid-template-columns:
-            44%
-            56%;
-    }
-
-    .edit-form-label {
-        font-size: 10.5px;
-    }
-
-    .edit-form-control input,
-    .edit-form-control select,
-    .edit-form-control textarea {
-        font-size: 10.5px;
-    }
-
-}
-
 </style>
 
 
