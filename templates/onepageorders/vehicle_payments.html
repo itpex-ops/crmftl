@@ -699,6 +699,23 @@
 }
 
 
+.veh-history-header .veh-header-left {
+
+    gap: 10px;
+}
+
+
+.veh-history-header .veh-header-icon {
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+
 .veh-history-subtitle {
 
     margin-top: 2px;
@@ -1481,7 +1498,8 @@
                      ===================================================== -->
 
                 <div class="vehicle-payment-summary">
-                    
+
+
                     <!-- TRIP -->
 
                     <div class="payment-summary-item">
@@ -1591,18 +1609,25 @@
 
     <div class="veh-history-header">
 
-        <div>
+        <div class="veh-header-left">
 
-            <div class="veh-history-title">
-                <i class="bi bi-clock-history me-1"></i>
-                Payment History
+            <div class="veh-header-icon">
+                <i class="bi bi-clock-history"></i>
             </div>
 
-            <div
-                class="veh-history-subtitle"
-                id="historySubtitle"
-            >
-                Payment history for selected Trip
+            <div>
+
+                <h5 class="veh-history-title">
+                    Trip Payment History
+                </h5>
+
+                <div
+                    class="veh-history-subtitle"
+                    id="historySubtitle"
+                >
+                    Select a trip to view payment history
+                </div>
+
             </div>
 
         </div>
@@ -1616,41 +1641,134 @@
 
     </div>
 
-    <div class="veh-history-header">
+    <div class="veh-table-wrapper">
 
-    <div class="veh-header-left">
+        <table class="veh-table">
 
-        <div class="veh-header-icon">
+            <thead>
+                <tr>
+                    <th>Paid Date</th>
+                    <th>Trip No</th>
+                    <th>Vehicle No</th>
+                    <th>Payment Type</th>
+                    <th>Transaction Reference</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
 
-            <i class="bi bi-clock-history"></i>
+            <tbody id="paymentHistoryBody">
 
-        </div>
+                <tr
+                    id="historyEmptyRow"
+                    style="display: none;"
+                >
+                    <td colspan="6">
 
-        <div>
+                        <div class="empty-row">
 
-            <h5 class="veh-title">
-                Trip Payment History
-            </h5>
+                            <div class="empty-icon">
+                                <i class="bi bi-receipt"></i>
+                            </div>
 
-            <p
-                class="veh-subtitle"
-                id="historySubtitle"
-            >
-                Select a trip to view payment history
-            </p>
+                            <div>
+                                <strong>
+                                    No payments recorded
+                                </strong>
 
-        </div>
+                                <span class="d-block">
+                                    No vehicle payments have been
+                                    recorded for this Trip.
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% for payment in payments %}
+
+                <tr
+                    class="payment-history-row"
+                    data-order-id="{{ payment.order_id }}"
+                    style="display: none;"
+                >
+
+                    <td>
+                        <div class="payment-date">
+                            {{ payment.paid_at|date:"d/m/Y" }}
+                            <small class="d-block text-muted">
+                                {{ payment.paid_at|date:"h:i A" }}
+                            </small>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="trip-number">
+
+                            <span class="trip-icon">
+                                <i class="bi bi-truck-front"></i>
+                            </span>
+
+                            {{ payment.order.trip_number }}
+
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="vehicle-number">
+                            {{ payment.vehicle_number|default:"-" }}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        {% if payment.payment_type == "Advance" %}
+
+                            <span class="payment-type-badge advance">
+                                <i class="bi bi-arrow-up-circle me-1"></i>
+                                Advance
+                            </span>
+
+                        {% elif payment.payment_type == "Balance" %}
+
+                            <span class="payment-type-badge balance">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Balance
+                            </span>
+
+                        {% else %}
+
+                            <span class="payment-type-badge others">
+                                <i class="bi bi-three-dots me-1"></i>
+                                Others
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        <span class="transaction-reference">
+                            {{ payment.transaction_reference|default:"-" }}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+                        <span class="amount">
+                            ₹{{ payment.amount|floatformat:2 }}
+                        </span>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </div>
-
-    <div
-        class="veh-history-count"
-        id="historyCount"
-    >
-        0 Payments
-    </div>
-
-</div>
 
 </div>
 
@@ -1798,7 +1916,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (historySubtitle) {
 
             let subtitle =
-                "Payment history for " +
+                "Payment history • " +
                 (tripNumber || "selected Trip");
 
             if (vehicleNumber) {
@@ -2018,5 +2136,6 @@ setTimeout(function () {
 }, 5000);
 
 </script>
+
 
 {% endblock %}
