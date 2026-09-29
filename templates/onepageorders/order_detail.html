@@ -5,198 +5,95 @@
 {% block content %}
 <style>
 /* =========================================================
-   ORDER DETAIL PAGE
+   ORDER DETAIL — SAAS / ERP STYLE
    ========================================================= */
-.order-detail-page {
-    width: 100%;
-    padding: 6px 28px 40px;
-    box-sizing: border-box;
-    background: #f8f9fb;
-    min-height: calc(100vh - 70px);
+.order-detail-page{
+    width:100%;
+    padding:8px 28px 40px;
+    box-sizing:border-box;
+    background:#f6f7f9;
+    min-height:calc(100vh - 70px);
+    font-family:"Poppins",sans-serif;
 }
-
-.order-detail-header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+.order-detail-header{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px; gap:15px;
 }
-
-.order-detail-heading {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-    font-size: 22px;
-    font-weight: 600;
-    color: #212529;
+.order-detail-heading{
+    margin:0; font-size:21px; font-weight:600; color:#20252b; line-height:1.3;
 }
-
-.order-detail-subtitle {
-    margin-top: 4px;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    color: #8a9199;
+.order-detail-subtitle{
+    margin-top:4px; font-size:11px; color:#8b929a; font-weight:400;
 }
-
-.detail-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.detail-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.detail-btn{
+    display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;
+    border-radius:6px;font-size:11.5px;font-weight:600;text-decoration:none;
+    transition:all .18s ease;box-sizing:border-box;
 }
-
-.detail-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 38px;
-    padding: 0 16px;
-    border-radius: 7px;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all .2s ease;
-    box-sizing: border-box;
+.detail-edit-btn{border:1px solid #FDB81B;background:#FDB81B;color:#222}
+.detail-edit-btn:hover{background:#e7a800;border-color:#e7a800;color:#fff}
+.detail-back-btn{border:1px solid #dfe3e8;background:#fff;color:#495057}
+.detail-back-btn:hover{background:#f1f3f5;border-color:#cfd4da;color:#212529}
+.detail-message{
+    margin:0 0 14px;padding:9px 13px;border:1px solid #e2e5e9;border-radius:7px;
+    background:#fff;font-size:11px;color:#495057;box-shadow:0 1px 2px rgba(25,35,45,.03)
 }
-
-.detail-edit-btn {
-    border: 1px solid #FDB81B;
-    background: #FDB81B;
-    color: #212529;
+.order-detail-grid{
+    width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    column-gap:18px;row-gap:14px;align-items:start;
 }
-
-.detail-edit-btn:hover {
-    background: #e7a800;
-    border-color: #e7a800;
-    color: #fff;
+.order-detail-card{
+    width:100%;margin:0;border:1px solid #e1e5e9;border-radius:8px;background:#fff;
+    overflow:hidden;box-sizing:border-box;box-shadow:0 1px 3px rgba(25,35,45,.045);
 }
-
-.detail-back-btn {
-    border: 1px solid #dfe3e8;
-    background: #fff;
-    color: #495057;
+.order-detail-card-title{
+    min-height:38px;display:flex;align-items:center;justify-content:flex-start;
+    padding:8px 13px;background:#fff;border-bottom:1px solid #e8ebee;
+    color:#252a30;font-size:12px;font-weight:600;text-transform:none;text-align:left;
+    line-height:1.2;position:relative;
 }
-
-.detail-back-btn:hover {
-    background: #f4f5f7;
-    border-color: #cfd4da;
-    color: #212529;
+.order-detail-card-title:before{
+    content:"";width:3px;height:17px;border-radius:3px;background:#FDB81B;margin-right:8px;
 }
-
-.detail-message {
-    margin-bottom: 15px;
-    padding: 10px 14px;
-    border: 1px solid #d9dde2;
-    border-radius: 6px;
-    background: #fff;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    color: #495057;
+.detail-row{
+    display:grid;grid-template-columns:42% 58%;min-height:38px;
+    border-bottom:1px solid #eef0f2;box-sizing:border-box;
 }
-
-.order-detail-grid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-    column-gap: 22px;
-    row-gap: 14px;
-    align-items: start;
+.detail-row:last-child{border-bottom:none}
+.detail-label{
+    display:flex;align-items:center;padding:6px 11px;background:#fafbfc;
+    color:#68717b;font-size:10.5px;font-weight:500;line-height:1.3;
+    border-right:1px solid #eef0f2;box-sizing:border-box;
 }
-
-.order-detail-card {
-    width: 100%;
-    border: 1px solid #8d8d8d;
-    background: #fff;
-    overflow: hidden;
-    box-sizing: border-box;
+.detail-value{
+    display:flex;align-items:center;min-width:0;padding:6px 11px;background:#fff;
+    color:#343a40;font-size:11px;font-weight:400;line-height:1.4;
+    word-break:break-word;box-sizing:border-box;
 }
-
-.order-detail-card-title {
-    min-height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 7px 10px;
-    background: #ffc000;
-    border-bottom: 1px solid #777;
-    color: #111;
-    font-family: "Poppins", sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 1.2;
+.detail-value.strong{font-weight:600;color:#20252b}
+.detail-value.amount{justify-content:flex-end;font-weight:500;color:#20252b}
+.detail-value.total{
+    justify-content:flex-end;font-size:11.5px;font-weight:700;color:#20252b;background:#fffdf3;
 }
-
-.detail-row {
-    display: grid;
-    grid-template-columns: 42% 58%;
-    min-height: 39px;
-    border-bottom: 1px solid #b8b8b8;
-    box-sizing: border-box;
+.detail-value.margin-positive{justify-content:flex-end;font-weight:700;color:#198754;background:#f7fbf9}
+.detail-value.margin-negative{justify-content:flex-end;font-weight:700;color:#dc3545;background:#fff8f8}
+.detail-status{
+    display:inline-flex;align-items:center;justify-content:center;padding:3px 9px;
+    border-radius:14px;font-size:9.5px;font-weight:600;line-height:1.2;
 }
-
-.detail-row:last-child { border-bottom: none; }
-
-.detail-label {
-    display: flex;
-    align-items: center;
-    padding: 6px 9px;
-    border-right: 1px solid #b8b8b8;
-    background: #fff;
-    color: #172033;
-    font-family: "Poppins", sans-serif;
-    font-size: 11.5px;
-    line-height: 1.25;
-    box-sizing: border-box;
-}
-
-.detail-value {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    padding: 6px 9px;
-    background: #fff;
-    color: #343a40;
-    font-family: "Poppins", sans-serif;
-    font-size: 11.5px;
-    line-height: 1.4;
-    word-break: break-word;
-    box-sizing: border-box;
-}
-
-.detail-value.strong { font-weight: 600; color: #212529; }
-.detail-value.amount { justify-content: flex-end; font-weight: 600; color: #212529; }
-.detail-value.total { justify-content: flex-end; font-size: 12px; font-weight: 700; color: #212529; background: #f5f6f7; }
-.detail-value.margin-positive { justify-content: flex-end; font-weight: 700; color: #198754; background: #f7fbf9; }
-.detail-value.margin-negative { justify-content: flex-end; font-weight: 700; color: #dc3545; background: #fff8f8; }
-
-.detail-status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 600;
-}
-
-.status-pending { background: #fff3cd; color: #856404; }
-.status-approved { background: #d1e7dd; color: #0f5132; }
-.status-rejected { background: #f8d7da; color: #842029; }
-.empty-value { color: #adb5bd; }
-
-@media (max-width: 950px) {
-    .order-detail-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-    .order-detail-page { padding: 15px; }
-    .order-detail-header { align-items: flex-start; gap: 12px; }
-    .detail-header-actions { width: 100%; }
-    .detail-btn { flex: 1; }
-    .detail-row { grid-template-columns: 44% 56%; }
-    .detail-label, .detail-value { font-size: 10.5px; }
+.status-pending{background:#fff3cd;color:#856404}
+.status-approved{background:#d1e7dd;color:#0f5132}
+.status-rejected{background:#f8d7da;color:#842029}
+.empty-value{color:#adb5bd}
+@media(max-width:950px){.order-detail-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+    .order-detail-page{padding:12px 15px 30px}
+    .order-detail-header{align-items:flex-start;flex-direction:column;gap:10px}
+    .detail-header-actions{width:100%}
+    .detail-btn{flex:1}
+    .detail-row{grid-template-columns:44% 56%}
+    .detail-label,.detail-value{font-size:10px}
 }
 </style>
 
