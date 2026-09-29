@@ -2149,11 +2149,6 @@ def import_driver(request, pk):
 # pk = TRACKING SESSION PK
 # =============================================================
 
-# =============================================================
-# SEND CONSENT
-# pk = TRACKING SESSION PK
-# =============================================================
-
 @login_required
 def onepageorder_send_consent(request, pk):
 
