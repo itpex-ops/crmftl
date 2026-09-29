@@ -1578,6 +1578,177 @@
 
 
 
+
+<!-- =========================================================
+     PAYMENT HISTORY
+     Hidden until a Trip is selected
+========================================================= -->
+
+<div
+    class="veh-card"
+    id="paymentHistoryCard"
+    style="display: none;"
+>
+
+    <div class="veh-history-header">
+
+        <div>
+
+            <div class="veh-history-title">
+                <i class="bi bi-clock-history me-1"></i>
+                Payment History
+            </div>
+
+            <div
+                class="veh-history-subtitle"
+                id="historySubtitle"
+            >
+                Payment history for selected Trip
+            </div>
+
+        </div>
+
+        <div
+            class="veh-history-count"
+            id="historyCount"
+        >
+            0 Payments
+        </div>
+
+    </div>
+
+    <div class="veh-table-wrapper">
+
+        <table class="veh-table">
+
+            <thead>
+                <tr>
+                    <th>Paid Date</th>
+                    <th>Trip No</th>
+                    <th>Vehicle No</th>
+                    <th>Payment Type</th>
+                    <th>Transaction Reference</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+
+            <tbody id="paymentHistoryBody">
+
+                <tr
+                    id="historyEmptyRow"
+                    style="display: none;"
+                >
+                    <td colspan="6">
+
+                        <div class="empty-row">
+
+                            <div class="empty-icon">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+
+                            <div>
+                                <strong>
+                                    No payments recorded
+                                </strong>
+
+                                <span class="d-block">
+                                    No vehicle payments have been
+                                    recorded for this Trip.
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% for payment in payments %}
+
+                <tr
+                    class="payment-history-row"
+                    data-order-id="{{ payment.order_id }}"
+                    style="display: none;"
+                >
+
+                    <td>
+                        <div class="payment-date">
+                            {{ payment.paid_at|date:"d/m/Y" }}
+                            <small class="d-block text-muted">
+                                {{ payment.paid_at|date:"h:i A" }}
+                            </small>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="trip-number">
+
+                            <span class="trip-icon">
+                                <i class="bi bi-truck-front"></i>
+                            </span>
+
+                            {{ payment.order.trip_number }}
+
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="vehicle-number">
+                            {{ payment.vehicle_number|default:"-" }}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        {% if payment.payment_type == "Advance" %}
+
+                            <span class="payment-type-badge advance">
+                                <i class="bi bi-arrow-up-circle me-1"></i>
+                                Advance
+                            </span>
+
+                        {% elif payment.payment_type == "Balance" %}
+
+                            <span class="payment-type-badge balance">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Balance
+                            </span>
+
+                        {% else %}
+
+                            <span class="payment-type-badge others">
+                                <i class="bi bi-three-dots me-1"></i>
+                                Others
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        <span class="transaction-reference">
+                            {{ payment.transaction_reference|default:"-" }}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+                        <span class="amount">
+                            ₹{{ payment.amount|floatformat:2 }}
+                        </span>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
 <!-- =========================================================
      AUTO-FILL JAVASCRIPT
      ========================================================= -->
@@ -1586,37 +1757,44 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-
     const orderSelect =
         document.getElementById("order");
-
 
     const vehicleInput =
         document.getElementById("vehicle_number");
 
-
     const paymentType =
         document.getElementById("payment_type");
-
 
     const amountInput =
         document.getElementById("amount");
 
-
     const tripDisplay =
         document.getElementById("auto_trip");
-
 
     const vehicleDisplay =
         document.getElementById("auto_vehicle");
 
-
     const advanceDisplay =
         document.getElementById("auto_advance");
 
-
     const balanceDisplay =
         document.getElementById("auto_balance");
+
+    const historyCard =
+        document.getElementById("paymentHistoryCard");
+
+    const historyRows =
+        document.querySelectorAll(".payment-history-row");
+
+    const historyEmptyRow =
+        document.getElementById("historyEmptyRow");
+
+    const historyCount =
+        document.getElementById("historyCount");
+
+    const historySubtitle =
+        document.getElementById("historySubtitle");
 
 
     if (!orderSelect) {
@@ -1624,10 +1802,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-
     /* =====================================================
        FORMAT MONEY
-       ===================================================== */
+    ===================================================== */
 
     function formatMoney(value) {
 
@@ -1645,13 +1822,115 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =====================================================
+       HIDE ENTIRE HISTORY
+    ===================================================== */
+
+    function hidePaymentHistory() {
+
+        if (historyCard) {
+            historyCard.style.display = "none";
+        }
+
+        historyRows.forEach(function (row) {
+            row.style.display = "none";
+        });
+
+        if (historyEmptyRow) {
+            historyEmptyRow.style.display = "none";
+        }
+
+        if (historyCount) {
+            historyCount.textContent = "0 Payments";
+        }
+    }
+
+
+    /* =====================================================
+       SHOW HISTORY FOR SELECTED TRIP
+    ===================================================== */
+
+    function showPaymentHistory(
+        orderId,
+        tripNumber,
+        vehicleNumber
+    ) {
+
+        if (!orderId) {
+            hidePaymentHistory();
+            return;
+        }
+
+        if (historyCard) {
+            historyCard.style.display = "block";
+        }
+
+        let visibleCount = 0;
+
+
+        historyRows.forEach(function (row) {
+
+            const rowOrderId =
+                row.dataset.orderId;
+
+            if (
+                String(rowOrderId) ===
+                String(orderId)
+            ) {
+
+                row.style.display = "table-row";
+                visibleCount++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+        });
+
+
+        if (historySubtitle) {
+
+            let subtitle =
+                "Payment history for " +
+                (tripNumber || "selected Trip");
+
+            if (vehicleNumber) {
+                subtitle += " • " + vehicleNumber;
+            }
+
+            historySubtitle.textContent =
+                subtitle;
+        }
+
+
+        if (historyCount) {
+
+            historyCount.textContent =
+                visibleCount +
+                (
+                    visibleCount === 1
+                        ? " Payment"
+                        : " Payments"
+                );
+        }
+
+
+        if (historyEmptyRow) {
+
+            historyEmptyRow.style.display =
+                visibleCount === 0
+                    ? "table-row"
+                    : "none";
+        }
+    }
+
 
     /* =====================================================
        LOAD SELECTED ORDER
-       ===================================================== */
+    ===================================================== */
 
     function loadOrderData() {
-
 
         const selected =
             orderSelect.options[
@@ -1661,46 +1940,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!selected || !selected.value) {
 
-
             vehicleInput.value = "";
-
 
             tripDisplay.textContent = "—";
 
-
             vehicleDisplay.textContent = "—";
-
 
             advanceDisplay.textContent =
                 "₹0.00";
 
-
             balanceDisplay.textContent =
                 "₹0.00";
 
+            hidePaymentHistory();
 
             return;
         }
 
 
-
-        /* =================================================
-           READ DATA
-           ================================================= */
-
         const trip =
             selected.dataset.trip || "—";
 
-
         const vehicle =
             selected.dataset.vehicle || "";
-
 
         const advance =
             parseFloat(
                 selected.dataset.advance || "0"
             );
-
 
         const balance =
             parseFloat(
@@ -1708,40 +1975,22 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-
-        /* =================================================
-           VEHICLE
-           ================================================= */
-
         vehicleInput.value =
             vehicle;
 
 
-
-        /* =================================================
-           SUMMARY
-           ================================================= */
-
         tripDisplay.textContent =
             trip;
-
 
         vehicleDisplay.textContent =
             vehicle || "—";
 
-
         advanceDisplay.textContent =
             formatMoney(advance);
-
 
         balanceDisplay.textContent =
             formatMoney(balance);
 
-
-
-        /* =================================================
-           PAYMENT TYPE
-           ================================================= */
 
         if (
             paymentType.value === "Balance"
@@ -1751,21 +2000,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 balance > 0
                     ? balance.toFixed(2)
                     : "";
-
         }
 
-    }
 
+        showPaymentHistory(
+            selected.value,
+            trip,
+            vehicle
+        );
+    }
 
 
     /* =====================================================
        PAYMENT TYPE CHANGE
-       ===================================================== */
+    ===================================================== */
 
     paymentType.addEventListener(
         "change",
         function () {
-
 
             const selected =
                 orderSelect.options[
@@ -1777,9 +2029,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 !selected ||
                 !selected.value
             ) {
-
                 return;
-
             }
 
 
@@ -1787,7 +2037,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 parseFloat(
                     selected.dataset.total || "0"
                 );
-
 
 
             if (
@@ -1799,47 +2048,36 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? balance.toFixed(2)
                         : "";
 
-            }
-
-
-            else {
+            } else {
 
                 amountInput.value = "";
 
             }
-
         }
     );
-
 
 
     /* =====================================================
        TRIP CHANGE
-       ===================================================== */
+    ===================================================== */
 
     orderSelect.addEventListener(
         "change",
         function () {
-
             loadOrderData();
-
         }
     );
 
 
-
     /* =====================================================
        INITIAL LOAD
-       Useful after validation error
-       ===================================================== */
+    ===================================================== */
 
     loadOrderData();
-
 
 });
 
 </script>
-
 
 
 <!-- =========================================================
