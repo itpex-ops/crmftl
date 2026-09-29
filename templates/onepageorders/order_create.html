@@ -2,327 +2,274 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-
 <style>
 /* =========================================================
-   GST OPTIONS
-   ========================================================= */
-
-.gst-options {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.gst-checkbox {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border: 1px solid #d5d5d5;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #333;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.gst-checkbox input {
-    width: 14px !important;
-    height: 14px !important;
-    margin: 0;
-    padding: 0;
-    accent-color: #ffc000;
-    cursor: pointer;
-}
-
-.gst-checkbox:has(input:checked) {
-    background: #fff4c7;
-    border-color: #ffc000;
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   ORDER CREATION PAGE
+   SAAS ORDER CREATION
    ========================================================= */
 
 .order-create-page {
     width: 100%;
-    padding: 6px 28px 35px;
-    box-sizing: border-box;
-    background: #f8f9fb;
+    padding: 18px 28px 40px;
+    background: #f6f7f9;
+    min-height: calc(100vh - 65px);
+    font-family: "Poppins", sans-serif;
 }
 
-
-/* =========================================================
-   HEADER
-   ========================================================= */
+/* HEADER */
 
 .order-create-header {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .order-create-title {
     margin: 0;
-    color: #212529;
-    font-family: "Poppins", sans-serif;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
+    color: #172033;
 }
 
-
-/* =========================================================
-   BACK BUTTON
-   ========================================================= */
-
-.edit-back-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 38px;
-    padding: 0 16px;
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #495057;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
+.order-create-subtitle {
+    margin-top: 3px;
+    color: #7b8494;
+    font-size: 11px;
 }
 
-.edit-back-btn:hover {
-    background: #f4f5f7;
-    border-color: #cfd4da;
-    color: #212529;
-}
-
-
-/* =========================================================
-   TWO COLUMN GRID
-   ========================================================= */
+/* GRID */
 
 .order-two-columns {
-    width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 22px;
-    row-gap: 14px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
 }
 
-
-/* =========================================================
-   CARD
-   ========================================================= */
+/* CARD */
 
 .order-card {
-    width: 100%;
-    margin: 0;
-    border: 1px solid #8d8d8d;
     background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
     overflow: hidden;
-    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
-
-/* =========================================================
-   CARD HEADER
-   ========================================================= */
+/* CARD HEADER */
 
 .order-card-title {
-    min-height: 38px;
+    min-height: 44px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 7px 10px;
-    background: #ffc000;
-    border-bottom: 1px solid #777;
-    color: #111111;
-    font-family: "Poppins", sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    text-transform: uppercase;
-    line-height: 1.2;
+    padding: 0 16px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #edf0f3;
+
+    color: #172033;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: none;
 }
 
+/* Add yellow accent */
 
-/* =========================================================
-   FORM ROW
-   ========================================================= */
+.order-card-title::before {
+    content: "";
+    width: 4px;
+    height: 18px;
+    margin-right: 9px;
+
+    background: #FDB81B;
+    border-radius: 4px;
+}
+
+/* FORM ROW */
 
 .order-form-row {
     display: grid;
-    grid-template-columns: 42% 58%;
-    min-height: 39px;
-    border-bottom: 1px solid #b8b8b8;
-    box-sizing: border-box;
+    grid-template-columns: 38% 62%;
+    min-height: 46px;
+
+    border-bottom: 1px solid #f0f1f3;
 }
 
 .order-form-row:last-child {
-    border-bottom: none;
+    border-bottom: 0;
 }
 
-
-/* =========================================================
-   LABEL
-   ========================================================= */
+/* LABEL */
 
 .order-form-label {
     display: flex;
     align-items: center;
-    padding: 5px 9px;
-    border-right: 1px solid #b8b8b8;
-    background: #ffffff;
-    color: #172033;
-    font-family: "Poppins", sans-serif;
-    font-size: 11.5px;
-    line-height: 1.25;
-    box-sizing: border-box;
+
+    padding: 8px 14px;
+
+    background: #fafbfc;
+    border-right: 1px solid #edf0f2;
+
+    color: #596273;
+    font-size: 11px;
+    font-weight: 500;
 }
 
-
-/* =========================================================
-   INPUT AREA
-   ========================================================= */
+/* INPUT AREA */
 
 .order-form-control {
-    min-width: 0;
-    padding: 3px 5px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    box-sizing: border-box;
+    flex-direction: column;
+
+    padding: 6px 10px;
 }
 
-
-/* =========================================================
-   INPUT / SELECT / TEXTAREA
-   ========================================================= */
+/* INPUT */
 
 .order-form-control input,
 .order-form-control select,
 .order-form-control textarea {
     width: 100%;
     min-width: 0;
-    height: 30px;
-    padding: 4px 7px;
-    border: 1px solid #d5d5d5;
-    border-radius: 3px;
+
+    height: 34px;
+    padding: 6px 10px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+
     background: #ffffff;
-    color: #222222;
+    color: #252b36;
+
     font-family: "Poppins", sans-serif;
-    font-size: 11.5px;
+    font-size: 11px;
+
     outline: none;
-    box-shadow: none;
-    box-sizing: border-box;
+    transition: all .15s ease;
 }
 
 .order-form-control textarea {
-    min-height: 48px;
     height: auto;
-    resize: vertical;
+    min-height: 55px;
 }
 
-
-/* =========================================================
-   FOCUS
-   ========================================================= */
+/* FOCUS */
 
 .order-form-control input:focus,
 .order-form-control select:focus,
 .order-form-control textarea:focus {
-    border-color: #fdb81b;
-    background: #fffef0;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(253, 184, 27, 0.10);
+    border-color: #FDB81B;
+    box-shadow: 0 0 0 3px rgba(253, 184, 27, .12);
+    background: #fffef7;
 }
 
-
-/* =========================================================
-   READONLY
-   ========================================================= */
+/* READONLY */
 
 .order-form-control input[readonly] {
-    background: #eef0f2;
-    font-weight: 600;
+    background: #f3f4f6;
+    color: #687080;
 }
 
+/* GST */
 
-/* =========================================================
-   ERROR
-   ========================================================= */
-
-.field-error {
-    margin-top: 2px;
-    color: #dc3545;
-    font-size: 9px;
-    line-height: 1.2;
+.gst-options {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
+.gst-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 
-/* =========================================================
-   ALERT
-   ========================================================= */
+    padding: 5px 10px;
 
-.order-error-alert {
-    margin-bottom: 15px;
-    padding: 10px 14px;
-    border: 1px solid #f5c2c7;
+    border: 1px solid #e1e4e8;
     border-radius: 6px;
-    background: #f8d7da;
-    color: #842029;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
+
+    background: #fff;
+    color: #596273;
+
+    font-size: 10px;
+    cursor: pointer;
 }
 
+.gst-checkbox:has(input:checked) {
+    background: #fff8dc;
+    border-color: #FDB81B;
+    color: #7a5b00;
+}
 
-/* =========================================================
-   CREATE BUTTON
-   ========================================================= */
+/* BUTTON */
 
 .create-order-container {
-    width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 14px 0 20px;
+    justify-content: flex-end;
+
+    padding: 18px 0;
 }
 
 .create-order-button {
-    min-width: 125px;
-    height: 38px;
-    border-radius: 5px;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
+    min-width: 145px;
+    height: 40px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: #FDB81B;
+    color: #172033;
+
+    font-size: 11px;
     font-weight: 600;
+
+    box-shadow: 0 3px 8px rgba(253, 184, 27, .22);
 }
 
+.create-order-button:hover {
+    background: #f2aa00;
+}
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* BACK */
 
-@media (max-width: 950px) {
+.edit-back-btn {
+    display: inline-flex;
+    align-items: center;
+
+    height: 36px;
+    padding: 0 13px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #596273;
+
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.edit-back-btn:hover {
+    background: #f8f9fa;
+    color: #172033;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
     .order-two-columns {
         grid-template-columns: 1fr;
     }
+
 }
 
 @media (max-width: 600px) {
+
     .order-create-page {
-        padding: 15px;
+        padding: 12px;
     }
 
     .order-create-header {
@@ -331,18 +278,14 @@
     }
 
     .order-form-row {
-        grid-template-columns: 44% 56%;
+        grid-template-columns: 42% 58%;
     }
 
     .order-form-label {
-        font-size: 10.5px;
+        font-size: 10px;
+        padding: 7px 9px;
     }
 
-    .order-form-control input,
-    .order-form-control select,
-    .order-form-control textarea {
-        font-size: 10.5px;
-    }
 }
 </style>
 
