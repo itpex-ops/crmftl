@@ -3,13 +3,10 @@
 {% block title %}{{ order.trip_number }}{% endblock %}
 
 {% block content %}
-
 <style>
-
 /* =========================================================
    ORDER DETAIL PAGE
    ========================================================= */
-
 .order-detail-page {
     width: 100%;
     padding: 6px 28px 40px;
@@ -18,46 +15,28 @@
     min-height: calc(100vh - 70px);
 }
 
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
 .order-detail-header {
     width: 100%;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 20px;
 }
 
 .order-detail-heading {
     margin: 0;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 22px;
     font-weight: 600;
-
     color: #212529;
 }
 
 .order-detail-subtitle {
     margin-top: 4px;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 11px;
-
     color: #8a9199;
 }
-
-
-/* =========================================================
-   HEADER BUTTONS
-   ========================================================= */
 
 .detail-header-actions {
     display: flex;
@@ -65,399 +44,161 @@
     gap: 8px;
 }
 
-
 .detail-btn {
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
     height: 38px;
-
     padding: 0 16px;
-
     border-radius: 7px;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 12px;
     font-weight: 600;
-
     text-decoration: none;
-
-    transition: all 0.2s ease;
-
+    transition: all .2s ease;
     box-sizing: border-box;
 }
 
-
-/* Edit */
-
 .detail-edit-btn {
     border: 1px solid #FDB81B;
-
     background: #FDB81B;
-
     color: #212529;
 }
 
 .detail-edit-btn:hover {
     background: #e7a800;
     border-color: #e7a800;
-    color: #ffffff;
+    color: #fff;
 }
-
-
-/* Back */
 
 .detail-back-btn {
     border: 1px solid #dfe3e8;
-
-    background: #ffffff;
-
+    background: #fff;
     color: #495057;
 }
 
 .detail-back-btn:hover {
     background: #f4f5f7;
-
     border-color: #cfd4da;
-
     color: #212529;
 }
-
-
-/* =========================================================
-   MESSAGE
-   ========================================================= */
 
 .detail-message {
     margin-bottom: 15px;
-
     padding: 10px 14px;
-
     border: 1px solid #d9dde2;
-
     border-radius: 6px;
-
-    background: #ffffff;
-
+    background: #fff;
     font-family: "Poppins", sans-serif;
-
     font-size: 11px;
-
     color: #495057;
 }
 
-
-/* =========================================================
-   SIX SECTION GRID
-   ========================================================= */
-
 .order-detail-grid {
-
     width: 100%;
-
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        minmax(0, 1fr);
-
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
     column-gap: 22px;
-
     row-gap: 14px;
-
     align-items: start;
 }
 
-
-/* =========================================================
-   DETAIL CARD
-   ========================================================= */
-
 .order-detail-card {
-
     width: 100%;
-
     border: 1px solid #8d8d8d;
-
-    background: #ffffff;
-
+    background: #fff;
     overflow: hidden;
-
     box-sizing: border-box;
 }
 
-
-/* =========================================================
-   CARD HEADER
-   ========================================================= */
-
 .order-detail-card-title {
-
     min-height: 38px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     padding: 7px 10px;
-
     background: #ffc000;
-
     border-bottom: 1px solid #777;
-
-    color: #111111;
-
+    color: #111;
     font-family: "Poppins", sans-serif;
-
     font-size: 13px;
-
     font-weight: 700;
-
     text-transform: uppercase;
-
     text-align: center;
-
     line-height: 1.2;
 }
 
-
-/* =========================================================
-   DETAIL ROW
-   ========================================================= */
-
 .detail-row {
-
     display: grid;
-
-    grid-template-columns:
-        42%
-        58%;
-
+    grid-template-columns: 42% 58%;
     min-height: 39px;
-
     border-bottom: 1px solid #b8b8b8;
-
     box-sizing: border-box;
 }
 
-.detail-row:last-child {
-    border-bottom: none;
-}
-
-
-/* =========================================================
-   LABEL
-   ========================================================= */
+.detail-row:last-child { border-bottom: none; }
 
 .detail-label {
-
     display: flex;
-
     align-items: center;
-
     padding: 6px 9px;
-
     border-right: 1px solid #b8b8b8;
-
-    background: #ffffff;
-
+    background: #fff;
     color: #172033;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 11.5px;
-
     line-height: 1.25;
-
     box-sizing: border-box;
 }
-
-
-/* =========================================================
-   VALUE
-   ========================================================= */
 
 .detail-value {
-
     display: flex;
-
     align-items: center;
-
     min-width: 0;
-
     padding: 6px 9px;
-
-    background: #ffffff;
-
+    background: #fff;
     color: #343a40;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 11.5px;
-
     line-height: 1.4;
-
     word-break: break-word;
-
     box-sizing: border-box;
 }
 
-
-/* =========================================================
-   IMPORTANT VALUES
-   ========================================================= */
-
-.detail-value.strong {
-    font-weight: 600;
-    color: #212529;
-}
-
-
-.detail-value.amount {
-    justify-content: flex-end;
-
-    font-weight: 600;
-
-    color: #212529;
-}
-
-
-.detail-value.total {
-    justify-content: flex-end;
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    color: #212529;
-
-    background: #f5f6f7;
-}
-
-
-.detail-value.margin-positive {
-    justify-content: flex-end;
-
-    font-weight: 700;
-
-    color: #198754;
-
-    background: #f7fbf9;
-}
-
-
-.detail-value.margin-negative {
-    justify-content: flex-end;
-
-    font-weight: 700;
-
-    color: #dc3545;
-
-    background: #fff8f8;
-}
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
+.detail-value.strong { font-weight: 600; color: #212529; }
+.detail-value.amount { justify-content: flex-end; font-weight: 600; color: #212529; }
+.detail-value.total { justify-content: flex-end; font-size: 12px; font-weight: 700; color: #212529; background: #f5f6f7; }
+.detail-value.margin-positive { justify-content: flex-end; font-weight: 700; color: #198754; background: #f7fbf9; }
+.detail-value.margin-negative { justify-content: flex-end; font-weight: 700; color: #dc3545; background: #fff8f8; }
 
 .detail-status {
-
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
     padding: 3px 9px;
-
     border-radius: 20px;
-
     font-size: 10px;
-
     font-weight: 600;
 }
 
-
-.status-pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
-
-.status-approved {
-    background: #d1e7dd;
-    color: #0f5132;
-}
-
-
-.status-rejected {
-    background: #f8d7da;
-    color: #842029;
-}
-
-
-/* =========================================================
-   EMPTY VALUE
-   ========================================================= */
-
-.empty-value {
-    color: #adb5bd;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+.status-pending { background: #fff3cd; color: #856404; }
+.status-approved { background: #d1e7dd; color: #0f5132; }
+.status-rejected { background: #f8d7da; color: #842029; }
+.empty-value { color: #adb5bd; }
 
 @media (max-width: 950px) {
-
-    .order-detail-grid {
-        grid-template-columns: 1fr;
-    }
-
+    .order-detail-grid { grid-template-columns: 1fr; }
 }
-
 
 @media (max-width: 600px) {
-
-    .order-detail-page {
-        padding: 15px;
-    }
-
-    .order-detail-header {
-        align-items: flex-start;
-
-        gap: 12px;
-    }
-
-    .detail-header-actions {
-        width: 100%;
-    }
-
-    .detail-btn {
-        flex: 1;
-    }
-
-    .detail-row {
-        grid-template-columns:
-            44%
-            56%;
-    }
-
-    .detail-label,
-    .detail-value {
-        font-size: 10.5px;
-    }
-
+    .order-detail-page { padding: 15px; }
+    .order-detail-header { align-items: flex-start; gap: 12px; }
+    .detail-header-actions { width: 100%; }
+    .detail-btn { flex: 1; }
+    .detail-row { grid-template-columns: 44% 56%; }
+    .detail-label, .detail-value { font-size: 10.5px; }
 }
-
 </style>
-
 
 <div class="order-detail-page">
 
