@@ -968,98 +968,151 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showTripTransactions() {
 
-        const selectedOrderId = orderSelect.value;
+    const orderId = orderSelect.value;
 
-        const selectedOption =
-            orderSelect.options[orderSelect.selectedIndex];
+    if (!orderId) {
+        transactionCard.style.display = "none";
+        return;
+    }
 
+    const selectedOption =
+        orderSelect.options[orderSelect.selectedIndex];
 
-        // -----------------------------------------
-        // No trip selected
-        // -----------------------------------------
+    const tripNumber =
+        selectedOption.dataset.trip || "";
 
-        if (!selectedOrderId) {
+    const customer =
+        selectedOption.dataset.customer || "";
 
-            transactionSection.style.display = "none";
+    const selling =
+        parseFloat(
+            selectedOption.dataset.sellingPrice || 0
+        );
 
-            transactionRows.forEach(function (row) {
-                row.style.display = "none";
-            });
-
-            noTransactionRow.style.display = "none";
-
-            return;
-        }
-
-
-        // -----------------------------------------
-        // Show transaction card
-        // -----------------------------------------
-
-        transactionSection.style.display = "block";
+    const transactions =
+        paymentHistory[orderId] || [];
 
 
-        // Trip label
-        if (selectedOption) {
+    // =====================================================
+    // NO TRANSACTION
+    // SHOW ONLY MESSAGE
+    // =====================================================
 
-            selectedTripLabel.textContent =
-                selectedOption.text.trim();
+    if (!transactions.length) {
 
-        }
+        transactionCard.style.display = "block";
 
+        transactionCard.innerHTML = `
+            <div class="no-trip-transactions">
+                No transactions found for
+                <strong>${escapeHtml(tripNumber)}</strong>
+                ${customer
+                    ? " - " + escapeHtml(customer)
+                    : ""}
+            </div>
+        `;
 
-        // -----------------------------------------
-        // Filter transactions
-        // -----------------------------------------
-
-        let visibleCount = 0;
-
-
-        transactionRows.forEach(function (row) {
-
-            const rowOrderId =
-                row.dataset.orderId;
-
-
-            if (rowOrderId === selectedOrderId) {
-
-                row.style.display = "";
-
-                visibleCount++;
-
-            } else {
-
-                row.style.display = "none";
-
-            }
-
-        });
-
-
-        // -----------------------------------------
-        // No transactions
-        // -----------------------------------------
-
-        if (visibleCount === 0) {
-
-            noTransactionRow.style.display = "";
-
-            transactionCount.textContent =
-                "0 Transactions";
-
-        } else {
-
-            noTransactionRow.style.display = "none";
-
-            transactionCount.textContent =
-                visibleCount +
-                (visibleCount === 1
-                    ? " Transaction"
-                    : " Transactions");
-        }
+        return;
     }
 
 
+    // =====================================================
+    // TRANSACTIONS EXIST
+    // =====================================================
+
+    transactionCard.style.display = "block";
+
+
+    transactionTripInfo.textContent =
+        tripNumber +
+        (customer ? " • " + customer : "");
+
+
+    let totalReceived = 0;
+
+    transactions.forEach(function (item) {
+
+        totalReceived +=
+            parseFloat(
+                item.received_amount || 0
+            );
+
+    });
+
+
+    let balance =
+        selling - totalReceived;
+
+    if (balance < 0) {
+        balance = 0;
+    }
+
+
+    summarySelling.textContent =
+        "₹" + money(selling);
+
+    summaryReceived.textContent =
+        "₹" + money(totalReceived);
+
+    summaryBalance.textContent =
+        "₹" + money(balance);
+
+
+    if (
+        selling > 0 &&
+        totalReceived >= selling
+    ) {
+
+        summaryStatus.innerHTML =
+            '<span class="status status-success">' +
+            'Payment Cleared' +
+            '</span>';
+
+    } else {
+
+        summaryStatus.innerHTML =
+            '<span class="status status-info">' +
+            'Part Amount Received' +
+            '</span>';
+
+    }
+
+
+    let rows = "";
+
+    transactions.forEach(function (item) {
+
+        rows += `
+            <tr>
+
+                <td>
+                    ${escapeHtml(item.received_at)}
+                </td>
+
+                <td class="amount">
+                    ₹${money(item.received_amount)}
+                </td>
+
+                <td>
+                    ${escapeHtml(item.received_through)}
+                </td>
+
+                <td>
+                    ${escapeHtml(item.utr_details)}
+                </td>
+
+                <td class="status-cell">
+                    ${getStatusHtml(item.status)}
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+
+    transactionBody.innerHTML = rows;
+}
     // =====================================================
     // TRIP CHANGE
     // =====================================================
