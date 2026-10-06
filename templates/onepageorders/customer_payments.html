@@ -734,71 +734,129 @@
      SELECTED TRIP TRANSACTION HISTORY
      ========================================================= -->
 
-<div id="tripTransactionSection"
-     class="cpay-card"
-     style="display:none; margin-top:18px;">
+<!-- =========================================================
+     SELECTED TRIP TRANSACTION HISTORY
+     ========================================================= -->
 
-    <div style="
-        padding:14px 16px;
-        border-bottom:1px solid #e9ecef;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-    ">
+<div
+    id="tripTransactionSection"
+    class="cpay-card"
+    style="display:none; margin-top:18px;"
+>
+
+    <div
+        style="
+            padding:14px 16px;
+            border-bottom:1px solid #e9ecef;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        "
+    >
+
         <div>
-            <div style="
-                font-size:14px;
-                font-weight:600;
-                color:#212529;
-            ">
+
+            <div
+                style="
+                    font-size:14px;
+                    font-weight:600;
+                    color:#212529;
+                "
+            >
                 Trip Transaction History
             </div>
 
-            <div id="selectedTripLabel"
-                 style="
+            <div
+                id="selectedTripLabel"
+                style="
                     margin-top:3px;
                     font-size:10px;
                     color:#8a9199;
-                 ">
-            </div>
+                "
+            ></div>
+
         </div>
 
-        <div id="transactionCount"
-             style="
+        <div
+            id="transactionCount"
+            style="
                 font-size:10px;
                 font-weight:600;
                 background:#f3f4f6;
                 padding:5px 10px;
                 border-radius:20px;
                 color:#495057;
-             ">
-        </div>
+            "
+        ></div>
+
     </div>
 
 
-    <div class="cpay-table-wrapper">
+    <!-- =====================================================
+         NO TRANSACTION MESSAGE
+         ===================================================== -->
+
+    <div
+        id="noTransactionMessage"
+        style="
+            display:none;
+            padding:30px 20px;
+            text-align:center;
+            color:#8a9199;
+            font-size:11px;
+        "
+    >
+        No transactions found for this trip.
+    </div>
+
+
+    <!-- =====================================================
+         TRANSACTION TABLE
+         ===================================================== -->
+
+    <div
+        id="transactionTableWrapper"
+        class="cpay-table-wrapper"
+    >
 
         <table class="cpay-table">
 
             <thead>
+
                 <tr>
+
                     <th>Trip</th>
+
                     <th>Customer</th>
-                    <th class="amount-header">Selling</th>
-                    <th class="amount-header">Received</th>
+
+                    <th class="amount-header">
+                        Selling
+                    </th>
+
+                    <th class="amount-header">
+                        Received
+                    </th>
+
                     <th>Status</th>
+
                     <th>Mode</th>
+
                     <th>UTR</th>
+
                     <th>Received At</th>
+
                 </tr>
+
             </thead>
 
-            <tbody id="tripTransactionBody">
+            <tbody>
 
                 {% for p in payments %}
 
-                <tr class="transaction-row"
-                    data-order-id="{{ p.order.pk }}">
+                <tr
+                    class="transaction-row"
+                    data-order-id="{{ p.order.pk }}"
+                >
 
                     <td>
                         <div class="trip-number">
@@ -846,7 +904,7 @@
                         {{ p.received_through|default:"-" }}
                     </td>
 
-                    <td title="{{ p.utr_details|default:'-' }}">
+                    <td>
                         {{ p.utr_details|default:"-" }}
                     </td>
 
@@ -858,20 +916,6 @@
 
                 {% endfor %}
 
-
-                <!-- No transaction message -->
-
-                <tr id="noTransactionRow" style="display:none;">
-
-                    <td colspan="8"
-                        class="empty-row">
-
-                        No transactions found for this trip.
-
-                    </td>
-
-                </tr>
-
             </tbody>
 
         </table>
@@ -879,11 +923,6 @@
     </div>
 
 </div>
-
-
-<!-- =========================================================
-     AUTO-FILL AMOUNTS
-     ========================================================= -->
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -977,106 +1016,112 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showTripTransactions() {
 
-        const orderId =
-            orderSelect.value;
+    const orderId = orderSelect.value;
+
+    const transactionRows =
+        document.querySelectorAll(".transaction-row");
+
+    const transactionSection =
+        document.getElementById("tripTransactionSection");
+
+    const transactionTableWrapper =
+        document.getElementById("transactionTableWrapper");
+
+    const noTransactionMessage =
+        document.getElementById("noTransactionMessage");
+
+    const selectedTripLabel =
+        document.getElementById("selectedTripLabel");
+
+    const transactionCount =
+        document.getElementById("transactionCount");
 
 
-        // Nothing selected
-        if (!orderId) {
+    // Nothing selected
+    if (!orderId) {
 
-            transactionSection.style.display =
-                "none";
+        transactionSection.style.display = "none";
 
-            return;
-        }
-
-
-        const selectedOption =
-            orderSelect.options[
-                orderSelect.selectedIndex
-            ];
-
-
-        const tripNumber =
-            selectedOption.textContent.trim();
-
-
-        // -------------------------------------------------
-        // FIND TRANSACTIONS FOR SELECTED TRIP
-        // -------------------------------------------------
-
-        let foundCount = 0;
-
-
-        transactionRows.forEach(function (row) {
-
-            const rowOrderId =
-                row.dataset.orderId;
-
-
-            if (rowOrderId === orderId) {
-
-                row.style.display = "";
-
-                foundCount++;
-
-            } else {
-
-                row.style.display = "none";
-
-            }
-
-        });
-
-
-        // -------------------------------------------------
-        // NO TRANSACTIONS
-        // -------------------------------------------------
-
-        if (foundCount === 0) {
-
-            transactionSection.style.display =
-                "block";
-
-            selectedTripLabel.textContent =
-                tripNumber;
-
-            transactionCount.textContent =
-                "0 Transactions";
-
-
-            noTransactionRow.style.display =
-                "";
-
-
-            return;
-        }
-
-
-        // -------------------------------------------------
-        // TRANSACTIONS FOUND
-        // -------------------------------------------------
-
-        transactionSection.style.display =
-            "block";
-
-        selectedTripLabel.textContent =
-            tripNumber;
-
-        transactionCount.textContent =
-            foundCount +
-            (
-                foundCount === 1
-                    ? " Transaction"
-                    : " Transactions"
-            );
-
-
-        noTransactionRow.style.display =
-            "none";
+        return;
     }
 
 
+    const selectedOption =
+        orderSelect.options[
+            orderSelect.selectedIndex
+        ];
+
+    const tripNumber =
+        selectedOption.textContent.trim();
+
+
+    let foundCount = 0;
+
+
+    // -------------------------------------------------
+    // FILTER TRANSACTIONS
+    // -------------------------------------------------
+
+    transactionRows.forEach(function (row) {
+
+        if (row.dataset.orderId === orderId) {
+
+            row.style.display = "";
+
+            foundCount++;
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+
+    transactionSection.style.display = "block";
+
+    selectedTripLabel.textContent =
+        tripNumber;
+
+
+    // -------------------------------------------------
+    // NO TRANSACTION
+    // -------------------------------------------------
+
+    if (foundCount === 0) {
+
+        transactionTableWrapper.style.display =
+            "none";
+
+        noTransactionMessage.style.display =
+            "block";
+
+        transactionCount.textContent =
+            "";
+
+        return;
+    }
+
+
+    // -------------------------------------------------
+    // TRANSACTIONS AVAILABLE
+    // -------------------------------------------------
+
+    transactionTableWrapper.style.display =
+        "block";
+
+    noTransactionMessage.style.display =
+        "none";
+
+    transactionCount.textContent =
+        foundCount +
+        (
+            foundCount === 1
+                ? " Transaction"
+                : " Transactions"
+        );
+}
     // =====================================================
     // TRIP CHANGE
     // =====================================================
