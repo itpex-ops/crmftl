@@ -1475,23 +1475,207 @@
                          TRANSACTION REFERENCE
                          ================================================= -->
 
-                    <div class="veh-field">
+                    <!-- =========================================================
+     PAYMENT HISTORY
+     Hidden until a Trip is selected
+     ========================================================= -->
 
-                        <label for="transaction_reference">
+<div
+    class="veh-card"
+    id="paymentHistoryCard"
+    style="display:none;"
+>
 
-                            Transaction Reference
+    <!-- HEADER -->
 
-                        </label>
+    <div class="veh-history-header">
 
-                        <input
-                            type="text"
-                            id="transaction_reference"
-                            name="transaction_reference"
-                            value="{{ request.POST.transaction_reference|default:'' }}"
-                            placeholder="UTR / transaction ID"
-                        >
+        <div class="veh-header-left">
 
-                    </div>
+            <div class="veh-header-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+
+            <div>
+
+                <h5 class="veh-history-title">
+                    Trip Payment History
+                </h5>
+
+                <div
+                    class="veh-history-subtitle"
+                    id="historySubtitle"
+                ></div>
+
+            </div>
+
+        </div>
+
+        <div
+            class="veh-history-count"
+            id="historyCount"
+            style="display:none;"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NO PAYMENT MESSAGE
+         ===================================================== -->
+
+    <div
+        id="historyEmptyMessage"
+        style="
+            display:none;
+            padding:32px 20px;
+            text-align:center;
+            color:var(--text-muted);
+            font-size:10.5px;
+        "
+    >
+        No transactions found for this trip.
+    </div>
+
+
+    <!-- =====================================================
+         PAYMENT TABLE
+         ===================================================== -->
+
+    <div
+        class="veh-table-wrapper"
+        id="paymentTableWrapper"
+    >
+
+        <table class="veh-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Paid Date</th>
+
+                    <th>Trip No</th>
+
+                    <th>Vehicle No</th>
+
+                    <th>Payment Type</th>
+
+                    <th>Transaction Reference</th>
+
+                    <th class="text-end">
+                        Amount
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="paymentHistoryBody">
+
+                {% for payment in payments %}
+
+                <tr
+                    class="payment-history-row"
+                    data-order-id="{{ payment.order_id }}"
+                    style="display:none;"
+                >
+
+                    <td>
+
+                        <div class="payment-date">
+
+                            {{ payment.paid_at|date:"d/m/Y" }}
+
+                            <small class="d-block text-muted">
+                                {{ payment.paid_at|date:"h:i A" }}
+                            </small>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="trip-number">
+
+                            <span class="trip-icon">
+                                <i class="bi bi-truck-front"></i>
+                            </span>
+
+                            {{ payment.order.trip_number }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="vehicle-number">
+                            {{ payment.vehicle_number|default:"-" }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if payment.payment_type == "Advance" %}
+
+                            <span class="payment-type-badge advance">
+                                <i class="bi bi-arrow-up-circle me-1"></i>
+                                Advance
+                            </span>
+
+                        {% elif payment.payment_type == "Balance" %}
+
+                            <span class="payment-type-badge balance">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Balance
+                            </span>
+
+                        {% else %}
+
+                            <span class="payment-type-badge others">
+                                <i class="bi bi-three-dots me-1"></i>
+                                Others
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="transaction-reference">
+                            {{ payment.transaction_reference|default:"-" }}
+                        </span>
+
+                    </td>
+
+
+                    <td class="text-end">
+
+                        <span class="amount">
+                            ₹{{ payment.amount|floatformat:2 }}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
                 </div>
                 <!-- =====================================================
                      AUTO-FILLED SUMMARY
@@ -1850,106 +2034,173 @@ document.addEventListener("DOMContentLoaded", function () {
        HIDE ENTIRE HISTORY
     ===================================================== */
 
-    function hidePaymentHistory() {
-
-        if (historyCard) {
-            historyCard.style.display = "none";
-        }
-
-        historyRows.forEach(function (row) {
-            row.style.display = "none";
-        });
-
-        if (historyEmptyRow) {
-            historyEmptyRow.style.display = "none";
-        }
-
-        if (historyCount) {
-            historyCount.textContent = "0 Payments";
-        }
-    }
-
-
     /* =====================================================
-       SHOW HISTORY FOR SELECTED TRIP
-    ===================================================== */
+   HIDE ENTIRE HISTORY
+   ===================================================== */
 
-    function showPaymentHistory(
-        orderId,
-        tripNumber,
-        vehicleNumber
-    ) {
+function hidePaymentHistory() {
 
-        if (!orderId) {
-            hidePaymentHistory();
-            return;
-        }
+    if (historyCard) {
+        historyCard.style.display = "none";
+    }
 
-        if (historyCard) {
-            historyCard.style.display = "block";
-        }
+    historyRows.forEach(function (row) {
+        row.style.display = "none";
+    });
 
-        let visibleCount = 0;
+    if (historyCount) {
+        historyCount.style.display = "none";
+        historyCount.textContent = "";
+    }
 
+    if (historyEmptyMessage) {
+        historyEmptyMessage.style.display = "none";
+    }
 
-        historyRows.forEach(function (row) {
+    if (paymentTableWrapper) {
+        paymentTableWrapper.style.display = "none";
+    }
 
-            const rowOrderId =
-                row.dataset.orderId;
-
-            if (
-                String(rowOrderId) ===
-                String(orderId)
-            ) {
-
-                row.style.display = "table-row";
-                visibleCount++;
-
-            } else {
-
-                row.style.display = "none";
-
-            }
-        });
+}
 
 
-        if (historySubtitle) {
+/* =====================================================
+   SHOW HISTORY FOR SELECTED TRIP
+   ===================================================== */
 
-            let subtitle =
-                "Payment history • " +
-                (tripNumber || "selected Trip");
+function showPaymentHistory(
+    orderId,
+    tripNumber,
+    vehicleNumber
+) {
 
-            if (vehicleNumber) {
-                subtitle += " • " + vehicleNumber;
-            }
+    if (!orderId) {
 
-            historySubtitle.textContent =
-                subtitle;
-        }
+        hidePaymentHistory();
 
-
-        if (historyCount) {
-
-            historyCount.textContent =
-                visibleCount +
-                (
-                    visibleCount === 1
-                        ? " Payment"
-                        : " Payments"
-                );
-        }
-
-
-        if (historyEmptyRow) {
-
-            historyEmptyRow.style.display =
-                visibleCount === 0
-                    ? "table-row"
-                    : "none";
-        }
+        return;
     }
 
 
+    let visibleCount = 0;
+
+
+    /* -------------------------------------------------
+       FILTER PAYMENT ROWS
+       ------------------------------------------------- */
+
+    historyRows.forEach(function (row) {
+
+        const rowOrderId =
+            row.dataset.orderId;
+
+
+        if (
+            String(rowOrderId) ===
+            String(orderId)
+        ) {
+
+            row.style.display =
+                "table-row";
+
+            visibleCount++;
+
+        } else {
+
+            row.style.display =
+                "none";
+
+        }
+
+    });
+
+
+    /* -------------------------------------------------
+       SHOW HISTORY CARD
+       ------------------------------------------------- */
+
+    historyCard.style.display =
+        "block";
+
+
+    /* -------------------------------------------------
+       SUBTITLE
+       ------------------------------------------------- */
+
+    let subtitle =
+        "Payment history • " +
+        (tripNumber || "Selected Trip");
+
+
+    if (vehicleNumber) {
+
+        subtitle +=
+            " • " +
+            vehicleNumber;
+
+    }
+
+
+    historySubtitle.textContent =
+        subtitle;
+
+
+    /* =================================================
+       NO TRANSACTIONS
+       ================================================= */
+
+    if (visibleCount === 0) {
+
+        // Hide table completely
+        paymentTableWrapper.style.display =
+            "none";
+
+
+        // Hide count
+        historyCount.style.display =
+            "none";
+
+        historyCount.textContent =
+            "";
+
+
+        // Show ONLY message
+        historyEmptyMessage.style.display =
+            "block";
+
+
+        return;
+    }
+
+
+    /* =================================================
+       TRANSACTIONS AVAILABLE
+       ================================================= */
+
+    // Show table
+    paymentTableWrapper.style.display =
+        "block";
+
+
+    // Hide empty message
+    historyEmptyMessage.style.display =
+        "none";
+
+
+    // Show transaction count
+    historyCount.style.display =
+        "block";
+
+
+    historyCount.textContent =
+        visibleCount +
+        (
+            visibleCount === 1
+                ? " Payment"
+                : " Payments"
+        );
+
+}
     /* =====================================================
        LOAD SELECTED ORDER
     ===================================================== */
