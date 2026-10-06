@@ -730,142 +730,155 @@
         </form>
 </div>
 
-    <!-- =====================================================
-         PAYMENT HISTORY
-         ===================================================== 
+   <!-- =========================================================
+     SELECTED TRIP TRANSACTION HISTORY
+     ========================================================= -->
 
-    <div class="cpay-card">
+<div id="tripTransactionSection"
+     class="cpay-card"
+     style="display:none; margin-top:18px;">
 
-        <div class="cpay-table-wrapper">
+    <div style="
+        padding:14px 16px;
+        border-bottom:1px solid #e9ecef;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+    ">
+        <div>
+            <div style="
+                font-size:14px;
+                font-weight:600;
+                color:#212529;
+            ">
+                Trip Transaction History
+            </div>
 
-            <table class="cpay-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Trip
-                        </th>
-
-                        <th>
-                            Customer
-                        </th>
-
-                        <th class="amount-header">
-                            Selling
-                        </th>
-
-                        <th class="amount-header">
-                            Received
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                        <th>
-                            Mode
-                        </th>
-
-                        <th>
-                            UTR
-                        </th>
-
-                        <th>
-                            Received At
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for p in payments %}
-
-                        <tr>
-
-                            <td>
-
-                                <div class="trip-number">
-                                    {{ p.order.trip_number }}
-                                </div>
-
-                            </td>
-
-                            <td>
-                                {{ p.order.customer.name|default:"-" }}
-                            </td>
-
-                            <td class="amount">
-                                ₹{{ p.selling_amount|floatformat:2 }}
-                            </td>
-
-                            <td class="amount">
-                                ₹{{ p.received_amount|floatformat:2 }}
-                            </td>
-
-                            <td class="status-cell">
-
-                                {% if p.status == "Payment Cleared" %}
-
-                                    <span class="status status-success">
-                                        {{ p.status }}
-                                    </span>
-
-                                {% elif p.status == "Part Amount Received" %}
-
-                                    <span class="status status-info">
-                                        {{ p.status }}
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="status status-warning">
-                                        {{ p.status }}
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-                                {{ p.received_through|default:"-" }}
-                            </td>
-
-                            <td>
-                                {{ p.utr_details|default:"-" }}
-                            </td>
-
-                            <td>
-                                {{ p.received_at|date:"d/m/Y H:i" }}
-                            </td>
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td
-                                colspan="8"
-                                class="empty-row"
-                            >
-                                No customer receipts found.
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
+            <div id="selectedTripLabel"
+                 style="
+                    margin-top:3px;
+                    font-size:10px;
+                    color:#8a9199;
+                 ">
+            </div>
         </div>
 
-    </div> -->
+        <div id="transactionCount"
+             style="
+                font-size:10px;
+                font-weight:600;
+                background:#f3f4f6;
+                padding:5px 10px;
+                border-radius:20px;
+                color:#495057;
+             ">
+        </div>
+    </div>
+
+
+    <div class="cpay-table-wrapper">
+
+        <table class="cpay-table">
+
+            <thead>
+                <tr>
+                    <th>Trip</th>
+                    <th>Customer</th>
+                    <th class="amount-header">Selling</th>
+                    <th class="amount-header">Received</th>
+                    <th>Status</th>
+                    <th>Mode</th>
+                    <th>UTR</th>
+                    <th>Received At</th>
+                </tr>
+            </thead>
+
+            <tbody id="tripTransactionBody">
+
+                {% for p in payments %}
+
+                <tr class="transaction-row"
+                    data-order-id="{{ p.order.pk }}">
+
+                    <td>
+                        <div class="trip-number">
+                            {{ p.order.trip_number }}
+                        </div>
+                    </td>
+
+                    <td>
+                        {{ p.order.customer.name|default:"-" }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ p.selling_amount|floatformat:2 }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ p.received_amount|floatformat:2 }}
+                    </td>
+
+                    <td class="status-cell">
+
+                        {% if p.status == "Payment Cleared" %}
+
+                            <span class="status status-success">
+                                {{ p.status }}
+                            </span>
+
+                        {% elif p.status == "Part Amount Received" %}
+
+                            <span class="status status-info">
+                                {{ p.status }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="status status-warning">
+                                {{ p.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ p.received_through|default:"-" }}
+                    </td>
+
+                    <td title="{{ p.utr_details|default:'-' }}">
+                        {{ p.utr_details|default:"-" }}
+                    </td>
+
+                    <td>
+                        {{ p.received_at|date:"d/m/Y H:i" }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+                <!-- No transaction message -->
+
+                <tr id="noTransactionRow" style="display:none;">
+
+                    <td colspan="8"
+                        class="empty-row">
+
+                        No transactions found for this trip.
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
 
 <!-- =========================================================
@@ -875,48 +888,71 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const orderSelect = document.getElementById("order");
-    const sellingAmount = document.getElementById("selling_amount");
-    const receivedAmount = document.getElementById("received_amount");
+    const orderSelect =
+        document.getElementById("order");
 
-    if (!orderSelect || !sellingAmount || !receivedAmount) {
+    const sellingAmount =
+        document.getElementById("selling_amount");
+
+    const receivedAmount =
+        document.getElementById("received_amount");
+
+    const transactionSection =
+        document.getElementById("tripTransactionSection");
+
+    const selectedTripLabel =
+        document.getElementById("selectedTripLabel");
+
+    const transactionCount =
+        document.getElementById("transactionCount");
+
+    const transactionRows =
+        document.querySelectorAll(".transaction-row");
+
+    const noTransactionRow =
+        document.getElementById("noTransactionRow");
+
+
+    if (!orderSelect) {
         return;
     }
 
-    // Preserve the amount submitted before validation failed
-    const postedReceivedAmount =
-        orderSelect.dataset.postedReceived || "";
+
+    // =====================================================
+    // AUTO FILL AMOUNTS
+    // =====================================================
 
     function updateAmounts(preserveReceived = false) {
 
         const selectedOption =
             orderSelect.options[orderSelect.selectedIndex];
 
+
         if (!selectedOption || !orderSelect.value) {
-            sellingAmount.value = "";
-            
-            if (!preserveReceived) {
+
+            if (sellingAmount) {
+                sellingAmount.value = "";
+            }
+
+            if (receivedAmount && !preserveReceived) {
                 receivedAmount.value = "";
             }
 
             return;
         }
 
-        // -------------------------------------------------
-        // Selling Amount
-        // Always taken from selected Order
-        // -------------------------------------------------
+
+        // Selling amount
         const sellingPrice =
             selectedOption.dataset.sellingPrice || "";
 
-        sellingAmount.value = sellingPrice;
+        if (sellingAmount) {
+            sellingAmount.value = sellingPrice;
+        }
 
 
-        // -------------------------------------------------
-        // Received Amount
-        // Auto-fill from customer advance
-        // -------------------------------------------------
-        if (!preserveReceived) {
+        // Customer Advance
+        if (!preserveReceived && receivedAmount) {
 
             const customerAdvance =
                 selectedOption.dataset.customerAdvance || "";
@@ -926,32 +962,130 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // When user changes Trip / Order
+    // =====================================================
+    // SHOW SELECTED TRIP TRANSACTIONS
+    // =====================================================
+
+    function showTripTransactions() {
+
+        const selectedOrderId = orderSelect.value;
+
+        const selectedOption =
+            orderSelect.options[orderSelect.selectedIndex];
+
+
+        // -----------------------------------------
+        // No trip selected
+        // -----------------------------------------
+
+        if (!selectedOrderId) {
+
+            transactionSection.style.display = "none";
+
+            transactionRows.forEach(function (row) {
+                row.style.display = "none";
+            });
+
+            noTransactionRow.style.display = "none";
+
+            return;
+        }
+
+
+        // -----------------------------------------
+        // Show transaction card
+        // -----------------------------------------
+
+        transactionSection.style.display = "block";
+
+
+        // Trip label
+        if (selectedOption) {
+
+            selectedTripLabel.textContent =
+                selectedOption.text.trim();
+
+        }
+
+
+        // -----------------------------------------
+        // Filter transactions
+        // -----------------------------------------
+
+        let visibleCount = 0;
+
+
+        transactionRows.forEach(function (row) {
+
+            const rowOrderId =
+                row.dataset.orderId;
+
+
+            if (rowOrderId === selectedOrderId) {
+
+                row.style.display = "";
+
+                visibleCount++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+
+        // -----------------------------------------
+        // No transactions
+        // -----------------------------------------
+
+        if (visibleCount === 0) {
+
+            noTransactionRow.style.display = "";
+
+            transactionCount.textContent =
+                "0 Transactions";
+
+        } else {
+
+            noTransactionRow.style.display = "none";
+
+            transactionCount.textContent =
+                visibleCount +
+                (visibleCount === 1
+                    ? " Transaction"
+                    : " Transactions");
+        }
+    }
+
+
+    // =====================================================
+    // TRIP CHANGE
+    // =====================================================
+
     orderSelect.addEventListener("change", function () {
 
         updateAmounts(false);
 
+        showTripTransactions();
+
     });
 
 
-    // Initial page load
+    // =====================================================
+    // INITIAL PAGE LOAD
+    // =====================================================
+
     if (orderSelect.value) {
 
-        if (postedReceivedAmount !== "") {
+        updateAmounts(true);
 
-            // Validation failed:
-            // keep user's submitted Received Amount
-            updateAmounts(true);
+        showTripTransactions();
 
-            receivedAmount.value = postedReceivedAmount;
+    } else {
 
-        } else {
-
-            // Normal page load:
-            // auto-fill Customer Advance
-            updateAmounts(false);
-
-        }
+        transactionSection.style.display = "none";
 
     }
 
