@@ -925,16 +925,23 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateAmounts(preserveReceived = false) {
 
         const selectedOption =
-            orderSelect.options[orderSelect.selectedIndex];
+            orderSelect.options[
+                orderSelect.selectedIndex
+            ];
 
-
-        if (!selectedOption || !orderSelect.value) {
+        if (
+            !selectedOption ||
+            !orderSelect.value
+        ) {
 
             if (sellingAmount) {
                 sellingAmount.value = "";
             }
 
-            if (receivedAmount && !preserveReceived) {
+            if (
+                receivedAmount &&
+                !preserveReceived
+            ) {
                 receivedAmount.value = "";
             }
 
@@ -942,7 +949,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Selling amount
         const sellingPrice =
             selectedOption.dataset.sellingPrice || "";
 
@@ -951,183 +957,144 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Customer Advance
-        if (!preserveReceived && receivedAmount) {
+        if (
+            !preserveReceived &&
+            receivedAmount
+        ) {
 
             const customerAdvance =
                 selectedOption.dataset.customerAdvance || "";
 
-            receivedAmount.value = customerAdvance;
+            receivedAmount.value =
+                customerAdvance;
         }
     }
 
 
     // =====================================================
-    // SHOW SELECTED TRIP TRANSACTIONS
+    // SHOW TRIP TRANSACTIONS
     // =====================================================
 
     function showTripTransactions() {
 
-    const orderId = orderSelect.value;
-
-    if (!orderId) {
-        transactionCard.style.display = "none";
-        return;
-    }
-
-    const selectedOption =
-        orderSelect.options[orderSelect.selectedIndex];
-
-    const tripNumber =
-        selectedOption.dataset.trip || "";
-
-    const customer =
-        selectedOption.dataset.customer || "";
-
-    const selling =
-        parseFloat(
-            selectedOption.dataset.sellingPrice || 0
-        );
-
-    const transactions =
-        paymentHistory[orderId] || [];
+        const orderId =
+            orderSelect.value;
 
 
-    // =====================================================
-    // NO TRANSACTION
-    // SHOW ONLY MESSAGE
-    // =====================================================
+        // Nothing selected
+        if (!orderId) {
 
-    if (!transactions.length) {
+            transactionSection.style.display =
+                "none";
 
-        transactionCard.style.display = "block";
-
-        transactionCard.innerHTML = `
-            <div class="no-trip-transactions">
-                No transactions found for
-                <strong>${escapeHtml(tripNumber)}</strong>
-                ${customer
-                    ? " - " + escapeHtml(customer)
-                    : ""}
-            </div>
-        `;
-
-        return;
-    }
+            return;
+        }
 
 
-    // =====================================================
-    // TRANSACTIONS EXIST
-    // =====================================================
-
-    transactionCard.style.display = "block";
-
-
-    transactionTripInfo.textContent =
-        tripNumber +
-        (customer ? " • " + customer : "");
+        const selectedOption =
+            orderSelect.options[
+                orderSelect.selectedIndex
+            ];
 
 
-    let totalReceived = 0;
+        const tripNumber =
+            selectedOption.textContent.trim();
 
-    transactions.forEach(function (item) {
 
-        totalReceived +=
-            parseFloat(
-                item.received_amount || 0
+        // -------------------------------------------------
+        // FIND TRANSACTIONS FOR SELECTED TRIP
+        // -------------------------------------------------
+
+        let foundCount = 0;
+
+
+        transactionRows.forEach(function (row) {
+
+            const rowOrderId =
+                row.dataset.orderId;
+
+
+            if (rowOrderId === orderId) {
+
+                row.style.display = "";
+
+                foundCount++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+
+        // -------------------------------------------------
+        // NO TRANSACTIONS
+        // -------------------------------------------------
+
+        if (foundCount === 0) {
+
+            transactionSection.style.display =
+                "block";
+
+            selectedTripLabel.textContent =
+                tripNumber;
+
+            transactionCount.textContent =
+                "0 Transactions";
+
+
+            noTransactionRow.style.display =
+                "";
+
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // TRANSACTIONS FOUND
+        // -------------------------------------------------
+
+        transactionSection.style.display =
+            "block";
+
+        selectedTripLabel.textContent =
+            tripNumber;
+
+        transactionCount.textContent =
+            foundCount +
+            (
+                foundCount === 1
+                    ? " Transaction"
+                    : " Transactions"
             );
 
-    });
 
-
-    let balance =
-        selling - totalReceived;
-
-    if (balance < 0) {
-        balance = 0;
+        noTransactionRow.style.display =
+            "none";
     }
 
 
-    summarySelling.textContent =
-        "₹" + money(selling);
-
-    summaryReceived.textContent =
-        "₹" + money(totalReceived);
-
-    summaryBalance.textContent =
-        "₹" + money(balance);
-
-
-    if (
-        selling > 0 &&
-        totalReceived >= selling
-    ) {
-
-        summaryStatus.innerHTML =
-            '<span class="status status-success">' +
-            'Payment Cleared' +
-            '</span>';
-
-    } else {
-
-        summaryStatus.innerHTML =
-            '<span class="status status-info">' +
-            'Part Amount Received' +
-            '</span>';
-
-    }
-
-
-    let rows = "";
-
-    transactions.forEach(function (item) {
-
-        rows += `
-            <tr>
-
-                <td>
-                    ${escapeHtml(item.received_at)}
-                </td>
-
-                <td class="amount">
-                    ₹${money(item.received_amount)}
-                </td>
-
-                <td>
-                    ${escapeHtml(item.received_through)}
-                </td>
-
-                <td>
-                    ${escapeHtml(item.utr_details)}
-                </td>
-
-                <td class="status-cell">
-                    ${getStatusHtml(item.status)}
-                </td>
-
-            </tr>
-        `;
-
-    });
-
-
-    transactionBody.innerHTML = rows;
-}
     // =====================================================
     // TRIP CHANGE
     // =====================================================
 
-    orderSelect.addEventListener("change", function () {
+    orderSelect.addEventListener(
+        "change",
+        function () {
 
-        updateAmounts(false);
+            updateAmounts(false);
 
-        showTripTransactions();
+            showTripTransactions();
 
-    });
+        }
+    );
 
 
     // =====================================================
-    // INITIAL PAGE LOAD
+    // INITIAL LOAD
     // =====================================================
 
     if (orderSelect.value) {
@@ -1138,11 +1105,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } else {
 
-        transactionSection.style.display = "none";
-
+        transactionSection.style.display =
+            "none";
     }
 
 });
 </script>
-
 {% endblock %}
