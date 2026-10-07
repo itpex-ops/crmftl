@@ -1,1028 +1,1317 @@
-
 {% extends "layouts/base.html" %}
 
-{% block title %}Customer Payments{% endblock %}
-
+{% block title %}Customer Payment{% endblock %}
 
 {% block content %}
 
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <style>
-
-/* =========================================================
-   PAGE
-   ========================================================= */
-
-.cpay-page {
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    padding: 22px 28px 40px;
-    background: #f8f9fb;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.cpay-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-}
-
-.cpay-title {
-    margin: 0;
-    color: #212529;
-    font-size: 22px;
-    font-weight: 600;
-}
-
-.cpay-subtitle {
-    margin: 4px 0 0;
-    color: #8a9199;
-    font-size: 11px;
-}
-
-/* =========================================================
-   MESSAGE
-   ========================================================= */
-
-.cpay-message {
-    margin-bottom: 15px;
-    padding: 10px 14px;
-    border: 1px solid #dfe3e8;
-    border-radius: 6px;
-    background: #ffffff;
-    color: #495057;
-    font-size: 11px;
-}
-
-/* =========================================================
-   FORM CARD
-   ========================================================= */
-
-.cpay-form-card {
-    width: 100%;
-    margin-bottom: 18px;
-    padding: 18px;
-    background: #ffffff;
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-    box-sizing: border-box;
-}
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-.orders-toolbar {
-    width: 100%;
-    margin-bottom: 18px;
-}
-
-.orders-search {
-    display: flex;
-    width: 100%;
-    max-width: 520px;
-}
-
-.orders-search input {
-    flex: 1;
-    min-width: 0;
-    height: 42px;
-    padding: 0 13px;
-    border: 1px solid #dfe3e8;
-    border-right: none;
-    border-radius: 7px 0 0 7px;
-    background: #ffffff;
-    color: #343a40;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.orders-search input::placeholder {
-    color: #9aa0a6;
-}
-
-.orders-search input:focus {
-    border-color: #FDB81B;
-    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.10);
-}
-
-.orders-search button {
-    width: 90px;
-    height: 42px;
-    border: 1px solid #FDB81B;
-    border-radius: 0 7px 7px 0;
-    background: #FDB81B;
-    color: #212529;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.orders-search button:hover {
-    background: #e7a900;
-    color: #ffffff;
-}
-
-/* =========================================================
-   FORM GRID
-   ========================================================= */
-
-.cpay-form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px 18px;
-}
-
-/* =========================================================
-   FIELD
-   ========================================================= */
-
-.cpay-field {
-    min-width: 0;
-}
-
-.cpay-field label {
-    display: block;
-    margin-bottom: 6px;
-    color: #495057;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.cpay-field input,
-.cpay-field select {
-    width: 100%;
-    height: 38px;
-    padding: 6px 9px;
-    border: 1px solid #dfe3e8;
-    border-radius: 6px;
-    background: #ffffff;
-    color: #343a40;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    outline: none;
-    box-sizing: border-box;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.cpay-field input:focus,
-.cpay-field select:focus {
-    border-color: #FDB81B;
-    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
-}
-
-/* =========================================================
-   AUTO-FILLED AMOUNTS
-   ========================================================= */
-
-#selling_amount,
-#received_amount {
-    background: #f8f9fb;
-    font-weight: 600;
-}
-
-/* =========================================================
-   FORM ACTIONS
-   ========================================================= */
-
-.cpay-form-actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 18px;
-}
-
-.cpay-save-btn {
-    min-width: 140px;
-    height: 38px;
-    padding: 0 18px;
-    border: 1px solid #0d6efd;
-    border-radius: 6px;
-    background: #0d6efd;
-    color: #ffffff;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.cpay-save-btn:hover {
-    background: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-/* =========================================================
-   TABLE CARD
-   ========================================================= */
-
-.cpay-card {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #dfe3e8;
-    border-radius: 8px;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.cpay-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-.cpay-table {
-    width: 100%;
-    min-width: 950px;
-    margin: 0;
-    border-collapse: collapse;
-    table-layout: fixed;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-}
-
-/* =========================================================
-   COLUMN WIDTHS
-   ========================================================= */
-
-.cpay-table th:nth-child(1),
-.cpay-table td:nth-child(1) {
-    width: 12%;
-}
-
-.cpay-table th:nth-child(2),
-.cpay-table td:nth-child(2) {
-    width: 18%;
-}
-
-.cpay-table th:nth-child(3),
-.cpay-table td:nth-child(3) {
-    width: 12%;
-}
-
-.cpay-table th:nth-child(4),
-.cpay-table td:nth-child(4) {
-    width: 12%;
-}
-
-.cpay-table th:nth-child(5),
-.cpay-table td:nth-child(5) {
-    width: 16%;
-}
-
-.cpay-table th:nth-child(6),
-.cpay-table td:nth-child(6) {
-    width: 10%;
-}
-
-.cpay-table th:nth-child(7),
-.cpay-table td:nth-child(7) {
-    width: 10%;
-}
-
-.cpay-table th:nth-child(8),
-.cpay-table td:nth-child(8) {
-    width: 10%;
-}
-
-/* =========================================================
-   TABLE HEADER
-   ========================================================= */
-
-.cpay-table thead th {
-    height: 42px;
-    padding: 9px 12px;
-    background: #f3f4f6;
-    border-bottom: 1px solid #dfe3e8;
-    color: #343a40;
-    font-size: 10.5px;
-    font-weight: 600;
-    text-align: left;
-    vertical-align: middle;
-    white-space: nowrap;
-    box-sizing: border-box;
-}
-
-.cpay-table thead th.amount-header {
-    text-align: right;
-}
-
-/* =========================================================
-   TABLE BODY
-   ========================================================= */
-
-.cpay-table tbody td {
-    height: 43px;
-    padding: 9px 12px;
-    border-bottom: 1px solid #eef0f2;
-    color: #555e68;
-    text-align: left;
-    vertical-align: middle;
-    box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.cpay-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.cpay-table tbody tr:hover {
-    background: #fafafa;
-}
-
-/* =========================================================
-   TRIP
-   ========================================================= */
-
-.cpay-table .trip-number {
-    color: #212529;
-    font-weight: 600;
-}
-
-/* =========================================================
-   AMOUNT
-   ========================================================= */
-
-.cpay-table .amount {
-    color: #343a40;
-    font-weight: 600;
-    text-align: right;
-    white-space: nowrap;
-}
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-.cpay-table .status-cell {
-    text-align: left;
-}
-
-.cpay-table .status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 100%;
-    padding: 4px 9px;
-    border-radius: 20px;
-    font-size: 9px;
-    font-weight: 600;
-    white-space: nowrap;
-    box-sizing: border-box;
-}
-
-.cpay-table .status-success {
-    background: #d1e7dd;
-    color: #0f5132;
-}
-
-.cpay-table .status-warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.cpay-table .status-info {
-    background: #cff4fc;
-    color: #055160;
-}
-
-/* =========================================================
-   EMPTY
-   ========================================================= */
-
-.cpay-table .empty-row {
-    height: 100px;
-    padding: 30px 20px !important;
-    color: #8a9199 !important;
-    font-size: 11px;
-    text-align: center !important;
-}
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-    .cpay-page {
-        padding: 18px 15px 30px;
+    body {
+        background: #f4f6fb;
     }
 
-    .cpay-form-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .customer-payment-page {
+        min-height: calc(100vh - 60px);
+        padding: 12px 14px 35px;
     }
 
-    .cpay-table {
-        min-width: 900px;
-    }
-}
-
-@media (max-width: 600px) {
-
-    .cpay-form-grid {
-        grid-template-columns: 1fr;
+    .payment-alerts {
+        max-width: 520px;
+        margin: 0 auto 10px;
     }
 
-    .cpay-header {
-        align-items: flex-start;
+    .payment-alerts .alert {
+        font-size: 11px;
+        padding: 8px 12px;
+        border-radius: 9px;
+        margin-bottom: 7px;
+    }
+
+    /* =========================================================
+       COMMON CARD
+       ========================================================= */
+
+    .payment-wrapper {
+        width: 100%;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+
+    .payment-card,
+    .confirmation-card,
+    .success-card {
+        background: #fff;
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 5px 18px rgba(16, 24, 40, .08);
+    }
+
+    /* =========================================================
+       STEP 1 - TRIP SELECTION
+       ========================================================= */
+
+    .trip-select-wrapper {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto 14px;
+    }
+
+    .trip-select-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 13px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+    }
+
+    .trip-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #344054;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .trip-select {
+        width: 100%;
+        height: 38px;
+        padding: 0 11px;
+        border: 1px solid #d9dee7;
+        border-radius: 10px;
+        background: #fff;
+        color: #344054;
+        font-size: 11px;
+        outline: none;
+    }
+
+    .trip-select:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, .08);
+    }
+
+    /* =========================================================
+       STEP 2 - PAYMENT FORM
+       ========================================================= */
+
+    .payment-header {
+        background: linear-gradient(135deg, #9EEA34, #EADB34);
+        color: #fff;
+        text-align: center;
+        padding: 9px 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .payment-body {
+        padding: 16px;
+    }
+
+    .customer-info {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .customer-name {
+        color: #212529;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .trip-number {
+        margin-top: 2px;
+        color: #6c757d;
+        font-size: 12px;
+    }
+
+    .selling-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 10px;
+        margin-bottom: 13px;
+        padding: 8px 10px;
+        border: 1px solid #edf0f3;
+        border-radius: 9px;
+        background: #f8fafc;
     }
 
-    .orders-search {
-        max-width: 100%;
+    .selling-label {
+        color: #667085;
+        font-size: 10px;
     }
-}
 
+    .selling-value {
+        color: #654321;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 7px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 4px;
+        color: #344054;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        height: 36px;
+        border: 1px solid #d9dee7;
+        border-radius: 10px;
+        font-size: 11px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #198754;
+        box-shadow: none;
+    }
+
+    textarea.form-control {
+        height: auto;
+        min-height: 46px;
+        resize: vertical;
+    }
+
+    .continue-btn {
+        width: 50%;
+        min-width: 150px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #EC32C1, #EADB34);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all .25s ease;
+    }
+
+    .continue-btn:hover {
+        color: #fff;
+        opacity: .95;
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       STEP 3 - CONFIRMATION
+       ========================================================= */
+
+    .confirmation-header {
+        background: linear-gradient(135deg, #198c53, #28a745);
+        color: #fff;
+        text-align: center;
+        padding: 10px 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .confirmation-body {
+        padding: 17px 13px 13px;
+    }
+
+    .confirm-customer {
+        text-align: center;
+        margin-bottom: 9px;
+    }
+
+    .confirm-customer-name {
+        color: #172033;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 1.25;
+    }
+
+    .confirm-trip {
+        margin-top: 4px;
+        color: #667085;
+        font-size: 11px;
+    }
+
+    .confirm-amount {
+        text-align: center;
+        margin-bottom: 18px;
+    }
+
+    .confirm-amount-value {
+        color: #198c53;
+        font-size: 27px;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .confirm-details {
+        margin-bottom: 22px;
+        padding: 9px 12px;
+        border: 1px solid #e4e7ec;
+        border-radius: 14px;
+        background: #f8f9fa;
+    }
+
+    .confirm-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        min-height: 29px;
+        color: #344054;
+        font-size: 11px;
+    }
+
+    .confirm-row span {
+        color: #667085;
+    }
+
+    .confirm-row strong {
+        color: #172033;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .reference-label {
+        margin-bottom: 5px;
+        color: #344054;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .reference-box {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        margin-bottom: 18px;
+        padding: 0 13px;
+        border: 1px solid #d9dee7;
+        border-radius: 11px;
+        background: #f8fafc;
+        color: #344054;
+        font-size: 12px;
+        word-break: break-all;
+    }
+
+    .confirm-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .edit-btn,
+    .confirm-btn {
+        height: 43px;
+        border: none;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .edit-btn {
+        width: 34%;
+        background: #f2f4f7;
+        color: #344054;
+    }
+
+    .confirm-btn {
+        flex: 1;
+        background: #198c53;
+        color: #fff;
+    }
+
+    .confirm-btn:hover {
+        background: #157347;
+        color: #fff;
+    }
+
+    /* =========================================================
+       STEP 4 - SUCCESS
+       ========================================================= */
+
+    .success-card {
+        max-width: 525px;
+        margin: 20px auto 0;
+        padding: 28px 12px 13px;
+    }
+
+    .success-icon {
+        width: 88px;
+        height: 88px;
+        margin: 0 auto 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #28a745;
+        color: #fff;
+        font-size: 48px;
+        box-shadow: 0 5px 14px rgba(40, 167, 69, .20);
+    }
+
+    .success-title {
+        margin: 0;
+        color: #16a34a;
+        text-align: center;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .success-subtitle {
+        margin: 5px 0 20px;
+        color: #667085;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .success-details {
+        margin: 0;
+        padding: 9px 15px;
+        border: 1px solid #e4e7ec;
+        border-radius: 14px;
+        background: #f8f9fa;
+    }
+
+    .success-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        min-height: 38px;
+        border-bottom: 1px solid #e4e7ec;
+        font-size: 12px;
+    }
+
+    .success-row:last-child {
+        border-bottom: none;
+    }
+
+    .success-row strong {
+        color: #667085;
+        font-weight: 600;
+    }
+
+    .success-row span {
+        color: #172033;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .success-reference {
+        margin-top: 15px;
+        padding: 17px 10px;
+        border-radius: 11px;
+        background: #e9f7ec;
+        color: #148346;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .new-payment-btn {
+        width: 100%;
+        height: 44px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 9px;
+        background: #198c53;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .new-payment-btn:hover {
+        background: #157347;
+        color: #fff;
+    }
+
+    /* =========================================================
+       TRANSACTION HISTORY
+       ========================================================= */
+
+    .transaction-card {
+        max-width: 1100px;
+        margin: 18px auto 0;
+        overflow: hidden;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+    }
+
+    .transaction-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 13px 16px;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+    .transaction-title {
+        color: #212529;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .transaction-subtitle {
+        margin-top: 2px;
+        color: #8a9199;
+        font-size: 10px;
+    }
+
+    .transaction-count {
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #f3f4f6;
+        color: #495057;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .transaction-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
+
+    .transaction-table th {
+        padding: 10px 12px;
+        background: #fafbfc;
+        border-bottom: 1px solid #edf0f3;
+        color: #667085;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .transaction-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #f0f2f5;
+        color: #344054;
+        white-space: nowrap;
+    }
+
+    .transaction-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .amount {
+        color: #344054;
+        font-weight: 600;
+    }
+
+    .status {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 9px;
+        font-weight: 600;
+    }
+
+    .status-success {
+        background: #ecfdf3;
+        color: #027a48;
+    }
+
+    .status-info {
+        background: #eff8ff;
+        color: #175cd3;
+    }
+
+    .status-warning {
+        background: #fffaeb;
+        color: #b54708;
+    }
+
+    .no-transactions {
+        padding: 28px 18px;
+        text-align: center;
+        color: #8a9199;
+        font-size: 11px;
+    }
+
+    .no-transactions i {
+        display: block;
+        margin-bottom: 7px;
+        color: #c4c9d0;
+        font-size: 22px;
+    }
+
+    .no-transactions strong {
+        color: #667085;
+        font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+        .customer-payment-page {
+            padding: 8px 10px 25px;
+        }
+
+        .payment-wrapper,
+        .success-card {
+            max-width: 100%;
+        }
+
+        .confirm-actions {
+            flex-direction: column;
+        }
+
+        .edit-btn {
+            width: 100%;
+        }
+
+        .success-title {
+            font-size: 21px;
+        }
+    }
 </style>
 
-<div class="cpay-page">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
-
-    <div class="cpay-header">
-        <div>
-
-            <h1 class="cpay-title">
-                Customer Payments
-            </h1>
-
-            <p class="cpay-subtitle">
-                Manage customer receipts and payment details.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         MESSAGES
-         ===================================================== -->
+<div class="customer-payment-page">
 
     {% if messages %}
-
+    <div class="payment-alerts">
         {% for message in messages %}
-
-            <div class="cpay-message">
-                {{ message }}
-            </div>
-
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
         {% endfor %}
-
+    </div>
     {% endif %}
 
 
-    <!-- =====================================================
-         PAYMENT FORM CARD
-         ===================================================== -->
+    {% if step == "success" and success_payment %}
 
-    <!-- 
-        =================================================
-             SEARCH
-             =================================================
-
-        <div class="orders-toolbar">
-
-            <form method="get" class="orders-search">
-
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ request.GET.q|default:'' }}"
-                    placeholder="Search trip, customer, vehicle, route..."
-                    autocomplete="off">
-
-                <button type="submit">
-                    <i class="bi bi-search me-1"></i>
-                    Search
-                </button>
-
-            </form>
-
-        </div>-->
-
-   <!--  =================================================
-             PAYMENT ENTRY FORM
+        <!-- =================================================
+             STEP 4 - SUCCESS
              ================================================= -->
-<div class="cpay-form-card">
 
-        <form method="POST">
+        <div class="success-card">
 
-            {% csrf_token %}
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
 
-            <div class="cpay-form-grid">
+            <h2 class="success-title">
+                Payment Saved Successfully
+            </h2>
 
-                <!-- =================================================
-                     ORDER
-                     ================================================= -->
+            <div class="success-subtitle">
+                Customer payment has been saved successfully.
+            </div>
 
-                <div class="cpay-field">
 
-                    <label for="order">
-                        Trip / Order
-                    </label>
+            <div class="success-details">
 
-                    <select
-                        id="order"
-                        name="order"
-                        required
-                    >
-
-                        <option value="">
-                            Select Trip
-                        </option>
-
-                        {% for order in orders %}
-
-                            <option
-                                value="{{ order.pk }}"
-                                data-selling-price="{{ order.selling_amount|default:0 }}"
-                                data-customer-advance="{{ order.customer_advance_amount|default:0 }}"
-                                {% if request.POST.order == order.pk|stringformat:"s" %}
-                                    selected
-                                {% endif %}
-                            >
-                                {{ order.trip_number }} - {{ order.customer.name }}
-                            </option>
-
-                        {% endfor %}
-
-                    </select>
-
+                <div class="success-row">
+                    <strong>Customer</strong>
+                    <span>
+                        {{ success_payment.customer_name }}
+                    </span>
                 </div>
 
-
-                <!-- =================================================
-                     SELLING AMOUNT
-                     ================================================= -->
-
-                <div class="cpay-field">
-
-                    <label for="selling_amount">
-                        Selling Amount
-                    </label>
-
-                    <input
-                        type="number"
-                        id="selling_amount"
-                        name="selling_amount"
-                        step="0.01"
-                        min="0"
-                        value=""
-                        placeholder="Auto-filled"
-                        readonly
-                        required
-                    >
-
+                <div class="success-row">
+                    <strong>Amount</strong>
+                    <span>
+                        ₹ {{ success_payment.amount }}
+                    </span>
                 </div>
 
-
-                <!-- =================================================
-                     RECEIVED AMOUNT
-                     ================================================= -->
-
-                <div class="cpay-field">
-
-                    <label for="received_amount">
-                        Received Amount
-                    </label>
-
-                    <input
-                        type="number"
-                        id="received_amount"
-                        name="received_amount"
-                        step="0.01"
-                        min="0"
-                        value="{{ request.POST.received_amount|default:'' }}"
-                        placeholder="0.00"
-                        required
-                    >
-
+                <div class="success-row">
+                    <strong>Against</strong>
+                    <span>
+                        {{ success_payment.against }}
+                    </span>
                 </div>
 
-
-                <!-- =================================================
-                     PAYMENT MODE
-                     ================================================= -->
-
-                <div class="cpay-field">
-
-                    <label for="received_through">
-                        Received Through
-                    </label>
-
-                    <select
-                        id="received_through"
-                        name="received_through"
-                    >
-
-                        <option value="">
-                            Select Mode
-                        </option>
-
-                        <option
-                            value="RTGS"
-                            {% if request.POST.received_through == "RTGS" %}
-                                selected
-                            {% endif %}
-                        >
-                            RTGS
-                        </option>
-
-                        <option
-                            value="NEFT"
-                            {% if request.POST.received_through == "NEFT" %}
-                                selected
-                            {% endif %}
-                        >
-                            NEFT
-                        </option>
-
-                        <option
-                            value="CASH"
-                            {% if request.POST.received_through == "CASH" %}
-                                selected
-                            {% endif %}
-                        >
-                            CASH
-                        </option>
-
-                        <option
-                            value="IMPS"
-                            {% if request.POST.received_through == "IMPS" %}
-                                selected
-                            {% endif %}
-                        >
-                            IMPS
-                        </option>
-
-                        <option
-                            value="UPI"
-                            {% if request.POST.received_through == "UPI" %}
-                                selected
-                            {% endif %}
-                        >
-                            UPI
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- =================================================
-                     UTR
-                     ================================================= -->
-
-                <div class="cpay-field">
-
-                    <label for="utr_details">
-                        UTR / Transaction Details
-                    </label>
-
-                    <input
-                        type="text"
-                        id="utr_details"
-                        name="utr_details"
-                        value="{{ request.POST.utr_details|default:'' }}"
-                        placeholder="Enter UTR / transaction reference"
-                    >
-
+                <div class="success-row">
+                    <strong>Mode</strong>
+                    <span>
+                        {{ success_payment.mode }}
+                    </span>
                 </div>
 
             </div>
 
 
-            <!-- =================================================
-                 SAVE BUTTON
-                 ================================================= -->
-
-            <div class="cpay-form-actions">
-
-                <button
-                    type="submit"
-                    class="cpay-save-btn"
-                >
-                    <i class="bi bi-receipt me-1"></i>
-                    Save Receipt
-                </button>
-
+            <div class="success-reference">
+                REF NO : {{ success_payment.reference_number }}
             </div>
 
-        </form>
-</div>
 
-   <!-- =========================================================
-     SELECTED TRIP TRANSACTION HISTORY
-     ========================================================= -->
-
-<!-- =========================================================
-     SELECTED TRIP TRANSACTION HISTORY
-     ========================================================= -->
-
-<div
-    id="tripTransactionSection"
-    class="cpay-card"
-    style="display:none; margin-top:18px;"
->
-
-    <div
-        style="
-            padding:14px 16px;
-            border-bottom:1px solid #e9ecef;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        "
-    >
-
-        <div>
-
-            <div
-                style="
-                    font-size:14px;
-                    font-weight:600;
-                    color:#212529;
-                "
+            <a
+                href="{% url 'customer_payments' %}"
+                class="new-payment-btn"
             >
-                Trip Transaction History
-            </div>
-
-            <div
-                id="selectedTripLabel"
-                style="
-                    margin-top:3px;
-                    font-size:10px;
-                    color:#8a9199;
-                "
-            ></div>
+                New Payment
+            </a>
 
         </div>
 
-        <div
-            id="transactionCount"
-            style="
-                font-size:10px;
-                font-weight:600;
-                background:#f3f4f6;
-                padding:5px 10px;
-                border-radius:20px;
-                color:#495057;
-            "
-        ></div>
 
-    </div>
+    {% elif step == "confirm" and draft and selected_order %}
 
+        <!-- =================================================
+             STEP 3 - CONFIRMATION
+             ================================================= -->
 
-    <!-- =====================================================
-         NO TRANSACTION MESSAGE
-         ===================================================== -->
+        <div class="payment-wrapper">
 
-    <div
-        id="noTransactionMessage"
-        style="
-            display:none;
-            padding:30px 20px;
-            text-align:center;
-            color:#8a9199;
-            font-size:11px;
-        "
-    >
-        No transactions found for this trip.
-    </div>
+            <div class="confirmation-card">
+
+                <div class="confirmation-header">
+                    Confirm Customer Payment
+                </div>
 
 
-    <!-- =====================================================
-         TRANSACTION TABLE
-         ===================================================== -->
+                <div class="confirmation-body">
 
-    <div
-        id="transactionTableWrapper"
-        class="cpay-table-wrapper"
-    >
+                    <div class="confirm-customer">
 
-        <table class="cpay-table">
+                        <div class="confirm-customer-name">
+                            {{ customer_name }}
+                        </div>
 
-            <thead>
+                        <div class="confirm-trip">
+                            {{ selected_order.trip_number }}
+                        </div>
 
-                <tr>
+                    </div>
 
-                    <th>Trip</th>
 
-                    <th>Customer</th>
+                    <div class="confirm-amount">
 
-                    <th class="amount-header">
-                        Selling
-                    </th>
+                        <div class="confirm-amount-value">
+                            ₹ {{ draft.received_amount }}
+                        </div>
 
-                    <th class="amount-header">
-                        Received
-                    </th>
+                    </div>
 
-                    <th>Status</th>
 
-                    <th>Mode</th>
+                    <div class="confirm-details">
 
-                    <th>UTR</th>
+                        <div class="confirm-row">
+                            <span>Account</span>
+                            <strong>
+                                {% if draft.account_type == "ltd" %}
+                                    LTD
+                                {% elif draft.account_type == "proprietor" %}
+                                    Proprietor
+                                {% else %}
+                                    {{ draft.account_type|title }}
+                                {% endif %}
+                            </strong>
+                        </div>
 
-                    <th>Received At</th>
+                        <div class="confirm-row">
+                            <span>Against</span>
+                            <strong>
+                                {{ draft.payment_against|title }}
+                            </strong>
+                        </div>
 
-                </tr>
+                        <div class="confirm-row">
+                            <span>Mode</span>
+                            <strong>
+                                {{ draft.payment_mode }}
+                            </strong>
+                        </div>
 
-            </thead>
+                        <div class="confirm-row">
+                            <span>Date</span>
+                            <strong>
+                                {{ draft.payment_date }}
+                            </strong>
+                        </div>
 
-            <tbody>
+                    </div>
 
-                {% for p in payments %}
 
-                <tr
-                    class="transaction-row"
-                    data-order-id="{{ p.order.pk }}"
+                    <div class="reference-label">
+                        Reference Number
+                    </div>
+
+                    <div class="reference-box">
+                        {{ draft.reference_number }}
+                    </div>
+
+
+                    <div class="confirm-actions">
+
+                        <form
+                            method="get"
+                            action="{% url 'customer_payments' %}"
+                            style="width:34%;"
+                        >
+
+                            <button
+                                type="submit"
+                                class="edit-btn"
+                                style="width:100%;"
+                            >
+                                <i class="bi bi-pencil me-1"></i>
+                                Edit
+                            </button>
+
+                        </form>
+
+
+                        <form
+                            method="post"
+                            id="confirmPaymentForm"
+                            style="flex:1;"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="confirm"
+                            >
+
+                            <button
+                                type="submit"
+                                id="confirmPaymentBtn"
+                                class="confirm-btn"
+                                style="width:100%;"
+                            >
+                                <i class="bi bi-check-circle me-1"></i>
+                                Confirm Payment
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    {% else %}
+
+        <!-- =================================================
+             STEP 1 - SELECT TRIP
+             ================================================= -->
+
+        <div class="trip-select-wrapper">
+
+            <div class="trip-select-card">
+
+                <label
+                    for="tripSelector"
+                    class="trip-label"
+                >
+                    Trip / Order
+                </label>
+
+                <select
+                    id="tripSelector"
+                    class="trip-select"
                 >
 
-                    <td>
-                        <div class="trip-number">
-                            {{ p.order.trip_number }}
-                        </div>
-                    </td>
+                    <option value="">
+                        Select Trip
+                    </option>
 
-                    <td>
-                        {{ p.order.customer.name|default:"-" }}
-                    </td>
+                    {% for order in orders %}
 
-                    <td class="amount">
-                        ₹{{ p.selling_amount|floatformat:2 }}
-                    </td>
-
-                    <td class="amount">
-                        ₹{{ p.received_amount|floatformat:2 }}
-                    </td>
-
-                    <td class="status-cell">
-
-                        {% if p.status == "Payment Cleared" %}
-
-                            <span class="status status-success">
-                                {{ p.status }}
-                            </span>
-
-                        {% elif p.status == "Part Amount Received" %}
-
-                            <span class="status status-info">
-                                {{ p.status }}
-                            </span>
-
-                        {% else %}
-
-                            <span class="status status-warning">
-                                {{ p.status }}
-                            </span>
-
+                    <option
+                        value="{{ order.pk }}"
+                        data-trip="{{ order.trip_number|default:'' }}"
+                        data-customer="{{ order.customer.name|default:'' }}"
+                        data-selling="{{ order.selling_amount|default:0 }}"
+                        data-advance="{{ order.customer_advance_amount|default:0 }}"
+                        {% if request.POST.order == order.pk|stringformat:"s" %}
+                            selected
                         {% endif %}
+                    >
+                        {{ order.trip_number }}
+                        -
+                        {{ order.customer.name|default:"-" }}
+                    </option>
 
-                    </td>
+                    {% endfor %}
 
-                    <td>
-                        {{ p.received_through|default:"-" }}
-                    </td>
+                </select>
 
-                    <td>
-                        {{ p.utr_details|default:"-" }}
-                    </td>
+            </div>
 
-                    <td>
-                        {{ p.received_at|date:"d/m/Y H:i" }}
-                    </td>
+        </div>
 
-                </tr>
 
-                {% endfor %}
+        <!-- =================================================
+             STEP 2 - PAYMENT FORM
+             ================================================= -->
 
-            </tbody>
+        <div
+            id="paymentStep"
+            class="payment-wrapper"
+            style="display:none;"
+        >
 
-        </table>
+            <div class="payment-card">
 
-    </div>
+                <div class="payment-header">
+                    Customer Payment
+                </div>
+
+
+                <div class="payment-body">
+
+                    <div class="customer-info">
+
+                        <div
+                            id="customerName"
+                            class="customer-name"
+                        >
+                            -
+                        </div>
+
+                        <div
+                            id="tripNumber"
+                            class="trip-number"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="selling-box">
+
+                        <span class="selling-label">
+                            Selling Amount
+                        </span>
+
+                        <strong
+                            id="sellingAmountDisplay"
+                            class="selling-value"
+                        >
+                            ₹0.00
+                        </strong>
+
+                    </div>
+
+
+                    <form
+                        method="post"
+                        id="paymentForm"
+                    >
+
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="order"
+                            id="orderInput"
+                        >
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="receivedAmount"
+                            >
+                                Amount
+                            </label>
+
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                name="received_amount"
+                                id="receivedAmount"
+                                class="form-control"
+                                placeholder="Enter amount"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="paymentDate"
+                            >
+                                Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="payment_date"
+                                id="paymentDate"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="accountType"
+                            >
+                                Account
+                            </label>
+
+                            <select
+                                name="account_type"
+                                id="accountType"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Account
+                                </option>
+
+                                <option value="ltd">
+                                    LTD
+                                </option>
+
+                                <option value="proprietor">
+                                    Proprietor
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="paymentAgainst"
+                            >
+                                Payment Against
+                            </label>
+
+                            <select
+                                name="payment_against"
+                                id="paymentAgainst"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Type
+                                </option>
+
+                                <option value="advance">
+                                    Advance
+                                </option>
+
+                                <option value="balance">
+                                    Balance
+                                </option>
+
+                                <option value="others">
+                                    Others
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="paymentMode"
+                            >
+                                Payment Mode
+                            </label>
+
+                            <select
+                                name="payment_mode"
+                                id="paymentMode"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Mode
+                                </option>
+
+                                <option value="CASH">
+                                    Cash
+                                </option>
+
+                                <option value="NEFT">
+                                    NEFT
+                                </option>
+
+                                <option value="RTGS">
+                                    RTGS
+                                </option>
+
+                                <option value="IMPS">
+                                    IMPS
+                                </option>
+
+                                <option value="UPI">
+                                    UPI
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="remarks"
+                            >
+                                Remarks
+                            </label>
+
+                            <textarea
+                                name="remarks"
+                                id="remarks"
+                                class="form-control"
+                                rows="1"
+                                placeholder="Enter remarks (optional)"
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-center mt-2">
+
+                            <button
+                                type="submit"
+                                class="continue-btn"
+                            >
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                Continue
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TRIP TRANSACTION HISTORY
+             ================================================= -->
+
+        <div
+            id="transactionSection"
+            class="transaction-card"
+            style="display:none;"
+        >
+
+            <div class="transaction-header">
+
+                <div>
+
+                    <div class="transaction-title">
+                        Trip Transaction History
+                    </div>
+
+                    <div
+                        id="transactionSubtitle"
+                        class="transaction-subtitle"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="transactionCount"
+                    class="transaction-count"
+                    style="display:none;"
+                ></div>
+
+            </div>
+
+
+            <div
+                id="transactionTableWrapper"
+                class="transaction-table-wrapper"
+                style="display:none;"
+            >
+
+                <table class="transaction-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Trip</th>
+                            <th>Customer</th>
+                            <th>Selling</th>
+                            <th>Received</th>
+                            <th>Status</th>
+                            <th>Mode</th>
+                            <th>UTR</th>
+                            <th>Received At</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for p in payments %}
+
+                        <tr
+                            class="transaction-row"
+                            data-order-id="{{ p.order_id }}"
+                            style="display:none;"
+                        >
+
+                            <td>
+                                {{ p.order.trip_number }}
+                            </td>
+
+                            <td>
+                                {{ p.order.customer.name|default:"-" }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.selling_amount|floatformat:2 }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ p.received_amount|floatformat:2 }}
+                            </td>
+
+                            <td>
+
+                                {% if p.status == "Payment Cleared" %}
+
+                                    <span class="status status-success">
+                                        Payment Cleared
+                                    </span>
+
+                                {% elif p.status == "Part Amount Received" %}
+
+                                    <span class="status status-info">
+                                        Part Amount Received
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-warning">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ p.received_through|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.utr_details|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ p.received_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div
+                id="noTransactionMessage"
+                class="no-transactions"
+                style="display:none;"
+            >
+
+                <i class="bi bi-receipt"></i>
+
+                <strong>
+                    No transactions found for this trip.
+                </strong>
+
+            </div>
+
+        </div>
+
+    {% endif %}
 
 </div>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const orderSelect =
-        document.getElementById("order");
+    /* =====================================================
+       ELEMENTS
+       ===================================================== */
 
-    const sellingAmount =
-        document.getElementById("selling_amount");
+    const tripSelector =
+        document.getElementById("tripSelector");
 
-    const receivedAmount =
-        document.getElementById("received_amount");
+    const paymentStep =
+        document.getElementById("paymentStep");
+
+    const orderInput =
+        document.getElementById("orderInput");
+
+    const customerName =
+        document.getElementById("customerName");
+
+    const tripNumber =
+        document.getElementById("tripNumber");
+
+    const sellingDisplay =
+        document.getElementById("sellingAmountDisplay");
+
+    const paymentDate =
+        document.getElementById("paymentDate");
 
     const transactionSection =
-        document.getElementById("tripTransactionSection");
+        document.getElementById("transactionSection");
 
-    const selectedTripLabel =
-        document.getElementById("selectedTripLabel");
+    const transactionSubtitle =
+        document.getElementById("transactionSubtitle");
 
     const transactionCount =
         document.getElementById("transactionCount");
-
-    const transactionRows =
-        document.querySelectorAll(".transaction-row");
-
-    const noTransactionRow =
-        document.getElementById("noTransactionRow");
-
-
-    if (!orderSelect) {
-        return;
-    }
-
-
-    // =====================================================
-    // AUTO FILL AMOUNTS
-    // =====================================================
-
-    function updateAmounts(preserveReceived = false) {
-
-        const selectedOption =
-            orderSelect.options[
-                orderSelect.selectedIndex
-            ];
-
-        if (
-            !selectedOption ||
-            !orderSelect.value
-        ) {
-
-            if (sellingAmount) {
-                sellingAmount.value = "";
-            }
-
-            if (
-                receivedAmount &&
-                !preserveReceived
-            ) {
-                receivedAmount.value = "";
-            }
-
-            return;
-        }
-
-
-        const sellingPrice =
-            selectedOption.dataset.sellingPrice || "";
-
-        if (sellingAmount) {
-            sellingAmount.value = sellingPrice;
-        }
-
-
-        if (
-            !preserveReceived &&
-            receivedAmount
-        ) {
-
-            const customerAdvance =
-                selectedOption.dataset.customerAdvance || "";
-
-            receivedAmount.value =
-                customerAdvance;
-        }
-    }
-
-
-    // =====================================================
-    // SHOW TRIP TRANSACTIONS
-    // =====================================================
-
-    function showTripTransactions() {
-
-    const orderId = orderSelect.value;
-
-    const transactionRows =
-        document.querySelectorAll(".transaction-row");
-
-    const transactionSection =
-        document.getElementById("tripTransactionSection");
 
     const transactionTableWrapper =
         document.getElementById("transactionTableWrapper");
@@ -1030,130 +1319,264 @@ document.addEventListener("DOMContentLoaded", function () {
     const noTransactionMessage =
         document.getElementById("noTransactionMessage");
 
-    const selectedTripLabel =
-        document.getElementById("selectedTripLabel");
-
-    const transactionCount =
-        document.getElementById("transactionCount");
+    const transactionRows =
+        document.querySelectorAll(".transaction-row");
 
 
-    // Nothing selected
-    if (!orderId) {
+    /* =====================================================
+       MONEY
+       ===================================================== */
 
-        transactionSection.style.display = "none";
+    function formatMoney(value) {
 
-        return;
+        const number =
+            parseFloat(value || 0);
+
+        return number.toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
     }
 
 
-    const selectedOption =
-        orderSelect.options[
-            orderSelect.selectedIndex
-        ];
+    /* =====================================================
+       HIDE PAYMENT
+       ===================================================== */
 
-    const tripNumber =
-        selectedOption.textContent.trim();
+    function hidePayment() {
+
+        if (paymentStep) {
+            paymentStep.style.display = "none";
+        }
+
+        if (transactionSection) {
+            transactionSection.style.display = "none";
+        }
+
+        if (transactionTableWrapper) {
+            transactionTableWrapper.style.display = "none";
+        }
+
+        if (noTransactionMessage) {
+            noTransactionMessage.style.display = "none";
+        }
+
+        if (transactionCount) {
+            transactionCount.style.display = "none";
+        }
+
+        transactionRows.forEach(function (row) {
+            row.style.display = "none";
+        });
+    }
 
 
-    let foundCount = 0;
+    /* =====================================================
+       SHOW SELECTED TRIP
+       ===================================================== */
+
+    function showSelectedTrip() {
+
+        if (!tripSelector) {
+            return;
+        }
+
+        const option =
+            tripSelector.options[
+                tripSelector.selectedIndex
+            ];
 
 
-    // -------------------------------------------------
-    // FILTER TRANSACTIONS
-    // -------------------------------------------------
+        if (!option || !option.value) {
 
-    transactionRows.forEach(function (row) {
+            hidePayment();
 
-        if (row.dataset.orderId === orderId) {
+            return;
+        }
 
-            row.style.display = "";
 
-            foundCount++;
+        const orderId =
+            option.value;
+
+        const trip =
+            option.dataset.trip || "-";
+
+        const customer =
+            option.dataset.customer || "-";
+
+        const selling =
+            option.dataset.selling || "0";
+
+
+        if (orderInput) {
+            orderInput.value = orderId;
+        }
+
+        if (customerName) {
+            customerName.textContent = customer;
+        }
+
+        if (tripNumber) {
+            tripNumber.textContent = trip;
+        }
+
+        if (sellingDisplay) {
+            sellingDisplay.textContent =
+                "₹" + formatMoney(selling);
+        }
+
+        if (paymentStep) {
+            paymentStep.style.display = "block";
+        }
+
+
+        /* ---------------------------------------------
+           TRANSACTION HISTORY
+           --------------------------------------------- */
+
+        let visibleCount = 0;
+
+        transactionRows.forEach(function (row) {
+
+            if (
+                String(row.dataset.orderId) ===
+                String(orderId)
+            ) {
+
+                row.style.display = "table-row";
+
+                visibleCount++;
+
+            } else {
+
+                row.style.display = "none";
+            }
+        });
+
+
+        if (!transactionSection) {
+            return;
+        }
+
+        transactionSection.style.display = "block";
+
+
+        if (transactionSubtitle) {
+
+            transactionSubtitle.textContent =
+                trip + " • " + customer;
+        }
+
+
+        if (visibleCount === 0) {
+
+            transactionTableWrapper.style.display =
+                "none";
+
+            transactionCount.style.display =
+                "none";
+
+            noTransactionMessage.style.display =
+                "block";
 
         } else {
 
-            row.style.display = "none";
+            transactionTableWrapper.style.display =
+                "block";
 
+            noTransactionMessage.style.display =
+                "none";
+
+            transactionCount.style.display =
+                "block";
+
+            transactionCount.textContent =
+                visibleCount +
+                (
+                    visibleCount === 1
+                        ? " Transaction"
+                        : " Transactions"
+                );
         }
-
-    });
-
-
-    transactionSection.style.display = "block";
-
-    selectedTripLabel.textContent =
-        tripNumber;
-
-
-    // -------------------------------------------------
-    // NO TRANSACTION
-    // -------------------------------------------------
-
-    if (foundCount === 0) {
-
-        transactionTableWrapper.style.display =
-            "none";
-
-        noTransactionMessage.style.display =
-            "block";
-
-        transactionCount.textContent =
-            "";
-
-        return;
     }
 
 
-    // -------------------------------------------------
-    // TRANSACTIONS AVAILABLE
-    // -------------------------------------------------
+    /* =====================================================
+       TRIP CHANGE
+       ===================================================== */
 
-    transactionTableWrapper.style.display =
-        "block";
+    if (tripSelector) {
 
-    noTransactionMessage.style.display =
-        "none";
-
-    transactionCount.textContent =
-        foundCount +
-        (
-            foundCount === 1
-                ? " Transaction"
-                : " Transactions"
+        tripSelector.addEventListener(
+            "change",
+            showSelectedTrip
         );
-}
-    // =====================================================
-    // TRIP CHANGE
-    // =====================================================
 
-    orderSelect.addEventListener(
-        "change",
-        function () {
-
-            updateAmounts(false);
-
-            showTripTransactions();
-
+        if (tripSelector.value) {
+            showSelectedTrip();
         }
-    );
+    }
 
 
-    // =====================================================
-    // INITIAL LOAD
-    // =====================================================
+    /* =====================================================
+       TODAY
+       ===================================================== */
 
-    if (orderSelect.value) {
+    if (paymentDate && !paymentDate.value) {
 
-        updateAmounts(true);
+        const today = new Date();
 
-        showTripTransactions();
+        const yyyy =
+            today.getFullYear();
 
-    } else {
+        const mm =
+            String(
+                today.getMonth() + 1
+            ).padStart(2, "0");
 
-        transactionSection.style.display =
-            "none";
+        const dd =
+            String(
+                today.getDate()
+            ).padStart(2, "0");
+
+        paymentDate.value =
+            yyyy + "-" + mm + "-" + dd;
+    }
+
+
+    /* =====================================================
+       CONFIRM BUTTON LOADING
+       ===================================================== */
+
+    const confirmForm =
+        document.getElementById(
+            "confirmPaymentForm"
+        );
+
+    const confirmButton =
+        document.getElementById(
+            "confirmPaymentBtn"
+        );
+
+    if (confirmForm && confirmButton) {
+
+        confirmForm.addEventListener(
+            "submit",
+            function () {
+
+                confirmButton.disabled = true;
+
+                confirmButton.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span>' +
+                    'Processing...';
+            }
+        );
     }
 
 });
 </script>
+
 {% endblock %}

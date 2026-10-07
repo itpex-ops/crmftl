@@ -632,6 +632,13 @@ class CustomerPayment(models.Model):
         auto_now_add=True,
     )
 
+    reference_number = models.CharField(
+    max_length=30,
+    unique=True,
+    blank=True,
+    null=True,
+)
+
     @property
     def status(self):
 
