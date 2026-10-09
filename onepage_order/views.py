@@ -1762,16 +1762,12 @@ def vehicle_payments(request):
         ),
     )
 
-
 # =============================================================
 # CUSTOMER PAYMENTS
 # =============================================================
-
 @login_required
 def customer_payments(request):
-
     search = request.GET.get("q", "").strip()
-
     orders = order_queryset()
 
     if search:
@@ -1786,27 +1782,15 @@ def customer_payments(request):
 
     payments = (
         CustomerPayment.objects
-        .select_related(
-            "order",
-            "order__customer",
-        )
-        .order_by(
-            "-received_at",
-            "-id",
-        )
+        .select_related("order", "order__customer")
+        .order_by("-received_at", "-id")
     )
 
-    # ======================================================
-    # SUCCESS
-    # ======================================================
-
     success_payment = request.session.pop(
-        "customer_payment_success",
-        None
+        "customer_payment_success", None
     )
 
     if success_payment:
-
         return render(
             request,
             "onepageorders/customer_payments.html",
@@ -1815,318 +1799,207 @@ def customer_payments(request):
                 "payments": payments,
                 "success_payment": success_payment,
                 "step": "success",
-            }
+            },
         )
-
-    # ======================================================
-    # CONFIRM PAYMENT
-    # ======================================================
 
     if request.method == "POST":
-
-        action = request.POST.get(
-            "action",
-            "review"
-        )
+        action = request.POST.get("action", "review").strip()
 
         # ==================================================
-        # CONFIRM
+        # CONFIRM PAYMENT — SAVE TO DATABASE
         # ==================================================
-
         if action == "confirm":
-
-            draft = request.session.get(
-                "customer_payment_draft"
-            )
+            draft = request.session.get("customer_payment_draft")
 
             if not draft:
-
                 messages.error(
                     request,
-                    "Payment session expired. Please enter the payment again."
+                    "Payment session expired. Please enter payment details again.",
                 )
-
-                return redirect(
-                    "customer_payments"
-                )
+                return redirect("customer_payments")
 
             try:
-
-                order = get_object_or_404(
-                    Order,
-                    pk=draft["order_id"]
-                )
-
-                received_amount = Decimal(
-                    draft["received_amount"]
-                )
-
-                selling_amount = Decimal(
-                    str(
-                        order.total_selling_amount or 0
-                    )
-                )
-
                 with transaction.atomic():
-
-                    payment = CustomerPayment.objects.create(
-
-                        order=order,
-
-                        selling_amount=selling_amount,
-
-                        received_amount=received_amount,
-
-                        payment_date=draft[
-                            "payment_date"
-                        ],
-
-                        account_type=draft[
-                            "account_type"
-                        ],
-
-                        payment_against=draft[
-                            "payment_against"
-                        ],
-
-                        received_through=draft[
-                            "payment_mode"
-                        ],
-
-                        remarks=draft.get(
-                            "remarks",
-                            ""
-                        ),
-
-                        reference_number=draft[
-                            "reference_number"
-                        ],
+                    order = get_object_or_404(
+                        Order.objects.select_related("customer"),
+                        pk=draft["order_id"],
                     )
 
-                # =========================================
-                # SUCCESS DATA
-                # =========================================
+                    received_amount = Decimal(
+                        str(draft["received_amount"])
+                    )
 
-                request.session[
-                    "customer_payment_success"
-                ] = {
+                    if not received_amount.is_finite() or received_amount <= 0:
+                        raise ValidationError(
+                            "Payment amount must be greater than zero."
+                        )
 
-                    "customer_name":
-                        (
-                            order.customer.name
-                            if order.customer
-                            else "-"
-                        ),
+                    selling_amount = Decimal(
+                        str(order.total_selling_amount or 0)
+                    )
 
-                    "trip_number":
-                        order.trip_number,
+                    reference_number = draft.get("reference_number", "")
+                    if not reference_number:
+                        raise ValidationError(
+                            "Payment reference is missing. Please review again."
+                        )
 
-                    "amount":
-                        str(
-                            payment.received_amount
-                        ),
+                    model_fields = {
+                        field.name
+                        for field in CustomerPayment._meta.concrete_fields
+                    }
 
-                    "against":
-                        dict(
-                            CustomerPayment
-                            .PAYMENT_AGAINST_CHOICES
-                        ).get(
-                            payment.payment_against,
-                            payment.payment_against
-                        ),
+                    # Required fields from your existing model
+                    payment_data = {
+                        "order": order,
+                        "selling_amount": selling_amount,
+                        "received_amount": received_amount,
+                        "received_through": draft["payment_mode"],
+                        "reference_number": reference_number,
+                    }
 
-                    "mode":
-                        dict(
-                            CustomerPayment
-                            .PAYMENT_MODE_CHOICES
-                        ).get(
-                            payment.received_through,
-                            payment.received_through
-                        ).lower(),
+                    # Save UTR independently from remarks
+                    if "utr_details" in model_fields:
+                        payment_data["utr_details"] = draft.get(
+                            "utr_details", ""
+                        )
 
-                    "reference_number":
-                        payment.reference_number,
+                    # Save these fields only if they exist in the model
+                    if "remarks" in model_fields:
+                        payment_data["remarks"] = draft.get("remarks", "")
+
+                    if "payment_date" in model_fields:
+                        payment_data["payment_date"] = datetime.strptime(
+                            draft["payment_date"], "%Y-%m-%d"
+                        ).date()
+
+                    if "account_type" in model_fields:
+                        payment_data["account_type"] = draft["account_type"]
+
+                    if "payment_against" in model_fields:
+                        payment_data["payment_against"] = draft[
+                            "payment_against"
+                        ]
+
+                    payment = CustomerPayment.objects.create(**payment_data)
+
+                against_labels = {
+                    "advance": "Advance",
+                    "balance": "Balance",
+                    "others": "Others",
                 }
 
-                # Clear temporary draft
-
-                request.session.pop(
-                    "customer_payment_draft",
-                    None
+                mode_labels = dict(
+                    getattr(CustomerPayment, "PAYMENT_MODES", [])
                 )
 
-                return redirect(
-                    "customer_payments"
-                )
+                request.session["customer_payment_success"] = {
+                    "customer_name": (
+                        order.customer.name if order.customer else "-"
+                    ),
+                    "trip_number": order.trip_number,
+                    "amount": str(payment.received_amount),
+                    "against": against_labels.get(
+                        draft.get("payment_against", ""), "-"
+                    ),
+                    "mode": mode_labels.get(
+                        payment.received_through,
+                        payment.received_through,
+                    ),
+                    "reference_number": payment.reference_number,
+                }
+
+                request.session.pop("customer_payment_draft", None)
+                return redirect("customer_payments")
+
+            except ValidationError as exc:
+                messages.error(request, str(exc))
+                return redirect("customer_payments")
 
             except Exception:
-
-                logger.exception(
-                    "Customer payment confirmation failed"
-                )
-
+                logger.exception("Customer payment confirmation failed")
                 messages.error(
                     request,
-                    "Unable to save customer payment."
+                    "Unable to save customer payment. Check the terminal for details.",
                 )
-
-                return redirect(
-                    "customer_payments"
-                )
+                return redirect("customer_payments")
 
         # ==================================================
-        # REVIEW
+        # REVIEW PAYMENT — NO DATABASE SAVE
         # ==================================================
-
         try:
-
-            order_id = request.POST.get(
-                "order",
-                ""
-            ).strip()
-
+            order_id = request.POST.get("order", "").strip()
             if not order_id:
-
-                raise ValidationError(
-                    "Please select a Trip."
-                )
+                raise ValidationError("Please select a Trip.")
 
             order = get_object_or_404(
-                Order,
-                pk=order_id
+                Order.objects.select_related("customer"),
+                pk=order_id,
             )
 
-            received_amount_raw = request.POST.get(
-                "received_amount",
-                ""
-            ).strip()
-
-            if not received_amount_raw:
-
-                raise ValidationError(
-                    "Please enter the payment amount."
-                )
+            amount_raw = request.POST.get("received_amount", "").strip()
+            if not amount_raw:
+                raise ValidationError("Please enter the payment amount.")
 
             try:
-
-                received_amount = Decimal(
-                    received_amount_raw
-                )
-
+                received_amount = Decimal(amount_raw)
             except InvalidOperation:
+                raise ValidationError("Please enter a valid payment amount.")
 
-                raise ValidationError(
-                    "Please enter a valid amount."
-                )
-
-            if received_amount <= 0:
-
+            if not received_amount.is_finite() or received_amount <= 0:
                 raise ValidationError(
                     "Payment amount must be greater than zero."
                 )
 
-            payment_date = request.POST.get(
-                "payment_date",
-                ""
-            ).strip()
-
+            payment_date = request.POST.get("payment_date", "").strip()
             if not payment_date:
+                raise ValidationError("Please select the payment date.")
 
-                raise ValidationError(
-                    "Please select the payment date."
-                )
+            try:
+                datetime.strptime(payment_date, "%Y-%m-%d")
+            except ValueError:
+                raise ValidationError("Please enter a valid payment date.")
 
-            account_type = request.POST.get(
-                "account_type",
-                ""
-            ).strip()
-
+            account_type = request.POST.get("account_type", "").strip()
             payment_against = request.POST.get(
-                "payment_against",
-                ""
+                "payment_against", ""
             ).strip()
-
             payment_mode = request.POST.get(
-                "payment_mode",
-                ""
+                "payment_mode", ""
             ).strip().upper()
 
-            remarks = request.POST.get(
-                "remarks",
-                ""
-            ).strip()
+            # Read these separately
+            utr_details = request.POST.get("utr_details", "").strip()
+            remarks = request.POST.get("remarks", "").strip()
 
-            if account_type not in {
-                "ltd",
-                "proprietor",
-            }:
+            if account_type not in {"ltd", "proprietor"}:
+                raise ValidationError("Please select Account.")
 
-                raise ValidationError(
-                    "Please select Account."
+            if payment_against not in {"advance", "balance", "others"}:
+                raise ValidationError("Please select Payment Against.")
+
+            valid_modes = {
+                value
+                for value, label in getattr(
+                    CustomerPayment, "PAYMENT_MODES", []
                 )
-
-            if payment_against not in {
-                "advance",
-                "balance",
-                "others",
-            }:
-
-                raise ValidationError(
-                    "Please select Payment Against."
-                )
-
-            if payment_mode not in {
-                "CASH",
-                "NEFT",
-                "RTGS",
-                "IMPS",
-                "UPI",
-            }:
-
-                raise ValidationError(
-                    "Please select Payment Mode."
-                )
-
-            # ==============================================
-            # GENERATE REFERENCE BEFORE CONFIRMATION
-            # ==============================================
-
-            reference_number = (
-                generate_customer_payment_reference()
-            )
-
-            # ==============================================
-            # STORE TEMPORARY PAYMENT
-            # ==============================================
-
-            request.session[
-                "customer_payment_draft"
-            ] = {
-
-                "order_id":
-                    order.pk,
-
-                "received_amount":
-                    str(received_amount),
-
-                "payment_date":
-                    payment_date,
-
-                "account_type":
-                    account_type,
-
-                "payment_against":
-                    payment_against,
-
-                "payment_mode":
-                    payment_mode,
-
-                "remarks":
-                    remarks,
-
-                "reference_number":
-                    reference_number,
             }
+            if payment_mode not in valid_modes:
+                raise ValidationError("Please select a valid Payment Mode.")
+
+            draft = {
+                "order_id": order.pk,
+                "received_amount": str(received_amount),
+                "payment_date": payment_date,
+                "account_type": account_type,
+                "payment_against": payment_against,
+                "payment_mode": payment_mode,
+                "utr_details": utr_details,
+                "remarks": remarks,
+                "reference_number": generate_customer_payment_reference(),
+            }
+
+            request.session["customer_payment_draft"] = draft
 
             return render(
                 request,
@@ -2135,32 +2008,23 @@ def customer_payments(request):
                     "orders": orders,
                     "payments": payments,
                     "step": "confirm",
-
-                    "draft": request.session[
-                        "customer_payment_draft"
-                    ],
-
+                    "draft": draft,
                     "selected_order": order,
-
-                    "customer_name":
-                        (
-                            order.customer.name
-                            if order.customer
-                            else "-"
-                        ),
-                }
+                    "customer_name": (
+                        order.customer.name if order.customer else "-"
+                    ),
+                },
             )
 
-        except ValidationError as e:
+        except ValidationError as exc:
+            messages.error(request, str(exc))
 
+        except Exception:
+            logger.exception("Customer payment review failed")
             messages.error(
                 request,
-                str(e)
+                "Unable to prepare payment confirmation. Check the terminal for details.",
             )
-
-    # ======================================================
-    # DEFAULT PAYMENT SCREEN
-    # ======================================================
 
     return render(
         request,
@@ -2169,8 +2033,10 @@ def customer_payments(request):
             "orders": orders,
             "payments": payments,
             "step": "payment",
-        }
+        },
     )
+
+
 
 # =============================================================
 # ADMIN MARGIN

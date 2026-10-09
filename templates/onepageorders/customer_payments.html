@@ -479,106 +479,141 @@
         white-space: nowrap;
     }
 
-    .transaction-table-wrapper {
-        overflow-x: auto;
+    
+.transaction-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.transaction-table {
+    width: 100%;
+    min-width: 1120px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 11px;
+}
+
+.transaction-table th,
+.transaction-table td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf0f3;
+}
+
+.transaction-table th {
+    background: #f8fafc;
+    color: #667085;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.transaction-table td {
+    color: #344054;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.transaction-table tbody tr:hover {
+    background: #f9fbff;
+}
+
+.transaction-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Consistent column widths */
+.transaction-table th:nth-child(1),
+.transaction-table td:nth-child(1) {
+    width: 10%;
+}
+
+.transaction-table th:nth-child(2),
+.transaction-table td:nth-child(2) {
+    width: 12%;
+}
+
+.transaction-table th:nth-child(3),
+.transaction-table td:nth-child(3),
+.transaction-table th:nth-child(4),
+.transaction-table td:nth-child(4) {
+    width: 11%;
+}
+
+.transaction-table th:nth-child(5),
+.transaction-table td:nth-child(5) {
+    width: 16%;
+}
+
+.transaction-table th:nth-child(6),
+.transaction-table td:nth-child(6) {
+    width: 8%;
+}
+
+.transaction-table th:nth-child(7),
+.transaction-table td:nth-child(7) {
+    width: 12%;
+}
+
+.transaction-table th:nth-child(8),
+.transaction-table td:nth-child(8) {
+    width: 12%;
+}
+
+.transaction-table th:nth-child(9),
+.transaction-table td:nth-child(9) {
+    width: 18%;
+}
+
+/* Amount columns */
+.transaction-table td:nth-child(3),
+.transaction-table td:nth-child(4) {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Status stays centered */
+.transaction-table td:nth-child(5) {
+    text-align: center;
+}
+
+.transaction-table .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 9px;
+    white-space: normal;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .transaction-card {
+        margin-top: 14px;
+        border-radius: 12px;
+    }
+
+    .transaction-header {
+        padding: 12px;
     }
 
     .transaction-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 10px;
+        min-width: 1120px;
     }
 
-    .transaction-table th {
-        padding: 10px 12px;
-        background: #fafbfc;
-        border-bottom: 1px solid #edf0f3;
-        color: #667085;
-        font-weight: 600;
-        text-align: left;
-        white-space: nowrap;
-    }
-
+    .transaction-table th,
     .transaction-table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #f0f2f5;
-        color: #344054;
-        white-space: nowrap;
+        padding: 10px 8px;
     }
+}
 
-    .transaction-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .amount {
-        color: #344054;
-        font-weight: 600;
-    }
-
-    .status {
-        display: inline-flex;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-size: 9px;
-        font-weight: 600;
-    }
-
-    .status-success {
-        background: #ecfdf3;
-        color: #027a48;
-    }
-
-    .status-info {
-        background: #eff8ff;
-        color: #175cd3;
-    }
-
-    .status-warning {
-        background: #fffaeb;
-        color: #b54708;
-    }
-
-    .no-transactions {
-        padding: 28px 18px;
-        text-align: center;
-        color: #8a9199;
-        font-size: 11px;
-    }
-
-    .no-transactions i {
-        display: block;
-        margin-bottom: 7px;
-        color: #c4c9d0;
-        font-size: 22px;
-    }
-
-    .no-transactions strong {
-        color: #667085;
-        font-weight: 600;
-    }
-
-    @media (max-width: 576px) {
-        .customer-payment-page {
-            padding: 8px 10px 25px;
-        }
-
-        .payment-wrapper,
-        .success-card {
-            max-width: 100%;
-        }
-
-        .confirm-actions {
-            flex-direction: column;
-        }
-
-        .edit-btn {
-            width: 100%;
-        }
-
-        .success-title {
-            font-size: 21px;
-        }
-    }
 </style>
 
 
@@ -593,8 +628,6 @@
         {% endfor %}
     </div>
     {% endif %}
-
-
     {% if step == "success" and success_payment %}
 
         <!-- =================================================
@@ -1167,20 +1200,21 @@
 
                 <table class="transaction-table">
 
-                    <thead>
+                    
+<thead>
+    <tr>
+        <th>Trip</th>
+        <th>Customer</th>
+        <th>Selling</th>
+        <th>Received</th>
+        <th>Status</th>
+        <th>Mode</th>
+        <th>UTR</th>
+        <th>Remarks</th>
+        <th>Received At</th>
+    </tr>
+</thead>
 
-                        <tr>
-                            <th>Trip</th>
-                            <th>Customer</th>
-                            <th>Selling</th>
-                            <th>Received</th>
-                            <th>Status</th>
-                            <th>Mode</th>
-                            <th>UTR</th>
-                            <th>Received At</th>
-                        </tr>
-
-                    </thead>
 
                     <tbody>
 
@@ -1234,11 +1268,15 @@
 
                             <td>
                                 {{ p.received_through|default:"-" }}
-                            </td>
-
+                            </td>   
                             <td>
                                 {{ p.utr_details|default:"-" }}
                             </td>
+
+                            <td>
+                                {{ p.remarks|default:"-" }}
+                            </td>
+
 
                             <td>
                                 {{ p.received_at|date:"d/m/Y H:i" }}
@@ -1253,8 +1291,6 @@
                 </table>
 
             </div>
-
-
             <div
                 id="noTransactionMessage"
                 class="no-transactions"
@@ -1274,8 +1310,6 @@
     {% endif %}
 
 </div>
-
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
