@@ -638,6 +638,9 @@ class CustomerPayment(models.Model):
     blank=True,
     null=True,
 )
+    remarks = models.TextField(
+        blank=True,
+    )
 
     @property
     def status(self):

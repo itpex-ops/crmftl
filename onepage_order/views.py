@@ -1969,7 +1969,7 @@ def customer_payments(request):
             ).strip().upper()
 
             # Read these separately
-            utr_details = request.POST.get("utr_details", "").strip()
+            #utr_details = request.POST.get("utr_details", "").strip()
             remarks = request.POST.get("remarks", "").strip()
 
             if account_type not in {"ltd", "proprietor"}:
@@ -1994,7 +1994,7 @@ def customer_payments(request):
                 "account_type": account_type,
                 "payment_against": payment_against,
                 "payment_mode": payment_mode,
-                "utr_details": utr_details,
+                #"utr_details": utr_details,
                 "remarks": remarks,
                 "reference_number": generate_customer_payment_reference(),
             }
