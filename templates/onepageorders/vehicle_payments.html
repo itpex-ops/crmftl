@@ -1,1029 +1,207 @@
+
 {% extends "layouts/base.html" %}
-
 {% block title %}Vehicle Payments{% endblock %}
-
 {% block content %}
 
 <style>
-
-
-
-/* =========================================================
-
-   PAGE
-
-   ========================================================= */
-
-
-
-.cpay-page {
-
-    width: 100%;
-
-    min-height: calc(100vh - 70px);
-
-    padding: 22px 28px 40px;
-
-    background: #f8f9fb;
-
-    box-sizing: border-box;
-
-    font-family: "Poppins", sans-serif;
-
-}
-
-
-
-/* =========================================================
-
-   HEADER
-
-   ========================================================= */
-
-
-
-.cpay-header {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 18px;
-
-}
-
-
-
-.cpay-title {
-
-    margin: 0;
-
-    color: #212529;
-
-    font-size: 22px;
-
-    font-weight: 600;
-
-}
-
-
-
-.cpay-subtitle {
-
-    margin: 4px 0 0;
-
-    color: #8a9199;
-
-    font-size: 11px;
-
-}
-
-
-
-/* =========================================================
-
-   MESSAGE
-
-   ========================================================= */
-
-
-
-.cpay-message {
-
-    margin-bottom: 15px;
-
-    padding: 10px 14px;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 6px;
-
-    background: #ffffff;
-
-    color: #495057;
-
-    font-size: 11px;
-
-}
-
-
-
-/* =========================================================
-
-   FORM CARD
-
-   ========================================================= */
-
-
-
-.cpay-form-card {
-
-    width: 100%;
-
-    margin-bottom: 18px;
-
-    padding: 18px;
-
-    background: #ffffff;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 8px;
-
-    box-sizing: border-box;
-
-}
-
-
-
-/* =========================================================
-
-   SEARCH
-
-   ========================================================= */
-
-
-
-.orders-toolbar {
-
-    width: 100%;
-
-    margin-bottom: 18px;
-
-}
-
-
-
-.orders-search {
-
-    display: flex;
-
-    width: 100%;
-
-    max-width: 520px;
-
-}
-
-
-
-.orders-search input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 42px;
-
-    padding: 0 13px;
-
-    border: 1px solid #dfe3e8;
-
-    border-right: none;
-
-    border-radius: 7px 0 0 7px;
-
-    background: #ffffff;
-
-    color: #343a40;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 12px;
-
-    outline: none;
-
-    box-sizing: border-box;
-
-}
-
-
-
-.orders-search input::placeholder {
-
-    color: #9aa0a6;
-
-}
-
-
-
-.orders-search input:focus {
-
-    border-color: #FDB81B;
-
-    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.10);
-
-}
-
-
-
-.orders-search button {
-
-    width: 90px;
-
-    height: 42px;
-
-    border: 1px solid #FDB81B;
-
-    border-radius: 0 7px 7px 0;
-
-    background: #FDB81B;
-
-    color: #212529;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 12px;
-
-    font-weight: 500;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-
-}
-
-
-
-.orders-search button:hover {
-
-    background: #e7a900;
-
-    color: #ffffff;
-
-}
-
-
-
-/* =========================================================
-
-   FORM GRID
-
-   ========================================================= */
-
-
-
-.cpay-form-grid {
-
-    display: grid;
-
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-
-    gap: 14px 18px;
-
-}
-
-
-
-/* =========================================================
-
-   FIELD
-
-   ========================================================= */
-
-
-
-.cpay-field {
-
-    min-width: 0;
-
-}
-
-
-
-.cpay-field label {
-
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: #495057;
-
-    font-size: 11px;
-
-    font-weight: 500;
-
-}
-
-
-
-.cpay-field input,
-
-.cpay-field select {
-
-    width: 100%;
-
-    height: 38px;
-
-    padding: 6px 9px;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 6px;
-
-    background: #ffffff;
-
-    color: #343a40;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-    outline: none;
-
-    box-sizing: border-box;
-
-    transition:
-
-        border-color 0.2s ease,
-
-        box-shadow 0.2s ease;
-
-}
-
-
-
-.cpay-field input:focus,
-
-.cpay-field select:focus {
-
-    border-color: #FDB81B;
-
-    box-shadow: 0 0 0 3px rgba(253, 184, 27, 0.12);
-
-}
-
-
-
-/* =========================================================
-
-   AUTO-FILLED AMOUNTS
-
-   ========================================================= */
-
-
-
-#selling_amount,
-
-#received_amount {
-
-    background: #f8f9fb;
-
-    font-weight: 600;
-
-}
-
-
-
-/* =========================================================
-
-   FORM ACTIONS
-
-   ========================================================= */
-
-
-
-.cpay-form-actions {
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    margin-top: 18px;
-
-}
-
-
-
-.cpay-save-btn {
-
-    min-width: 140px;
-
-    height: 38px;
-
-    padding: 0 18px;
-
-    border: 1px solid #0d6efd;
-
-    border-radius: 6px;
-
-    background: #0d6efd;
-
-    color: #ffffff;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-
-}
-
-
-
-.cpay-save-btn:hover {
-
-    background: #0b5ed7;
-
-    border-color: #0a58ca;
-
-}
-
-
-
-/* =========================================================
-
-   TABLE CARD
-
-   ========================================================= */
-
-
-
-.cpay-card {
-
-    width: 100%;
-
-    background: #ffffff;
-
-    border: 1px solid #dfe3e8;
-
-    border-radius: 8px;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-
-}
-
-
-
-.cpay-table-wrapper {
-
-    width: 100%;
-
-    overflow-x: auto;
-
-}
-
-
-
-/* =========================================================
-
-   TABLE
-
-   ========================================================= */
-
-
-
-.cpay-table {
-
-    width: 100%;
-
-    min-width: 950px;
-
-    margin: 0;
-
-    border-collapse: collapse;
-
-    table-layout: fixed;
-
-    font-family: "Poppins", sans-serif;
-
-    font-size: 11px;
-
-}
-
-
-
-/* =========================================================
-
-   COLUMN WIDTHS
-
-   ========================================================= */
-
-
-
-.cpay-table th:nth-child(1),
-
-.cpay-table td:nth-child(1) {
-
-    width: 12%;
-
-}
-
-
-
-.cpay-table th:nth-child(2),
-
-.cpay-table td:nth-child(2) {
-
-    width: 18%;
-
-}
-
-
-
-.cpay-table th:nth-child(3),
-
-.cpay-table td:nth-child(3) {
-
-    width: 12%;
-
-}
-
-
-
-.cpay-table th:nth-child(4),
-
-.cpay-table td:nth-child(4) {
-
-    width: 12%;
-
-}
-
-
-
-.cpay-table th:nth-child(5),
-
-.cpay-table td:nth-child(5) {
-
-    width: 16%;
-
-}
-
-
-
-.cpay-table th:nth-child(6),
-
-.cpay-table td:nth-child(6) {
-
-    width: 10%;
-
-}
-
-
-
-.cpay-table th:nth-child(7),
-
-.cpay-table td:nth-child(7) {
-
-    width: 10%;
-
-}
-
-
-
-.cpay-table th:nth-child(8),
-
-.cpay-table td:nth-child(8) {
-
-    width: 10%;
-
-}
-
-
-
-/* =========================================================
-
-   TABLE HEADER
-
-   ========================================================= */
-
-
-
-.cpay-table thead th {
-
-    height: 42px;
-
-    padding: 9px 12px;
-
-    background: #f3f4f6;
-
-    border-bottom: 1px solid #dfe3e8;
-
-    color: #343a40;
-
-    font-size: 10.5px;
-
-    font-weight: 600;
-
-    text-align: left;
-
-    vertical-align: middle;
-
-    white-space: nowrap;
-
-    box-sizing: border-box;
-
-}
-
-
-
-.cpay-table thead th.amount-header {
-
-    text-align: right;
-
-}
-
-
-
-/* =========================================================
-
-   TABLE BODY
-
-   ========================================================= */
-
-
-
-.cpay-table tbody td {
-
-    height: 43px;
-
-    padding: 9px 12px;
-
-    border-bottom: 1px solid #eef0f2;
-
-    color: #555e68;
-
-    text-align: left;
-
-    vertical-align: middle;
-
-    box-sizing: border-box;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-}
-
-
-
-.cpay-table tbody tr:last-child td {
-
-    border-bottom: none;
-
-}
-
-
-
-.cpay-table tbody tr:hover {
-
-    background: #fafafa;
-
-}
-
-
-
-/* =========================================================
-
-   TRIP
-
-   ========================================================= */
-
-
-
-.cpay-table .trip-number {
-
-    color: #212529;
-
-    font-weight: 600;
-
-}
-
-
-
-/* =========================================================
-
-   AMOUNT
-
-   ========================================================= */
-
-
-
-.cpay-table .amount {
-
-    color: #343a40;
-
-    font-weight: 600;
-
-    text-align: right;
-
-    white-space: nowrap;
-
-}
-
-
-
-/* =========================================================
-
-   STATUS
-
-   ========================================================= */
-
-
-
-.cpay-table .status-cell {
-
-    text-align: left;
-
-}
-
-
-
-.cpay-table .status {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    max-width: 100%;
-
-    padding: 4px 9px;
-
-    border-radius: 20px;
-
-    font-size: 9px;
-
-    font-weight: 600;
-
-    white-space: nowrap;
-
-    box-sizing: border-box;
-
-}
-
-
-
-.cpay-table .status-success {
-
-    background: #d1e7dd;
-
-    color: #0f5132;
-
-}
-
-
-
-.cpay-table .status-warning {
-
-    background: #fff3cd;
-
-    color: #856404;
-
-}
-
-
-
-.cpay-table .status-info {
-
-    background: #cff4fc;
-
-    color: #055160;
-
-}
-
-
-
-/* =========================================================
-
-   EMPTY
-
-   ========================================================= */
-
-
-
-.cpay-table .empty-row {
-
-    height: 100px;
-
-    padding: 30px 20px !important;
-
-    color: #8a9199 !important;
-
-    font-size: 11px;
-
-    text-align: center !important;
-
-}
-
-
-
-/* =========================================================
-
-   RESPONSIVE
-
-   ========================================================= */
-
-
-
-@media (max-width: 900px) {
-
-
-
-    .cpay-page {
-
-        padding: 18px 15px 30px;
-
-    }
-
-
-
-    .cpay-form-grid {
-
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    }
-
-
-
-    .cpay-table {
-
-        min-width: 900px;
-
-    }
-
-}
-
-
-
-@media (max-width: 600px) {
-
-
-
-    .cpay-form-grid {
-
-        grid-template-columns: 1fr;
-
-    }
-
-
-
-    .cpay-header {
-
-        align-items: flex-start;
-
-        gap: 10px;
-
-    }
-
-
-
-    .orders-search {
-
-        max-width: 100%;
-
-    }
-
-}
-
-
-
+.vehicle-page{padding:22px 28px 40px;background:#f4f6fb;min-height:calc(100vh - 70px);font-family:Poppins,sans-serif;color:#253047}
+.vehicle-heading{margin-bottom:18px}
+.vehicle-heading h1{font-size:22px;font-weight:600;margin:0}
+.vehicle-heading p{font-size:11px;color:#8791a2;margin:5px 0 0}
+.vehicle-card{background:#fff;border:1px solid #e5e9f1;border-radius:14px;padding:22px;box-shadow:0 5px 20px rgba(20,35,60,.04);margin-bottom:20px}
+.vehicle-card.narrow{max-width:600px;margin:0 auto 22px}
+.vehicle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.vehicle-field label{display:block;font-size:11px;font-weight:600;margin-bottom:6px}
+.vehicle-field input,.vehicle-field select{width:100%;height:42px;padding:0 12px;border:1px solid #d9e0eb;border-radius:9px;background:#fff;font:12px Poppins,sans-serif;box-sizing:border-box}
+.vehicle-field input:focus,.vehicle-field select:focus{outline:none;border-color:#8ba8ed;box-shadow:0 0 0 3px #eaf0ff}
+.vehicle-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.summary-item{background:#f8faff;border:1px solid #e6ebf4;border-radius:9px;padding:12px;min-width:0}
+.summary-item span{display:block;font-size:10px;color:#8590a2;margin-bottom:5px}
+.summary-item strong{font-size:12px;overflow-wrap:anywhere}
+.vehicle-actions{display:flex;justify-content:center;gap:10px;margin-top:22px}
+.vehicle-btn{display:inline-flex;justify-content:center;align-items:center;min-height:41px;padding:0 22px;border:0;border-radius:9px;background:linear-gradient(110deg,#ed3bb4,#f1cc29);color:#fff;font:600 12px Poppins,sans-serif;text-decoration:none;cursor:pointer}
+.vehicle-btn.secondary{background:#fff;border:1px solid #d9e0eb;color:#44516a}
+.vehicle-message{padding:12px 15px;margin-bottom:12px;border:1px solid #e2e7ef;background:#fff;border-radius:9px;font-size:12px}
+.vehicle-amount{font-size:32px;font-weight:700;color:#198754;text-align:center;margin:10px 0 22px}
+.vehicle-confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px;padding:17px;background:#f8faff;border-radius:10px;font-size:12px}
+.vehicle-confirm-grid span{display:block;font-size:10px;color:#8490a2;margin-bottom:5px}
+.vehicle-confirm-grid strong{overflow-wrap:anywhere}
+.vehicle-history{background:#fff;border:1px solid #e5e9f1;border-radius:14px;overflow:hidden;box-shadow:0 5px 20px rgba(20,35,60,.04)}
+.history-head{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #e9edf4}
+.history-title{font-size:14px;font-weight:600}
+.history-subtitle{font-size:10px;color:#8791a2;margin-top:4px}
+.history-count{font-size:10px;background:#f1f3f7;border-radius:20px;padding:7px 12px;white-space:nowrap}
+.vehicle-table-wrap{width:100%;overflow-x:auto}
+.vehicle-table{width:100%;min-width:850px;border-collapse:collapse;table-layout:fixed;font-size:11px}
+.vehicle-table th{background:#f8faff;color:#657188;font-size:10px;font-weight:600;white-space:nowrap}
+.vehicle-table th,.vehicle-table td{padding:13px 12px;border-bottom:1px solid #edf0f5;text-align:center;vertical-align:middle}
+.vehicle-table tbody tr:last-child td{border-bottom:0}
+.vehicle-table tbody tr:hover{background:#fafcff}
+.vehicle-table .amount{text-align:right;font-weight:600;white-space:nowrap}
+.vehicle-empty{display:none;padding:32px 15px;text-align:center;color:#8490a2;font-size:12px}
+@media(max-width:800px){.vehicle-page{padding:16px}.vehicle-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.vehicle-grid,.vehicle-confirm-grid{grid-template-columns:1fr}.vehicle-card{padding:16px}.history-head{padding:13px}.vehicle-heading h1{font-size:19px}}
 </style>
 
-<div class="cpay-page">
-
-    <div class="cpay-header">
-        <div>
-            <h1 class="cpay-title">Vehicle Payments</h1>
-            <p class="cpay-subtitle">Manage vehicle payments and trip-wise payment transactions.</p>
-        </div>
+<div class="vehicle-page">
+    <div class="vehicle-heading">
+        <h1>Vehicle Payments</h1>
+        <p>Manage vehicle payments and trip-wise payment transactions.</p>
     </div>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="cpay-message">{{ message }}</div>
+            <div class="vehicle-message">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
-    <div class="cpay-form-card">
+    {% if step == "payment" %}
+    <div class="vehicle-card">
         <form method="POST">
             {% csrf_token %}
+            <input type="hidden" name="action" value="review">
 
-            <div class="cpay-form-grid">
-
-                <div class="cpay-field">
+            <div class="vehicle-grid">
+                <div class="vehicle-field">
                     <label for="order">Trip / Order</label>
                     <select id="order" name="order" required>
                         <option value="">Select Trip</option>
                         {% for order in orders %}
-                            <option
-                                value="{{ order.pk }}"
-                                data-vehicle="{{ order.vehicle_number|default:'' }}"
-                                data-trip="{{ order.trip_number|default:'' }}"
-                                data-total="{{ order.vehicle_balance_amount|default:'0' }}"
-                                data-advance="{{ order.vehicle_advance_amount|default:'0' }}"
-                                {% if request.POST.order == order.pk|stringformat:"s" %}selected{% endif %}
-                            >
-                                {{ order.trip_number }} - {{ order.origin }} → {{ order.destination }}
-                            </option>
+                        <option value="{{ order.pk }}"
+                            data-trip="{{ order.trip_number|default:'' }}"
+                            data-vehicle="{{ order.vehicle_number|default:'' }}"
+                            data-advance="{{ order.vehicle_advance_amount|default:'0' }}"
+                            data-balance="{{ order.vehicle_balance_amount|default:'0' }}">
+                            {{ order.trip_number }} - {{ order.origin }} → {{ order.destination }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <div class="cpay-field">
+                <div class="vehicle-field">
                     <label for="vehicle_number">Vehicle Number</label>
-                    <input
-                        type="text"
-                        id="vehicle_number"
-                        name="vehicle_number"
-                        value="{{ request.POST.vehicle_number|default:'' }}"
-                        placeholder="Auto-filled"
-                        readonly
-                    >
+                    <input id="vehicle_number" name="vehicle_number" placeholder="Auto-filled" readonly required>
                 </div>
 
-                <div class="cpay-field">
+                <div class="vehicle-field">
                     <label for="payment_type">Payment Type</label>
                     <select id="payment_type" name="payment_type" required>
                         <option value="">Select Type</option>
-                        <option value="Advance" {% if request.POST.payment_type == "Advance" %}selected{% endif %}>Advance</option>
-                        <option value="Balance" {% if request.POST.payment_type == "Balance" %}selected{% endif %}>Balance</option>
-                        <option value="Others" {% if request.POST.payment_type == "Others" %}selected{% endif %}>Others</option>
+                        <option value="Advance">Advance</option>
+                        <option value="Balance">Balance</option>
+                        <option value="Others">Others</option>
                     </select>
                 </div>
 
-                <div class="cpay-field">
-                    <label for="amount">Amount</label>
-                    <input
-                        type="number"
-                        id="amount"
-                        name="amount"
-                        step="0.01"
-                        min="0"
-                        value="{{ request.POST.amount|default:'' }}"
-                        placeholder="Enter amount"
-                        required
-                    >
+                <div class="vehicle-field">
+                    <label for="amount">Amount (₹)</label>
+                    <input id="amount" name="amount" type="number" step="0.01" min="0.01" placeholder="Enter amount" required>
                 </div>
 
-                <div class="cpay-field">
-                    <label for="transaction_reference">Transaction Reference</label>
-                    <input
-                        type="text"
-                        id="transaction_reference"
-                        name="transaction_reference"
-                        value="{{ request.POST.transaction_reference|default:'' }}"
-                        placeholder="UTR / transaction ID"
-                    >
-                </div>
+                <!-- <div class="vehicle-field" style="grid-column:1/-1">
+    <label for="transaction_reference">
+        UTR / Transaction Reference
+    </label>
 
+    <input
+        type="text"
+        id="transaction_reference"
+        name="transaction_reference"
+        value=""
+        placeholder="Generated automatically after Continue"
+        readonly
+    >
+    <small style="color:#8791a2;font-size:10px">
+        Your internal payment reference is generated automatically.
+    </small>
+</div> -->
             </div>
 
-            <div class="vehicle-payment-summary" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px;margin-top:18px;">
-                <div class="payment-summary-item" style="padding:11px 13px;border:1px solid #dfe3e8;border-radius:6px;background:#f8f9fb;">
-                    <span style="display:block;color:#8a9199;font-size:10px;margin-bottom:4px;">Trip</span>
-                    <strong id="auto_trip" style="font-size:12px;color:#212529;">—</strong>
-                </div>
-                <div class="payment-summary-item" style="padding:11px 13px;border:1px solid #dfe3e8;border-radius:6px;background:#f8f9fb;">
-                    <span style="display:block;color:#8a9199;font-size:10px;margin-bottom:4px;">Vehicle</span>
-                    <strong id="auto_vehicle" style="font-size:12px;color:#212529;">—</strong>
-                </div>
-                <div class="payment-summary-item" style="padding:11px 13px;border:1px solid #dfe3e8;border-radius:6px;background:#f8f9fb;">
-                    <span style="display:block;color:#8a9199;font-size:10px;margin-bottom:4px;">Advance Paid</span>
-                    <strong id="auto_advance" style="font-size:12px;color:#212529;">₹0.00</strong>
-                </div>
-                <div class="payment-summary-item" style="padding:11px 13px;border:1px solid #dfe3e8;border-radius:6px;background:#f8f9fb;">
-                    <span style="display:block;color:#8a9199;font-size:10px;margin-bottom:4px;">Balance</span>
-                    <strong id="auto_balance" style="font-size:12px;color:#212529;">₹0.00</strong>
-                </div>
+            <div class="vehicle-summary">
+                <div class="summary-item"><span>Trip</span><strong id="auto_trip">—</strong></div>
+                <div class="summary-item"><span>Vehicle</span><strong id="auto_vehicle">—</strong></div>
+                <div class="summary-item"><span>Advance Paid</span><strong id="auto_advance">₹0.00</strong></div>
+                <div class="summary-item"><span>Balance</span><strong id="auto_balance">₹0.00</strong></div>
             </div>
 
-            <div class="cpay-form-actions">
-                <button type="submit" class="cpay-save-btn">
-                    <i class="bi bi-receipt me-1"></i>
-                    Make Payment
-                </button>
+            <div class="vehicle-actions">
+                <button type="submit" class="vehicle-btn">Continue →</button>
             </div>
         </form>
     </div>
 
-    <div id="tripTransactionSection" class="cpay-card" style="display:none;margin-top:18px;">
-        <div style="padding:14px 16px;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-                <div style="font-size:14px;font-weight:600;color:#212529;">Trip Transaction History</div>
-                <div id="selectedTripLabel" style="margin-top:3px;font-size:10px;color:#8a9199;"></div>
-            </div>
-            <div id="transactionCount" style="font-size:10px;font-weight:600;background:#f3f4f6;padding:5px 10px;border-radius:20px;color:#495057;display:none;"></div>
+    {% elif step == "confirm" %}
+    <div class="vehicle-card narrow">
+        <div style="text-align:center">
+            <div style="font-size:10px;font-weight:700;color:#7186ba;letter-spacing:1px">PAYMENT REVIEW</div>
+            <h2 style="font-size:21px;margin:8px 0">Confirm Vehicle Payment</h2>
+            <p style="font-size:11px;color:#8791a2">Please verify the details before confirming.</p>
         </div>
 
-        <div id="noTransactionMessage" style="display:none;padding:32px 20px;text-align:center;color:#8a9199;font-size:11px;">
+        <div class="vehicle-amount">₹{{ draft.amount }}</div>
+
+        <div class="vehicle-confirm-grid">
+            <div><span>Trip</span><strong>{{ draft.trip_number }}</strong></div>
+            <div><span>Customer</span><strong>{{ draft.customer_name }}</strong></div>
+            <div><span>Vehicle Number</span><strong>{{ draft.vehicle_number }}</strong></div>
+            <div><span>Payment Type</span><strong>{{ draft.payment_type }}</strong></div>
+            <div style="grid-column:1/-1"><span>Transaction Reference</span><strong>{{ draft.transaction_reference|default:"-" }}</strong></div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="confirm">
+            <div class="vehicle-actions">
+                <a class="vehicle-btn secondary" href="{% url 'vehicle_payments' %}">Cancel</a>
+                <button class="vehicle-btn" type="submit">✓ Confirm Payment</button>
+            </div>
+        </form>
+    </div>
+
+    {% elif step == "success" %}
+    <div class="vehicle-card narrow" style="text-align:center">
+        <div style="width:62px;height:62px;border-radius:50%;background:#d9f5e5;color:#16834b;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 15px">✓</div>
+        <h2 style="font-size:21px;color:#16834b;margin:0">Payment Saved Successfully</h2>
+        <p style="font-size:11px;color:#8791a2">The vehicle payment has been recorded.</p>
+        <div class="vehicle-amount">₹{{ success_payment.amount }}</div>
+
+        <div class="vehicle-confirm-grid" style="text-align:left">
+            <div><span>Trip</span><strong>{{ success_payment.trip_number }}</strong></div>
+            <div><span>Customer</span><strong>{{ success_payment.customer_name }}</strong></div>
+            <div><span>Vehicle</span><strong>{{ success_payment.vehicle_number }}</strong></div>
+            <div><span>Payment Type</span><strong>{{ success_payment.payment_type }}</strong></div>
+            <div><span>Transaction Reference</span><strong>{{ success_payment.transaction_reference }}</strong></div>
+            <div ><span>Paid At</span><strong>{{ success_payment.paid_at }}</strong></div>
+        </div>
+
+        <div class="vehicle-actions">
+            <a href="{% url 'vehicle_payments' %}" class="vehicle-btn">New Payment</a>
+        </div>
+    </div>
+    {% endif %}
+
+    
+{% if step == "payment" %}
+    <div class="vehicle-history">
+        <div class="history-head">
+            <div>
+                <div class="history-title">Trip Transaction History</div>
+                <div class="history-subtitle" id="selectedTripLabel">
+                    Select a trip to view transactions
+                </div>
+            </div>
+
+            <div class="history-count" id="transactionCount"
+                 style="display:none"></div>
+        </div>
+
+        <div class="vehicle-empty" id="noTransactionMessage">
             No transactions found for this trip.
         </div>
 
-        <div class="cpay-table-wrapper" id="transactionTableWrapper">
-            <table class="cpay-table" id="transactionTable">
+        <div class="vehicle-table-wrap" id="transactionTableWrapper"
+             style="display:none">
+            <table class="vehicle-table">
                 <thead>
                     <tr>
                         <th>Paid Date</th>
@@ -1031,24 +209,35 @@
                         <th>Vehicle</th>
                         <th>Payment Type</th>
                         <th>Transaction Reference</th>
-                        <th class="amount-header">Amount</th>
+                        <th>Amount</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for payment in payments %}
-                    <tr class="transaction-row" data-order-id="{{ payment.order_id }}" style="display:none;">
-                        <td>{{ payment.paid_at|date:"d/m/Y" }} <small style="color:#8a9199;">{{ payment.paid_at|date:"h:i A" }}</small></td>
-                        <td><div class="trip-number">{{ payment.order.trip_number }}</div></td>
+                    <tr class="transaction-row"
+                        data-order-id="{{ payment.order_id }}"
+                        style="display:none">
+                        <td>
+                            {{ payment.paid_at|date:"d/m/Y h:i A" }}
+                        </td>
+                        <td>{{ payment.order.trip_number }}</td>
                         <td>{{ payment.vehicle_number|default:"-" }}</td>
                         <td>{{ payment.payment_type|default:"-" }}</td>
-                        <td title="{{ payment.transaction_reference|default:'-' }}">{{ payment.transaction_reference|default:"-" }}</td>
-                        <td class="amount">₹{{ payment.amount|floatformat:2 }}</td>
+                        <td>
+                            {{ payment.transaction_reference|default:"-" }}
+                        </td>
+                        <td class="amount">
+                            ₹{{ payment.amount|floatformat:2 }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+{% endif %}
+
 </div>
 
 <script>
@@ -1057,67 +246,54 @@ document.addEventListener("DOMContentLoaded", function () {
     const vehicleInput = document.getElementById("vehicle_number");
     const paymentType = document.getElementById("payment_type");
     const amountInput = document.getElementById("amount");
+
     const tripDisplay = document.getElementById("auto_trip");
     const vehicleDisplay = document.getElementById("auto_vehicle");
     const advanceDisplay = document.getElementById("auto_advance");
     const balanceDisplay = document.getElementById("auto_balance");
 
-    const transactionSection = document.getElementById("tripTransactionSection");
-    const selectedTripLabel = document.getElementById("selectedTripLabel");
-    const transactionCount = document.getElementById("transactionCount");
-    const transactionRows = document.querySelectorAll(".transaction-row");
-    const noTransactionMessage = document.getElementById("noTransactionMessage");
-    const transactionTableWrapper = document.getElementById("transactionTableWrapper");
-
-    if (!orderSelect) return;
+    const historyLabel = document.getElementById("selectedTripLabel");
+    const historyCount = document.getElementById("transactionCount");
+    const historyRows = document.querySelectorAll(".transaction-row");
+    const emptyMessage = document.getElementById("noTransactionMessage");
+    const tableWrapper = document.getElementById("transactionTableWrapper");
 
     function money(value) {
-        const number = parseFloat(value || 0);
-        return "₹" + number.toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
-    }
-
-    function hideTransactions() {
-        transactionSection.style.display = "none";
-        transactionRows.forEach(row => row.style.display = "none");
-        transactionTableWrapper.style.display = "none";
-        noTransactionMessage.style.display = "none";
-        transactionCount.style.display = "none";
-        transactionCount.textContent = "";
-        selectedTripLabel.textContent = "";
+        const number = Number.parseFloat(value || 0);
+        return "₹" + number.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 
     function showTransactions(orderId, trip, vehicle) {
-        if (!orderId) { hideTransactions(); return; }
-
         let count = 0;
-        transactionRows.forEach(function (row) {
-            if (String(row.dataset.orderId) === String(orderId)) {
-                row.style.display = "table-row";
-                count++;
-            } else {
-                row.style.display = "none";
-            }
+
+        historyRows.forEach(function (row) {
+            const match = orderId && String(row.dataset.orderId) === String(orderId);
+            row.style.display = match ? "table-row" : "none";
+            if (match) count++;
         });
 
-        transactionSection.style.display = "block";
-        selectedTripLabel.textContent = trip + (vehicle ? " • " + vehicle : "");
+        historyLabel.textContent = orderId
+            ? trip + (vehicle ? " • " + vehicle : "")
+            : "Select a trip to view transactions";
 
-        if (count === 0) {
-            transactionTableWrapper.style.display = "none";
-            transactionCount.style.display = "none";
-            noTransactionMessage.style.display = "block";
-            return;
-        }
+        historyCount.style.display = count ? "block" : "none";
+        historyCount.textContent = count + (count === 1 ? " Transaction" : " Transactions");
 
-        transactionTableWrapper.style.display = "block";
-        noTransactionMessage.style.display = "none";
-        transactionCount.style.display = "block";
-        transactionCount.textContent = count + (count === 1 ? " Transaction" : " Transactions");
+        tableWrapper.style.display = count ? "block" : "none";
+        emptyMessage.style.display = orderId && count === 0 ? "block" : "none";
+    }
+
+    if (!orderSelect) {
+        return;
     }
 
     function loadOrderData() {
-        const selected = orderSelect.options[orderSelect.selectedIndex];
-        if (!selected || !selected.value) {
+        const option = orderSelect.options[orderSelect.selectedIndex];
+
+        if (!option || !option.value) {
             vehicleInput.value = "";
             tripDisplay.textContent = "—";
             vehicleDisplay.textContent = "—";
@@ -1125,14 +301,14 @@ document.addEventListener("DOMContentLoaded", function () {
             balanceDisplay.textContent = "₹0.00";
             if (paymentType) paymentType.value = "";
             if (amountInput) amountInput.value = "";
-            hideTransactions();
+            showTransactions("", "", "");
             return;
         }
 
-        const trip = selected.dataset.trip || "—";
-        const vehicle = selected.dataset.vehicle || "";
-        const advance = parseFloat(selected.dataset.advance || "0");
-        const balance = parseFloat(selected.dataset.total || "0");
+        const trip = option.dataset.trip || "—";
+        const vehicle = option.dataset.vehicle || "";
+        const advance = Number.parseFloat(option.dataset.advance || 0);
+        const balance = Number.parseFloat(option.dataset.balance || 0);
 
         vehicleInput.value = vehicle;
         tripDisplay.textContent = trip;
@@ -1140,22 +316,26 @@ document.addEventListener("DOMContentLoaded", function () {
         advanceDisplay.textContent = money(advance);
         balanceDisplay.textContent = money(balance);
 
-        if (paymentType && paymentType.value === "Balance") {
-            amountInput.value = balance > 0 ? balance.toFixed(2) : "";
-        }
-
-        showTransactions(selected.value, trip, vehicle);
+        showTransactions(option.value, trip, vehicle);
     }
 
-    paymentType.addEventListener("change", function () {
-        const selected = orderSelect.options[orderSelect.selectedIndex];
-        if (!selected || !selected.value) return;
-        const balance = parseFloat(selected.dataset.total || "0");
-        const advance = parseFloat(selected.dataset.advance || "0");
-        if (paymentType.value === "Balance") amountInput.value = balance > 0 ? balance.toFixed(2) : "";
-        else if (paymentType.value === "Advance") amountInput.value = advance > 0 ? advance.toFixed(2) : "";
-        else amountInput.value = "";
-    });
+    if (paymentType) {
+        paymentType.addEventListener("change", function () {
+            const option = orderSelect.options[orderSelect.selectedIndex];
+            if (!option || !option.value) return;
+
+            const advance = Number.parseFloat(option.dataset.advance || 0);
+            const balance = Number.parseFloat(option.dataset.balance || 0);
+
+            if (paymentType.value === "Advance") {
+                amountInput.value = advance > 0 ? advance.toFixed(2) : "";
+            } else if (paymentType.value === "Balance") {
+                amountInput.value = balance > 0 ? balance.toFixed(2) : "";
+            } else {
+                amountInput.value = "";
+            }
+        });
+    }
 
     orderSelect.addEventListener("change", loadOrderData);
     loadOrderData();
@@ -1163,4 +343,3 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 {% endblock %}
-

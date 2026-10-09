@@ -1563,8 +1563,6 @@ from django.shortcuts import render
 from django.db.models import Count, Q
 
 from .models import TrackingSession
-
-
 @login_required
 def tracking_dashboard(request):
 
@@ -1618,11 +1616,10 @@ def tracking_dashboard(request):
 # VEHICLE PAYMENTS
 # =============================================================
 
+
 @login_required
 def vehicle_payments(request):
-
     search = request.GET.get("q", "").strip()
-
     orders = order_queryset()
 
     if search:
@@ -1637,130 +1634,191 @@ def vehicle_payments(request):
 
     payments = (
         VehiclePayment.objects
-        .select_related(
-            "order",
-            "order__customer",
-        )
-        .order_by(
-            "-paid_at",
-            "-id",
-        )
+        .select_related("order", "order__customer")
+        .order_by("-paid_at", "-id")
     )
 
+    # Success screen: show once, then clear it.
+    success_payment = request.session.pop(
+        "vehicle_payment_success", None
+    )
+
+    if success_payment:
+        return render(
+            request,
+            "onepageorders/vehicle_payments.html",
+            {
+                **payment_page_context(orders, payments),
+                "step": "success",
+                "success_payment": success_payment,
+            },
+        )
+
     if request.method == "POST":
+        action = request.POST.get("action", "review").strip()
 
-        try:
-            pk = get_post_value(
-                request,
-                "order",
-            )
+        # --------------------------------------------------
+        # CONFIRM: the only action that saves a payment
+        # --------------------------------------------------
+        if action == "confirm":
+            draft = request.session.get("vehicle_payment_draft")
 
-            vehicle_number = get_post_value(
-                request,
-                "vehicle_number",
-            ).upper()
-
-            payment_type = get_post_value(
-                request,
-                "payment_type",
-            )
-
-            amount_value = get_post_value(
-                request,
-                "amount",
-            )
-
-            transaction_reference = get_post_value(
-                request,
-                "transaction_reference",
-            )
-
-            if not pk:
-                raise ValidationError(
-                    "Please select a Trip / Order."
+            if not draft:
+                messages.error(
+                    request,
+                    "Payment session expired. Please enter the details again.",
                 )
+                return redirect("vehicle_payments")
+
+            try:
+                with transaction.atomic():
+                    order = get_object_or_404(
+                        Order.objects.select_related("customer"),
+                        pk=draft["order_id"],
+                    )
+
+                    amount = Decimal(str(draft["amount"]))
+
+                    if not amount.is_finite() or amount <= 0:
+                        raise ValidationError(
+                            "Payment amount must be greater than zero."
+                        )
+
+                    payment = VehiclePayment.objects.create(
+                        order=order,
+                        vehicle_number=draft["vehicle_number"],
+                        payment_type=draft["payment_type"],
+                        amount=amount,
+                        transaction_reference=draft.get(
+                            "transaction_reference", ""
+                        ),
+                    )
+
+                request.session["vehicle_payment_success"] = {
+                    "trip_number": order.trip_number,
+                    "customer_name": (
+                        order.customer.name if order.customer else "-"
+                    ),
+                    "vehicle_number": payment.vehicle_number,
+                    "payment_type": payment.payment_type,
+                    "amount": str(payment.amount),
+                    "transaction_reference": (
+                        payment.transaction_reference or "-"
+                    ),
+                    "paid_at": payment.paid_at.strftime(
+                        "%d/%m/%Y %I:%M %p"
+                    ),
+                }
+
+                request.session.pop("vehicle_payment_draft", None)
+                return redirect("vehicle_payments")
+
+            except ValidationError as exc:
+                messages.error(request, str(exc))
+                return redirect("vehicle_payments")
+
+            except Exception:
+                logger.exception("Vehicle payment confirmation failed")
+                messages.error(
+                    request,
+                    "Unable to save vehicle payment. Check the terminal logs.",
+                )
+                return redirect("vehicle_payments")
+
+        # --------------------------------------------------
+        # REVIEW: validate and store in session only
+        # --------------------------------------------------
+        try:
+            order_id = request.POST.get("order", "").strip()
+            vehicle_number = request.POST.get(
+                "vehicle_number", ""
+            ).strip().upper()
+            payment_type = request.POST.get(
+                "payment_type", ""
+            ).strip()
+            amount_raw = request.POST.get("amount", "").strip()
+            transaction_reference = request.POST.get(
+                "transaction_reference", ""
+            ).strip()
+
+            if not order_id:
+                raise ValidationError("Please select a Trip / Order.")
 
             order = get_object_or_404(
-                Order,
-                pk=pk,
+                Order.objects.select_related("customer"),
+                pk=order_id,
             )
 
             if not vehicle_number:
-                raise ValidationError(
-                    "Vehicle Number is required."
-                )
+                raise ValidationError("Vehicle Number is required.")
 
-            valid_payment_types = {
-                "Advance",
-                "Balance",
-                "Others",
-            }
+            if payment_type not in {"Advance", "Balance", "Others"}:
+                raise ValidationError("Please select a valid Payment Type.")
 
-            if payment_type not in valid_payment_types:
-                raise ValidationError(
-                    "Please select a valid Payment Type."
-                )
+            try:
+                amount = Decimal(amount_raw)
+            except (InvalidOperation, ValueError):
+                raise ValidationError("Please enter a valid payment amount.")
 
-            amount = to_decimal(
-                amount_value,
-                "0.00",
-            )
-
-            if amount <= 0:
+            if not amount.is_finite() or amount <= 0:
                 raise ValidationError(
                     "Payment amount must be greater than zero."
                 )
 
-            with transaction.atomic():
-                payment = VehiclePayment.objects.create(
-                    order=order,
-                    vehicle_number=vehicle_number,
-                    payment_type=payment_type,
-                    amount=amount,
-                    transaction_reference=(
-                        transaction_reference
-                    ),
-                )
+            transaction_reference = generate_vehicle_payment_reference()
 
-            messages.success(
-                request,
-                (
-                    f"Vehicle payment of "
-                    f"₹{payment.amount:,.2f} "
-                    "saved successfully."
+            draft = {
+                "order_id": order.pk,
+                "trip_number": order.trip_number,
+                "customer_name": (
+                    order.customer.name if order.customer else "-"
                 ),
-            )
+                "vehicle_number": vehicle_number,
+                "payment_type": payment_type,
+                "amount": str(amount),
+                "transaction_reference": transaction_reference,
+            }
 
-            return redirect(
-                "vehicle_payments"
-            )
+            request.session["vehicle_payment_draft"] = draft
 
-        except ValidationError as e:
-
-            messages.error(
+            return render(
                 request,
-                str(e),
+                "onepageorders/vehicle_payments.html",
+                {
+                    **payment_page_context(orders, payments),
+                    "step": "confirm",
+                    "draft": draft,
+                    "selected_order": order,
+                },
             )
+
+        except ValidationError as exc:
+            messages.error(request, str(exc))
 
         except Exception:
-
-            logger.exception(
-                "Unexpected vehicle payment error"
-            )
-
+            logger.exception("Vehicle payment review failed")
             messages.error(
                 request,
-                "Unable to save vehicle payment.",
+                "Unable to prepare payment confirmation. Check the terminal logs.",
             )
 
     return render(
         request,
         "onepageorders/vehicle_payments.html",
-        payment_page_context(
-            orders,
-            payments,
-        ),
+        {
+            **payment_page_context(orders, payments),
+            "step": "payment",
+        },
     )
+import secrets
+from django.utils import timezone
+
+def generate_vehicle_payment_reference():
+    timestamp = timezone.localtime().strftime("%Y%m%d%H%M%S")
+    suffix = secrets.token_hex(3).upper()
+
+    return f"VEP{timestamp}{suffix}"
+
 
 # =============================================================
 # CUSTOMER PAYMENTS
