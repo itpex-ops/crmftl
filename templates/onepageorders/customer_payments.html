@@ -457,7 +457,59 @@
         </div>
     </section>
 
-   
+    <!-- {% elif step == "confirm" and draft %}
+    <section class="cpay-card">
+        <div class="cpay-body">
+            <p class="cpay-muted" style="text-align:center;letter-spacing:1.5px;">PAYMENT REVIEW</p>
+            <h2 style="text-align:center;font-size:22px;">Confirm Customer Payment</h2>
+            <p class="cpay-muted" style="text-align:center;">Please verify the details before confirming.</p>
+            <div class="cpay-amount">₹{{ draft.received_amount|floatformat:2 }}</div>
+
+            <div class="cpay-summary">
+                <div class="cpay-summary-row">
+                    <span>Customer</span><strong>{{ customer_name|default:"-" }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Trip</span><strong>{{ selected_order.trip_number }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Account</span><strong>{{ draft.account_type|title }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Payment Against</span><strong>{{ draft.payment_against|title }}</strong>
+                </div>
+                {% if draft.payment_against == "others" %}
+                <div class="cpay-summary-row">
+                    <span>Others Limit</span>
+                    <strong>₹{{ draft.others_limit|floatformat:2 }}</strong>
+                </div>
+                {% endif %}
+                <div class="cpay-summary-row">
+                    <span>Payment Mode</span><strong>{{ draft.payment_mode }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Date</span><strong>{{ draft.payment_date }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>UTR / Reference</span><strong>{{ draft.reference_number }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Remarks</span><strong>{{ draft.remarks|default:"-" }}</strong>
+                </div>
+            </div>
+
+            <div class="cpay-actions">
+                <a href="{% url 'customer_payments' %}" class="btn cpay-btn cpay-btn-secondary">Cancel</a>
+                <form method="post" action="{% url 'customer_payments' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="confirm">
+                    <button class="cpay-btn" type="submit">✓ Confirm Payment</button>
+                </form>
+            </div>
+        </div>
+    </section> -->
+
+    {% else %}
     <section class="cpay-card">
         <div class="cpay-header">
             <h2>Customer Payment</h2>
