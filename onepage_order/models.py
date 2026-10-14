@@ -543,7 +543,7 @@ class Order(models.Model):
 # ============================================================
 
 class VehiclePayment(models.Model):
-
+    
     PAYMENT_TYPES = [
         ("Advance", "Advance"),
         ("Balance", "Balance"),
@@ -579,6 +579,12 @@ class VehiclePayment(models.Model):
         auto_now_add=True,
     )
 
+    others_limit = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+
     def __str__(self):
         return (
             f"{self.order.trip_number} - "
@@ -591,6 +597,12 @@ class VehiclePayment(models.Model):
 # ============================================================
 
 class CustomerPayment(models.Model):
+
+    PAYMENT_AGAINST_CHOICES = [
+        ("advance", "Advance"),
+        ("balance", "Balance"),
+        ("others", "Others"),
+    ]
 
     PAYMENT_MODES = [
         ("RTGS", "RTGS"),
@@ -617,49 +629,65 @@ class CustomerPayment(models.Model):
         default=Decimal("0.00"),
     )
 
+    payment_against = models.CharField(
+        max_length=20,
+        choices=PAYMENT_AGAINST_CHOICES,
+        default="balance",
+    )
+
+    others_limit = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+
     received_through = models.CharField(
         max_length=20,
         choices=PAYMENT_MODES,
         blank=True,
     )
 
+    # Actual bank UTR
     utr_details = models.CharField(
         max_length=150,
         blank=True,
     )
 
-    received_at = models.DateTimeField(
-        auto_now_add=True,
+    # Internal CRM reference
+    reference_number = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        null=True,
     )
 
-    reference_number = models.CharField(
-    max_length=30,
-    unique=True,
-    blank=True,
-    null=True,
-)
-    remarks = models.TextField(
-        blank=True,
-    )
+    remarks = models.TextField(blank=True)
+
+    received_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def status(self):
+        from django.db.models import Sum
 
-        if self.received_amount <= 0:
-            return "Pending"
-
-        if self.received_amount >= self.selling_amount:
-            return "Payment Cleared"
-
-        return "Part Amount Received"
-
-    def __str__(self):
-        return (
-            f"{self.order.trip_number} - "
-            "Customer Payment"
+        total_received = (
+            self.order.customer_payments.aggregate(
+                total=Sum("received_amount")
+            )["total"]
+            or Decimal("0.00")
         )
 
+        total_selling = self.order.total_selling_amount or Decimal("0.00")
 
+        if total_received >= total_selling and total_selling > 0:
+            return "Payment Cleared"
+
+        if total_received > 0:
+            return "Part Amount Received"
+
+        return "Pending"
+
+    def __str__(self):
+        return f"{self.order.trip_number} - Customer Payment"
 
 # ============================================================
 # TRACKING SESSION

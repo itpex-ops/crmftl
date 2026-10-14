@@ -38,6 +38,173 @@ logger = logging.getLogger(__name__)
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 import random
+from decimal import Decimal, InvalidOperation
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Sum
+
+ZERO = Decimal("0.00")
+
+
+def payment_sum(queryset, field_name):
+    return queryset.aggregate(
+        total=Sum(field_name)
+    )["total"] or ZERO
+
+
+def get_customer_payment_limits(order):
+    payments = CustomerPayment.objects.filter(order=order)
+
+    advance_paid = payment_sum(
+        payments.filter(payment_against="advance"),
+        "received_amount",
+    )
+    balance_paid = payment_sum(
+        payments.filter(payment_against="balance"),
+        "received_amount",
+    )
+    others_paid = payment_sum(
+        payments.filter(payment_against="others"),
+        "received_amount",
+    )
+    total_received = payment_sum(payments, "received_amount")
+
+    existing_limit = payments.filter(
+        payment_against="others"
+    ).order_by("id").values_list("others_limit", flat=True).first()
+
+    return {
+        "total_limit": Decimal(str(order.total_selling_amount or 0)),
+        "total_received": total_received,
+        "advance_limit": Decimal(str(order.customer_advance_amount or 0)),
+        "advance_paid": advance_paid,
+        "advance_remaining": max(
+            Decimal(str(order.customer_advance_amount or 0)) - advance_paid,
+            ZERO,
+        ),
+        "balance_limit": Decimal(str(order.customer_balance_amount or 0)),
+        "balance_paid": balance_paid,
+        "balance_remaining": max(
+            Decimal(str(order.customer_balance_amount or 0)) - balance_paid,
+            ZERO,
+        ),
+        "others_limit": existing_limit,
+        "others_paid": others_paid,
+        "others_remaining": (
+            max(Decimal(str(existing_limit)) - others_paid, ZERO)
+            if existing_limit is not None else None
+        ),
+        "total_remaining": max(
+            Decimal(str(order.total_selling_amount or 0)) - total_received,
+            ZERO,
+        ),
+    }
+
+def get_vehicle_payment_limits(order):
+    payments = VehiclePayment.objects.filter(order=order)
+
+    advance_paid = payment_sum(
+        payments.filter(payment_type="Advance"), "amount"
+    )
+    balance_paid = payment_sum(
+        payments.filter(payment_type="Balance"), "amount"
+    )
+    others_paid = payment_sum(
+        payments.filter(payment_type="Others"), "amount"
+    )
+    total_paid = payment_sum(payments, "amount")
+
+    existing_limit = payments.filter(
+        payment_type="Others"
+    ).order_by("id").values_list("others_limit", flat=True).first()
+
+    return {
+        "total_limit": Decimal(str(order.total_trip_cost or 0)),
+        "total_paid": total_paid,
+        "advance_limit": Decimal(str(order.vehicle_advance_amount or 0)),
+        "advance_paid": advance_paid,
+        "advance_remaining": max(
+            Decimal(str(order.vehicle_advance_amount or 0)) - advance_paid,
+            ZERO,
+        ),
+        "balance_limit": Decimal(str(order.vehicle_balance_amount or 0)),
+        "balance_paid": balance_paid,
+        "balance_remaining": max(
+            Decimal(str(order.vehicle_balance_amount or 0)) - balance_paid,
+            ZERO,
+        ),
+        "others_limit": existing_limit,
+        "others_paid": others_paid,
+        "others_remaining": (
+            max(Decimal(str(existing_limit)) - others_paid, ZERO)
+            if existing_limit is not None else None
+        ),
+        "total_remaining": max(
+            Decimal(str(order.total_trip_cost or 0)) - total_paid,
+            ZERO,
+        ),
+    }
+
+# def validate_payment_amount(amount, category, limits, entered_others_limit=None):
+#     if not amount.is_finite() or amount <= ZERO:
+#         raise ValidationError("Payment amount must be greater than zero.")
+
+#     if limits["total_remaining"] <= ZERO:
+#         raise ValidationError("The total payable amount has already been paid.")
+
+#     if amount > limits["total_remaining"]:
+#         raise ValidationError(
+#             f"Payment exceeds the remaining total of "
+#             f"₹{limits['total_remaining']:,.2f}."
+#         )
+
+#     if category == "advance":
+#         remaining = limits["advance_remaining"]
+
+#     elif category == "balance":
+#         remaining = limits["balance_remaining"]
+
+#     elif category == "others":
+#         current_limit = limits["others_limit"]
+
+#         if current_limit is None:
+#             if entered_others_limit is None or entered_others_limit <= ZERO:
+#                 raise ValidationError(
+#                     "Enter a separate Others limit greater than zero."
+#                 )
+#             current_limit = entered_others_limit
+#         elif (
+#             entered_others_limit is not None
+#             and entered_others_limit != current_limit
+#         ):
+#             raise ValidationError(
+#                 f"This trip already has an Others limit of "
+#                 f"₹{current_limit:,.2f}. The limit cannot be changed here."
+#             )
+
+#         remaining = max(current_limit - limits["others_paid"], ZERO)
+
+#     else:
+#         raise ValidationError("Please select a valid payment category.")
+
+#     if remaining <= ZERO:
+#         raise ValidationError(
+#             f"No amount remains for {category.title()} payments."
+#         )
+
+#     if amount > remaining:
+#         raise ValidationError(
+#             f"Amount exceeds the remaining {category.title()} limit "
+#             f"of ₹{remaining:,.2f}."
+#         )
+
+#     return (
+#         limits["others_limit"]
+#         if category == "others" and limits["others_limit"] is not None
+#         else entered_others_limit
+#         if category == "others"
+#         else ZERO
+#     )
 
 def generate_customer_payment_reference():
     now = datetime.now()
@@ -1825,6 +1992,14 @@ def generate_vehicle_payment_reference():
 # =============================================================
 @login_required
 def customer_payments(request):
+    from decimal import Decimal, InvalidOperation
+    from django.db import transaction
+    from django.db.models import Q, Sum
+    from django.core.exceptions import ValidationError
+    from django.contrib import messages
+    from django.shortcuts import get_object_or_404, redirect, render
+    from datetime import datetime
+
     search = request.GET.get("q", "").strip()
     orders = order_queryset()
 
@@ -1860,12 +2035,12 @@ def customer_payments(request):
             },
         )
 
+    # ---------------------------------------------------------
+    # CONFIRM PAYMENT — validate again and save
+    # ---------------------------------------------------------
     if request.method == "POST":
         action = request.POST.get("action", "review").strip()
 
-        # ==================================================
-        # CONFIRM PAYMENT — SAVE TO DATABASE
-        # ==================================================
         if action == "confirm":
             draft = request.session.get("customer_payment_draft")
 
@@ -1879,22 +2054,56 @@ def customer_payments(request):
             try:
                 with transaction.atomic():
                     order = get_object_or_404(
-                        Order.objects.select_related("customer"),
+                        Order.objects.select_for_update().select_related(
+                            "customer"
+                        ),
                         pk=draft["order_id"],
                     )
+
+                    total_selling = Decimal(
+                        str(order.total_selling_amount or "0.00")
+                    )
+
+                    total_received = (
+                        CustomerPayment.objects
+                        .filter(order=order)
+                        .aggregate(total=Sum("received_amount"))["total"]
+                        or Decimal("0.00")
+                    )
+
+                    outstanding = max(
+                        Decimal("0.00"),
+                        total_selling - total_received,
+                    )
+
+                    if outstanding <= 0:
+                        request.session.pop(
+                            "customer_payment_draft", None
+                        )
+                        messages.error(
+                            request,
+                            f"Payment is already cleared for "
+                            f"{order.trip_number}. No further payment is allowed.",
+                        )
+                        return redirect("customer_payments")
 
                     received_amount = Decimal(
                         str(draft["received_amount"])
                     )
 
-                    if not received_amount.is_finite() or received_amount <= 0:
+                    if (
+                        not received_amount.is_finite()
+                        or received_amount <= 0
+                    ):
                         raise ValidationError(
                             "Payment amount must be greater than zero."
                         )
 
-                    selling_amount = Decimal(
-                        str(order.total_selling_amount or 0)
-                    )
+                    if received_amount > outstanding:
+                        raise ValidationError(
+                            f"Payment exceeds the outstanding amount. "
+                            f"Maximum payable: ₹{outstanding:,.2f}."
+                        )
 
                     reference_number = draft.get("reference_number", "")
                     if not reference_number:
@@ -1902,30 +2111,26 @@ def customer_payments(request):
                             "Payment reference is missing. Please review again."
                         )
 
+                    payment_data = {
+                        "order": order,
+                        "selling_amount": total_selling,
+                        "received_amount": received_amount,
+                        "received_through": draft["payment_mode"],
+                        "reference_number": reference_number,
+                        "payment_against": draft["payment_against"],
+                        "others_limit": Decimal(
+                            str(draft.get("others_limit") or "0.00")
+                        ),
+                        "utr_details": draft.get("utr_details", ""),
+                        "remarks": draft.get("remarks", ""),
+                    }
+
                     model_fields = {
                         field.name
                         for field in CustomerPayment._meta.concrete_fields
                     }
 
-                    # Required fields from your existing model
-                    payment_data = {
-                        "order": order,
-                        "selling_amount": selling_amount,
-                        "received_amount": received_amount,
-                        "received_through": draft["payment_mode"],
-                        "reference_number": reference_number,
-                    }
-
-                    # Save UTR independently from remarks
-                    if "utr_details" in model_fields:
-                        payment_data["utr_details"] = draft.get(
-                            "utr_details", ""
-                        )
-
-                    # Save these fields only if they exist in the model
-                    if "remarks" in model_fields:
-                        payment_data["remarks"] = draft.get("remarks", "")
-
+                    # Keep compatibility with optional fields in this project.
                     if "payment_date" in model_fields:
                         payment_data["payment_date"] = datetime.strptime(
                             draft["payment_date"], "%Y-%m-%d"
@@ -1934,66 +2139,95 @@ def customer_payments(request):
                     if "account_type" in model_fields:
                         payment_data["account_type"] = draft["account_type"]
 
-                    if "payment_against" in model_fields:
-                        payment_data["payment_against"] = draft[
-                            "payment_against"
-                        ]
-
                     payment = CustomerPayment.objects.create(**payment_data)
 
-                against_labels = {
-                    "advance": "Advance",
-                    "balance": "Balance",
-                    "others": "Others",
-                }
+                    total_after_payment = total_received + received_amount
+                    remaining_after_payment = max(
+                        Decimal("0.00"),
+                        total_selling - total_after_payment,
+                    )
 
-                mode_labels = dict(
-                    getattr(CustomerPayment, "PAYMENT_MODES", [])
-                )
+                    against_labels = {
+                        "advance": "Advance",
+                        "balance": "Balance",
+                        "others": "Others",
+                    }
+                    mode_labels = dict(
+                        getattr(CustomerPayment, "PAYMENT_MODES", [])
+                    )
 
-                request.session["customer_payment_success"] = {
-                    "customer_name": (
-                        order.customer.name if order.customer else "-"
-                    ),
-                    "trip_number": order.trip_number,
-                    "amount": str(payment.received_amount),
-                    "against": against_labels.get(
-                        draft.get("payment_against", ""), "-"
-                    ),
-                    "mode": mode_labels.get(
-                        payment.received_through,
-                        payment.received_through,
-                    ),
-                    "reference_number": payment.reference_number,
-                }
+                    request.session["customer_payment_success"] = {
+                        "customer_name": (
+                            order.customer.name if order.customer else "-"
+                        ),
+                        "trip_number": order.trip_number,
+                        "amount": str(payment.received_amount),
+                        "against": against_labels.get(
+                            draft.get("payment_against", ""), "-"
+                        ),
+                        "mode": mode_labels.get(
+                            payment.received_through,
+                            payment.received_through,
+                        ),
+                        "reference_number": payment.reference_number,
+                        "outstanding": str(remaining_after_payment),
+                        "status": (
+                            "Payment Cleared"
+                            if remaining_after_payment == 0
+                            else "Part Amount Received"
+                        ),
+                    }
 
-                request.session.pop("customer_payment_draft", None)
+                    request.session.pop("customer_payment_draft", None)
+
                 return redirect("customer_payments")
 
             except ValidationError as exc:
-                messages.error(request, str(exc))
+                messages.error(request, " ".join(exc.messages))
                 return redirect("customer_payments")
 
             except Exception:
                 logger.exception("Customer payment confirmation failed")
                 messages.error(
                     request,
-                    "Unable to save customer payment. Check the terminal for details.",
+                    "Unable to save customer payment. Check the server log.",
                 )
                 return redirect("customer_payments")
 
-        # ==================================================
-        # REVIEW PAYMENT — NO DATABASE SAVE
-        # ==================================================
+        # -----------------------------------------------------
+        # REVIEW PAYMENT — do not save yet
+        # -----------------------------------------------------
         try:
             order_id = request.POST.get("order", "").strip()
             if not order_id:
-                raise ValidationError("Please select a Trip.")
+                raise ValidationError("Please select a trip.")
 
             order = get_object_or_404(
                 Order.objects.select_related("customer"),
                 pk=order_id,
             )
+
+            total_selling = Decimal(
+                str(order.total_selling_amount or "0.00")
+            )
+
+            total_received = (
+                CustomerPayment.objects
+                .filter(order=order)
+                .aggregate(total=Sum("received_amount"))["total"]
+                or Decimal("0.00")
+            )
+
+            outstanding = max(
+                Decimal("0.00"),
+                total_selling - total_received,
+            )
+
+            if outstanding <= 0:
+                raise ValidationError(
+                    f"Payment is already cleared for {order.trip_number}. "
+                    "No further payment is allowed."
+                )
 
             amount_raw = request.POST.get("received_amount", "").strip()
             if not amount_raw:
@@ -2007,6 +2241,12 @@ def customer_payments(request):
             if not received_amount.is_finite() or received_amount <= 0:
                 raise ValidationError(
                     "Payment amount must be greater than zero."
+                )
+
+            if received_amount > outstanding:
+                raise ValidationError(
+                    f"Payment exceeds the outstanding amount. "
+                    f"Maximum payable: ₹{outstanding:,.2f}."
                 )
 
             payment_date = request.POST.get("payment_date", "").strip()
@@ -2026,12 +2266,11 @@ def customer_payments(request):
                 "payment_mode", ""
             ).strip().upper()
 
-            # Read these separately
-            #utr_details = request.POST.get("utr_details", "").strip()
+            utr_details = request.POST.get("utr_details", "").strip()
             remarks = request.POST.get("remarks", "").strip()
 
             if account_type not in {"ltd", "proprietor"}:
-                raise ValidationError("Please select Account.")
+                raise ValidationError("Please select an account.")
 
             if payment_against not in {"advance", "balance", "others"}:
                 raise ValidationError("Please select Payment Against.")
@@ -2043,7 +2282,32 @@ def customer_payments(request):
                 )
             }
             if payment_mode not in valid_modes:
-                raise ValidationError("Please select a valid Payment Mode.")
+                raise ValidationError("Please select a valid payment mode.")
+
+            others_limit = Decimal("0.00")
+            if payment_against == "others":
+                raw_limit = request.POST.get("others_limit", "").strip()
+                if not raw_limit:
+                    raise ValidationError(
+                        "Please enter the Others payment limit."
+                    )
+                try:
+                    others_limit = Decimal(raw_limit)
+                except InvalidOperation:
+                    raise ValidationError(
+                        "Please enter a valid Others payment limit."
+                    )
+
+                if not others_limit.is_finite() or others_limit <= 0:
+                    raise ValidationError(
+                        "Others payment limit must be greater than zero."
+                    )
+
+                # The Others limit cannot override the trip's total outstanding.
+                if received_amount > min(outstanding, others_limit):
+                    raise ValidationError(
+                        "Payment exceeds the Others limit or outstanding amount."
+                    )
 
             draft = {
                 "order_id": order.pk,
@@ -2052,8 +2316,9 @@ def customer_payments(request):
                 "account_type": account_type,
                 "payment_against": payment_against,
                 "payment_mode": payment_mode,
-                #"utr_details": utr_details,
+                "utr_details": utr_details,
                 "remarks": remarks,
+                "others_limit": str(others_limit),
                 "reference_number": generate_customer_payment_reference(),
             }
 
@@ -2075,13 +2340,13 @@ def customer_payments(request):
             )
 
         except ValidationError as exc:
-            messages.error(request, str(exc))
+            messages.error(request, " ".join(exc.messages))
 
         except Exception:
             logger.exception("Customer payment review failed")
             messages.error(
                 request,
-                "Unable to prepare payment confirmation. Check the terminal for details.",
+                "Unable to prepare payment confirmation. Check the server log.",
             )
 
     return render(
@@ -2093,7 +2358,6 @@ def customer_payments(request):
             "step": "payment",
         },
     )
-
 
 
 # =============================================================

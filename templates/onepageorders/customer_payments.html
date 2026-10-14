@@ -1,1616 +1,857 @@
-{% extends "layouts/base.html" %}
 
-{% block title %}Customer Payment{% endblock %}
+{% extends "layouts/base.html" %}
+{% load static %}
 
 {% block content %}
 
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
 
 <style>
-    body {
-        background: #f4f6fb;
-    }
-
-    .customer-payment-page {
-        min-height: calc(100vh - 60px);
-        padding: 12px 14px 35px;
-    }
-
-    .payment-alerts {
-        max-width: 520px;
-        margin: 0 auto 10px;
-    }
-
-    .payment-alerts .alert {
-        font-size: 11px;
-        padding: 8px 12px;
-        border-radius: 9px;
-        margin-bottom: 7px;
-    }
-
-    /* =========================================================
-       COMMON CARD
-       ========================================================= */
-
-    .payment-wrapper {
-        width: 100%;
-        max-width: 380px;
-        margin: 0 auto;
-    }
-
-    .payment-card,
-    .confirmation-card,
-    .success-card {
-        background: #fff;
-        border: none;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 5px 18px rgba(16, 24, 40, .08);
-    }
-
-    /* =========================================================
-       STEP 1 - TRIP SELECTION
-       ========================================================= */
-
-    .trip-select-wrapper {
-        width: 100%;
-        max-width: 520px;
-        margin: 0 auto 14px;
-    }
-
-    .trip-select-card {
-        background: #fff;
-        border-radius: 14px;
-        padding: 13px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-    }
-
-    .trip-label {
-        display: block;
-        margin-bottom: 5px;
-        color: #344054;
-        font-size: 11px;
-        font-weight: 600;
-    }
-
-    .trip-select {
-        width: 100%;
-        height: 38px;
-        padding: 0 11px;
-        border: 1px solid #d9dee7;
-        border-radius: 10px;
-        background: #fff;
-        color: #344054;
-        font-size: 11px;
-        outline: none;
-    }
-
-    .trip-select:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 3px rgba(25, 135, 84, .08);
-    }
-
-    /* =========================================================
-       STEP 2 - PAYMENT FORM
-       ========================================================= */
-
-    .payment-header {
-        background: linear-gradient(135deg, #9EEA34, #EADB34);
-        color: #fff;
-        text-align: center;
-        padding: 9px 8px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .payment-body {
-        padding: 16px;
-    }
-
-    .customer-info {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-
-    .customer-name {
-        color: #212529;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .trip-number {
-        margin-top: 2px;
-        color: #6c757d;
-        font-size: 12px;
-    }
-
-    .selling-box {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 13px;
-        padding: 8px 10px;
-        border: 1px solid #edf0f3;
-        border-radius: 9px;
-        background: #f8fafc;
-    }
-
-    .selling-label {
-        color: #667085;
-        font-size: 10px;
-    }
-
-    .selling-value {
-        color: #654321;
-        font-size: 11px;
-        font-weight: 600;
-    }
-
-    .form-group {
-        margin-bottom: 7px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 4px;
-        color: #344054;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .form-control,
-    .form-select {
-        width: 100%;
-        height: 36px;
-        border: 1px solid #d9dee7;
-        border-radius: 10px;
-        font-size: 11px;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #198754;
-        box-shadow: none;
-    }
-
-    textarea.form-control {
-        height: auto;
-        min-height: 46px;
-        resize: vertical;
-    }
-
-    .continue-btn {
-        width: 50%;
-        min-width: 150px;
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #EC32C1, #EADB34);
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all .25s ease;
-    }
-
-    .continue-btn:hover {
-        color: #fff;
-        opacity: .95;
-        transform: translateY(-1px);
-    }
-
-    /* =========================================================
-       STEP 3 - CONFIRMATION
-       ========================================================= */
-
-    .confirmation-header {
-        background: linear-gradient(135deg, #198c53, #28a745);
-        color: #fff;
-        text-align: center;
-        padding: 10px 8px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .confirmation-body {
-        padding: 17px 13px 13px;
-    }
-
-    .confirm-customer {
-        text-align: center;
-        margin-bottom: 9px;
-    }
-
-    .confirm-customer-name {
-        color: #172033;
-        font-size: 18px;
-        font-weight: 500;
-        line-height: 1.25;
-    }
-
-    .confirm-trip {
-        margin-top: 4px;
-        color: #667085;
-        font-size: 11px;
-    }
-
-    .confirm-amount {
-        text-align: center;
-        margin-bottom: 18px;
-    }
-
-    .confirm-amount-value {
-        color: #198c53;
-        font-size: 27px;
-        font-weight: 700;
-        line-height: 1.1;
-    }
-
-    .confirm-details {
-        margin-bottom: 22px;
-        padding: 9px 12px;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        background: #f8f9fa;
-    }
-
-    .confirm-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        min-height: 29px;
-        color: #344054;
-        font-size: 11px;
-    }
-
-    .confirm-row span {
-        color: #667085;
-    }
-
-    .confirm-row strong {
-        color: #172033;
-        font-weight: 500;
-        text-align: right;
-    }
-
-    .reference-label {
-        margin-bottom: 5px;
-        color: #344054;
-        font-size: 11px;
-        font-weight: 500;
-    }
-
-    .reference-box {
-        display: flex;
-        align-items: center;
-        min-height: 48px;
-        margin-bottom: 18px;
-        padding: 0 13px;
-        border: 1px solid #d9dee7;
-        border-radius: 11px;
-        background: #f8fafc;
-        color: #344054;
-        font-size: 12px;
-        word-break: break-all;
-    }
-
-    .confirm-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .edit-btn,
-    .confirm-btn {
-        height: 43px;
-        border: none;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .edit-btn {
-        width: 34%;
-        background: #f2f4f7;
-        color: #344054;
-    }
-
-    .confirm-btn {
-        flex: 1;
-        background: #198c53;
-        color: #fff;
-    }
-
-    .confirm-btn:hover {
-        background: #157347;
-        color: #fff;
-    }
-
-    /* =========================================================
-       STEP 4 - SUCCESS
-       ========================================================= */
-
-    .success-card {
-        max-width: 525px;
-        margin: 20px auto 0;
-        padding: 28px 12px 13px;
-    }
-
-    .success-icon {
-        width: 88px;
-        height: 88px;
-        margin: 0 auto 17px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: #28a745;
-        color: #fff;
-        font-size: 48px;
-        box-shadow: 0 5px 14px rgba(40, 167, 69, .20);
-    }
-
-    .success-title {
-        margin: 0;
-        color: #16a34a;
-        text-align: center;
-        font-size: 25px;
-        font-weight: 700;
-    }
-
-    .success-subtitle {
-        margin: 5px 0 20px;
-        color: #667085;
-        text-align: center;
-        font-size: 11px;
-    }
-
-    .success-details {
-        margin: 0;
-        padding: 9px 15px;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        background: #f8f9fa;
-    }
-
-    .success-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        min-height: 38px;
-        border-bottom: 1px solid #e4e7ec;
-        font-size: 12px;
-    }
-
-    .success-row:last-child {
-        border-bottom: none;
-    }
-
-    .success-row strong {
-        color: #667085;
-        font-weight: 600;
-    }
-
-    .success-row span {
-        color: #172033;
-        font-weight: 500;
-        text-align: right;
-    }
-
-    .success-reference {
-        margin-top: 15px;
-        padding: 17px 10px;
-        border-radius: 11px;
-        background: #e9f7ec;
-        color: #148346;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 700;
-        word-break: break-word;
-    }
-
-    .new-payment-btn {
-        width: 100%;
-        height: 44px;
-        margin-top: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        border-radius: 9px;
-        background: #198c53;
-        color: #fff;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .new-payment-btn:hover {
-        background: #157347;
-        color: #fff;
-    }
-
-    /* =========================================================
-       TRANSACTION HISTORY
-       ========================================================= */
-
-    .transaction-card {
-        max-width: 1100px;
-        margin: 18px auto 0;
-        overflow: hidden;
-        background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-    }
-
-    .transaction-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 13px 16px;
-        border-bottom: 1px solid #edf0f3;
-    }
-
-    .transaction-title {
-        color: #212529;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .transaction-subtitle {
-        margin-top: 2px;
-        color: #8a9199;
-        font-size: 10px;
-    }
-
-    .transaction-count {
-        padding: 5px 10px;
-        border-radius: 20px;
-        background: #f3f4f6;
-        color: #495057;
-        font-size: 10px;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    
-.transaction-table-wrapper {
+/* ===============================
+   PAGE
+================================ */
+.cpay-page {
+    min-height: calc(100vh - 70px);
+    padding: 6px 18px 35px;
+    background: #f5f7fa;
+    color: #263753;
+    font-family: Poppins, "Segoe UI", sans-serif;
+}
+
+.cpay-page *,
+.cpay-page *::before,
+.cpay-page *::after {
+    box-sizing: border-box;
+}
+
+.cpay-page [hidden] {
+    display: none !important;
+}
+
+/* ===============================
+   PAYMENT CARD
+================================ */
+.cpay-card {
+    width: 100%;
+    max-width: 418px;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    background: #fff;
+    border: 0;
+    border-radius: 19px;
+    box-shadow: 0 8px 25px rgba(28, 39, 60, .09);
+}
+
+.cpay-header {
+    padding: 11px 15px;
+    background: linear-gradient(110deg, #9bea32, #e7dc32);
+    color: #fff;
+    text-align: center;
+}
+
+.cpay-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cpay-header p {
+    display: none;
+}
+
+.cpay-body {
+    padding: 19px 18px 18px;
+}
+
+/* ===============================
+   FORM FIELDS
+================================ */
+.cpay-field {
+    margin-bottom: 10px;
+}
+
+.cpay-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: #253753;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cpay-field input,
+.cpay-field select,
+.cpay-field textarea {
+    display: block;
+    width: 100%;
+    min-height: 39px;
+    padding: 9px 12px;
+    border: 1px solid #d8e0eb;
+    border-radius: 12px;
+    background-color: #fff;
+    color: #263753;
+    font-family: inherit;
+    font-size: 11px;
+    outline: none;
+    box-shadow: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.cpay-field textarea {
+    min-height: 50px;
+    resize: vertical;
+}
+
+.cpay-field input:focus,
+.cpay-field select:focus,
+.cpay-field textarea:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, .08);
+}
+
+/* ===============================
+   CUSTOMER / TRIP DETAILS
+================================ */
+.cpay-customer-info {
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.cpay-customer-name {
+    margin: 0;
+    color: #172033;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.cpay-trip-number {
+    margin-top: 4px;
+    color: #7b879b;
+    font-size: 12px;
+}
+
+/* ===============================
+   BALANCE SUMMARY
+================================ */
+.cpay-summary {
+    margin: 13px 0 15px;
+    padding: 7px 11px;
+    border: 1px solid #e9edf3;
+    border-radius: 11px;
+    background: #f8fafc;
+}
+
+.cpay-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e8edf3;
+    font-size: 10px;
+}
+
+.cpay-summary-row:last-child {
+    border-bottom: 0;
+}
+
+.cpay-summary-row span {
+    color: #64748b;
+}
+
+.cpay-summary-row strong {
+    color: #654321;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+#customerBalanceSummary
+.cpay-summary-row:last-child strong {
+    color: #b45309;
+    font-size: 12px;
+}
+
+/* ===============================
+   CONTINUE / CONFIRM BUTTON
+================================ */
+.cpay-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    min-width: 150px;
+    min-height: 42px;
+    margin: 8px auto 0;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 11px;
+    background: linear-gradient(110deg, #ed35c0, #f0d72d);
+    color: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+}
+
+.cpay-btn:hover {
+    color: #fff;
+    opacity: .93;
+    transform: translateY(-1px);
+}
+
+.cpay-btn-secondary {
+    border: 1px solid #dce2eb;
+    background: #f5f7fa;
+    color: #344054;
+}
+
+.cpay-btn-secondary:hover {
+    background: #e9edf3;
+    color: #344054;
+}
+
+.cpay-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.cpay-actions form {
+    flex: 1;
+    min-width: 0;
+}
+
+.cpay-actions .cpay-btn {
+    width: 100%;
+    margin: 0;
+}
+
+.cpay-actions > a {
+    flex: 1;
+}
+
+/* ===============================
+   PAYMENT AMOUNT / SUCCESS
+================================ */
+.cpay-amount {
+    margin: 18px 0;
+    color: #198754;
+    font-size: 27px;
+    font-weight: 750;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.cpay-success-icon {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e5f7ec;
+    color: #198754;
+    font-size: 34px;
+}
+
+.cpay-card .cpay-success-icon ~ .cpay-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* ===============================
+   TRANSACTION HISTORY
+================================ */
+.cpay-history {
+    width: 100%;
+    max-width: 1208px;
+    margin: 20px auto 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(28, 39, 60, .08);
+}
+
+.cpay-history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 19px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.cpay-history-head h3 {
+    margin: 0;
+    color: #172b4d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.cpay-muted {
+    margin-top: 3px;
+    color: #7b879b;
+    font-size: 10px;
+}
+
+.cpay-count {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #f2f4f7;
+    color: #344054;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cpay-table-wrap {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.transaction-table {
+.cpay-table {
     width: 100%;
-    min-width: 1120px;
-    table-layout: fixed;
+    min-width: 1050px;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 11px;
 }
 
-.transaction-table th,
-.transaction-table td {
-    padding: 12px 10px;
-    vertical-align: middle;
-    border-bottom: 1px solid #edf0f3;
-}
-
-.transaction-table th {
+.cpay-table th {
+    padding: 13px 12px;
     background: #f8fafc;
-    color: #667085;
+    color: #64748b;
     font-size: 10px;
     font-weight: 600;
     text-align: center;
     white-space: nowrap;
 }
 
-.transaction-table td {
-    color: #344054;
+.cpay-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #edf0f4;
+    color: #344563;
+    font-size: 11px;
     text-align: center;
-    white-space: normal;
+    vertical-align: middle;
     overflow-wrap: anywhere;
 }
 
-.transaction-table tbody tr:hover {
+.cpay-table tbody tr:hover {
     background: #f9fbff;
 }
 
-.transaction-table tbody tr:last-child td {
-    border-bottom: none;
+.cpay-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
-/* Consistent column widths */
-.transaction-table th:nth-child(1),
-.transaction-table td:nth-child(1) {
-    width: 10%;
-}
-
-.transaction-table th:nth-child(2),
-.transaction-table td:nth-child(2) {
-    width: 12%;
-}
-
-.transaction-table th:nth-child(3),
-.transaction-table td:nth-child(3),
-.transaction-table th:nth-child(4),
-.transaction-table td:nth-child(4) {
-    width: 11%;
-}
-
-.transaction-table th:nth-child(5),
-.transaction-table td:nth-child(5) {
-    width: 16%;
-}
-
-.transaction-table th:nth-child(6),
-.transaction-table td:nth-child(6) {
-    width: 8%;
-}
-
-.transaction-table th:nth-child(7),
-.transaction-table td:nth-child(7) {
-    width: 12%;
-}
-
-.transaction-table th:nth-child(8),
-.transaction-table td:nth-child(8) {
-    width: 12%;
-}
-
-.transaction-table th:nth-child(9),
-.transaction-table td:nth-child(9) {
-    width: 18%;
-}
-
-/* Amount columns */
-.transaction-table td:nth-child(3),
-.transaction-table td:nth-child(4) {
-    text-align: right;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-}
-
-/* Status stays centered */
-.transaction-table td:nth-child(5) {
+.cpay-empty {
+    padding: 23px 16px;
+    color: #7b879b;
+    font-size: 12px;
     text-align: center;
 }
 
-.transaction-table .status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 100%;
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 9px;
-    white-space: normal;
-    line-height: 1.35;
+/* ===============================
+   ALERTS
+================================ */
+.cpay-page .alert {
+    max-width: 600px;
+    margin: 0 auto 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 11px;
 }
 
-@media (max-width: 768px) {
-    .transaction-card {
-        margin-top: 14px;
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 600px) {
+    .cpay-page {
+        padding: 10px 10px 25px;
+    }
+
+    .cpay-card {
+        max-width: 100%;
+        border-radius: 15px;
+    }
+
+    .cpay-body {
+        padding: 17px 14px;
+    }
+
+    .cpay-btn {
+        width: 65%;
+    }
+
+    .cpay-actions {
+        flex-direction: column;
+    }
+
+    .cpay-actions .cpay-btn {
+        width: 100%;
+    }
+
+    .cpay-history {
         border-radius: 12px;
     }
 
-    .transaction-header {
-        padding: 12px;
+    .cpay-history-head {
+        padding: 13px;
     }
 
-    .transaction-table {
-        min-width: 1120px;
-    }
-
-    .transaction-table th,
-    .transaction-table td {
-        padding: 10px 8px;
+    .cpay-table th,
+    .cpay-table td {
+        padding: 12px 10px;
     }
 }
-
 </style>
 
 
-<div class="customer-payment-page">
+<div class="cpay-page">
 
     {% if messages %}
-    <div class="payment-alerts">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
+        <div style="max-width:600px;margin:0 auto 16px;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
     {% endif %}
+
     {% if step == "success" and success_payment %}
+    <section class="cpay-card">
+        <div class="cpay-body" style="text-align:center;padding-top:34px;">
+            <div class="cpay-success-icon">✓</div>
+            <h2 style="font-size:21px;font-weight:750;">Payment Saved Successfully</h2>
+            <p class="cpay-muted">Your customer payment has been recorded.</p>
+            <div class="cpay-amount">₹{{ success_payment.amount|floatformat:2 }}</div>
 
-        <!-- =================================================
-             STEP 4 - SUCCESS
-             ================================================= -->
-
-        <div class="success-card">
-
-            <div class="success-icon">
-                <i class="bi bi-check-lg"></i>
-            </div>
-
-            <h2 class="success-title">
-                Payment Saved Successfully
-            </h2>
-
-            <div class="success-subtitle">
-                Customer payment has been saved successfully.
-            </div>
-
-
-            <div class="success-details">
-
-                <div class="success-row">
-                    <strong>Customer</strong>
-                    <span>
-                        {{ success_payment.customer_name }}
-                    </span>
+            <div class="cpay-summary" style="text-align:left;">
+                <div class="cpay-summary-row">
+                    <span>Customer</span><strong>{{ success_payment.customer_name }}</strong>
                 </div>
-
-                <div class="success-row">
-                    <strong>Amount</strong>
-                    <span>
-                        ₹ {{ success_payment.amount }}
-                    </span>
+                <div class="cpay-summary-row">
+                    <span>Trip</span><strong>{{ success_payment.trip_number }}</strong>
                 </div>
-
-                <div class="success-row">
-                    <strong>Against</strong>
-                    <span>
-                        {{ success_payment.against }}
-                    </span>
+                <div class="cpay-summary-row">
+                    <span>Against</span><strong>{{ success_payment.against }}</strong>
                 </div>
-
-                <div class="success-row">
-                    <strong>Mode</strong>
-                    <span>
-                        {{ success_payment.mode }}
-                    </span>
+                <div class="cpay-summary-row">
+                    <span>Payment Mode</span><strong>{{ success_payment.mode }}</strong>
                 </div>
-
+                <div class="cpay-summary-row">
+                    <span>Reference Number</span><strong>{{ success_payment.reference_number }}</strong>
+                </div>
             </div>
-
-
-            <div class="success-reference">
-                REF NO : {{ success_payment.reference_number }}
-            </div>
-
-
-            <a
-                href="{% url 'customer_payments' %}"
-                class="new-payment-btn"
-            >
-                New Payment
-            </a>
-
+            <a href="{% url 'customer_payments' %}" class="btn cpay-btn">＋ New Payment</a>
         </div>
+    </section>
 
+    <!-- {% elif step == "confirm" and draft %}
+    <section class="cpay-card">
+        <div class="cpay-body">
+            <p class="cpay-muted" style="text-align:center;letter-spacing:1.5px;">PAYMENT REVIEW</p>
+            <h2 style="text-align:center;font-size:22px;">Confirm Customer Payment</h2>
+            <p class="cpay-muted" style="text-align:center;">Please verify the details before confirming.</p>
+            <div class="cpay-amount">₹{{ draft.received_amount|floatformat:2 }}</div>
 
-    {% elif step == "confirm" and draft and selected_order %}
-
-        <!-- =================================================
-             STEP 3 - CONFIRMATION
-             ================================================= -->
-
-        <div class="payment-wrapper">
-
-            <div class="confirmation-card">
-
-                <div class="confirmation-header">
-                    Confirm Customer Payment
+            <div class="cpay-summary">
+                <div class="cpay-summary-row">
+                    <span>Customer</span><strong>{{ customer_name|default:"-" }}</strong>
                 </div>
-
-
-                <div class="confirmation-body">
-
-                    <div class="confirm-customer">
-
-                        <div class="confirm-customer-name">
-                            {{ customer_name }}
-                        </div>
-
-                        <div class="confirm-trip">
-                            {{ selected_order.trip_number }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="confirm-amount">
-
-                        <div class="confirm-amount-value">
-                            ₹ {{ draft.received_amount }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="confirm-details">
-
-                        <div class="confirm-row">
-                            <span>Account</span>
-                            <strong>
-                                {% if draft.account_type == "ltd" %}
-                                    LTD
-                                {% elif draft.account_type == "proprietor" %}
-                                    Proprietor
-                                {% else %}
-                                    {{ draft.account_type|title }}
-                                {% endif %}
-                            </strong>
-                        </div>
-
-                        <div class="confirm-row">
-                            <span>Against</span>
-                            <strong>
-                                {{ draft.payment_against|title }}
-                            </strong>
-                        </div>
-
-                        <div class="confirm-row">
-                            <span>Mode</span>
-                            <strong>
-                                {{ draft.payment_mode }}
-                            </strong>
-                        </div>
-
-                        <div class="confirm-row">
-                            <span>Date</span>
-                            <strong>
-                                {{ draft.payment_date }}
-                            </strong>
-                        </div>
-
-                    </div>
-
-
-                    <div class="reference-label">
-                        Reference Number
-                    </div>
-
-                    <div class="reference-box">
-                        {{ draft.reference_number }}
-                    </div>
-
-
-                    <div class="confirm-actions">
-
-                        <form
-                            method="get"
-                            action="{% url 'customer_payments' %}"
-                            style="width:34%;"
-                        >
-
-                            <button
-                                type="submit"
-                                class="edit-btn"
-                                style="width:100%;"
-                            >
-                                <i class="bi bi-pencil me-1"></i>
-                                Edit
-                            </button>
-
-                        </form>
-
-
-                        <form
-                            method="post"
-                            id="confirmPaymentForm"
-                            style="flex:1;"
-                        >
-
-                            {% csrf_token %}
-
-                            <input
-                                type="hidden"
-                                name="action"
-                                value="confirm"
-                            >
-
-                            <button
-                                type="submit"
-                                id="confirmPaymentBtn"
-                                class="confirm-btn"
-                                style="width:100%;"
-                            >
-                                <i class="bi bi-check-circle me-1"></i>
-                                Confirm Payment
-                            </button>
-
-                        </form>
-
-                    </div>
-
+                <div class="cpay-summary-row">
+                    <span>Trip</span><strong>{{ selected_order.trip_number }}</strong>
                 </div>
-
+                <div class="cpay-summary-row">
+                    <span>Account</span><strong>{{ draft.account_type|title }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Payment Against</span><strong>{{ draft.payment_against|title }}</strong>
+                </div>
+                {% if draft.payment_against == "others" %}
+                <div class="cpay-summary-row">
+                    <span>Others Limit</span>
+                    <strong>₹{{ draft.others_limit|floatformat:2 }}</strong>
+                </div>
+                {% endif %}
+                <div class="cpay-summary-row">
+                    <span>Payment Mode</span><strong>{{ draft.payment_mode }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Date</span><strong>{{ draft.payment_date }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>UTR / Reference</span><strong>{{ draft.reference_number }}</strong>
+                </div>
+                <div class="cpay-summary-row">
+                    <span>Remarks</span><strong>{{ draft.remarks|default:"-" }}</strong>
+                </div>
             </div>
 
+            <div class="cpay-actions">
+                <a href="{% url 'customer_payments' %}" class="btn cpay-btn cpay-btn-secondary">Cancel</a>
+                <form method="post" action="{% url 'customer_payments' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="confirm">
+                    <button class="cpay-btn" type="submit">✓ Confirm Payment</button>
+                </form>
+            </div>
         </div>
-
+    </section> -->
 
     {% else %}
-
-        <!-- =================================================
-             STEP 1 - SELECT TRIP
-             ================================================= -->
-
-        <div class="trip-select-wrapper">
-
-            <div class="trip-select-card">
-
-                <label
-                    for="tripSelector"
-                    class="trip-label"
-                >
-                    Trip / Order
-                </label>
-
-                <select
-                    id="tripSelector"
-                    class="trip-select"
-                >
-
-                    <option value="">
-                        Select Trip
-                    </option>
-
-                    {% for order in orders %}
-
-                    <option
-                        value="{{ order.pk }}"
-                        data-trip="{{ order.trip_number|default:'' }}"
-                        data-customer="{{ order.customer.name|default:'' }}"
-                        data-selling="{{ order.selling_amount|default:0 }}"
-                        data-advance="{{ order.customer_advance_amount|default:0 }}"
-                        {% if request.POST.order == order.pk|stringformat:"s" %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ order.trip_number }}
-                        -
-                        {{ order.customer.name|default:"-" }}
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
+    <section class="cpay-card">
+        <div class="cpay-header">
+            <h2>Customer Payment</h2>
+            <p>Select a trip and enter payment details</p>
         </div>
+        <div class="cpay-body">
+            <form method="post" action="{% url 'customer_payments' %}" id="customerPaymentForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="review">
 
+                <div class="cpay-field">
+                    <label for="order">Trip / Customer</label>
+                    <select id="order" name="order" required>
+    <option value="">Select Trip</option>
 
-        <!-- =================================================
-             STEP 2 - PAYMENT FORM
-             ================================================= -->
+    {% for order in orders %}
+    <option value="{{ order.pk }}"
+        data-trip="{{ order.trip_number }}"
+        data-customer="{{ order.customer.name|default:'' }}"
+        data-total="{{ order.total_selling_amount|default:0 }}"
+        data-received="{{ order.customer_received_amount|default:0 }}"
+        data-outstanding="{{ order.customer_balance_due|default:0 }}">
 
-        <div
-            id="paymentStep"
-            class="payment-wrapper"
-            style="display:none;"
-        >
-
-            <div class="payment-card">
-
-                <div class="payment-header">
-                    Customer Payment
+        {{ order.trip_number }} -
+        {{ order.customer.name|default:"Customer" }}
+    </option>
+    {% endfor %}
+</select>
                 </div>
 
-
-                <div class="payment-body">
-
-                    <div class="customer-info">
-
-                        <div
-                            id="customerName"
-                            class="customer-name"
-                        >
-                            -
-                        </div>
-
-                        <div
-                            id="tripNumber"
-                            class="trip-number"
-                        >
-                            -
-                        </div>
-
-                    </div>
-
-
-                    <div class="selling-box">
-
-                        <span class="selling-label">
-                            Selling Amount
-                        </span>
-
-                        <strong
-                            id="sellingAmountDisplay"
-                            class="selling-value"
-                        >
-                            ₹0.00
-                        </strong>
-
-                    </div>
-
-
-                    <form
-                        method="post"
-                        id="paymentForm"
-                    >
-
-                        {% csrf_token %}
-
-                        <input
-                            type="hidden"
-                            name="order"
-                            id="orderInput"
-                        >
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="receivedAmount"
-                            >
-                                Amount
-                            </label>
-
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0.01"
-                                name="received_amount"
-                                id="receivedAmount"
-                                class="form-control"
-                                placeholder="Enter amount"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="paymentDate"
-                            >
-                                Date
-                            </label>
-
-                            <input
-                                type="date"
-                                name="payment_date"
-                                id="paymentDate"
-                                class="form-control"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="accountType"
-                            >
-                                Account
-                            </label>
-
-                            <select
-                                name="account_type"
-                                id="accountType"
-                                class="form-select"
-                                required
-                            >
-
-                                <option value="">
-                                    Select Account
-                                </option>
-
-                                <option value="ltd">
-                                    LTD
-                                </option>
-
-                                <option value="proprietor">
-                                    Proprietor
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="paymentAgainst"
-                            >
-                                Payment Against
-                            </label>
-
-                            <select
-                                name="payment_against"
-                                id="paymentAgainst"
-                                class="form-select"
-                                required
-                            >
-
-                                <option value="">
-                                    Select Type
-                                </option>
-
-                                <option value="advance">
-                                    Advance
-                                </option>
-
-                                <option value="balance">
-                                    Balance
-                                </option>
-
-                                <option value="others">
-                                    Others
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="paymentMode"
-                            >
-                                Payment Mode
-                            </label>
-
-                            <select
-                                name="payment_mode"
-                                id="paymentMode"
-                                class="form-select"
-                                required
-                            >
-
-                                <option value="">
-                                    Select Mode
-                                </option>
-
-                                <option value="CASH">
-                                    Cash
-                                </option>
-
-                                <option value="NEFT">
-                                    NEFT
-                                </option>
-
-                                <option value="RTGS">
-                                    RTGS
-                                </option>
-
-                                <option value="IMPS">
-                                    IMPS
-                                </option>
-
-                                <option value="UPI">
-                                    UPI
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label
-                                class="form-label"
-                                for="remarks"
-                            >
-                                Remarks
-                            </label>
-
-                            <textarea
-                                name="remarks"
-                                id="remarks"
-                                class="form-control"
-                                rows="1"
-                                placeholder="Enter remarks (optional)"
-                            ></textarea>
-
-                        </div>
-
-
-                        <div class="d-flex justify-content-center mt-2">
-
-                            <button
-                                type="submit"
-                                class="continue-btn"
-                            >
-                                <i class="bi bi-arrow-right-circle me-1"></i>
-                                Continue
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             TRIP TRANSACTION HISTORY
-             ================================================= -->
-
-        <div
-            id="transactionSection"
-            class="transaction-card"
-            style="display:none;"
-        >
-
-            <div class="transaction-header">
-
-                <div>
-
-                    <div class="transaction-title">
-                        Trip Transaction History
-                    </div>
-
-                    <div
-                        id="transactionSubtitle"
-                        class="transaction-subtitle"
-                    ></div>
-
-                </div>
-
-                <div
-                    id="transactionCount"
-                    class="transaction-count"
-                    style="display:none;"
-                ></div>
-
-            </div>
-
-
-            <div
-                id="transactionTableWrapper"
-                class="transaction-table-wrapper"
-                style="display:none;"
-            >
-
-                <table class="transaction-table">
-
-                    
-<thead>
-    <tr>
-        <th>Trip</th>
-        <th>Customer</th>
-        <th>Selling</th>
-        <th>Received</th>
-        <th>Status</th>
-        <th>Mode</th>
-        <th>UTR</th>
-        <th>Remarks</th>
-        <th>Received At</th>
-    </tr>
-</thead>
-
-
-                    <tbody>
-
-                        {% for p in payments %}
-
-                        <tr
-                            class="transaction-row"
-                            data-order-id="{{ p.order_id }}"
-                            style="display:none;"
-                        >
-
-                            <td>
-                                {{ p.order.trip_number }}
-                            </td>
-
-                            <td>
-                                {{ p.order.customer.name|default:"-" }}
-                            </td>
-
-                            <td class="amount">
-                                ₹{{ p.selling_amount|floatformat:2 }}
-                            </td>
-
-                            <td class="amount">
-                                ₹{{ p.received_amount|floatformat:2 }}
-                            </td>
-
-                            <td>
-
-                                {% if p.status == "Payment Cleared" %}
-
-                                    <span class="status status-success">
-                                        Payment Cleared
-                                    </span>
-
-                                {% elif p.status == "Part Amount Received" %}
-
-                                    <span class="status status-info">
-                                        Part Amount Received
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="status status-warning">
-                                        Pending
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-                                {{ p.received_through|default:"-" }}
-                            </td>   
-                            <td>
-                                {{ p.reference_number|default:"-" }}
-                            </td>
-
-                            <td>
-                                {{ p.remarks|default:"-" }}
-                            </td>
-
-
-                            <td>
-                                {{ p.received_at|date:"d/m/Y H:i" }}
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-            <div
-                id="noTransactionMessage"
-                class="no-transactions"
-                style="display:none;"
-            >
-
-                <i class="bi bi-receipt"></i>
-
-                <strong>
-                    No transactions found for this trip.
-                </strong>
-
-            </div>
-
-        </div>
-
-    {% endif %}
+<div class="cpay-summary" id="customerBalanceSummary" hidden>
+
+    <div class="cpay-summary-row">
+        <span>Selling Amount</span>
+        <strong id="customerTotalLimit">₹0.00</strong>
+    </div>
+
+    <div class="cpay-summary-row">
+        <span>Received Amount</span>
+        <strong id="customerReceivedAmount">₹0.00</strong>
+    </div>
+
+    <div class="cpay-summary-row">
+        <span>Outstanding Amount</span>
+        <strong id="customerTotalRemaining">₹0.00</strong>
+    </div>
 
 </div>
+
+
+                <div class="cpay-field">
+                    <label for="received_amount">Amount (₹)</label>
+                    <input type="number" id="received_amount" name="received_amount"
+                           min="0.01" step="0.01" placeholder="Enter payment amount" required>
+                </div>
+
+                <div class="cpay-field">
+                    <label for="payment_date">Payment Date</label>
+                    <input type="date" id="payment_date" name="payment_date" required>
+                </div>
+
+                <div class="cpay-field">
+                    <label for="account_type">Account</label>
+                    <select id="account_type" name="account_type" required>
+                        <option value="">Select Account</option>
+                        <option value="ltd">LTD</option>
+                        <option value="proprietor">Proprietor</option>
+                    </select>
+                </div>
+
+                <div class="cpay-field">
+                    <label for="payment_against">Payment Against</label>
+                    <select id="payment_against" name="payment_against" required>
+                        <option value="">Select Type</option>
+                        <option value="advance">Advance</option>
+                        <option value="balance">Balance</option>
+                        <option value="others">Others</option>
+                    </select>
+                </div>
+
+                <div class="cpay-field" id="customerOthersLimitField" hidden>
+                    <label for="others_limit">Customer Others Limit (₹)</label>
+                    <input type="number" id="others_limit" name="others_limit"
+                           min="0.01" step="0.01" placeholder="Enter separate Others limit">
+                    <small id="customerOthersRemaining" class="cpay-muted"></small>
+                </div>
+
+                <div class="cpay-field">
+                    <label for="payment_mode">Payment Mode</label>
+                    <select id="payment_mode" name="payment_mode" required>
+                        <option value="">Select Mode</option>
+                        <option value="CASH">Cash</option>
+                        <option value="NEFT">NEFT</option>
+                        <option value="RTGS">RTGS</option>
+                        <option value="IMPS">IMPS</option>
+                        <option value="UPI">UPI</option>
+                    </select>
+                </div>
+
+                <div class="cpay-field">
+                    <label for="utr_details">UTR / Transaction Reference</label>
+                    <input type="text" id="utr_details" name="utr_details"
+                           maxlength="150" placeholder="Enter UTR / transaction ID">
+                </div>
+
+                <div class="cpay-field">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" name="remarks" rows="2"
+                              placeholder="Enter remarks (optional)"></textarea>
+                </div>
+
+                <button class="cpay-btn" type="submit">➲ Continue</button>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="cpay-history">
+        <div class="cpay-history-head">
+            <div>
+                <h3>Trip Transaction History</h3>
+                <div class="cpay-muted" id="customerHistorySubtitle">Select a trip to view transactions</div>
+            </div>
+            <div class="cpay-count" id="customerHistoryCount" hidden></div>
+        </div>
+
+        <div class="cpay-empty" id="customerHistoryEmpty">
+            Select a trip to view its payment history.
+        </div>
+
+        <div class="cpay-table-wrap" id="customerHistoryTableWrap" hidden>
+            <table class="cpay-table">
+                <thead>
+                    <tr>
+                        <th>Trip</th><th>Customer</th><th>Selling</th>
+                        <th>Received</th><th>Received On</th><th>Outstanding</th><th>Status</th>
+                        <th>Mode</th><th>Remarks</th>
+                    </tr>
+                </thead>
+<tbody id="customerHistoryRows">
+    {% for p in payments %}
+    <tr class="customer-payment-row" data-order-id="{{ p.order_id }}">
+        <td>{{ p.order.trip_number }}</td>
+
+        <td>{{ p.order.customer.name|default:"-" }}</td>
+
+        <td>
+            ₹{{ p.order.total_selling_amount|floatformat:2 }}
+        </td>
+
+        <td>
+            ₹{{ p.received_amount|floatformat:2 }}
+        </td>
+
+        <td>
+            {{ p.received_at|date:"d/m/Y" }}
+        </td>
+
+        <td>
+            ₹{{ p.order.customer_balance_due|floatformat:2 }}
+        </td>
+
+        <td>{{ p.status }}</td>
+
+        <td>
+            {{ p.get_received_through_display|default:p.received_through|default:"-" }}
+        </td>
+
+        <td>{{ p.remarks|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+            </table>
+        </div>
+    </section>
+</div>
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
+    const tripSelect = document.getElementById("order");
+    const amountInput = document.getElementById("received_amount");
+    const form = document.getElementById("customerPaymentForm");
+    const summary = document.getElementById("customerBalanceSummary");
+    const clearedMessage = document.getElementById("customerPaymentCleared");
+    const againstSelect = document.getElementById("payment_against");
+    const othersField = document.getElementById("customerOthersLimitField");
+    const othersInput = document.getElementById("others_limit");
 
-    /* =====================================================
-       ELEMENTS
-       ===================================================== */
+    const sellingElement = document.getElementById("customerTotalLimit");
+    const receivedElement = document.getElementById("customerReceivedAmount");
+    const outstandingElement = document.getElementById("customerTotalRemaining");
 
-    const tripSelector =
-        document.getElementById("tripSelector");
+    const money = value => "₹" + Number(value || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
-    const paymentStep =
-        document.getElementById("paymentStep");
+    let selling = 0;
+    let received = 0;
+    let outstanding = 0;
 
-    const orderInput =
-        document.getElementById("orderInput");
+    function updateSummary() {
+        const entered = Math.max(0, Number(amountInput?.value || 0));
 
-    const customerName =
-        document.getElementById("customerName");
+        if (sellingElement) sellingElement.textContent = money(selling);
 
-    const tripNumber =
-        document.getElementById("tripNumber");
+        if (receivedElement) {
+            receivedElement.textContent = money(received + entered);
+        }
 
-    const sellingDisplay =
-        document.getElementById("sellingAmountDisplay");
+        if (outstandingElement) {
+            outstandingElement.textContent =
+                money(Math.max(0, outstanding - entered));
+        }
 
-    const paymentDate =
-        document.getElementById("paymentDate");
+        const continueButton = form?.querySelector('button[type="submit"]');
+        const cleared = Boolean(tripSelect?.value) && outstanding <= 0;
+        const exceedsBalance = entered > outstanding;
 
-    const transactionSection =
-        document.getElementById("transactionSection");
+        if (clearedMessage) clearedMessage.hidden = !cleared;
 
-    const transactionSubtitle =
-        document.getElementById("transactionSubtitle");
+        if (continueButton) {
+            continueButton.disabled = cleared || exceedsBalance;
+            continueButton.title = cleared
+                ? "This trip is already paid."
+                : exceedsBalance
+                    ? "Payment exceeds the outstanding amount."
+                    : "";
+        }
 
-    const transactionCount =
-        document.getElementById("transactionCount");
+        if (amountInput) {
+            amountInput.setCustomValidity(
+                entered > outstanding
+                    ? "Payment cannot exceed the outstanding amount."
+                    : ""
+            );
+        }
+    }
 
-    const transactionTableWrapper =
-        document.getElementById("transactionTableWrapper");
+    function handleTripChange() {
+        if (!tripSelect) return;
 
-    const noTransactionMessage =
-        document.getElementById("noTransactionMessage");
+        const option = tripSelect.options[tripSelect.selectedIndex];
+        const selected = Boolean(tripSelect.value);
 
-    const transactionRows =
-        document.querySelectorAll(".transaction-row");
+        selling = selected ? Number(option.dataset.total || 0) : 0;
+        received = selected ? Number(option.dataset.received || 0) : 0;
+        outstanding = Math.max(0, selling - received);
 
+        if (amountInput) amountInput.value = "";
 
-    /* =====================================================
-       MONEY
-       ===================================================== */
+        if (summary) summary.hidden = !selected;
 
-    function formatMoney(value) {
-
-        const number =
-            parseFloat(value || 0);
-
-        return number.toLocaleString(
-            "en-IN",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
+        filterCustomerHistory(
+            tripSelect.value,
+            selected ? option.dataset.trip : ""
         );
+
+        updateSummary();
     }
 
+    function toggleOthers() {
+        if (!againstSelect || !othersField) return;
 
-    /* =====================================================
-       HIDE PAYMENT
-       ===================================================== */
+        const show = againstSelect.value === "others";
+        othersField.hidden = !show;
 
-    function hidePayment() {
-
-        if (paymentStep) {
-            paymentStep.style.display = "none";
+        if (othersInput) {
+            othersInput.required = show;
+            if (!show) othersInput.value = "";
         }
-
-        if (transactionSection) {
-            transactionSection.style.display = "none";
-        }
-
-        if (transactionTableWrapper) {
-            transactionTableWrapper.style.display = "none";
-        }
-
-        if (noTransactionMessage) {
-            noTransactionMessage.style.display = "none";
-        }
-
-        if (transactionCount) {
-            transactionCount.style.display = "none";
-        }
-
-        transactionRows.forEach(function (row) {
-            row.style.display = "none";
-        });
     }
 
+    function filterCustomerHistory(orderId, tripNumber) {
+        const rows = document.querySelectorAll(".customer-payment-row");
+        const wrap = document.getElementById("customerHistoryTableWrap");
+        const empty = document.getElementById("customerHistoryEmpty");
+        const count = document.getElementById("customerHistoryCount");
+        const subtitle = document.getElementById("customerHistorySubtitle");
 
-    /* =====================================================
-       SHOW SELECTED TRIP
-       ===================================================== */
+        let found = 0;
 
-    function showSelectedTrip() {
+        rows.forEach(row => {
+            const match = Boolean(orderId) &&
+                row.dataset.orderId === String(orderId);
 
-        if (!tripSelector) {
-            return;
-        }
-
-        const option =
-            tripSelector.options[
-                tripSelector.selectedIndex
-            ];
-
-
-        if (!option || !option.value) {
-
-            hidePayment();
-
-            return;
-        }
-
-
-        const orderId =
-            option.value;
-
-        const trip =
-            option.dataset.trip || "-";
-
-        const customer =
-            option.dataset.customer || "-";
-
-        const selling =
-            option.dataset.selling || "0";
-
-
-        if (orderInput) {
-            orderInput.value = orderId;
-        }
-
-        if (customerName) {
-            customerName.textContent = customer;
-        }
-
-        if (tripNumber) {
-            tripNumber.textContent = trip;
-        }
-
-        if (sellingDisplay) {
-            sellingDisplay.textContent =
-                "₹" + formatMoney(selling);
-        }
-
-        if (paymentStep) {
-            paymentStep.style.display = "block";
-        }
-
-
-        /* ---------------------------------------------
-           TRANSACTION HISTORY
-           --------------------------------------------- */
-
-        let visibleCount = 0;
-
-        transactionRows.forEach(function (row) {
-
-            if (
-                String(row.dataset.orderId) ===
-                String(orderId)
-            ) {
-
-                row.style.display = "table-row";
-
-                visibleCount++;
-
-            } else {
-
-                row.style.display = "none";
-            }
+            row.hidden = !match;
+            if (match) found++;
         });
 
-
-        if (!transactionSection) {
-            return;
+        if (subtitle) {
+            subtitle.textContent = orderId
+                ? tripNumber + " • Transaction History"
+                : "Select a trip to view transactions";
         }
 
-        transactionSection.style.display = "block";
-
-
-        if (transactionSubtitle) {
-
-            transactionSubtitle.textContent =
-                trip + " • " + customer;
+        if (count) {
+            count.hidden = !orderId || found === 0;
+            count.textContent = found +
+                (found === 1 ? " Transaction" : " Transactions");
         }
 
+        if (wrap) wrap.hidden = !orderId || found === 0;
 
-        if (visibleCount === 0) {
-
-            transactionTableWrapper.style.display =
-                "none";
-
-            transactionCount.style.display =
-                "none";
-
-            noTransactionMessage.style.display =
-                "block";
-
-        } else {
-
-            transactionTableWrapper.style.display =
-                "block";
-
-            noTransactionMessage.style.display =
-                "none";
-
-            transactionCount.style.display =
-                "block";
-
-            transactionCount.textContent =
-                visibleCount +
-                (
-                    visibleCount === 1
-                        ? " Transaction"
-                        : " Transactions"
-                );
+        if (empty) {
+            empty.hidden = !orderId || found > 0;
+            empty.textContent = orderId
+                ? "No transactions found for this trip."
+                : "Select a trip to view its payment history.";
         }
     }
 
-
-    /* =====================================================
-       TRIP CHANGE
-       ===================================================== */
-
-    if (tripSelector) {
-
-        tripSelector.addEventListener(
-            "change",
-            showSelectedTrip
-        );
-
-        if (tripSelector.value) {
-            showSelectedTrip();
-        }
+    if (tripSelect) {
+        tripSelect.addEventListener("change", handleTripChange);
     }
 
-
-    /* =====================================================
-       TODAY
-       ===================================================== */
-
-    if (paymentDate && !paymentDate.value) {
-
-        const today = new Date();
-
-        const yyyy =
-            today.getFullYear();
-
-        const mm =
-            String(
-                today.getMonth() + 1
-            ).padStart(2, "0");
-
-        const dd =
-            String(
-                today.getDate()
-            ).padStart(2, "0");
-
-        paymentDate.value =
-            yyyy + "-" + mm + "-" + dd;
+    if (amountInput) {
+        amountInput.addEventListener("input", updateSummary);
     }
 
-
-    /* =====================================================
-       CONFIRM BUTTON LOADING
-       ===================================================== */
-
-    const confirmForm =
-        document.getElementById(
-            "confirmPaymentForm"
-        );
-
-    const confirmButton =
-        document.getElementById(
-            "confirmPaymentBtn"
-        );
-
-    if (confirmForm && confirmButton) {
-
-        confirmForm.addEventListener(
-            "submit",
-            function () {
-
-                confirmButton.disabled = true;
-
-                confirmButton.innerHTML =
-                    '<span class="spinner-border spinner-border-sm me-1"></span>' +
-                    'Processing...';
-            }
-        );
+    if (againstSelect) {
+        againstSelect.addEventListener("change", toggleOthers);
     }
 
-});
+    const dateInput = document.getElementById("payment_date");
+    if (dateInput && !dateInput.value) {
+        const now = new Date();
+        dateInput.value = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0")
+        ].join("-");
+    }
+
+    toggleOthers();
+    filterCustomerHistory("", "");
+
+    if (tripSelect && tripSelect.value) {
+        handleTripChange();
+    }
+})();
 </script>
 
 {% endblock %}
