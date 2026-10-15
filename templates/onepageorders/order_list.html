@@ -5,76 +5,7 @@
 
 
 {% block title %}Orders
-<!-- DataTables 2 with Bootstrap 5 styling -->
-<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const table = document.getElementById("ordersDataTable");
-    if (!table || typeof DataTable === "undefined") return;
-
-    const dataTable = new DataTable(table, {
-        paging: true,
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-        ordering: true,
-        searching: true,
-        info: true,
-        autoWidth: false,
-        scrollX: true,
-        scrollY: "58vh",
-        scrollCollapse: true,
-        order: [],
-        columnDefs: [
-            { targets: 0, width: "105px" },
-            { targets: 1, width: "145px" },
-            { targets: 2, width: "150px" },
-            { targets: 3, width: "235px", orderable: false },
-            { targets: 4, width: "150px" },
-            { targets: 5, width: "125px" },
-            { targets: 6, width: "135px" },
-            { targets: 7, width: "105px", orderable: false, searchable: false }
-        ],
-        language: {
-            emptyTable: "No orders found. Try another search or create a new order.",
-            zeroRecords: "No matching orders found.",
-            lengthMenu: "Show _MENU_ orders",
-            info: "Showing _START_ to _END_ of _TOTAL_ orders",
-            infoEmpty: "Showing 0 orders",
-            infoFiltered: "(filtered from _MAX_ total orders)",
-            search: "Filter:",
-            paginate: { first: "First", last: "Last", next: "Next", previous: "Prev" }
-        },
-        layout: {
-            topStart: "pageLength",
-            topEnd: "search",
-            bottomStart: "info",
-            bottomEnd: "paging"
-        }
-    });
-
-    /* The existing search form still supports Django GET filtering.
-       Typing also filters the current DataTables page instantly. */
-    const searchForm = document.querySelector(".orders-search");
-    const searchInput = searchForm ? searchForm.querySelector('input[name="q"]') : null;
-
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            dataTable.search(this.value).draw();
-        });
-        searchForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            const url = new URL(window.location.href);
-            const value = searchInput.value.trim();
-            if (value) url.searchParams.set("q", value);
-            else url.searchParams.delete("q");
-            window.location.href = url.toString();
-        });
-    }
-});
-</script>
 
 {% endblock %}
 
@@ -689,41 +620,89 @@ document.addEventListener("DOMContentLoaded", function () {
     .orders-messages .alert { padding: 10px 36px 10px 12px; font-size: 10px; }
 }
 
-/* DataTables controls and compact layout */
+/* DataTables controls — compact spacing */
 .dataTables_wrapper, .dt-container {
     width: 100%;
     min-width: 0;
     color: #667085;
     font-family: "Poppins", sans-serif;
-    font-size: 11px;
+    font-size: 10px;
 }
 .dt-container .dt-layout-row {
+    display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 8px 10px;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    min-height: 0 !important;
+}
+.dt-container .dt-layout-cell {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.dt-container .dt-length,
+.dt-container .dt-info,
+.dt-container .dt-paging {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.25;
 }
 .dt-container .dt-length select,
-.dt-container .dt-search input,
 .dt-container .dt-input {
-    min-height: 30px;
-    padding: 4px 8px;
+    min-height: 27px;
+    height: 27px;
+    margin: 0 4px;
+    padding: 2px 7px;
     border: 1px solid #dfe4ea;
-    border-radius: 6px;
+    border-radius: 5px;
     background: #fff;
     color: #344054;
     font: inherit;
 }
-.dt-container .dt-search input { margin-left: 6px; }
-.dt-container .dt-info { padding-top: 4px; color: #667085; }
-.dt-container .dt-paging .dt-paging-button {
-    min-width: 30px;
-    margin-left: 3px;
-    padding: 5px 9px;
-    border: 1px solid #e7ebf0 !important;
+.dt-container .dt-search {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap;
+}
+.dt-container .dt-search label {
+    margin: 0 !important;
+    color: #667085;
+    font-size: 10px;
+}
+.dt-container .dt-search input,
+.dt-container .dt-search .dt-input {
+    width: 220px;
+    max-width: 100%;
+    min-height: 29px;
+    height: 29px;
+    margin: 0 !important;
+    padding: 4px 9px !important;
+    border: 1px solid #dfe4ea !important;
     border-radius: 6px !important;
+    background: #fff !important;
+    color: #344054 !important;
+    font: inherit;
+    outline: none;
+}
+.dt-container .dt-search input:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+.dt-container .dt-info { padding-top: 0 !important; color: #667085; }
+.dt-container .dt-paging .dt-paging-button {
+    min-width: 28px;
+    margin: 0 0 0 3px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #e7ebf0 !important;
+    border-radius: 5px !important;
     background: #fff !important;
     color: #475467 !important;
     font-size: 10px;
+    line-height: 1.2;
 }
 .dt-container .dt-paging .dt-paging-button.current,
 .dt-container .dt-paging .dt-paging-button.current:hover {
@@ -749,7 +728,9 @@ document.addEventListener("DOMContentLoaded", function () {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-        margin: 8px;
+        gap: 6px;
+        margin: 0 !important;
+        padding: 6px 8px !important;
     }
     .dt-container .dt-layout-cell { max-width: 100%; }
     .dt-container .dt-length, .dt-container .dt-info { font-size: 10px; }
@@ -779,6 +760,106 @@ document.addEventListener("DOMContentLoaded", function () {
         border-bottom: 1px solid #eef1f4 !important;
     }
     .orders-table tbody td::before { content: none !important; display: none !important; }
+}
+
+
+/* =========================================================
+   ORDERS TABLE ALIGNMENT — FINAL OVERRIDES
+========================================================= */
+.orders-card .dt-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Slightly inset the page-length and result-count controls. */
+.orders-card .dt-container > .dt-layout-row:not(.dt-layout-table) {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 7px 14px !important;
+}
+.orders-card .dt-container .dt-layout-cell.dt-layout-start {
+    padding-left: 10px !important;
+}
+.orders-card .dt-container .dt-layout-cell {
+    min-width: 0;
+    box-sizing: border-box !important;
+}
+
+/* Center labels in the original table and DataTables' cloned scroll header. */
+.orders-card #ordersDataTable thead th,
+.orders-card .dt-scroll-head table thead th,
+.orders-card .dt-scroll-head table.dataTable thead th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+.orders-card .dt-scroll-head table.dataTable thead th .dt-column-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    width: 100%;
+}
+.orders-card .dt-scroll-head table.dataTable thead th .dt-column-title {
+    text-align: center !important;
+}
+
+/* Keep the original freight/margin header alignment centered too. */
+.orders-card #ordersDataTable thead th.text-end,
+.orders-card #ordersDataTable thead th.text-center {
+    text-align: center !important;
+}
+
+@media (max-width: 767.98px) {
+    .orders-card .dt-container > .dt-layout-row:not(.dt-layout-table) {
+        padding: 7px 10px !important;
+    }
+    .orders-card .dt-container .dt-layout-cell.dt-layout-start {
+        padding-left: 6px !important;
+    }
+}
+
+
+/* FINAL FIX: inset the DataTables Show and Showing controls from the card edge.
+   Apply spacing to the controls themselves so DataTables layout rows cannot override it. */
+.orders-card .dt-container .dt-length {
+    margin-left: 14px !important;
+    padding-left: 0 !important;
+}
+.orders-card .dt-container .dt-info {
+    margin-left: 14px !important;
+    padding-left: 0 !important;
+}
+.orders-card .dt-container > .dt-layout-row:first-child > .dt-layout-cell.dt-layout-start,
+.orders-card .dt-container > .dt-layout-row:last-child > .dt-layout-cell.dt-layout-start {
+    padding-left: 0 !important;
+}
+
+
+/* Search is now part of the DataTables controls inside Order Management. */
+.dt-container .dt-layout-row:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 8px 14px !important;
+}
+.dt-container .dt-layout-row:first-child .dt-layout-cell {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+.dt-container .dt-layout-row:last-child {
+    padding: 8px 14px !important;
+}
+@media (max-width: 600px) {
+    .dt-container .dt-layout-row:first-child {
+        flex-wrap: wrap;
+        align-items: flex-start !important;
+    }
+    .dt-container .dt-search { width: 100%; justify-content: flex-start; }
+    .dt-container .dt-search input,
+    .dt-container .dt-search .dt-input { width: 100%; }
 }
 
 </style>
@@ -988,42 +1069,6 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
 
         </div>
-
-    </div>
-
-    <!-- =====================================================
-
-         SEARCH
-
-    ====================================================== -->
-
-    <div class="orders-toolbar">
-
-        <form method="get" class="orders-search">
-
-            <i class="bi bi-search orders-search-icon"></i>
-
-            <input
-
-                type="text"
-
-                name="q"
-
-                value="{{ q|default:'' }}"
-
-                placeholder="Search trip, customer, vehicle, route..."
-
-                autocomplete="off">
-
-            <button type="submit">
-
-                <i class="bi bi-search me-1"></i>
-
-                Search
-
-            </button>
-
-        </form>
 
     </div>
 
@@ -1502,5 +1547,63 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 
 </div>
+
+
+
+<!-- DataTables 2 with Bootstrap 5 styling -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.getElementById("ordersDataTable");
+    if (!table || !window.jQuery || !jQuery.fn.DataTable) {
+        console.error("Orders DataTable not initialized: table or DataTables library is missing.");
+        return;
+    }
+
+    const dataTable = jQuery(table).DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        ordering: true,
+        searching: true,
+        info: true,
+        autoWidth: false,
+        scrollX: true,
+        scrollY: "58vh",
+        scrollCollapse: true,
+        order: [],
+        columnDefs: [
+            { targets: 0, width: "105px" },
+            { targets: 1, width: "145px" },
+            { targets: 2, width: "150px" },
+            { targets: 3, width: "235px", orderable: false },
+            { targets: 4, width: "150px" },
+            { targets: 5, width: "125px" },
+            { targets: 6, width: "135px" },
+            { targets: 7, width: "105px", orderable: false, searchable: false }
+        ],
+        language: {
+            emptyTable: "No orders found. Try another search or create a new order.",
+            zeroRecords: "No matching orders found.",
+            lengthMenu: "Show _MENU_ orders",
+            info: "Showing _START_ to _END_ of _TOTAL_ orders",
+            infoEmpty: "Showing 0 orders",
+            infoFiltered: "(filtered from _MAX_ total orders)",
+            search: "Filter:",
+            paginate: { first: "First", last: "Last", next: "Next", previous: "Prev" }
+        },
+        layout: {
+            topStart: "pageLength",
+            topEnd: "search",
+            bottomStart: "info",
+            bottomEnd: "paging"
+        }
+    });
+});
+</script>
 
 {% endblock %}
