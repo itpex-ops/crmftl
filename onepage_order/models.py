@@ -364,6 +364,10 @@ class Order(models.Model):
         auto_now=True,
     )
 
+    created_by = models.CharField(
+        max_length=120,
+        blank=True,)
+
     # ========================================================
     # CALCULATIONS
     # ========================================================

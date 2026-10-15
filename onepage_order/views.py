@@ -718,7 +718,8 @@ def build_order_from_request(request, customer):
             request,
             "upi_number",
         ),
-
+        created_by=request.user.username if request.user.is_authenticated else "Anonymous",
+        
         # Options
         send_sms=(
             request.POST.get("send_sms") == "on"
