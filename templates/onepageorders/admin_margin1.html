@@ -1,0 +1,2342 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Vehicle vs Customer{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.admin-margin-page {
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    padding: 12px 24px 35px;
+    background: #f8f9fb;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.admin-margin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.admin-margin-title {
+    margin: 0;
+    color: #172033;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.admin-margin-subtitle {
+    margin-top: 3px;
+    color: #8a94a6;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.admin-margin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-margin-search {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+}
+
+.admin-margin-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #98a2b3;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.admin-margin-search input {
+    width: 100%;
+    height: 40px;
+    padding: 0 78px 0 35px;
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #344054;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    outline: none;
+    transition: .2s ease;
+    box-sizing: border-box;
+}
+
+.admin-margin-search input::placeholder {
+    color: #98a2b3;
+}
+
+.admin-margin-search input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+.admin-margin-search-clear {
+    position: absolute;
+    right: 7px;
+    top: 4px;
+    height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #f2f4f7;
+    color: #667085;
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.admin-margin-search-clear:hover {
+    background: #e4e7ec;
+}
+
+
+/* =========================================================
+   RESULTS COUNT
+
+========================================================= */
+
+.admin-margin-result {
+    color: #98a2b3;
+    font-size: 9px;
+    margin-left: auto;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.admin-margin-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e7ebf0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+}
+
+.admin-margin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.admin-margin-table {
+    width: 100%;
+    min-width: 1280px;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+.admin-margin-table thead th {
+    position: relative;
+    padding: 11px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e7ebf0;
+    color: #667085;
+    font-size: 8.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .25px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.admin-margin-table tbody td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #eef1f4;
+    color: #475467;
+    background: #ffffff;
+    font-size: 10px;
+    vertical-align: middle;
+    transition: background .15s ease;
+}
+
+.admin-margin-table tbody tr:hover td {
+    background: #fafcff;
+}
+
+.admin-margin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+/* =========================================================
+   TRIP
+========================================================= */
+
+.trip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #2563eb;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.trip-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.trip-icon {
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: #eef4ff;
+    color: #2563eb;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CUSTOMER
+========================================================= */
+
+.customer-name {
+    display: block;
+    max-width: 145px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #344054;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+
+
+/* =========================================================
+   ROUTE
+========================================================= */
+
+.route-modern {
+    width: 225px;
+    max-width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 7px;
+
+    text-align: left;
+}
+
+.route-card {
+    width: 100%;
+
+    padding: 7px 9px 9px;
+
+    background: #edf8f1;
+
+    border-radius: 0 17px 17px 0;
+
+    box-sizing: border-box;
+
+    text-align: left;
+}
+
+.pickup-card {
+    border-left: 3px solid #2563eb;
+}
+
+.drop-card {
+    border-left: 3px solid #039855;
+}
+
+.route-title {
+    margin: 0 0 5px;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: .25px;
+
+    text-transform: uppercase;
+}
+
+.pickup-card .route-title {
+    color: #039855;
+}
+
+.drop-card .route-title {
+    color: #ea580c;
+}
+
+.route-chip {
+    display: inline-flex;
+    align-items: center;
+
+    max-width: 100%;
+    min-height: 27px;
+
+    padding: 4px 9px;
+
+    background: #ffffff;
+
+    border-radius: 7px;
+
+    font-size: 8.5px;
+    font-weight: 600;
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
+}
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc;
+    color: #027a48;
+}
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892;
+    color: #e85d04;
+}
+
+.route-chip i {
+    flex-shrink: 0;
+    margin-right: 5px;
+    font-size: 8px;
+}
+
+.route-direction {
+    display: none !important;
+}
+
+
+/* =========================================================
+   VEHICLE TYPE
+========================================================= */
+
+.vehicle-type-route {
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 225px;
+
+    margin-top: 0;
+
+    padding: 3px 7px;
+
+    background: #f2f4f7;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 5px;
+
+    color: #667085;
+
+    font-size: 7.5px;
+
+    font-weight: 500;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   KEEP LOCATION CELLS CONSISTENT
+========================================================= */
+
+.location-cell {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0;
+
+    max-width: 100%;
+}
+
+.location-icon {
+    width: auto;
+    height: auto;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 0 !important;
+
+    background: transparent !important;
+
+    font-size: 8px;
+}
+
+.location-text {
+    display: block;
+
+    max-width: 100%;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #475467;
+
+    font-size: 9px;
+
+    font-weight: 500;
+}
+
+.pickup-icon {
+    color: #039855;
+}
+
+.drop-icon {
+    color: #ea580c;
+}
+
+/* =========================================================
+   VEHICLE TYPE
+========================================================= */
+
+.vehicle-type-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: none;
+    padding: 4px 7px;
+    background: #f2f4f7;
+    border: 1px solid #e4e7ec;
+    border-radius: 5px;
+    color: #667085;
+    font-size: 8px;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   AMOUNT
+========================================================= */
+
+.amount {
+    color: #344054;
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-align: right;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 23px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 7.8px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.status-success {
+    background: #ecfdf3;
+    border: 1px solid #d1fadf;
+    color: #027a48;
+}
+
+.status-warning {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #c2410c;
+}
+
+
+/* =========================================================
+   MARGIN
+========================================================= */
+
+.margin-positive {
+    color: #039855;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.margin-negative {
+    color: #d92d20;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: right;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-table {
+    padding: 55px 20px !important;
+    color: #98a2b3 !important;
+    font-size: 11px;
+    text-align: center !important;
+}
+
+.empty-icon {
+    display: block;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    font-size: 24px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .admin-margin-page {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+    /* Route cards */
+    .route-modern {
+        width: 100%;
+        max-width: 225px;
+        margin-top: 0;
+        gap: 7px;
+    }
+
+    .route-card {
+        padding: 7px 8px 8px;
+        border-radius: 0 16px 16px 0;
+    }
+
+    .route-title {
+        font-size: 7.5px;
+        margin-bottom: 5px;
+    }
+
+    .route-chip {
+        min-height: 27px;
+        max-width: 100%;
+        padding: 4px 8px;
+        font-size: 8px;
+    }
+
+    .route-chip i {
+        font-size: 7.5px;
+        margin-right: 4px;
+    }
+
+    .vehicle-type-route {
+        max-width: 225px;
+        font-size: 7px;
+    }
+
+
+
+    .admin-margin-page {
+        min-height: calc(100vh - 60px);
+        padding: 10px 10px 25px;
+    }
+
+    .admin-margin-header {
+        margin-bottom: 9px;
+    }
+
+    .admin-margin-title {
+        font-size: 17px;
+    }
+
+    .admin-margin-subtitle {
+        font-size: 8.5px;
+    }
+
+    .admin-margin-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .admin-margin-search {
+        max-width: none;
+    }
+
+    .column-tools {
+        width: 100%;
+    }
+
+    .column-tools-btn {
+        width: 100%;
+        justify-content: center;
+        height: 38px;
+    }
+
+    .column-tools-menu {
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+
+    .admin-margin-result {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+
+    .admin-margin-card {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        overflow: visible;
+    }
+
+    .admin-margin-table-wrapper {
+        overflow: visible;
+    }
+
+    .admin-margin-table {
+        width: 100% !important;
+        min-width: 0 !important;
+        display: block;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .admin-margin-table thead {
+        display: none;
+    }
+
+    .admin-margin-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-margin-table tbody tr {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background: #ffffff;
+        border: 1px solid #e7ebf0;
+        border-radius: 11px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, .045);
+        box-sizing: border-box;
+    }
+
+    .admin-margin-table tbody td {
+        display: grid;
+        grid-template-columns: 105px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        min-width: 0 !important;
+        min-height: 36px;
+        padding: 6px 0;
+        border-bottom: 1px solid #eef1f4;
+        background: transparent !important;
+        text-align: left !important;
+        box-sizing: border-box;
+    }
+
+    .admin-margin-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .admin-margin-table tbody td[data-label]::before {
+        content: attr(data-label);
+        color: #98a2b3;
+        font-size: 7.5px;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: .25px;
+        text-transform: uppercase;
+    }
+
+    .trip-link {
+        font-size: 9.5px;
+    }
+
+    .trip-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 8px;
+    }
+
+    .customer-name {
+        max-width: 100%;
+        font-size: 9px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .location-cell {
+        max-width: 100%;
+    }
+
+    .location-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 8px;
+    }
+
+    .location-text {
+        max-width: 100%;
+        font-size: 8.5px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .vehicle-type-cell {
+        max-width: 100%;
+        font-size: 8px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .amount {
+        font-size: 9.5px;
+        text-align: left;
+    }
+
+    .status {
+        justify-self: start;
+        max-width: 100%;
+        min-height: 22px;
+        padding: 4px 7px;
+        font-size: 7.5px;
+        white-space: normal;
+    }
+
+    .margin-positive,
+    .margin-negative {
+        font-size: 9.5px;
+        text-align: left;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .admin-margin-page {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .admin-margin-title {
+        font-size: 16px;
+    }
+
+    .admin-margin-subtitle {
+        font-size: 8px;
+    }
+
+    .admin-margin-table tbody tr {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .admin-margin-table tbody td {
+        grid-template-columns: 90px minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    .admin-margin-table tbody td[data-label]::before {
+        font-size: 7px;
+    }
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.admin-margin-table-wrapper::-webkit-scrollbar {
+    height: 7px;
+}
+
+.admin-margin-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f3f5;
+}
+
+.admin-margin-table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.admin-margin-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+
+/* =========================================================
+   TABLE COLUMN SIZING
+========================================================= */
+
+.admin-margin-table {
+    table-layout: fixed;
+}
+
+.admin-margin-table th,
+.admin-margin-table td {
+    box-sizing: border-box;
+}
+
+.admin-margin-table col:nth-child(1) { width: 125px; }
+.admin-margin-table col:nth-child(2) { width: 150px; }
+.admin-margin-table col:nth-child(3) { width: 225px; }
+.admin-margin-table col:nth-child(5) { width: 120px; }
+.admin-margin-table col:nth-child(6) { width: 115px; }
+.admin-margin-table col:nth-child(7) { width: 150px; }
+.admin-margin-table col:nth-child(8) { width: 120px; }
+.admin-margin-table col:nth-child(9) { width: 145px; }
+.admin-margin-table col:nth-child(10) { width: 110px; }
+
+
+/* =========================================================
+   FINAL ROUTE OVERRIDE
+   Rounded cards matching the requested visual
+========================================================= */
+
+.route-modern {
+    width: 225px !important;
+    min-height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    margin-top: 5px !important;
+}
+
+.route-card {
+    width: 225px !important;
+
+    padding: 7px 9px 9px !important;
+
+    margin: 0 !important;
+
+    background: #edf8f1 !important;
+
+    border-radius: 0 17px 17px 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+.pickup-card {
+    border-left: 3px solid #2563eb !important;
+}
+
+.drop-card {
+    border-left: 3px solid #039855 !important;
+}
+
+.route-title {
+    margin: 0 0 5px !important;
+
+    font-size: 8px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    letter-spacing: .25px !important;
+
+    text-transform: uppercase !important;
+}
+
+.pickup-card .route-title {
+    color: #039855 !important;
+}
+
+.drop-card .route-title {
+    color: #ea580c !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    max-width: 100% !important;
+
+    min-height: 27px !important;
+
+    padding: 4px 9px !important;
+
+    background: #ffffff !important;
+
+    border-radius: 7px !important;
+
+    font-size: 8.5px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.25 !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc !important;
+    color: #027a48 !important;
+}
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892 !important;
+    color: #e85d04 !important;
+}
+
+.route-chip i {
+    flex-shrink: 0 !important;
+    margin-right: 5px !important;
+    font-size: 8px !important;
+}
+
+.route-direction {
+    display: none !important;
+}
+
+@media (max-width: 767.98px) {
+    .route-modern {
+        width: 100% !important;
+        max-width: 225px !important;
+        gap: 7px !important;
+        margin-top: 0 !important;
+    }
+
+    .route-card {
+        width: 100% !important;
+        max-width: 225px !important;
+        padding: 7px 8px 8px !important;
+        border-radius: 0 16px 16px 0 !important;
+    }
+
+    .route-title {
+        font-size: 7.5px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .route-chip {
+        min-height: 27px !important;
+        padding: 4px 8px !important;
+        font-size: 8px !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+}
+
+
+/* =========================================================
+   FINAL ROUTE PRESENTATION
+========================================================= */
+
+.route-modern {
+    width: 225px !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 7px !important;
+}
+
+.route-card {
+    width: 100% !important;
+    padding: 7px 9px 9px !important;
+    margin: 0 !important;
+    background: #edf8f1 !important;
+    border-radius: 0 17px 17px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.pickup-card {
+    border-left: 3px solid #2563eb !important;
+}
+
+.drop-card {
+    border-left: 3px solid #039855 !important;
+}
+
+.route-title {
+    margin: 0 0 5px !important;
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: .25px !important;
+    text-transform: uppercase !important;
+}
+
+.pickup-card .route-title {
+    color: #039855 !important;
+}
+
+.drop-card .route-title {
+    color: #ea580c !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    min-height: 27px !important;
+    padding: 4px 9px !important;
+    background: #ffffff !important;
+    border-radius: 7px !important;
+    font-size: 8.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+
+.pickup-card .route-chip {
+    border: 1px solid #b7efcc !important;
+    color: #027a48 !important;
+}
+
+.drop-card .route-chip {
+    border: 1px solid #f7c892 !important;
+    color: #e85d04 !important;
+}
+
+.route-chip i {
+    flex-shrink: 0 !important;
+    margin-right: 5px !important;
+    font-size: 8px !important;
+}
+
+.route-direction {
+    display: none !important;
+}
+
+@media (max-width: 767.98px) {
+
+    .route-modern {
+        width: 225px !important;
+        max-width: 100% !important;
+    }
+
+    .route-card {
+        width: 100% !important;
+        padding: 7px 8px 8px !important;
+    }
+
+    .route-title {
+        font-size: 7.5px !important;
+    }
+
+    .route-chip {
+        min-height: 27px !important;
+        font-size: 8px !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+}
+
+
+/* =========================================================
+   TABLE COLUMN ADJUSTMENT
+========================================================= */
+
+.admin-margin-table {
+    table-layout: fixed;
+}
+
+.admin-margin-table thead th {
+    position: relative;
+    user-select: none;
+}
+
+.column-header-label {
+    display: inline-block;
+    padding-right: 8px;
+}
+
+.column-resizer {
+    position: absolute;
+
+    top: 0;
+    right: -4px;
+
+    width: 9px;
+    height: 100%;
+
+    cursor: col-resize;
+
+    z-index: 30;
+}
+
+.column-resizer::after {
+    content: "";
+
+    position: absolute;
+
+    top: 25%;
+    left: 3px;
+
+    width: 2px;
+    height: 50%;
+
+    border-radius: 2px;
+
+    background: transparent;
+
+    transition: background .15s ease;
+}
+
+.admin-margin-table thead th:hover .column-resizer::after {
+    background: #cbd5e1;
+}
+
+body.column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.column-resizing * {
+    cursor: col-resize !important;
+}
+
+/* Keep the Route column comfortable */
+.admin-margin-table col[data-column-width="route"] {
+    min-width: 160px;
+}
+
+/* Mobile: use normal card layout; drag handles are desktop-only */
+@media (max-width: 767.98px) {
+
+    .column-resizer {
+        display: none;
+    }
+
+    .admin-margin-table {
+        table-layout: auto;
+    }
+
+    .admin-margin-table col {
+        width: auto !important;
+    }
+}
+
+
+/* =========================================================
+   RESET WIDTHS BUTTON
+========================================================= */
+
+.column-reset-inline {
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 0 11px;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #667085;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.column-reset-inline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #344054;
+}
+
+@media (max-width: 767.98px) {
+
+    .column-reset-inline {
+        width: 100%;
+        justify-content: center;
+        height: 38px;
+    }
+}
+
+
+/* =========================================================
+   DATA VISIBILITY / NO CLIPPING
+   Column width adjustment stays enabled.
+========================================================= */
+
+/* Never clip normal table cell text */
+.admin-margin-table tbody td {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Customer names */
+.customer-name {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* Pickup / Drop route cards */
+.route-modern {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.route-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
+.route-chip {
+    display: inline-flex !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    height: auto !important;
+    min-height: 27px;
+}
+
+/* Location text */
+.location-text {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Vehicle type */
+.vehicle-type-cell {
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Payment status badges */
+.status {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Amounts and margin should remain on one line when possible,
+   but must not be clipped if the user narrows the column. */
+.amount,
+.margin-positive,
+.margin-negative {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* On desktop, let the row height expand naturally */
+.admin-margin-table tbody td {
+    height: auto !important;
+    vertical-align: top;
+}
+
+/* Keep the route visually aligned near the top of its row */
+.admin-margin-table tbody td[data-label="Route"] {
+    vertical-align: top;
+}
+
+/* Mobile already uses card-style fields */
+@media (max-width: 767.98px) {
+
+    .admin-margin-table tbody td {
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+
+    .route-modern {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .route-chip {
+        width: auto !important;
+        max-width: 100% !important;
+    }
+}
+
+</style>
+
+
+<div class="admin-margin-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="admin-margin-header">
+
+        <div>
+
+            <h1 class="admin-margin-title">
+                Vehicle vs Customer — Admin
+            </h1>
+
+            <div class="admin-margin-subtitle">
+                Vehicle cost, customer selling amount and trip margin
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH + COLUMN SETTINGS
+    ====================================================== -->
+
+    <div class="admin-margin-toolbar">
+
+        <div class="admin-margin-search">
+
+            <i class="bi bi-search admin-margin-search-icon"></i>
+
+            <input
+                type="text"
+                id="marginSearch"
+                placeholder="Search trip, customer, route, vehicle..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                id="clearMarginSearch"
+                class="admin-margin-search-clear"
+            >
+                Clear
+            </button>
+
+        </div>
+
+
+        
+        <button
+            type="button"
+            id="resetColumnWidths"
+            class="column-reset-inline"
+            title="Reset table column widths"
+        >
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset widths
+        </button>
+
+<div id="marginResult" class="admin-margin-result">
+            Showing {{ orders|length }} order{{ orders|length|pluralize }}
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
+
+    <div class="admin-margin-card">
+
+        <div class="admin-margin-table-wrapper">
+
+            <table class="admin-margin-table" id="marginTable">
+                <colgroup>
+                    <col data-column-width="trip" style="width:125px;">
+                    <col data-column-width="customer" style="width:150px;">
+                    <col data-column-width="route" style="width:225px;">
+                    <col data-column-width="vehicle_type" style="width:120px;">
+                    <col data-column-width="vehicle_cost" style="width:115px;">
+                    <col data-column-width="vehicle_payment" style="width:150px;">
+                    <col data-column-width="customer_selling" style="width:120px;">
+                    <col data-column-width="customer_payment" style="width:145px;">
+                    <col data-column-width="margin" style="width:110px;">
+                </colgroup>
+
+<thead>
+
+                    <tr>
+
+                        <th data-column-cell="trip"><span class="column-header-label">Trip</span><span class="column-resizer" data-resize-column="trip" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="customer"><span class="column-header-label">Customer</span><span class="column-resizer" data-resize-column="customer" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="route"><span class="column-header-label">Route</span><span class="column-resizer" data-resize-column="route" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span><span class="column-resizer" data-resize-column="vehicle_type" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span><span class="column-resizer" data-resize-column="vehicle_cost" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span><span class="column-resizer" data-resize-column="vehicle_payment" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span><span class="column-resizer" data-resize-column="customer_selling" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span><span class="column-resizer" data-resize-column="customer_payment" title="Drag to resize"></span></th>
+
+                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span><span class="column-resizer" data-resize-column="margin" title="Drag to resize"></span></th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="marginTableBody">
+
+                    {% for o in orders %}
+
+                    <tr class="margin-row">
+
+
+                        <!-- =========================================
+                             TRIP
+                        ========================================== -->
+
+                        <td
+                            data-label="Trip"
+                            data-column-cell="trip"
+                        >
+
+                            <a
+                                href="{% url 'onepageorder_detail' o.pk %}"
+                                class="trip-link"
+                            >
+
+                                <span class="trip-icon">
+                                    <i class="bi bi-arrow-up-right"></i>
+                                </span>
+
+                                {{ o.trip_number }}
+
+                            </a>
+
+                        </td>
+
+
+                        <!-- =========================================
+                             CUSTOMER
+                        ========================================== -->
+
+                        <td
+                            data-label="Customer"
+                            data-column-cell="customer"
+                        >
+
+                            {% if o.customer %}
+
+                                <span
+                                    class="customer-name"
+                                    title="{{ o.customer.name }}"
+                                >
+                                    {{ o.customer.name }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             PICKUP
+                        ========================================== -->
+
+                        <td
+                            data-label="Route"
+                            data-column-cell="route"
+                        >
+
+                            <div class="route-modern">
+
+                                {% if o.origin %}
+
+                                <div class="route-card pickup-card">
+
+                                    <div class="route-title">
+                                        PICKUP
+                                    </div>
+
+                                    <span
+                                        class="route-chip"
+                                        title="{{ o.origin }}"
+                                    >
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        {{ o.origin }}
+                                    </span>
+
+                                </div>
+
+                                {% endif %}
+
+                                {% if o.destination %}
+
+                                <div class="route-card drop-card">
+
+                                    <div class="route-title">
+                                        DROP
+                                    </div>
+
+                                    <span
+                                        class="route-chip"
+                                        title="{{ o.destination }}"
+                                    >
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        {{ o.destination }}
+                                    </span>
+
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- =========================================
+                             VEHICLE TYPE
+                        ========================================== -->
+
+                        <td
+                            data-label="Vehicle Type"
+                            data-column-cell="vehicle_type"
+                        >
+
+                            {% if o.vehicle_type %}
+
+                                <span
+                                    class="vehicle-type-cell"
+                                    title="{{ o.vehicle_type }}"
+                                >
+
+                                    <i class="bi bi-truck"></i>
+
+                                    {{ o.vehicle_type }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             VEHICLE COST
+                        ========================================== -->
+
+                        <td
+                            data-label="Vehicle Cost"
+                            data-column-cell="vehicle_cost"
+                            class="amount"
+                        >
+
+                            ₹{{ o.vehicle_cost|floatformat:2 }}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             VEHICLE PAYMENT
+                        ========================================== -->
+
+                        <td
+                            data-label="Vehicle Payment"
+                            data-column-cell="vehicle_payment"
+                        >
+
+                            {% if o.vehicle_cost > 0 %}
+
+                                <span class="status status-success">
+                                    Advance / Payment Made
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-warning">
+                                    No Payment Done
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             CUSTOMER SELLING
+                        ========================================== -->
+
+                        <td
+                            data-label="Customer Selling"
+                            data-column-cell="customer_selling"
+                            class="amount"
+                        >
+
+                            ₹{{ o.selling_amount|floatformat:2 }}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             CUSTOMER PAYMENT
+                        ========================================== -->
+
+                        <td
+                            data-label="Customer Payment"
+                            data-column-cell="customer_payment"
+                        >
+
+                            {% with p=o.customer_payments.last %}
+
+                                {% if p %}
+
+                                    {% if p.status == "Payment Cleared" %}
+
+                                        <span class="status status-success">
+                                            {{ p.status }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status status-warning">
+                                            {{ p.status }}
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="status status-warning">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </td>
+
+
+                        <!-- =========================================
+                             MARGIN
+                        ========================================== -->
+
+                        <td
+                            data-label="Margin"
+                            data-column-cell="margin"
+                        >
+
+                            {% if o.margin >= 0 %}
+
+                                <div class="margin-positive">
+                                    <i class="bi bi-arrow-up-right me-1"></i>
+                                    ₹{{ o.margin|floatformat:2 }}
+                                </div>
+
+                            {% else %}
+
+                                <div class="margin-negative">
+                                    <i class="bi bi-arrow-down-right me-1"></i>
+                                    ₹{{ o.margin|floatformat:2 }}
+                                </div>
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr id="emptyServerRow">
+
+                        <td
+                            colspan="9"
+                            class="empty-table"
+                        >
+
+                            <i class="bi bi-bar-chart-line empty-icon"></i>
+
+                            No orders available.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+
+                    <!-- Client-side search empty state -->
+                    <tr
+                        id="searchEmptyRow"
+                        style="display:none;"
+                    >
+
+                        <td
+                            colspan="9"
+                            class="empty-table"
+                        >
+
+                            <i class="bi bi-search empty-icon"></i>
+
+                            No matching orders found.
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       SEARCH
+    ====================================================== */
+
+    const searchInput =
+        document.getElementById("marginSearch");
+
+    const clearSearch =
+        document.getElementById("clearMarginSearch");
+
+    const tableBody =
+        document.getElementById("marginTableBody");
+
+    const resultText =
+        document.getElementById("marginResult");
+
+    const searchEmptyRow =
+        document.getElementById("searchEmptyRow");
+
+
+    if (!tableBody) {
+        return;
+    }
+
+
+    const rows = Array.from(
+        tableBody.querySelectorAll("tr.margin-row")
+    );
+
+
+    function applySearch() {
+
+        const term =
+            (searchInput?.value || "")
+            .trim()
+            .toLowerCase();
+
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+
+            const rowText =
+                (row.innerText || "")
+                .replace(/\s+/g, " ")
+                .toLowerCase();
+
+            const matches =
+                !term ||
+                rowText.includes(term);
+
+            row.style.display =
+                matches ? "" : "none";
+
+            if (matches) {
+                visibleCount++;
+            }
+        });
+
+
+        if (searchEmptyRow) {
+
+            searchEmptyRow.style.display =
+                (
+                    rows.length > 0 &&
+                    visibleCount === 0
+                )
+                    ? "table-row"
+                    : "none";
+        }
+
+
+        if (resultText) {
+
+            resultText.textContent =
+                "Showing " +
+                visibleCount +
+                " order" +
+                (visibleCount === 1 ? "" : "s");
+        }
+    }
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            applySearch
+        );
+    }
+
+
+    if (clearSearch) {
+
+        clearSearch.addEventListener(
+            "click",
+            function () {
+
+                if (searchInput) {
+                    searchInput.value = "";
+                }
+
+                applySearch();
+
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+        );
+    }
+
+
+    /* =====================================================
+       COLUMN RESIZING
+    ====================================================== */
+
+    const defaultWidths = {
+        trip: 125,
+        customer: 150,
+        route: 225,
+        vehicle_type: 120,
+        vehicle_cost: 115,
+        vehicle_payment: 150,
+        customer_selling: 120,
+        customer_payment: 145,
+        margin: 110
+    };
+
+
+    const minWidths = {
+        trip: 90,
+        customer: 100,
+        route: 160,
+        vehicle_type: 90,
+        vehicle_cost: 90,
+        vehicle_payment: 110,
+        customer_selling: 90,
+        customer_payment: 110,
+        margin: 90
+    };
+
+
+    const maxWidths = {
+        trip: 280,
+        customer: 320,
+        route: 380,
+        vehicle_type: 260,
+        vehicle_cost: 240,
+        vehicle_payment: 320,
+        customer_selling: 260,
+        customer_payment: 320,
+        margin: 240
+    };
+
+
+    const columns = {};
+
+    document.querySelectorAll(
+        "[data-column-width]"
+    ).forEach(function (col) {
+
+        columns[
+            col.dataset.columnWidth
+        ] = col;
+    });
+
+
+    const resizeHandles =
+        document.querySelectorAll(
+            ".column-resizer"
+        );
+
+
+    function clampWidth(columnName, value) {
+
+        const number =
+            parseInt(value, 10);
+
+        if (!Number.isFinite(number)) {
+
+            return defaultWidths[columnName];
+        }
+
+        return Math.max(
+            minWidths[columnName],
+            Math.min(
+                maxWidths[columnName],
+                number
+            )
+        );
+    }
+
+
+    function applyColumnWidth(
+        columnName,
+        width
+    ) {
+
+        if (!columns[columnName]) {
+            return;
+        }
+
+        const safeWidth =
+            clampWidth(
+                columnName,
+                width
+            );
+
+        columns[columnName].style.width =
+            safeWidth + "px";
+    }
+
+
+    function saveColumnWidths() {
+
+        const state = {};
+
+        Object.keys(columns).forEach(
+            function (columnName) {
+
+                const width =
+                    columns[columnName]
+                    .getBoundingClientRect()
+                    .width;
+
+                state[columnName] =
+                    Math.round(width);
+            }
+        );
+
+        localStorage.setItem(
+            "vehicleCustomerRouteColumnWidths",
+            JSON.stringify(state)
+        );
+    }
+
+
+    function loadColumnWidths() {
+
+        let saved = {};
+
+        try {
+
+            saved = JSON.parse(
+                localStorage.getItem(
+                    "vehicleCustomerRouteColumnWidths"
+                ) || "{}"
+            );
+
+        } catch (error) {
+
+            saved = {};
+        }
+
+
+        Object.keys(defaultWidths).forEach(
+            function (columnName) {
+
+                applyColumnWidth(
+                    columnName,
+                    saved[columnName] ||
+                    defaultWidths[columnName]
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       MOUSE RESIZE
+    ====================================================== */
+
+    let resizing = false;
+    let activeColumn = null;
+    let startX = 0;
+    let startWidth = 0;
+
+
+    resizeHandles.forEach(function (handle) {
+
+        handle.addEventListener(
+            "mousedown",
+            function (event) {
+
+                if (window.innerWidth <= 767) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                if (!columns[activeColumn]) {
+                    return;
+                }
+
+                resizing = true;
+
+                startX =
+                    event.clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+                document.body.classList.add(
+                    "column-resizing"
+                );
+            }
+        );
+
+
+        /* Double click = reset only this column */
+
+        handle.addEventListener(
+            "dblclick",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const columnName =
+                    this.dataset.resizeColumn;
+
+                applyColumnWidth(
+                    columnName,
+                    defaultWidths[columnName]
+                );
+
+                saveColumnWidths();
+            }
+        );
+
+    });
+
+
+    document.addEventListener(
+        "mousemove",
+        function (event) {
+
+            if (
+                !resizing ||
+                !activeColumn
+            ) {
+                return;
+            }
+
+            const delta =
+                event.clientX - startX;
+
+            const width =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            applyColumnWidth(
+                activeColumn,
+                width
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        "mouseup",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            document.body.classList.remove(
+                "column-resizing"
+            );
+
+            saveColumnWidths();
+        }
+    );
+
+
+    /* =====================================================
+       TOUCH RESIZE
+    ====================================================== */
+
+    resizeHandles.forEach(function (handle) {
+
+        handle.addEventListener(
+            "touchstart",
+            function (event) {
+
+                if (
+                    window.innerWidth <= 767 ||
+                    !event.touches.length
+                ) {
+                    return;
+                }
+
+                activeColumn =
+                    this.dataset.resizeColumn;
+
+                if (!columns[activeColumn]) {
+                    return;
+                }
+
+                resizing = true;
+
+                startX =
+                    event.touches[0].clientX;
+
+                startWidth =
+                    columns[activeColumn]
+                    .getBoundingClientRect()
+                    .width;
+
+            },
+            { passive: true }
+        );
+    });
+
+
+    document.addEventListener(
+        "touchmove",
+        function (event) {
+
+            if (
+                !resizing ||
+                !activeColumn ||
+                !event.touches.length
+            ) {
+                return;
+            }
+
+            const delta =
+                event.touches[0].clientX - startX;
+
+            const width =
+                clampWidth(
+                    activeColumn,
+                    startWidth + delta
+                );
+
+            applyColumnWidth(
+                activeColumn,
+                width
+            );
+        },
+        { passive: true }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        function () {
+
+            if (!resizing) {
+                return;
+            }
+
+            resizing = false;
+
+            activeColumn = null;
+
+            document.body.classList.remove(
+                "column-resizing"
+            );
+
+            saveColumnWidths();
+        }
+    );
+
+
+    /* =====================================================
+       RESET WIDTHS
+    ====================================================== */
+
+    const resetButton =
+        document.getElementById(
+            "resetColumnWidths"
+        );
+
+    if (resetButton) {
+
+        resetButton.addEventListener(
+            "click",
+            function () {
+
+                Object.keys(defaultWidths)
+                    .forEach(
+                        function (columnName) {
+
+                            applyColumnWidth(
+                                columnName,
+                                defaultWidths[
+                                    columnName
+                                ]
+                            );
+                        }
+                    );
+
+                localStorage.removeItem(
+                    "vehicleCustomerRouteColumnWidths"
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       INITIALIZE
+    ====================================================== */
+
+    loadColumnWidths();
+
+    applySearch();
+
+});
+
+</script>
+
+{% endblock %}

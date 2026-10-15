@@ -1,0 +1,188 @@
+{# Shared DataTables 2 component for Parcelex tables. Include once per page. #}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+<style>
+/* =========================================================
+   PARCELEX COMMON DATATABLE — shared controls and behavior
+========================================================= */
+.dt-container {
+    width: 100%;
+    min-width: 0;
+    color: #667085;
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+}
+.dt-container .dt-layout-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 9px 14px !important;
+}
+.dt-container .dt-layout-cell { padding: 0 !important; margin: 0 !important; }
+.dt-container .dt-length,
+.dt-container .dt-search,
+.dt-container .dt-info,
+.dt-container .dt-paging { margin: 0 !important; padding: 0 !important; line-height: 1.4; }
+.dt-container .dt-length label,
+.dt-container .dt-search label { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.dt-container .dt-length select,
+.dt-container .dt-search input,
+.dt-container .dt-input {
+    min-height: 30px;
+    height: 30px;
+    margin: 0 4px;
+    padding: 4px 9px;
+    border: 1px solid #dfe4ea !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: #344054 !important;
+    font: inherit;
+    box-shadow: none !important;
+}
+.dt-container .dt-search input { width: min(250px, 52vw); }
+.dt-container .dt-search input:focus,
+.dt-container .dt-length select:focus { border-color: #2563eb !important; outline: 0; }
+.dt-container .dt-info { color: #667085; padding-left: 0 !important; }
+.dt-container .dt-paging { display: flex; align-items: center; gap: 3px; }
+.dt-container .dt-paging .dt-paging-button {
+    min-width: 29px;
+    margin: 0 !important;
+    padding: 5px 8px !important;
+    border: 1px solid #e7ebf0 !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: #475467 !important;
+    font-size: 10px;
+    line-height: 1.2;
+}
+.dt-container .dt-paging .dt-paging-button.current,
+.dt-container .dt-paging .dt-paging-button.current:hover {
+    border-color: #2563eb !important;
+    background: #2563eb !important;
+    color: #fff !important;
+}
+.dt-container .dt-paging .dt-paging-button:hover:not(.disabled) {
+    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    color: #172033 !important;
+}
+.dt-container table.dataTable { margin-top: 0 !important; margin-bottom: 0 !important; }
+.dt-container table.dataTable thead th { vertical-align: middle; }
+.dt-container .dt-scroll-head table.dataTable thead th { text-align: center; }
+.dt-container .dt-scroll-body { border-bottom: 1px solid #e7ebf0; }
+.dt-container .dt-empty-footer { display: none; }
+@media (max-width: 767.98px) {
+    .dt-container .dt-layout-row { padding: 8px 10px !important; }
+    .dt-container .dt-search input { width: min(210px, 48vw); }
+    .dt-container .dt-paging { max-width: 100%; overflow-x: auto; }
+}
+</style>
+<script>
+(function () {
+    function initParcelexDataTables() {
+        if (!window.jQuery || !jQuery.fn.DataTable) return;
+
+        document.querySelectorAll('table.js-common-datatable').forEach(function (table) {
+            if (jQuery.fn.DataTable.isDataTable(table)) return;
+
+            /* Convert expandable tracking-history rows into DataTables child rows.
+               This keeps one paginated/sortable row per trip. */
+            const historyById = new Map();
+            if (table.classList.contains('tracking-table')) {
+                table.querySelectorAll('tbody tr.history-row').forEach(function (historyRow) {
+                    const id = historyRow.id;
+                    const mainRow = historyRow.previousElementSibling;
+                    const cell = historyRow.querySelector('td');
+                    if (id && mainRow && mainRow.classList.contains('main-row') && cell) {
+                        historyById.set(id, { row: mainRow, html: cell.innerHTML });
+                        historyRow.remove();
+                    }
+                });
+            }
+
+            const isOrders = table.id === 'ordersDataTable';
+            const isTracking = table.classList.contains('tracking-table');
+            const isMargin = table.id === 'marginTable';
+            const isPaymentReport = table.classList.contains('payment-table');
+
+            const options = {
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
+                ordering: true,
+                searching: true,
+                info: true,
+                autoWidth: false,
+                scrollX: isOrders,
+                scrollCollapse: isOrders,
+                order: [],
+                language: {
+                    emptyTable: isOrders ? 'No orders found. Create a new order to get started.' :
+                                isTracking ? 'No tracking records found.' :
+                                isMargin ? 'No orders available.' :
+                                isPaymentReport ? 'No payment records found for the selected filters.' :
+                                'No records found.',
+                    zeroRecords: 'No matching records found.',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    infoEmpty: 'Showing 0 entries',
+                    infoFiltered: '(filtered from _MAX_ total entries)',
+                    search: 'Search:',
+                    paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Prev' }
+                },
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                }
+            };
+
+            /* Keep action/control columns non-sortable. */
+            if (isOrders) options.columnDefs = [{ targets: [3, 7], orderable: false }, { targets: 7, searchable: false }];
+            if (isTracking) options.columnDefs = [{ targets: 0, orderable: false }, { targets: -1, orderable: false, searchable: false }];
+            if (isMargin) options.columnDefs = [{ targets: 2, orderable: false }];
+
+            const dt = jQuery(table).DataTable(options);
+
+            if (isMargin) {
+                const externalSearch = document.getElementById('marginSearch');
+                if (externalSearch) externalSearch.closest('.admin-margin-search')?.remove();
+                const clear = document.getElementById('clearMarginSearch');
+                if (clear) clear.remove();
+            }
+
+            if (isTracking && historyById.size) {
+                table.addEventListener('click', function (event) {
+                    const trigger = event.target.closest('a.history-btn');
+                    if (!trigger) return;
+                    const key = (trigger.getAttribute('href') || '').replace(/^#/, '');
+                    const history = historyById.get(key);
+                    if (!history) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const rowApi = dt.row(history.row);
+                    if (rowApi.child.isShown()) {
+                        rowApi.child.hide();
+                        trigger.setAttribute('aria-expanded', 'false');
+                    } else {
+                        rowApi.child(history.html, 'history-child-row').show();
+                        trigger.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initParcelexDataTables);
+    } else {
+        initParcelexDataTables();
+    }
+})();
+</script>

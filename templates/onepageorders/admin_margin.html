@@ -19,7 +19,6 @@
     font-family: "Poppins", sans-serif;
 }
 
-
 /* =========================================================
    HEADER
 ========================================================= */
@@ -30,6 +29,7 @@
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 12px;
+    
 }
 
 .admin-margin-title {
@@ -163,15 +163,17 @@
     border-collapse: separate;
     border-spacing: 0;
     font-family: "Poppins", sans-serif;
+    background: #654321;
+    color: #FDB81B;
 }
 
 .admin-margin-table thead th {
     position: relative;
     padding: 11px 10px;
-    background: #f8fafc;
     border-bottom: 1px solid #e7ebf0;
-    color: #667085;
-    font-size: 8.5px;
+    background: #654321;
+    color: #FDB81B;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .25px;
@@ -179,23 +181,11 @@
     vertical-align: middle;
 }
 
-.admin-margin-table tbody td {
-    padding: 11px 10px;
-    border-bottom: 1px solid #eef1f4;
-    color: #475467;
-    background: #ffffff;
-    font-size: 10px;
-    vertical-align: middle;
-    transition: background .15s ease;
-}
 
 .admin-margin-table tbody tr:hover td {
     background: #fafcff;
 }
 
-.admin-margin-table tbody tr:last-child td {
-    border-bottom: none;
-}
 /* =========================================================
    TRIP
 ========================================================= */
@@ -549,6 +539,8 @@
     color: #98a2b3 !important;
     font-size: 11px;
     text-align: center !important;
+    background: #654321;
+    color: #FDB81B;
 }
 
 .empty-icon {
@@ -675,6 +667,8 @@
         display: block;
         border-collapse: separate;
         border-spacing: 0;
+        background: #654321;
+    color: #FDB81B;
     }
 
     .admin-margin-table thead {
@@ -720,7 +714,7 @@
     .admin-margin-table tbody td[data-label]::before {
         content: attr(data-label);
         color: #98a2b3;
-        font-size: 7.5px;
+        font-size: 12px;
         font-weight: 600;
         line-height: 1.2;
         letter-spacing: .25px;
@@ -1132,67 +1126,9 @@
     user-select: none;
 }
 
-.column-header-label {
-    display: inline-block;
-    padding-right: 8px;
-}
-
-.column-resizer {
-    position: absolute;
-
-    top: 0;
-    right: -4px;
-
-    width: 9px;
-    height: 100%;
-
-    cursor: col-resize;
-
-    z-index: 30;
-}
-
-.column-resizer::after {
-    content: "";
-
-    position: absolute;
-
-    top: 25%;
-    left: 3px;
-
-    width: 2px;
-    height: 50%;
-
-    border-radius: 2px;
-
-    background: transparent;
-
-    transition: background .15s ease;
-}
-
-.admin-margin-table thead th:hover .column-resizer::after {
-    background: #cbd5e1;
-}
-
-body.column-resizing {
-    cursor: col-resize !important;
-    user-select: none !important;
-}
-
-body.column-resizing * {
-    cursor: col-resize !important;
-}
-
-/* Keep the Route column comfortable */
-.admin-margin-table col[data-column-width="route"] {
-    min-width: 160px;
-}
 
 /* Mobile: use normal card layout; drag handles are desktop-only */
 @media (max-width: 767.98px) {
-
-    .column-resizer {
-        display: none;
-    }
 
     .admin-margin-table {
         table-layout: auto;
@@ -1245,21 +1181,6 @@ body.column-resizing * {
         justify-content: center;
         height: 38px;
     }
-}
-
-
-/* =========================================================
-   DATA VISIBILITY / NO CLIPPING
-   Column width adjustment stays enabled.
-========================================================= */
-
-/* Never clip normal table cell text */
-.admin-margin-table tbody td {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    overflow-wrap: anywhere;
-    word-break: break-word;
 }
 
 /* Customer names */
@@ -1367,9 +1288,7 @@ body.column-resizing * {
 
 </style>
 
-
 <div class="admin-margin-page">
-
 
     <!-- =====================================================
          HEADER
@@ -1394,33 +1313,10 @@ body.column-resizing * {
 
     <!-- =====================================================
          SEARCH + COLUMN SETTINGS
-    ====================================================== -->
+    ====================================================== 
 
     <div class="admin-margin-toolbar">
 
-        <div class="admin-margin-search">
-
-            <i class="bi bi-search admin-margin-search-icon"></i>
-
-            <input
-                type="text"
-                id="marginSearch"
-                placeholder="Search trip, customer, route, vehicle..."
-                autocomplete="off"
-            >
-
-            <button
-                type="button"
-                id="clearMarginSearch"
-                class="admin-margin-search-clear"
-            >
-                Clear
-            </button>
-
-        </div>
-
-
-        
         <button
             type="button"
             id="resetColumnWidths"
@@ -1431,12 +1327,10 @@ body.column-resizing * {
             Reset widths
         </button>
 
-<div id="marginResult" class="admin-margin-result">
-            Showing {{ orders|length }} order{{ orders|length|pluralize }}
-        </div>
+
 
     </div>
-
+-->
 
     <!-- =====================================================
          TABLE
@@ -1446,46 +1340,34 @@ body.column-resizing * {
 
         <div class="admin-margin-table-wrapper">
 
-            <table class="admin-margin-table" id="marginTable">
-                <colgroup>
-                    <col data-column-width="trip" style="width:125px;">
-                    <col data-column-width="customer" style="width:150px;">
-                    <col data-column-width="route" style="width:225px;">
-                    <col data-column-width="vehicle_type" style="width:120px;">
-                    <col data-column-width="vehicle_cost" style="width:115px;">
-                    <col data-column-width="vehicle_payment" style="width:150px;">
-                    <col data-column-width="customer_selling" style="width:120px;">
-                    <col data-column-width="customer_payment" style="width:145px;">
-                    <col data-column-width="margin" style="width:110px;">
-                </colgroup>
+            <table class="admin-margin-table js-common-datatable" id="marginTable">
+                
 
 <thead>
 
                     <tr>
 
-                        <th data-column-cell="trip"><span class="column-header-label">Trip</span><span class="column-resizer" data-resize-column="trip" title="Drag to resize"></span></th>
+                        <th data-column-cell="trip"><span class="column-header-label">Trip</span></th>
 
-                        <th data-column-cell="customer"><span class="column-header-label">Customer</span><span class="column-resizer" data-resize-column="customer" title="Drag to resize"></span></th>
+                        <th data-column-cell="customer"><span class="column-header-label">Customer</span></th>
 
-                        <th data-column-cell="route"><span class="column-header-label">Route</span><span class="column-resizer" data-resize-column="route" title="Drag to resize"></span></th>
+                        <th data-column-cell="route"><span class="column-header-label">Route</span></th>
 
-                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span><span class="column-resizer" data-resize-column="vehicle_type" title="Drag to resize"></span></th>
+                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span></th>
 
-                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span><span class="column-resizer" data-resize-column="vehicle_cost" title="Drag to resize"></span></th>
+                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span></th>
 
-                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span><span class="column-resizer" data-resize-column="vehicle_payment" title="Drag to resize"></span></th>
+                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span></th>
 
-                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span><span class="column-resizer" data-resize-column="customer_selling" title="Drag to resize"></span></th>
+                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span></th>
 
-                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span><span class="column-resizer" data-resize-column="customer_payment" title="Drag to resize"></span></th>
+                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span></th>
 
-                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span><span class="column-resizer" data-resize-column="margin" title="Drag to resize"></span></th>
+                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span></th>
 
                     </tr>
 
                 </thead>
-
-
                 <tbody id="marginTableBody">
 
                     {% for o in orders %}
@@ -1760,45 +1642,8 @@ body.column-resizing * {
 
 
                     {% empty %}
-
-                    <tr id="emptyServerRow">
-
-                        <td
-                            colspan="9"
-                            class="empty-table"
-                        >
-
-                            <i class="bi bi-bar-chart-line empty-icon"></i>
-
-                            No orders available.
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-
-                    <!-- Client-side search empty state -->
-                    <tr
-                        id="searchEmptyRow"
-                        style="display:none;"
-                    >
-
-                        <td
-                            colspan="9"
-                            class="empty-table"
-                        >
-
-                            <i class="bi bi-search empty-icon"></i>
-
-                            No matching orders found.
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
+{% endfor %}
+</tbody>
 
             </table>
 
@@ -1812,121 +1657,6 @@ body.column-resizing * {
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    /* =====================================================
-       SEARCH
-    ====================================================== */
-
-    const searchInput =
-        document.getElementById("marginSearch");
-
-    const clearSearch =
-        document.getElementById("clearMarginSearch");
-
-    const tableBody =
-        document.getElementById("marginTableBody");
-
-    const resultText =
-        document.getElementById("marginResult");
-
-    const searchEmptyRow =
-        document.getElementById("searchEmptyRow");
-
-
-    if (!tableBody) {
-        return;
-    }
-
-
-    const rows = Array.from(
-        tableBody.querySelectorAll("tr.margin-row")
-    );
-
-
-    function applySearch() {
-
-        const term =
-            (searchInput?.value || "")
-            .trim()
-            .toLowerCase();
-
-        let visibleCount = 0;
-
-        rows.forEach(function (row) {
-
-            const rowText =
-                (row.innerText || "")
-                .replace(/\s+/g, " ")
-                .toLowerCase();
-
-            const matches =
-                !term ||
-                rowText.includes(term);
-
-            row.style.display =
-                matches ? "" : "none";
-
-            if (matches) {
-                visibleCount++;
-            }
-        });
-
-
-        if (searchEmptyRow) {
-
-            searchEmptyRow.style.display =
-                (
-                    rows.length > 0 &&
-                    visibleCount === 0
-                )
-                    ? "table-row"
-                    : "none";
-        }
-
-
-        if (resultText) {
-
-            resultText.textContent =
-                "Showing " +
-                visibleCount +
-                " order" +
-                (visibleCount === 1 ? "" : "s");
-        }
-    }
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "input",
-            applySearch
-        );
-    }
-
-
-    if (clearSearch) {
-
-        clearSearch.addEventListener(
-            "click",
-            function () {
-
-                if (searchInput) {
-                    searchInput.value = "";
-                }
-
-                applySearch();
-
-                if (searchInput) {
-                    searchInput.focus();
-                }
-            }
-        );
-    }
-
-
-    /* =====================================================
-       COLUMN RESIZING
-    ====================================================== */
 
     const defaultWidths = {
         trip: 125,
@@ -1966,7 +1696,6 @@ document.addEventListener("DOMContentLoaded", function () {
         margin: 240
     };
 
-
     const columns = {};
 
     document.querySelectorAll(
@@ -1977,12 +1706,6 @@ document.addEventListener("DOMContentLoaded", function () {
             col.dataset.columnWidth
         ] = col;
     });
-
-
-    const resizeHandles =
-        document.querySelectorAll(
-            ".column-resizer"
-        );
 
 
     function clampWidth(columnName, value) {
@@ -2333,10 +2056,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadColumnWidths();
 
-    applySearch();
 
 });
 
 </script>
+
+{% include "onepageorders/common_datatable.html" %}
 
 {% endblock %}
