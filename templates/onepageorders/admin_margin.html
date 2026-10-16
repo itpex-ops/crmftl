@@ -1126,9 +1126,67 @@
     user-select: none;
 }
 
+.column-header-label {
+    display: inline-block;
+    padding-right: 8px;
+}
+
+.column-resizer {
+    position: absolute;
+
+    top: 0;
+    right: -4px;
+
+    width: 9px;
+    height: 100%;
+
+    cursor: col-resize;
+
+    z-index: 30;
+}
+
+.column-resizer::after {
+    content: "";
+
+    position: absolute;
+
+    top: 25%;
+    left: 3px;
+
+    width: 2px;
+    height: 50%;
+
+    border-radius: 2px;
+
+    background: transparent;
+
+    transition: background .15s ease;
+}
+
+.admin-margin-table thead th:hover .column-resizer::after {
+    background: #cbd5e1;
+}
+
+body.column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.column-resizing * {
+    cursor: col-resize !important;
+}
+
+/* Keep the Route column comfortable */
+.admin-margin-table col[data-column-width="route"] {
+    min-width: 160px;
+}
 
 /* Mobile: use normal card layout; drag handles are desktop-only */
 @media (max-width: 767.98px) {
+
+    .column-resizer {
+        display: none;
+    }
 
     .admin-margin-table {
         table-layout: auto;
@@ -1181,6 +1239,21 @@
         justify-content: center;
         height: 38px;
     }
+}
+
+
+/* =========================================================
+   DATA VISIBILITY / NO CLIPPING
+   Column width adjustment stays enabled.
+========================================================= */
+
+/* Never clip normal table cell text */
+.admin-margin-table tbody td {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 /* Customer names */
@@ -1286,9 +1359,45 @@
     }
 }
 
+
+
+/* =========================================================
+   COMMON DATATABLE SCROLLING — Orders, Admin Margin, Reports
+========================================================= */
+.dt-container,
+.dt-container .dt-scroll {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+.dt-container .dt-scroll-body {
+    max-height: 58vh !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f3f5;
+    overscroll-behavior: contain;
+}
+.dt-container .dt-scroll-body::-webkit-scrollbar { width: 8px; height: 8px; }
+.dt-container .dt-scroll-body::-webkit-scrollbar-track { background: #f1f3f5; }
+.dt-container .dt-scroll-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+.dt-container .dt-scroll-head { overflow: hidden !important; }
+.dt-container .dt-scroll-head table,
+.dt-container .dt-scroll-body table { margin: 0 !important; }
+.dt-container .dt-scroll-head th { white-space: normal !important; vertical-align: middle !important; }
+.dt-container .dt-scroll-body td { vertical-align: middle; }
+@media (max-width: 767.98px) {
+    .dt-container .dt-layout-row { flex-wrap: wrap !important; gap: 8px !important; }
+    .dt-container .dt-search { max-width: 100%; }
+    .dt-container .dt-search input,
+    .dt-container .dt-input { max-width: min(220px, 55vw); }
+}
+
 </style>
 
+
 <div class="admin-margin-page">
+
 
     <!-- =====================================================
          HEADER
@@ -1341,33 +1450,45 @@
         <div class="admin-margin-table-wrapper">
 
             <table class="admin-margin-table js-common-datatable" id="marginTable">
-                
+                <colgroup>
+                    <col data-column-width="trip" style="width:125px;">
+                    <col data-column-width="customer" style="width:150px;">
+                    <col data-column-width="route" style="width:225px;">
+                    <col data-column-width="vehicle_type" style="width:120px;">
+                    <col data-column-width="vehicle_cost" style="width:115px;">
+                    <col data-column-width="vehicle_payment" style="width:150px;">
+                    <col data-column-width="customer_selling" style="width:120px;">
+                    <col data-column-width="customer_payment" style="width:145px;">
+                    <col data-column-width="margin" style="width:110px;">
+                </colgroup>
 
 <thead>
 
                     <tr>
 
-                        <th data-column-cell="trip"><span class="column-header-label">Trip</span></th>
+                        <th data-column-cell="trip"><span class="column-header-label">Trip</span><span class="column-resizer" data-resize-column="trip" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer"><span class="column-header-label">Customer</span></th>
+                        <th data-column-cell="customer"><span class="column-header-label">Customer</span><span class="column-resizer" data-resize-column="customer" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="route"><span class="column-header-label">Route</span></th>
+                        <th data-column-cell="route"><span class="column-header-label">Route</span><span class="column-resizer" data-resize-column="route" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span></th>
+                        <th data-column-cell="vehicle_type"><span class="column-header-label">Vehicle Type</span><span class="column-resizer" data-resize-column="vehicle_type" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span></th>
+                        <th data-column-cell="vehicle_cost" class="text-end"><span class="column-header-label">Vehicle Cost</span><span class="column-resizer" data-resize-column="vehicle_cost" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span></th>
+                        <th data-column-cell="vehicle_payment"><span class="column-header-label">Vehicle Payment</span><span class="column-resizer" data-resize-column="vehicle_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span></th>
+                        <th data-column-cell="customer_selling" class="text-end"><span class="column-header-label">Customer Selling</span><span class="column-resizer" data-resize-column="customer_selling" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span></th>
+                        <th data-column-cell="customer_payment"><span class="column-header-label">Customer Payment</span><span class="column-resizer" data-resize-column="customer_payment" title="Drag to resize"></span></th>
 
-                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span></th>
+                        <th data-column-cell="margin" class="text-end"><span class="column-header-label">Margin</span><span class="column-resizer" data-resize-column="margin" title="Drag to resize"></span></th>
 
                     </tr>
 
                 </thead>
+
+
                 <tbody id="marginTableBody">
 
                     {% for o in orders %}
@@ -1658,6 +1779,12 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+
+
+    /* =====================================================
+       COLUMN RESIZING
+    ====================================================== */
+
     const defaultWidths = {
         trip: 125,
         customer: 150,
@@ -1696,6 +1823,7 @@ document.addEventListener("DOMContentLoaded", function () {
         margin: 240
     };
 
+
     const columns = {};
 
     document.querySelectorAll(
@@ -1706,6 +1834,12 @@ document.addEventListener("DOMContentLoaded", function () {
             col.dataset.columnWidth
         ] = col;
     });
+
+
+    const resizeHandles =
+        document.querySelectorAll(
+            ".column-resizer"
+        );
 
 
     function clampWidth(columnName, value) {
