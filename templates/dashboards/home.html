@@ -205,11 +205,11 @@
 
                         <div>
                             <div class="kpi-label">
-                                Cancelled Orders
+                                Pending Approval
                             </div>
 
                             <div class="kpi-value">
-                                {{ cancelled_orders }}
+                                {{ pending_approval }}
                             </div>
                         </div>
 
@@ -407,11 +407,11 @@
 
                     <div class="d-flex justify-content-between py-3 border-bottom">
                         <span class="text-muted">
-                            Cancelled Orders
+                            Pending Approval
                         </span>
 
                         <strong class="text-danger">
-                            {{ cancelled_orders }}
+                            {{ pending_approval }}
                         </strong>
                     </div>
 
@@ -437,7 +437,7 @@
 {{ total_orders|default:0|json_script:"total-orders-data" }}
 {{ vehicle_placements|default:0|json_script:"vehicle-placements-data" }}
 {{ live_tracking|default:0|json_script:"live-tracking-data" }}
-{{ cancelled_orders|default:0|json_script:"cancelled-orders-data" }}
+{{ pending_approval|default:0|json_script:"pending-approval-data" }}
 
 {{ weekly_labels|json_script:"weekly-labels-data" }}
 {{ weekly_orders|json_script:"weekly-orders-data" }}
@@ -467,8 +467,8 @@
         document.getElementById("live-tracking-data").textContent
     );
 
-    const cancelledOrders = JSON.parse(
-        document.getElementById("cancelled-orders-data").textContent
+    const pendingApproval = JSON.parse(
+        document.getElementById("pending-approval-data").textContent
     );
 
     const weeklyLabels = JSON.parse(
@@ -553,7 +553,7 @@
                     "Orders",
                     "Vehicle Placed",
                     "Live Tracking",
-                    "Cancelled"
+                    "Pending Approval"
                 ],
 
                 datasets: [{
@@ -562,7 +562,7 @@
                         totalOrders,
                         vehiclePlacements,
                         liveTracking,
-                        cancelledOrders
+                        pendingApproval
                     ],
 
                     borderWidth: 2
